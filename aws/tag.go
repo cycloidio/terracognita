@@ -22,6 +22,9 @@ func (t Tag) toEC2Filter() *ec2.Filter {
 }
 
 func toEC2Filters(tags []Tag) []*ec2.Filter {
+	if len(tags) == 0 {
+		return nil
+	}
 	filters := make([]*ec2.Filter, 0, len(tags))
 
 	for _, t := range tags {
