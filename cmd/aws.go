@@ -38,7 +38,7 @@ var (
 
 			err := aws.Import(
 				ctx, viper.GetString("access-key"), viper.GetString("secret-key"), viper.GetString("region"),
-				tags, viper.GetStringSlice("include"), viper.GetStringSlice("include"), out,
+				tags, viper.GetStringSlice("include"), viper.GetStringSlice("exclude"), out,
 			)
 			if err != nil {
 				return fmt.Errorf("could not import from AWS: %s", err)

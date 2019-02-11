@@ -55,7 +55,7 @@ func init() {
 	RootCmd.PersistentFlags().StringSliceVarP(&include, "include", "i", []string{}, "List of resources to import, this names are the ones on TF (ex: aws_instance). If not set then means that all the resources will be imported")
 	viper.BindPFlag("include", RootCmd.PersistentFlags().Lookup("include"))
 
-	RootCmd.PersistentFlags().StringSliceVarP(&include, "exclude", "e", []string{}, "List of resources to not import, this names are the ones on TF (ex: aws_instance). If not set then means that none the resources will be excluded")
+	RootCmd.PersistentFlags().StringSliceVarP(&exclude, "exclude", "e", []string{}, "List of resources to not import, this names are the ones on TF (ex: aws_instance). If not set then means that none the resources will be excluded")
 	viper.BindPFlag("exclude", RootCmd.PersistentFlags().Lookup("exclude"))
 }
 
