@@ -5,7 +5,7 @@ Imports cloud infrastructure to a Terraform file
 ## Installation
 
 ```
-$> go get -u github.com/cycloid/terraforming
+$> go get -u github.com/cycloidio/terraforming
 ```
 
 ## Usage
