@@ -57,6 +57,9 @@ func init() {
 
 	RootCmd.PersistentFlags().StringSliceVarP(&exclude, "exclude", "e", []string{}, "List of resources to not import, this names are the ones on TF (ex: aws_instance). If not set then means that none the resources will be excluded")
 	viper.BindPFlag("exclude", RootCmd.PersistentFlags().Lookup("exclude"))
+
+	RootCmd.PersistentFlags().BoolP("tf-state", "s", false, "Import the Terraform State. If activated no TF files will be generated, only TF or TFState can work at the same time")
+	viper.BindPFlag("tf-state", RootCmd.PersistentFlags().Lookup("tf-state"))
 }
 
 func initViper() {
