@@ -12,6 +12,19 @@ $> go get -u github.com/cycloidio/terraforming
 
 Using the `terraforming --help` you will know the basics
 
+## Docker
+
+To build the Docker image just run
+
+```
+$> make dbuild
+```
+
+And then:
+
+```
+$> docker run terraforming -h
+```
 
 ## Contribute
 
