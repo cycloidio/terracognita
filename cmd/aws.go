@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/cycloidio/terraforming/aws"
+	"github.com/cycloidio/terraforming/util"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -25,20 +26,20 @@ var (
 			}
 
 			// Initialize the tags
-			tags := make([]aws.Tag, 0, len(viper.GetStringSlice("tags")))
+			tags := make([]util.Tag, 0, len(viper.GetStringSlice("tags")))
 			for _, t := range viper.GetStringSlice("tags") {
 				values := strings.Split(t, ":")
 				if len(values) != 2 {
 					return errors.New("invalid format for --tags, the expected format is 'NAME:VALUE'")
 				}
-				tags = append(tags, aws.Tag{Name: values[0], Value: values[1]})
+				tags = append(tags, util.Tag{Name: values[0], Value: values[1]})
 			}
 
 			ctx := context.Background()
 
 			err := aws.Import(
 				ctx, viper.GetString("access-key"), viper.GetString("secret-key"), viper.GetString("region"),
-				tags, viper.GetStringSlice("include"), viper.GetStringSlice("exclude"), out,
+				tags, viper.GetStringSlice("include"), viper.GetStringSlice("exclude"), viper.GetBool("tf-state"), out,
 			)
 			if err != nil {
 				return fmt.Errorf("could not import from AWS: %s", err)

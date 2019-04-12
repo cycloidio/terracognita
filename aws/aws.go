@@ -6,19 +6,26 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 
 	"github.com/hashicorp/hcl/hcl/printer"
+	"github.com/pkg/errors"
 
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/chr4/pwgen"
 	"github.com/cycloidio/raws"
+	"github.com/cycloidio/terraforming/util"
+	"github.com/cycloidio/terraforming/util/writer"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/fmtcmd"
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/terraform"
 	tfaws "github.com/terraform-providers/terraform-provider-aws/aws"
 )
 
-type funcReader func(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, region string, tags []Tag, res map[string]interface{}) error
+const (
+	Provider = "aws"
+)
+
+type funcReader func(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error
 
 var (
 	awsResources = map[string]funcReader{
@@ -40,7 +47,8 @@ var (
 
 // Import imports from AWS the resources filtered by tags
 // and include|exclude and writes the result HCL to out
-func Import(ctx context.Context, accessKey, secretKey, region string, tags []Tag, include, exclude []string, out io.Writer) error {
+func Import(ctx context.Context, accessKey, secretKey, region string, tags []util.Tag, include, exclude []string, state bool, out io.Writer) error {
+	log.SetFlags(0)
 	awsr, err := raws.NewAWSReader(ctx, accessKey, secretKey, []string{region}, nil)
 	if err != nil {
 		return fmt.Errorf("could not initialize 'raws' because: %s", err)
@@ -66,8 +74,11 @@ func Import(ctx context.Context, accessKey, secretKey, region string, tags []Tag
 		mapExclude[r] = struct{}{}
 	}
 
-	mapCfg := map[string]interface{}{
-		"resource": make(map[string]map[string]interface{}),
+	var wr writer.Writer
+	if state {
+		wr = writer.NewTFStateWriter()
+	} else {
+		wr = writer.NewHCLWriter()
 	}
 
 	for r, fn := range awsResources {
@@ -81,39 +92,61 @@ func Import(ctx context.Context, accessKey, secretKey, region string, tags []Tag
 				continue
 			}
 		}
-		err = fn(ctx, awsClient, awsr, region, tags, mapCfg)
+		err = fn(ctx, awsClient, awsr, r, region, tags, state, wr)
 		if err != nil {
 			return fmt.Errorf("could not import the resource %q because: %s", r, err)
 		}
 	}
 
-	b, err := json.Marshal(mapCfg)
-	if err != nil {
-		return err
-	}
+	if state {
+		// Write to root because then the NewState is called
+		// it creates by default a 'root' one and then on the
+		// AddModuleState we replace that empty module for this one
+		ms := &terraform.ModuleState{
+			Path: []string{"root"},
+		}
 
-	f, err := hcl.ParseBytes(b)
-	if err != nil {
-		return fmt.Errorf("error while 'hcl.ParseBytes': %s", err)
-	}
+		tfw := wr.(*writer.TFStateWriter)
+		ms.Resources = tfw.Config
 
-	var buff bytes.Buffer
-	err = printer.Fprint(&buff, f.Node)
-	if err != nil {
-		return fmt.Errorf("error while pretty printing HCL: %s", err)
-	}
+		state := terraform.NewState()
+		state.AddModuleState(ms)
 
-	err = fmtcmd.Run(nil, nil, &buff, out, fmtcmd.Options{})
-	if err != nil {
-		return fmt.Errorf("error while fmt HCL: %s", err)
-	}
+		enc := json.NewEncoder(out)
+		enc.SetIndent("", "  ")
+		err := enc.Encode(state)
+		if err != nil {
+			return fmt.Errorf("could not encode state due to: %s", err)
+		}
+	} else {
+		hclw := wr.(*writer.HCLWriter)
+		b, err := json.Marshal(hclw.Config)
+		if err != nil {
+			return err
+		}
 
+		f, err := hcl.ParseBytes(b)
+		if err != nil {
+			return fmt.Errorf("error while 'hcl.ParseBytes': %s", err)
+		}
+
+		buff := &bytes.Buffer{}
+		err = printer.Fprint(buff, f.Node)
+		if err != nil {
+			return fmt.Errorf("error while pretty printing HCL: %s", err)
+		}
+
+		buff = bytes.NewBuffer(util.FormatHCL(buff.Bytes()))
+
+		err = fmtcmd.Run(nil, nil, buff, out, fmtcmd.Options{})
+		if err != nil {
+			return fmt.Errorf("error while fmt HCL: %s", err)
+		}
+	}
 	return nil
 }
 
-func awsInstance(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, region string, tags []Tag, res map[string]interface{}) error {
-	res["resource"].(map[string]map[string]interface{})["aws_instance"] = make(map[string]interface{})
-
+func awsInstance(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
 	var input = &ec2.DescribeInstancesInput{
 		Filters: toEC2Filters(tags),
 	}
@@ -130,26 +163,15 @@ func awsInstance(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSRead
 		}
 	}
 
-	for _, id := range instanceIDs {
-		p := tfaws.Provider().(*schema.Provider)
-		resource := p.ResourcesMap["aws_instance"]
-		srd := resource.Data(nil)
-		srd.SetId(id)
-
-		err = resource.Read(srd, tfAWSClient)
-		if err != nil {
-			return err
-		}
-
-		res["resource"].(map[string]map[string]interface{})["aws_instance"][pwgen.Alpha(5)] = mergeFullConfig(srd, resource.Schema, "")
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, instanceIDs, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
 
 	return nil
 }
 
-func awsVpc(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, region string, tags []Tag, res map[string]interface{}) error {
-	res["resource"].(map[string]map[string]interface{})["aws_vpc"] = make(map[string]interface{})
-
+func awsVpc(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
 	var input = &ec2.DescribeVpcsInput{
 		Filters: toEC2Filters(tags),
 	}
@@ -164,26 +186,15 @@ func awsVpc(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, r
 		vpcsIDs = append(vpcsIDs, *v.VpcId)
 	}
 
-	for _, id := range vpcsIDs {
-		p := tfaws.Provider().(*schema.Provider)
-		resource := p.ResourcesMap["aws_vpc"]
-		srd := resource.Data(nil)
-		srd.SetId(id)
-
-		err = resource.Read(srd, tfAWSClient)
-		if err != nil {
-			return err
-		}
-
-		res["resource"].(map[string]map[string]interface{})["aws_vpc"][pwgen.Alpha(5)] = mergeFullConfig(srd, resource.Schema, "")
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, vpcsIDs, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
 
 	return nil
 }
 
-func awsAmi(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, region string, tags []Tag, res map[string]interface{}) error {
-	res["resource"].(map[string]map[string]interface{})["aws_ami"] = make(map[string]interface{})
-
+func awsAmi(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
 	var input = &ec2.DescribeImagesInput{
 		Filters: toEC2Filters(tags),
 	}
@@ -198,26 +209,15 @@ func awsAmi(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, r
 		imagesIDs = append(imagesIDs, *v.ImageId)
 	}
 
-	for _, id := range imagesIDs {
-		p := tfaws.Provider().(*schema.Provider)
-		resource := p.ResourcesMap["aws_ami"]
-		srd := resource.Data(nil)
-		srd.SetId(id)
-
-		err = resource.Read(srd, tfAWSClient)
-		if err != nil {
-			return err
-		}
-
-		res["resource"].(map[string]map[string]interface{})["aws_ami"][pwgen.Alpha(5)] = mergeFullConfig(srd, resource.Schema, "")
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, imagesIDs, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
 
 	return nil
 }
 
-func awsSecurityGroup(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, region string, tags []Tag, res map[string]interface{}) error {
-	res["resource"].(map[string]map[string]interface{})["aws_security_group"] = make(map[string]interface{})
-
+func awsSecurityGroup(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
 	var input = &ec2.DescribeSecurityGroupsInput{
 		Filters: toEC2Filters(tags),
 	}
@@ -232,26 +232,15 @@ func awsSecurityGroup(ctx context.Context, tfAWSClient interface{}, awsr raws.AW
 		sgsIDs = append(sgsIDs, *v.GroupId)
 	}
 
-	for _, id := range sgsIDs {
-		p := tfaws.Provider().(*schema.Provider)
-		resource := p.ResourcesMap["aws_security_group"]
-		srd := resource.Data(nil)
-		srd.SetId(id)
-
-		err = resource.Read(srd, tfAWSClient)
-		if err != nil {
-			return err
-		}
-
-		res["resource"].(map[string]map[string]interface{})["aws_security_group"][pwgen.Alpha(5)] = mergeFullConfig(srd, resource.Schema, "")
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, sgsIDs, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
 
 	return nil
 }
 
-func awsSubnet(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, region string, tags []Tag, res map[string]interface{}) error {
-	res["resource"].(map[string]map[string]interface{})["aws_subnet"] = make(map[string]interface{})
-
+func awsSubnet(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
 	var input = &ec2.DescribeSubnetsInput{
 		Filters: toEC2Filters(tags),
 	}
@@ -266,26 +255,15 @@ func awsSubnet(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader
 		subnetsIDs = append(subnetsIDs, *v.SubnetId)
 	}
 
-	for _, id := range subnetsIDs {
-		p := tfaws.Provider().(*schema.Provider)
-		resource := p.ResourcesMap["aws_subnet"]
-		srd := resource.Data(nil)
-		srd.SetId(id)
-
-		err = resource.Read(srd, tfAWSClient)
-		if err != nil {
-			return err
-		}
-
-		res["resource"].(map[string]map[string]interface{})["aws_subnet"][pwgen.Alpha(5)] = mergeFullConfig(srd, resource.Schema, "")
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, subnetsIDs, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
 
 	return nil
 }
 
-func awsEbsVolume(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, region string, tags []Tag, res map[string]interface{}) error {
-	res["resource"].(map[string]map[string]interface{})["aws_ebs_volume"] = make(map[string]interface{})
-
+func awsEbsVolume(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
 	var input = &ec2.DescribeVolumesInput{
 		Filters: toEC2Filters(tags),
 	}
@@ -300,26 +278,15 @@ func awsEbsVolume(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSRea
 		volumesIDs = append(volumesIDs, *v.VolumeId)
 	}
 
-	for _, id := range volumesIDs {
-		p := tfaws.Provider().(*schema.Provider)
-		resource := p.ResourcesMap["aws_ebs_volume"]
-		srd := resource.Data(nil)
-		srd.SetId(id)
-
-		err = resource.Read(srd, tfAWSClient)
-		if err != nil {
-			return err
-		}
-
-		res["resource"].(map[string]map[string]interface{})["aws_ebs_volume"][pwgen.Alpha(5)] = mergeFullConfig(srd, resource.Schema, "")
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, volumesIDs, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
 
 	return nil
 }
 
-func awsEbsSnapshot(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, region string, tags []Tag, res map[string]interface{}) error {
-	res["resource"].(map[string]map[string]interface{})["aws_ebs_snapshot"] = make(map[string]interface{})
-
+func awsEbsSnapshot(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
 	var input = &ec2.DescribeSnapshotsInput{
 		Filters: toEC2Filters(tags),
 	}
@@ -334,26 +301,15 @@ func awsEbsSnapshot(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSR
 		snapshotsIDs = append(snapshotsIDs, *v.SnapshotId)
 	}
 
-	for _, id := range snapshotsIDs {
-		p := tfaws.Provider().(*schema.Provider)
-		resource := p.ResourcesMap["aws_ebs_snapshot"]
-		srd := resource.Data(nil)
-		srd.SetId(id)
-
-		err = resource.Read(srd, tfAWSClient)
-		if err != nil {
-			return err
-		}
-
-		res["resource"].(map[string]map[string]interface{})["aws_ebs_snapshot"][pwgen.Alpha(5)] = mergeFullConfig(srd, resource.Schema, "")
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, snapshotsIDs, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
 
 	return nil
 }
 
-func awsElasticacheCluster(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, region string, tags []Tag, res map[string]interface{}) error {
-	res["resource"].(map[string]map[string]interface{})["aws_elasticache_cluster"] = make(map[string]interface{})
-
+func awsElasticacheCluster(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
 	cacheClusters, err := awsr.GetElastiCacheCluster(ctx, nil)
 	if err != nil {
 		return err
@@ -364,32 +320,15 @@ func awsElasticacheCluster(ctx context.Context, tfAWSClient interface{}, awsr ra
 		cacheClustersIDs = append(cacheClustersIDs, *v.CacheClusterId)
 	}
 
-	for _, id := range cacheClustersIDs {
-		p := tfaws.Provider().(*schema.Provider)
-		resource := p.ResourcesMap["aws_elasticache_cluster"]
-		srd := resource.Data(nil)
-		srd.SetId(id)
-
-		err = resource.Read(srd, tfAWSClient)
-		if err != nil {
-			return err
-		}
-
-		for _, t := range tags {
-			if srd.Get(fmt.Sprintf("tags.%s", t.Name)).(string) != t.Value {
-				continue
-			}
-		}
-
-		res["resource"].(map[string]map[string]interface{})["aws_elasticache_cluster"][pwgen.Alpha(5)] = mergeFullConfig(srd, resource.Schema, "")
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, cacheClustersIDs, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
 
 	return nil
 }
 
-func awsElb(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, region string, tags []Tag, res map[string]interface{}) error {
-	res["resource"].(map[string]map[string]interface{})["aws_elb"] = make(map[string]interface{})
-
+func awsElb(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
 	lbs, err := awsr.GetLoadBalancers(ctx, nil)
 	if err != nil {
 		return err
@@ -400,32 +339,15 @@ func awsElb(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, r
 		lbsIDs = append(lbsIDs, *v.LoadBalancerName)
 	}
 
-	for _, id := range lbsIDs {
-		p := tfaws.Provider().(*schema.Provider)
-		resource := p.ResourcesMap["aws_elb"]
-		srd := resource.Data(nil)
-		srd.SetId(id)
-
-		err = resource.Read(srd, tfAWSClient)
-		if err != nil {
-			return err
-		}
-
-		for _, t := range tags {
-			if srd.Get(fmt.Sprintf("tags.%s", t.Name)).(string) != t.Value {
-				continue
-			}
-		}
-
-		res["resource"].(map[string]map[string]interface{})["aws_elb"][pwgen.Alpha(5)] = mergeFullConfig(srd, resource.Schema, "")
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, lbsIDs, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
 
 	return nil
 }
 
-func awsAlb(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, region string, tags []Tag, res map[string]interface{}) error {
-	res["resource"].(map[string]map[string]interface{})["aws_alb"] = make(map[string]interface{})
-
+func awsAlb(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
 	lbs, err := awsr.GetLoadBalancersV2(ctx, nil)
 	if err != nil {
 		return err
@@ -436,32 +358,15 @@ func awsAlb(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, r
 		lbsIDs = append(lbsIDs, *v.LoadBalancerArn)
 	}
 
-	for _, id := range lbsIDs {
-		p := tfaws.Provider().(*schema.Provider)
-		resource := p.ResourcesMap["aws_alb"]
-		srd := resource.Data(nil)
-		srd.SetId(id)
-
-		err = resource.Read(srd, tfAWSClient)
-		if err != nil {
-			return err
-		}
-
-		for _, t := range tags {
-			if srd.Get(fmt.Sprintf("tags.%s", t.Name)).(string) != t.Value {
-				continue
-			}
-		}
-
-		res["resource"].(map[string]map[string]interface{})["aws_alb"][pwgen.Alpha(5)] = mergeFullConfig(srd, resource.Schema, "")
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, lbsIDs, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
 
 	return nil
 }
 
-func awsDbInstance(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, region string, tags []Tag, res map[string]interface{}) error {
-	res["resource"].(map[string]map[string]interface{})["aws_db_instance"] = make(map[string]interface{})
-
+func awsDbInstance(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
 	dbs, err := awsr.GetDBInstances(ctx, nil)
 	if err != nil {
 		return err
@@ -472,32 +377,15 @@ func awsDbInstance(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSRe
 		dbsIDs = append(dbsIDs, *v.DBInstanceIdentifier)
 	}
 
-	for _, id := range dbsIDs {
-		p := tfaws.Provider().(*schema.Provider)
-		resource := p.ResourcesMap["aws_db_instance"]
-		srd := resource.Data(nil)
-		srd.SetId(id)
-
-		err = resource.Read(srd, tfAWSClient)
-		if err != nil {
-			return err
-		}
-
-		for _, t := range tags {
-			if srd.Get(fmt.Sprintf("tags.%s", t.Name)).(string) != t.Value {
-				continue
-			}
-		}
-
-		res["resource"].(map[string]map[string]interface{})["aws_db_instance"][pwgen.Alpha(5)] = mergeFullConfig(srd, resource.Schema, "")
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, dbsIDs, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
 
 	return nil
 }
 
-func awsS3Bucket(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, region string, tags []Tag, res map[string]interface{}) error {
-	res["resource"].(map[string]map[string]interface{})["aws_s3_bucket"] = make(map[string]interface{})
-
+func awsS3Bucket(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
 	buckets, err := awsr.ListBuckets(ctx, nil)
 	if err != nil {
 		return err
@@ -508,30 +396,15 @@ func awsS3Bucket(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSRead
 		bucketsIDs = append(bucketsIDs, *v.Name)
 	}
 
-	for _, id := range bucketsIDs {
-		p := tfaws.Provider().(*schema.Provider)
-		resource := p.ResourcesMap["aws_s3_bucket"]
-		srd := resource.Data(nil)
-		srd.SetId(id)
-
-		err = resource.Read(srd, tfAWSClient)
-		if err != nil {
-			return err
-		}
-
-		for _, t := range tags {
-			if srd.Get(fmt.Sprintf("tags.%s", t.Name)).(string) != t.Value {
-				continue
-			}
-		}
-
-		res["resource"].(map[string]map[string]interface{})["aws_s3_bucket"][pwgen.Alpha(5)] = mergeFullConfig(srd, resource.Schema, "")
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, bucketsIDs, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
 
 	return nil
 }
 
-//func aws_s3_bucket_object(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, res map[string]interface{}) error {
+//func aws_s3_bucket_object(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, state bool, w writer.Writer) error {
 //res["resource"].(map[string]map[string]interface{})["aws_s3_bucket_object"] = make(map[string]interface{})
 
 //for _, b := range res["resource"].(map[string]map[string]interface{})["aws_s3_bucket"] {
@@ -572,70 +445,22 @@ func awsS3Bucket(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSRead
 //continue
 //}
 
-//res["resource"].(map[string]map[string]interface{})["aws_s3_bucket_object"][pwgen.Alpha(5)] = mergeFullConfig(srd, resource.Schema, "")
+//res["resource"].(map[string]map[string]interface{})["aws_s3_bucket_object"][pwgen.Alpha(5)] = mergeFullConfig(srd, state bool, resource.Schema, "")
 //}
 //}
 
 //return nil
 //}
 
-// mergeFullConfig creates the key to the map and if it had a value before set it, if
-func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, key string) map[string]interface{} {
-	res := make(map[string]interface{})
-	for k, v := range sch {
-		kk := key
-		if key != "" {
-			kk = key + "." + k
-		} else {
-			kk = k
-		}
-
-		// schema.Resource means that it has nested fields
-		if sr, ok := v.Elem.(*schema.Resource); ok {
-			if v.Type == schema.TypeSet || v.Type == schema.TypeList {
-				ar, ok := res[k]
-				if !ok {
-					ar = make([]interface{}, 0, 0)
-				}
-
-				list, ok := cfgr.GetOk(kk)
-				if !ok {
-					continue
-				}
-				if list != nil {
-					// For the types that are a list, we have to set them in an array, and also
-					// add the correct index for the number of setts (entries on the original config)
-					// that there are on the provided configuration
-					switch val := list.(type) {
-					case []map[string]interface{}:
-						for i := range val {
-							ar = append(ar.([]interface{}), mergeFullConfig(cfgr, sr.Schema, fmt.Sprintf("%s.%d", kk, i)))
-						}
-					case []interface{}:
-						for i := range val {
-							ar = append(ar.([]interface{}), mergeFullConfig(cfgr, sr.Schema, fmt.Sprintf("%s.%d", kk, i)))
-						}
-					}
-				} else {
-					ar = append(ar.([]interface{}), mergeFullConfig(cfgr, sr.Schema, kk))
-				}
-				res[k] = ar
-			} else {
-				res[k] = mergeFullConfig(cfgr, sr.Schema, kk)
-			}
-			continue
-		}
-
-		vv := cfgr.Get(kk)
-		if vv == nil {
-			continue
-		}
-
-		if s, ok := vv.(*schema.Set); ok {
-			res[k] = s.List()
-		} else {
-			res[k] = vv
-		}
+func toEC2Filters(tags []util.Tag) []*ec2.Filter {
+	if len(tags) == 0 {
+		return nil
 	}
-	return res
+	filters := make([]*ec2.Filter, 0, len(tags))
+
+	for _, t := range tags {
+		filters = append(filters, t.ToEC2Filter())
+	}
+
+	return filters
 }

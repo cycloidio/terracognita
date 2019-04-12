@@ -1,4 +1,4 @@
-package aws
+package util
 
 import (
 	"fmt"
@@ -14,22 +14,9 @@ type Tag struct {
 	Value string
 }
 
-func (t Tag) toEC2Filter() *ec2.Filter {
+func (t Tag) ToEC2Filter() *ec2.Filter {
 	return &ec2.Filter{
 		Name:   aws.String(fmt.Sprintf("tag:%s", t.Name)),
 		Values: []*string{aws.String(t.Value)},
 	}
-}
-
-func toEC2Filters(tags []Tag) []*ec2.Filter {
-	if len(tags) == 0 {
-		return nil
-	}
-	filters := make([]*ec2.Filter, 0, len(tags))
-
-	for _, t := range tags {
-		filters = append(filters, t.toEC2Filter())
-	}
-
-	return filters
 }
