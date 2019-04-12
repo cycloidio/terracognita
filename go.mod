@@ -4,7 +4,6 @@ require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/aws/aws-sdk-go v1.16.33
 	github.com/beevik/etree v1.1.0 // indirect
-	github.com/chr4/pwgen v1.1.0
 	github.com/cycloidio/raws v0.0.7
 	github.com/hashicorp/go-getter v1.0.3 // indirect
 	github.com/hashicorp/go-uuid v1.0.1 // indirect
@@ -19,11 +18,13 @@ require (
 	github.com/mitchellh/cli v1.0.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/pierrec/lz4 v2.0.5+incompatible // indirect
+	github.com/pkg/errors v0.8.1
 	github.com/posener/complete v1.2.1 // indirect
 	github.com/pquerna/otp v1.1.0 // indirect
 	github.com/spf13/afero v1.2.1 // indirect
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/viper v1.3.1
+	github.com/stretchr/testify v1.3.0
 	github.com/terraform-providers/terraform-provider-aws v1.58.0
 	github.com/terraform-providers/terraform-provider-template v1.0.0 // indirect
 	github.com/terraform-providers/terraform-provider-tls v1.2.0 // indirect
