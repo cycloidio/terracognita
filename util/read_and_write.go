@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/cycloidio/terraforming/util/writer"
 	"github.com/hashicorp/terraform/helper/schema"
@@ -10,6 +11,7 @@ import (
 	tfaws "github.com/terraform-providers/terraform-provider-aws/aws"
 )
 
+// ReadIDsAndWrite reades the config from the provider+resourceType ids and writes to w the state or the HCL
 func ReadIDsAndWrite(tfAWSClient interface{}, provider, resourceType string, tags []Tag, state bool, ids []string, w writer.Writer) error {
 	for _, id := range ids {
 		p := tfaws.Provider().(*schema.Provider)
@@ -105,33 +107,31 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 
 		// schema.Resource means that it has nested fields
 		if sr, ok := v.Elem.(*schema.Resource); ok {
-			if v.Type == schema.TypeSet || v.Type == schema.TypeList {
-				ar, ok := res[k]
-				if !ok {
-					ar = make([]interface{}, 0, 0)
-				}
-
-				list, ok := cfgr.GetOk(kk)
+			// Example would be aws_security_group
+			if v.Type == schema.TypeSet {
+				s, ok := cfgr.GetOk(kk)
 				if !ok {
 					continue
 				}
-				if list != nil {
-					// For the types that are a list, we have to set them in an array, and also
-					// add the correct index for the number of setts (entries on the original config)
-					// that there are on the provided configuration
-					switch val := list.(type) {
-					case []map[string]interface{}:
-						for i := range val {
-							ar = append(ar.([]interface{}), mergeFullConfig(cfgr, sr.Schema, fmt.Sprintf("%s.%d", kk, i)))
-						}
-					case []interface{}:
-						for i := range val {
-							ar = append(ar.([]interface{}), mergeFullConfig(cfgr, sr.Schema, fmt.Sprintf("%s.%d", kk, i)))
-						}
-					}
-				} else {
-					ar = append(ar.([]interface{}), mergeFullConfig(cfgr, sr.Schema, kk))
+
+				// Was the default from Set/List
+				//ar = append(ar.([]interface{}), mergeFullConfig(cfgr, sr.Schema, kk))
+
+				res[k] = normalizSet(s.(*schema.Set))
+			} else if v.Type == schema.TypeList {
+				var ar interface{}
+				ar = make([]interface{}, 0, 0)
+
+				l, ok := cfgr.GetOk(kk)
+				if !ok {
+					continue
 				}
+
+				list := l.([]interface{})
+				for i := range list {
+					ar = append(ar.([]interface{}), mergeFullConfig(cfgr, sr.Schema, fmt.Sprintf("%s.%d", kk, i)))
+				}
+
 				res[k] = ar
 			} else {
 				res[k] = mergeFullConfig(cfgr, sr.Schema, kk)
@@ -153,4 +153,71 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 		}
 	}
 	return res
+}
+
+// normalizSet returns the normalization of a schema.Set
+// it could be a simple list or a embedded structure
+func normalizSet(ss *schema.Set) interface{} {
+	var ar interface{}
+	ar = make([]interface{}, 0, 0)
+
+	setList := ss.List()
+	for _, set := range setList {
+		switch val := set.(type) {
+		case map[string]interface{}:
+			// This case it's when a TypeSet has
+			// a nested structure,
+			// example: aws_security_group.ingress
+			res := make(map[string]interface{})
+			for k, v := range val {
+				if s, ok := v.(*schema.Set); ok {
+					ns := normalizSet(s)
+					if !isDefault(ns) {
+						res[k] = ns
+					}
+				} else {
+					if !isDefault(v) {
+						res[k] = v
+					}
+				}
+			}
+			ar = append(ar.([]interface{}), res)
+		case interface{}:
+			// This case is normally for the
+			// "Type: schema.TypeSet, Elm: schema.Schema{Type: schema.TypeString}"
+			// definitions on TF,
+			// example: aws_security_group.ingress.security_groups
+			ar = append(ar.([]interface{}), val)
+		}
+	}
+
+	return ar
+}
+
+var (
+	// Ideally this could be generated using "enumer", it
+	// would be a better idea as then we do not have
+	// to maintain this list
+	tfTypes = []schema.ValueType{
+		schema.TypeBool,
+		schema.TypeInt,
+		schema.TypeFloat,
+		schema.TypeString,
+		schema.TypeList,
+		schema.TypeMap,
+		schema.TypeSet,
+	}
+)
+
+// isDefault is used on normalizSet as the Sets do not use the normal
+// TF strucure (access by key) and are stored as raw maps with some
+// default values that we don't want on the HCL output.
+// example: [], false, "", 0 ...
+func isDefault(v interface{}) bool {
+	for _, t := range tfTypes {
+		if reflect.DeepEqual(t.Zero(), v) {
+			return true
+		}
+	}
+	return false
 }
