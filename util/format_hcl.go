@@ -5,6 +5,9 @@ import (
 )
 
 var (
+	// transformers are all the transformmations
+	// we'll apply to the HCL and in the order
+	// those will be applied
 	transformers = []struct {
 		match   *regexp.Regexp
 		replace []byte
@@ -37,6 +40,8 @@ var (
 	}
 )
 
+// FormatHCL format the hcl to have a better formatter thatn the default one
+// returend from HCL printer.Fprint
 func FormatHCL(hcl []byte) []byte {
 	for _, m := range transformers {
 		hcl = m.match.ReplaceAll(hcl, m.replace)

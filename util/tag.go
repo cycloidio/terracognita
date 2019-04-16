@@ -14,6 +14,8 @@ type Tag struct {
 	Value string
 }
 
+// ToEC2Filter transforms the Tag to a ec2.Filter
+// to use on AWS filters
 func (t Tag) ToEC2Filter() *ec2.Filter {
 	return &ec2.Filter{
 		Name:   aws.String(fmt.Sprintf("tag:%s", t.Name)),

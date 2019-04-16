@@ -22,6 +22,7 @@ import (
 )
 
 const (
+	// Provider it's the name of the provider
 	Provider = "aws"
 )
 

@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// The list of possible errors
 var (
 	ErrRequiredKey      = errors.New("the key it's required")
 	ErrRequiredValue    = errors.New("the value it's required")
@@ -26,11 +27,14 @@ type Writer interface {
 	Write(key string, value interface{}) error
 }
 
+// HCLWriter it's a Writer implementation that writes to
+// a static map to then use to traform to HCL
 type HCLWriter struct {
 	// TODO: Change it to "map[string]map[string]schema.ResourceData"
 	Config map[string]interface{}
 }
 
+// NewHCLWriter rerturns a HCLWriter initializatioon
 func NewHCLWriter() *HCLWriter {
 	cfg := make(map[string]interface{})
 	cfg["resource"] = make(map[string]map[string]interface{})
@@ -40,6 +44,7 @@ func NewHCLWriter() *HCLWriter {
 }
 
 // Write expects a key similar to "aws_instance.your_name"
+// repeated keys will report an error
 func (hclw *HCLWriter) Write(key string, value interface{}) error {
 	if key == "" {
 		return ErrRequiredKey
@@ -64,16 +69,21 @@ func (hclw *HCLWriter) Write(key string, value interface{}) error {
 	return nil
 }
 
+// TFStateWriter it's a Writer implementation that it's ment to
+// then generate a TFState
 type TFStateWriter struct {
 	Config map[string]*terraform.ResourceState
 }
 
+// NewTFStateWriter returns a TFStateWriter initialization
 func NewTFStateWriter() *TFStateWriter {
 	return &TFStateWriter{
 		Config: make(map[string]*terraform.ResourceState),
 	}
 }
 
+// Write expects a key similar to "aws_instance" and the value to be *terraform.ResourceState
+// repeated keys will report an error
 func (tfsw *TFStateWriter) Write(key string, value interface{}) error {
 	if key == "" {
 		return ErrRequiredKey
