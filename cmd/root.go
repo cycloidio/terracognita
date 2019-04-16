@@ -24,7 +24,7 @@ var (
 			if viper.GetString("out") == "" {
 				out = os.Stdout
 			} else {
-				f, err := os.OpenFile(viper.GetString("out"), os.O_RDWR|os.O_CREATE, 0755)
+				f, err := os.OpenFile(viper.GetString("out"), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 				if err != nil {
 					return fmt.Errorf("could not OpenFile %s because: %s", viper.GetString("out"), err)
 				}
