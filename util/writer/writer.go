@@ -63,7 +63,9 @@ func (hclw *HCLWriter) Write(key string, value interface{}) error {
 		return errors.Wrapf(ErrAlreadyExistsKey, "with key %q", key)
 	}
 
-	hclw.Config["resource"].(map[string]map[string]interface{})[keys[0]] = make(map[string]interface{})
+	if _, ok := hclw.Config["resource"].(map[string]map[string]interface{})[keys[0]]; !ok {
+		hclw.Config["resource"].(map[string]map[string]interface{})[keys[0]] = make(map[string]interface{})
+	}
 	hclw.Config["resource"].(map[string]map[string]interface{})[keys[0]][keys[1]] = value
 
 	return nil
