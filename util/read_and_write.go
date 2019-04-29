@@ -24,7 +24,7 @@ func ReadIDsAndWrite(tfAWSClient interface{}, provider, resourceType string, tag
 		// so we have to do it manually
 		// it's not all of them though
 		for _, t := range tags {
-			if srd.Get(fmt.Sprintf("tags.%s", t.Name)).(string) != t.Value {
+			if v, ok := srd.GetOk(fmt.Sprintf("tags.%s", t.Name)); ok && v.(string) != t.Value {
 				continue
 			}
 		}

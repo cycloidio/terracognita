@@ -43,6 +43,9 @@ var (
 		"aws_db_instance":         awsDbInstance,
 		"aws_s3_bucket":           awsS3Bucket,
 		//"aws_s3_bucket_object": aws_s3_bucket_object,
+		"aws_cloudfront_distribution":           awsCloudFrontDistribution,
+		"aws_cloudfront_origin_access_identity": awsCloudFrontOriginAccessIdentity,
+		"aws_cloudfront_public_key":             awsCloudFrontPublicKey,
 	}
 )
 
@@ -452,6 +455,63 @@ func awsS3Bucket(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSRead
 
 //return nil
 //}
+
+func awsCloudFrontDistribution(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	distributions, err := awsr.GetCloudFrontDistributions(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	distributionIDs := make([]string, 0)
+	for _, i := range distributions[region].DistributionList.Items {
+		distributionIDs = append(distributionIDs, *i.Id)
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, distributionIDs, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsCloudFrontOriginAccessIdentity(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	identitys, err := awsr.GetCloudFrontOriginAccessIdentities(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	identityIDs := make([]string, 0)
+	for _, i := range identitys[region].CloudFrontOriginAccessIdentityList.Items {
+		identityIDs = append(identityIDs, *i.Id)
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, identityIDs, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsCloudFrontPublicKey(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	publicKeys, err := awsr.GetCloudFrontPublicKeys(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	publicKeyIDs := make([]string, 0)
+	for _, i := range publicKeys[region].PublicKeyList.Items {
+		publicKeyIDs = append(publicKeyIDs, *i.Id)
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, publicKeyIDs, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
 
 func toEC2Filters(tags []util.Tag) []*ec2.Filter {
 	if len(tags) == 0 {
