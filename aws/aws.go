@@ -200,7 +200,7 @@ func awsAmi(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, r
 		Filters: toEC2Filters(tags),
 	}
 
-	images, err := awsr.GetImages(ctx, input)
+	images, err := awsr.GetOwnImages(ctx, input)
 	if err != nil {
 		return err
 	}
@@ -292,7 +292,7 @@ func awsEbsSnapshot(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSR
 		Filters: toEC2Filters(tags),
 	}
 
-	snapshots, err := awsr.GetSnapshots(ctx, input)
+	snapshots, err := awsr.GetOwnSnapshots(ctx, input)
 	if err != nil {
 		return err
 	}
@@ -311,7 +311,7 @@ func awsEbsSnapshot(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSR
 }
 
 func awsElasticacheCluster(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
-	cacheClusters, err := awsr.GetElastiCacheCluster(ctx, nil)
+	cacheClusters, err := awsr.GetElastiCacheClusters(ctx, nil)
 	if err != nil {
 		return err
 	}
