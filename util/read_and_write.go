@@ -11,14 +11,23 @@ import (
 	tfaws "github.com/terraform-providers/terraform-provider-aws/aws"
 )
 
+type ResourceDataFn func(*schema.ResourceData) error
+
 // ReadIDsAndWrite reades the config from the provider+resourceType ids and writes to w the state or the HCL
-func ReadIDsAndWrite(tfAWSClient interface{}, provider, resourceType string, tags []Tag, state bool, ids []string, w writer.Writer) error {
+func ReadIDsAndWrite(tfAWSClient interface{}, provider, resourceType string, tags []Tag, state bool, ids []string, rdfn ResourceDataFn, w writer.Writer) error {
 	for _, id := range ids {
 		p := tfaws.Provider().(*schema.Provider)
 		resource := p.ResourcesMap[resourceType]
 		srd := resource.Data(nil)
 		srd.SetId(id)
 		srd.SetType(resourceType)
+
+		if rdfn != nil {
+			err := rdfn(srd)
+			if err != nil {
+				return err
+			}
+		}
 
 		// Some resources can not be filtered by tags,
 		// so we have to do it manually

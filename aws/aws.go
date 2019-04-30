@@ -11,12 +11,15 @@ import (
 	"github.com/hashicorp/hcl/hcl/printer"
 	"github.com/pkg/errors"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/cycloidio/raws"
 	"github.com/cycloidio/terraforming/util"
 	"github.com/cycloidio/terraforming/util/writer"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/fmtcmd"
+	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 	tfaws "github.com/terraform-providers/terraform-provider-aws/aws"
 )
@@ -46,6 +49,34 @@ var (
 		"aws_cloudfront_distribution":           awsCloudFrontDistribution,
 		"aws_cloudfront_origin_access_identity": awsCloudFrontOriginAccessIdentity,
 		"aws_cloudfront_public_key":             awsCloudFrontPublicKey,
+		"aws_iam_access_key":                    awsIAMAccessKey,
+		"aws_iam_account_alias":                 awsIAMAccountAlias,
+		"aws_iam_account_password_policy":       awsIAMAccountPasswordPolicy,
+		"aws_iam_group":                         awsIAMGroup,
+		"aws_iam_group_membership":              awsIAMGroupMembership,
+		"aws_iam_group_policy":                  awsIAMGroupPolicy,
+		"aws_iam_group_policy_attachment":       awsIAMGroupPolicyAttachment,
+		"aws_iam_instance_profile":              awsIAMInstanceProfile,
+		"aws_iam_openid_connect_provider":       awsIAMOpenIDConnectProvicer,
+		"aws_iam_policy":                        awsIAMPolicy,
+		// As it's deprecated we'll not support it
+		//"aws_iam_policy_attachment"
+		"aws_iam_role":                   awsIAMRole,
+		"aws_iam_role_policy":            awsIAMRolePolicy,
+		"aws_iam_role_policy_attachment": awsIAMRolePolicyAttachment,
+		"aws_iam_saml_provider":          awsIAMSAMLProvider,
+		"aws_iam_server_certificate":     awsIAMServerCertificate,
+		// TODO: Don't know how to get it from AWS SKD
+		//"aws_iam_service_linked_role"
+		"aws_iam_user":                  awsIAMUser,
+		"aws_iam_user_group_membership": awsIAMUserGroupMembership,
+		// Can not be Read
+		// aws_iam_user_login_profile
+		"aws_iam_user_policy":            awsIAMUserPolicy,
+		"aws_iam_user_policy_attachment": awsIAMUserPolicyAttachment,
+		// TODO: Requires to many mandatory fields
+		// let's see if we can do it later
+		//"aws_iam_user_ssh_key":           awsIAMUserSSHKey,
 	}
 )
 
@@ -167,7 +198,7 @@ func awsInstance(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSRead
 		}
 	}
 
-	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, instanceIDs, w)
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, instanceIDs, nil, w)
 	if err != nil {
 		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
@@ -190,7 +221,7 @@ func awsVpc(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, r
 		vpcsIDs = append(vpcsIDs, *v.VpcId)
 	}
 
-	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, vpcsIDs, w)
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, vpcsIDs, nil, w)
 	if err != nil {
 		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
@@ -213,7 +244,7 @@ func awsAmi(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, r
 		imagesIDs = append(imagesIDs, *v.ImageId)
 	}
 
-	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, imagesIDs, w)
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, imagesIDs, nil, w)
 	if err != nil {
 		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
@@ -236,7 +267,7 @@ func awsSecurityGroup(ctx context.Context, tfAWSClient interface{}, awsr raws.AW
 		sgsIDs = append(sgsIDs, *v.GroupId)
 	}
 
-	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, sgsIDs, w)
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, sgsIDs, nil, w)
 	if err != nil {
 		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
@@ -259,7 +290,7 @@ func awsSubnet(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader
 		subnetsIDs = append(subnetsIDs, *v.SubnetId)
 	}
 
-	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, subnetsIDs, w)
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, subnetsIDs, nil, w)
 	if err != nil {
 		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
@@ -282,7 +313,7 @@ func awsEbsVolume(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSRea
 		volumesIDs = append(volumesIDs, *v.VolumeId)
 	}
 
-	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, volumesIDs, w)
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, volumesIDs, nil, w)
 	if err != nil {
 		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
@@ -305,7 +336,7 @@ func awsEbsSnapshot(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSR
 		snapshotsIDs = append(snapshotsIDs, *v.SnapshotId)
 	}
 
-	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, snapshotsIDs, w)
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, snapshotsIDs, nil, w)
 	if err != nil {
 		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
@@ -324,7 +355,7 @@ func awsElasticacheCluster(ctx context.Context, tfAWSClient interface{}, awsr ra
 		cacheClustersIDs = append(cacheClustersIDs, *v.CacheClusterId)
 	}
 
-	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, cacheClustersIDs, w)
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, cacheClustersIDs, nil, w)
 	if err != nil {
 		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
@@ -343,7 +374,7 @@ func awsElb(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, r
 		lbsIDs = append(lbsIDs, *v.LoadBalancerName)
 	}
 
-	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, lbsIDs, w)
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, lbsIDs, nil, w)
 	if err != nil {
 		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
@@ -362,7 +393,7 @@ func awsAlb(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, r
 		lbsIDs = append(lbsIDs, *v.LoadBalancerArn)
 	}
 
-	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, lbsIDs, w)
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, lbsIDs, nil, w)
 	if err != nil {
 		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
@@ -381,7 +412,7 @@ func awsDbInstance(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSRe
 		dbsIDs = append(dbsIDs, *v.DBInstanceIdentifier)
 	}
 
-	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, dbsIDs, w)
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, dbsIDs, nil, w)
 	if err != nil {
 		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
@@ -400,7 +431,7 @@ func awsS3Bucket(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSRead
 		bucketsIDs = append(bucketsIDs, *v.Name)
 	}
 
-	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, bucketsIDs, w)
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, bucketsIDs, nil, w)
 	if err != nil {
 		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
@@ -467,7 +498,7 @@ func awsCloudFrontDistribution(ctx context.Context, tfAWSClient interface{}, aws
 		distributionIDs = append(distributionIDs, *i.Id)
 	}
 
-	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, distributionIDs, w)
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, distributionIDs, nil, w)
 	if err != nil {
 		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
@@ -486,7 +517,7 @@ func awsCloudFrontOriginAccessIdentity(ctx context.Context, tfAWSClient interfac
 		identityIDs = append(identityIDs, *i.Id)
 	}
 
-	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, identityIDs, w)
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, identityIDs, nil, w)
 	if err != nil {
 		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
@@ -505,13 +536,533 @@ func awsCloudFrontPublicKey(ctx context.Context, tfAWSClient interface{}, awsr r
 		publicKeyIDs = append(publicKeyIDs, *i.Id)
 	}
 
-	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, publicKeyIDs, w)
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, publicKeyIDs, nil, w)
 	if err != nil {
 		return errors.Wrap(err, "failed to ReadIDsAndWrite")
 	}
 
 	return nil
 }
+
+func awsIAMAccessKey(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	// I could get all the users and do the same filtering by user but it
+	// seems that it does not need it and returns all the AccessKeys
+	accessKeys, err := awsr.GetAccessKeys(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	accessKeyIDs := make([]string, 0)
+	mapAccessKeyIDs := make(map[string]string)
+	for _, i := range accessKeys[region].AccessKeyMetadata {
+		accessKeyIDs = append(accessKeyIDs, *i.AccessKeyId)
+		mapAccessKeyIDs[*i.AccessKeyId] = *i.UserName
+	}
+
+	rdfn := func(srd *schema.ResourceData) error {
+		if n, ok := mapAccessKeyIDs[srd.Id()]; ok {
+			srd.Set("user", n)
+		} else {
+			return errors.Errorf("invalid id: %s", n)
+		}
+
+		return nil
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, accessKeyIDs, rdfn, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsIAMAccountAlias(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	accountAliases, err := awsr.GetAccountAliases(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	accountAliasIDs := make([]string, 0)
+	for _, i := range accountAliases[region].AccountAliases {
+		accountAliasIDs = append(accountAliasIDs, *i)
+	}
+
+	rdfn := func(srd *schema.ResourceData) error {
+		// This resource has no IDs so
+		// the account_alias acts as it
+		srd.Set("account_alias", srd.Id())
+		return nil
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, accountAliasIDs, rdfn, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsIAMAccountPasswordPolicy(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	// As it's for the full account we'll tell TF to fetch it directly with a "" id
+	err := util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, []string{""}, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsIAMGroup(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	groups, err := awsr.GetGroups(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	groupIDs := make([]string, 0)
+	for _, i := range groups[region].Groups {
+		// Internally TF uses the GroupName as the ID
+		// https://github.com/terraform-providers/terraform-provider-aws/blob/master/aws/resource_aws_iam_group.go#L70
+		groupIDs = append(groupIDs, *i.GroupName)
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, groupIDs, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsIAMGroupMembership(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	groupNames, err := getGroupNames(ctx, awsr, region)
+	if err != nil {
+		return err
+	}
+
+	for _, gn := range groupNames {
+		rdfn := func(srd *schema.ResourceData) error {
+			srd.Set("group", srd.Id())
+			return nil
+		}
+		err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, []string{gn}, rdfn, w)
+		if err != nil {
+			return errors.Wrap(err, "failed to ReadIDsAndWrite")
+		}
+	}
+	return nil
+}
+
+func awsIAMGroupPolicy(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	groupNames, err := getGroupNames(ctx, awsr, region)
+	if err != nil {
+		return err
+	}
+
+	for _, gn := range groupNames {
+		input := &iam.ListGroupPoliciesInput{
+			GroupName: aws.String(gn),
+		}
+		groupPolicies, err := awsr.GetGroupPolicies(ctx, input)
+		if err != nil {
+			return err
+		}
+
+		groupPolicyIDs := make([]string, 0)
+		for _, i := range groupPolicies[region].PolicyNames {
+			// It needs the ID to be "GN:PN"
+			// https://github.com/terraform-providers/terraform-provider-aws/blob/master/aws/resource_aws_iam_group_policy.go#L134:6
+			groupPolicyIDs = append(groupPolicyIDs, fmt.Sprintf("%s:%s", gn, *i))
+		}
+
+		err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, groupPolicyIDs, nil, w)
+		if err != nil {
+			return errors.Wrap(err, "failed to ReadIDsAndWrite")
+		}
+	}
+
+	return nil
+}
+
+func awsIAMGroupPolicyAttachment(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	groupNames, err := getGroupNames(ctx, awsr, region)
+	if err != nil {
+		return err
+	}
+
+	for _, gn := range groupNames {
+		input := &iam.ListAttachedGroupPoliciesInput{
+			GroupName: aws.String(gn),
+		}
+		groupPolicies, err := awsr.GetAttachedGroupPolicies(ctx, input)
+		if err != nil {
+			return err
+		}
+
+		groupPolicyIDs := make([]string, 0)
+		mapGroupPolicyID := make(map[string]string)
+		for _, i := range groupPolicies[region].AttachedPolicies {
+			groupPolicyIDs = append(groupPolicyIDs, fmt.Sprintf("%s:%s", gn, *i))
+			mapGroupPolicyID[fmt.Sprintf("%s:%s", gn, *i)] = *i.PolicyArn
+		}
+		rdfn := func(srd *schema.ResourceData) error {
+			srd.Set("group", gn)
+			srd.Set("policy_arn", mapGroupPolicyID[srd.Id()])
+			return nil
+		}
+
+		err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, groupPolicyIDs, rdfn, w)
+		if err != nil {
+			return errors.Wrap(err, "failed to ReadIDsAndWrite")
+		}
+	}
+
+	return nil
+}
+
+func awsIAMPolicy(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	input := &iam.ListPoliciesInput{
+		Scope: aws.String("Local"),
+	}
+	policies, err := awsr.GetPolicies(ctx, input)
+	if err != nil {
+		return err
+	}
+
+	policyIDs := make([]string, 0)
+	for _, i := range policies[region].Policies {
+		// Internally TF uses the ARN as the ID
+		// https://github.com/terraform-providers/terraform-provider-aws/blob/master/aws/resource_aws_iam_policy.go#L121
+		policyIDs = append(policyIDs, *i.Arn)
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, policyIDs, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsIAMRole(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	roles, err := awsr.GetRoles(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	roleIDs := make([]string, 0)
+	for _, i := range roles[region].Roles {
+		// Internally TF uses the RoleName as the ID
+		// https://github.com/terraform-providers/terraform-provider-aws/blob/master/aws/resource_aws_iam_role.go#L162
+		roleIDs = append(roleIDs, *i.RoleName)
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, roleIDs, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsIAMUser(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	users, err := awsr.GetUsers(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	userIDs := make([]string, 0)
+	for _, i := range users[region].Users {
+		// Internally TF uses the RoleName as the ID
+		// https://github.com/terraform-providers/terraform-provider-aws/blob/master/aws/resource_aws_iam_user.go#L86
+		userIDs = append(userIDs, *i.UserName)
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, userIDs, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsIAMUserGroupMembership(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	userNames, err := getUserNames(ctx, awsr, region)
+	if err != nil {
+		return err
+	}
+
+	groupNames, err := getGroupNames(ctx, awsr, region)
+	if err != nil {
+		return err
+	}
+	gni := make([]interface{}, len(groupNames))
+	for i, gn := range groupNames {
+		gni[i] = gn
+	}
+	groupSet := schema.NewSet(schema.HashString, gni)
+
+	for _, un := range userNames {
+		rdfn := func(srd *schema.ResourceData) error {
+			srd.Set("user", srd.Id())
+			// TF will filter the correct ones
+			// and not all of them
+			srd.Set("groups", groupSet)
+			return nil
+		}
+		err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, []string{un}, rdfn, w)
+		if err != nil {
+			return errors.Wrap(err, "failed to ReadIDsAndWrite")
+		}
+	}
+	return nil
+}
+
+func awsIAMInstanceProfile(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	instanceProfiles, err := awsr.GetInstanceProfiles(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	instanceProfileIDs := make([]string, 0)
+	for _, i := range instanceProfiles[region].InstanceProfiles {
+		// Internally TF uses the RoleName as the ID
+		// https://github.com/terraform-providers/terraform-provider-aws/blob/master/aws/resource_aws_iam_instance_profile.go#L283
+		instanceProfileIDs = append(instanceProfileIDs, *i.InstanceProfileName)
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, instanceProfileIDs, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsIAMOpenIDConnectProvicer(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	openIDConnectProviders, err := awsr.GetOpenIDConnectProviders(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	openIDConnectProviderIDs := make([]string, 0)
+	for _, i := range openIDConnectProviders[region].OpenIDConnectProviderList {
+		// Internally TF uses the ARN as the ID
+		// https://github.com/terraform-providers/terraform-provider-aws/blob/master/aws/resource_aws_iam_openid_connect_provider.go#L283
+		openIDConnectProviderIDs = append(openIDConnectProviderIDs, *i.Arn)
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, openIDConnectProviderIDs, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsIAMSAMLProvider(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	samalProviders, err := awsr.GetSAMLProviders(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	samalProviderIDs := make([]string, 0)
+	for _, i := range samalProviders[region].SAMLProviderList {
+		// Internally TF uses the ARN as the ID
+		// https://github.com/terraform-providers/terraform-provider-aws/blob/master/aws/resource_aws_iam_saml_provider.go#L71
+		samalProviderIDs = append(samalProviderIDs, *i.Arn)
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, samalProviderIDs, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsIAMRolePolicy(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	roleNames, err := getRoleNames(ctx, awsr, region)
+	if err != nil {
+		return err
+	}
+
+	for _, rn := range roleNames {
+		input := &iam.ListRolePoliciesInput{
+			RoleName: aws.String(rn),
+		}
+		rolePolicies, err := awsr.GetRolePolicies(ctx, input)
+		if err != nil {
+			return err
+		}
+
+		rolePolicyIDs := make([]string, 0)
+		for _, i := range rolePolicies[region].PolicyNames {
+			// It needs the ID to be "RN:PN"
+			rolePolicyIDs = append(rolePolicyIDs, fmt.Sprintf("%s:%s", rn, *i))
+		}
+
+		err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, rolePolicyIDs, nil, w)
+		if err != nil {
+			return errors.Wrap(err, "failed to ReadIDsAndWrite")
+		}
+	}
+
+	return nil
+}
+
+func awsIAMRolePolicyAttachment(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	roleNames, err := getRoleNames(ctx, awsr, region)
+	if err != nil {
+		return err
+	}
+
+	for _, rn := range roleNames {
+		input := &iam.ListAttachedRolePoliciesInput{
+			RoleName: aws.String(rn),
+		}
+		rolePolicies, err := awsr.GetAttachedRolePolicies(ctx, input)
+		if err != nil {
+			return err
+		}
+
+		rolePolicyIDs := make([]string, 0)
+		mapRolePolicyID := make(map[string]string)
+		for _, i := range rolePolicies[region].AttachedPolicies {
+			rolePolicyIDs = append(rolePolicyIDs, fmt.Sprintf("%s:%s", rn, *i))
+			mapRolePolicyID[fmt.Sprintf("%s:%s", rn, *i)] = *i.PolicyArn
+		}
+		rdfn := func(srd *schema.ResourceData) error {
+			srd.Set("role", rn)
+			srd.Set("policy_arn", mapRolePolicyID[srd.Id()])
+			return nil
+		}
+
+		err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, rolePolicyIDs, rdfn, w)
+		if err != nil {
+			return errors.Wrap(err, "failed to ReadIDsAndWrite")
+		}
+	}
+
+	return nil
+}
+
+func awsIAMUserPolicy(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	userNames, err := getUserNames(ctx, awsr, region)
+	if err != nil {
+		return err
+	}
+
+	for _, un := range userNames {
+		input := &iam.ListUserPoliciesInput{
+			UserName: aws.String(un),
+		}
+		userPolicies, err := awsr.GetUserPolicies(ctx, input)
+		if err != nil {
+			return err
+		}
+
+		userPolicyIDs := make([]string, 0)
+		for _, i := range userPolicies[region].PolicyNames {
+			// It needs the ID to be "RN:PN"
+			userPolicyIDs = append(userPolicyIDs, fmt.Sprintf("%s:%s", un, *i))
+		}
+
+		err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, userPolicyIDs, nil, w)
+		if err != nil {
+			return errors.Wrap(err, "failed to ReadIDsAndWrite")
+		}
+	}
+
+	return nil
+}
+
+func awsIAMUserPolicyAttachment(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	userNames, err := getUserNames(ctx, awsr, region)
+	if err != nil {
+		return err
+	}
+
+	for _, un := range userNames {
+		input := &iam.ListAttachedUserPoliciesInput{
+			UserName: aws.String(un),
+		}
+		userPolicies, err := awsr.GetAttachedUserPolicies(ctx, input)
+		if err != nil {
+			return err
+		}
+
+		userPolicyIDs := make([]string, 0)
+		mapUserPolicyID := make(map[string]string)
+		for _, i := range userPolicies[region].AttachedPolicies {
+			userPolicyIDs = append(userPolicyIDs, fmt.Sprintf("%s:%s", un, *i))
+			mapUserPolicyID[fmt.Sprintf("%s:%s", un, *i)] = *i.PolicyArn
+		}
+		rdfn := func(srd *schema.ResourceData) error {
+			srd.Set("user", un)
+			srd.Set("policy_arn", mapUserPolicyID[srd.Id()])
+			return nil
+		}
+
+		err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, userPolicyIDs, rdfn, w)
+		if err != nil {
+			return errors.Wrap(err, "failed to ReadIDsAndWrite")
+		}
+	}
+
+	return nil
+}
+
+func awsIAMServerCertificate(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	serverCertificates, err := awsr.GetServerCertificates(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	serverCertificateIDs := make([]string, 0)
+	for _, i := range serverCertificates[region].ServerCertificateMetadataList {
+		serverCertificateIDs = append(serverCertificateIDs, *i.ServerCertificateName)
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, serverCertificateIDs, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+//func awsIAMUserSSHKey(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+//userNames, err := getUserNames(ctx, awsr, region)
+//if err != nil {
+//return err
+//}
+
+//for _, un := range userNames {
+//input := &iam.GetSSHPublicKeyInput{
+//UserName: aws.String(un),
+//Encoding: aws.String("SSH"),
+//}
+
+//userSSHKey, err := awsr.GetSSHPublicKey(ctx, input)
+//if err != nil {
+//return err
+//}
+
+//rdfn := func(srd *schema.ResourceData) error {
+//srd.Set("username", userSSHKey[region].SSHPublicKey.UserName)
+//srd.Set("encoding", "SSH")
+//return nil
+//}
+
+//err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, []string{*userSSHKey[region].SSHPublicKey.SSHPublicKeyId}, rdfn, w)
+//if err != nil {
+//return errors.Wrap(err, "failed to ReadIDsAndWrite")
+//}
+//}
+
+//return nil
+//}
 
 func toEC2Filters(tags []util.Tag) []*ec2.Filter {
 	if len(tags) == 0 {
@@ -524,4 +1075,46 @@ func toEC2Filters(tags []util.Tag) []*ec2.Filter {
 	}
 
 	return filters
+}
+
+func getUserNames(ctx context.Context, awsr raws.AWSReader, region string) ([]string, error) {
+	users, err := awsr.GetUsers(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	userNames := make([]string, 0)
+	for _, i := range users[region].Users {
+		userNames = append(userNames, *i.UserName)
+	}
+
+	return userNames, nil
+}
+
+func getGroupNames(ctx context.Context, awsr raws.AWSReader, region string) ([]string, error) {
+	groups, err := awsr.GetGroups(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	groupIDs := make([]string, 0)
+	for _, i := range groups[region].Groups {
+		groupIDs = append(groupIDs, *i.GroupName)
+	}
+
+	return groupIDs, nil
+}
+
+func getRoleNames(ctx context.Context, awsr raws.AWSReader, region string) ([]string, error) {
+	roles, err := awsr.GetRoles(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	roleIDs := make([]string, 0)
+	for _, i := range roles[region].Roles {
+		roleIDs = append(roleIDs, *i.RoleName)
+	}
+
+	return roleIDs, nil
 }

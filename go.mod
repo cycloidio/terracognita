@@ -4,7 +4,8 @@ require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/aws/aws-sdk-go v1.16.33
 	github.com/beevik/etree v1.1.0 // indirect
-	github.com/cycloidio/raws v0.0.7
+	github.com/cycloidio/raws v0.0.8-0.20190429083939-e274449a3a85
+	github.com/davecgh/go-spew v1.1.1
 	github.com/hashicorp/go-getter v1.0.3 // indirect
 	github.com/hashicorp/go-uuid v1.0.1 // indirect
 	github.com/hashicorp/hcl v1.0.0

@@ -37,6 +37,10 @@ github.com/coreos/go-etcd v2.0.0+incompatible/go.mod h1:Jez6KQU2B/sWsbdaef3ED8Nz
 github.com/coreos/go-semver v0.2.0/go.mod h1:nnelYz7RCh+5ahJtPPxZlU+153eP4D4r3EedlOD2RNk=
 github.com/cycloidio/raws v0.0.7 h1:Yn+phia8dlhvdvw8ZCMoCLNPIdQvULnrkpuhsCBSxo8=
 github.com/cycloidio/raws v0.0.7/go.mod h1:PeKkmBwpPlt/zvtPXeMPTU/EtUwksIP/SPV6lBjzLE4=
+github.com/cycloidio/raws v0.0.8-0.20190429080313-f3b890db15cb h1:A1hU4VaJtdl5Rrq3n4/lDJSgRcDxEueU0iX9Co1YUyA=
+github.com/cycloidio/raws v0.0.8-0.20190429080313-f3b890db15cb/go.mod h1:PeKkmBwpPlt/zvtPXeMPTU/EtUwksIP/SPV6lBjzLE4=
+github.com/cycloidio/raws v0.0.8-0.20190429083939-e274449a3a85 h1:aMas049P/OEs3l2znTeX4q1gNnNRnaFEtGA/aSKYUhM=
+github.com/cycloidio/raws v0.0.8-0.20190429083939-e274449a3a85/go.mod h1:PeKkmBwpPlt/zvtPXeMPTU/EtUwksIP/SPV6lBjzLE4=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
