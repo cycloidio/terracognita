@@ -33,13 +33,17 @@ type funcReader func(ctx context.Context, tfAWSClient interface{}, awsr raws.AWS
 
 var (
 	awsResources = map[string]funcReader{
-		"aws_instance":            awsInstance,
-		"aws_vpc":                 awsVpc,
-		"aws_ami":                 awsAmi,
-		"aws_security_group":      awsSecurityGroup,
-		"aws_subnet":              awsSubnet,
-		"aws_ebs_volume":          awsEbsVolume,
-		"aws_ebs_snapshot":        awsEbsSnapshot,
+		"aws_instance": awsInstance,
+		"aws_vpc":      awsVpc,
+		// Do not have them for now as it's not needed
+		// but works
+		//"aws_ami":                 awsAmi,
+		"aws_security_group": awsSecurityGroup,
+		"aws_subnet":         awsSubnet,
+		"aws_ebs_volume":     awsEbsVolume,
+		// Do not have them for now as it's not needed
+		// but works
+		//"aws_ebs_snapshot":        awsEbsSnapshot,
 		"aws_elasticache_cluster": awsElasticacheCluster,
 		"aws_elb":                 awsElb,
 		"aws_alb":                 awsAlb,
