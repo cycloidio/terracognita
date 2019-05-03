@@ -66,6 +66,12 @@ func ReadIDsAndWrite(tfAWSClient interface{}, provider, resourceType string, tag
 					name := GetNameFromTag(rd, id)
 
 					tis := rd.State()
+					if tis == nil {
+						// IDK why some times it does not have
+						// the ID (the only case in tis it's nil)
+						// so if nil we don't need it
+						continue
+					}
 					trs := &terraform.ResourceState{
 						Type:     resourceType,
 						Primary:  tis,
