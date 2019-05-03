@@ -15,7 +15,8 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
 
 # final stage
-FROM scratch
+FROM alpine
 COPY --from=builder /app/terraforming /app/
-EXPOSE 8080
+# https://github.com/hashicorp/terraform/issues/10779
+RUN apk --update add ca-certificates
 ENTRYPOINT ["/app/terraforming"]
