@@ -54,19 +54,25 @@ func (hclw *HCLWriter) Write(key string, value interface{}) error {
 		return ErrRequiredValue
 	}
 
+	//keys := strings.Split(key, ".")
+	//if len(keys) != 2 {
+	//return errors.Wrapf(ErrInvalidKey, "with key %q", key)
+	//}
 	keys := strings.Split(key, ".")
-	if len(keys) != 2 {
+	if len(keys) < 2 {
 		return errors.Wrapf(ErrInvalidKey, "with key %q", key)
 	}
 
-	if _, ok := hclw.Config["resource"].(map[string]map[string]interface{})[keys[0]][keys[1]]; ok {
+	name := strings.Join(keys[1:len(keys)], "")
+
+	if _, ok := hclw.Config["resource"].(map[string]map[string]interface{})[keys[0]][name]; ok {
 		return errors.Wrapf(ErrAlreadyExistsKey, "with key %q", key)
 	}
 
 	if _, ok := hclw.Config["resource"].(map[string]map[string]interface{})[keys[0]]; !ok {
 		hclw.Config["resource"].(map[string]map[string]interface{})[keys[0]] = make(map[string]interface{})
 	}
-	hclw.Config["resource"].(map[string]map[string]interface{})[keys[0]][keys[1]] = value
+	hclw.Config["resource"].(map[string]map[string]interface{})[keys[0]][name] = value
 
 	return nil
 }
