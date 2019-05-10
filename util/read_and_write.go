@@ -77,11 +77,17 @@ func ReadIDsAndWrite(tfAWSClient interface{}, provider, resourceType string, tag
 						Primary:  tis,
 						Provider: provider,
 					}
-					if err := w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, name), trs); err != nil && errors.Cause(err) == writer.ErrAlreadyExistsKey {
-						err = w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, tis.ID), trs)
-						if err != nil {
-							return err
+
+					err := w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, name), trs)
+					if err != nil {
+						if errors.Cause(err) == writer.ErrAlreadyExistsKey {
+							err = w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, tis.ID), trs)
+							if err != nil {
+								return err
+							}
+							return nil
 						}
+						return err
 					}
 				}
 			} else {
@@ -90,12 +96,16 @@ func ReadIDsAndWrite(tfAWSClient interface{}, provider, resourceType string, tag
 			}
 		} else {
 			name := GetNameFromTag(srd, id)
-
-			if err := w.Write(fmt.Sprintf("%s.%s", resourceType, name), mergeFullConfig(srd, resource.Schema, "")); err != nil && errors.Cause(err) == writer.ErrAlreadyExistsKey {
-				err = w.Write(fmt.Sprintf("%s.%s", resourceType, id), mergeFullConfig(srd, resource.Schema, ""))
-				if err != nil {
-					return err
+			err := w.Write(fmt.Sprintf("%s.%s", resourceType, name), mergeFullConfig(srd, resource.Schema, ""))
+			if err != nil {
+				if errors.Cause(err) == writer.ErrAlreadyExistsKey {
+					err = w.Write(fmt.Sprintf("%s.%s", resourceType, id), mergeFullConfig(srd, resource.Schema, ""))
+					if err != nil {
+						return err
+					}
+					return nil
 				}
+				return err
 			}
 		}
 	}
@@ -129,10 +139,7 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 					continue
 				}
 
-				// Was the default from Set/List
-				//ar = append(ar.([]interface{}), mergeFullConfig(cfgr, sr.Schema, kk))
-
-				res[k] = normalizSet(s.(*schema.Set))
+				res[k] = normalizeSetList(s.(*schema.Set).List())
 			} else if v.Type == schema.TypeList {
 				var ar interface{}
 				ar = make([]interface{}, 0, 0)
@@ -170,14 +177,13 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 	return res
 }
 
-// normalizSet returns the normalization of a schema.Set
+// normalizeSetList returns the normalization of a schema.Set.List
 // it could be a simple list or a embedded structure
-func normalizSet(ss *schema.Set) interface{} {
+func normalizeSetList(list []interface{}) interface{} {
 	var ar interface{}
 	ar = make([]interface{}, 0, 0)
 
-	setList := ss.List()
-	for _, set := range setList {
+	for _, set := range list {
 		switch val := set.(type) {
 		case map[string]interface{}:
 			// This case it's when a TypeSet has
@@ -185,24 +191,37 @@ func normalizSet(ss *schema.Set) interface{} {
 			// example: aws_security_group.ingress
 			res := make(map[string]interface{})
 			for k, v := range val {
-				if s, ok := v.(*schema.Set); ok {
-					ns := normalizSet(s)
+				switch vv := v.(type) {
+				case *schema.Set:
+					ns := normalizeSetList(vv.List())
 					if !isDefault(ns) {
 						res[k] = ns
 					}
-				} else {
+				case []interface{}:
+					ns := normalizeSetList(vv)
+					if !isDefault(ns) {
+						res[k] = ns
+					}
+				case interface{}:
 					if !isDefault(v) {
 						res[k] = v
 					}
 				}
 			}
 			ar = append(ar.([]interface{}), res)
+		case []interface{}:
+			ns := normalizeSetList(val)
+			if !isDefault(ns) {
+				ar = append(ar.([]interface{}), ns)
+			}
 		case interface{}:
 			// This case is normally for the
 			// "Type: schema.TypeSet, Elm: schema.Schema{Type: schema.TypeString}"
 			// definitions on TF,
 			// example: aws_security_group.ingress.security_groups
-			ar = append(ar.([]interface{}), val)
+			if !isDefault(val) {
+				ar = append(ar.([]interface{}), val)
+			}
 		}
 	}
 
