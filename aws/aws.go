@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"strings"
 
 	"github.com/hashicorp/hcl/hcl/printer"
 	"github.com/pkg/errors"
@@ -14,6 +15,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/iam"
+	"github.com/aws/aws-sdk-go/service/route53"
+	"github.com/aws/aws-sdk-go/service/ses"
 	"github.com/cycloidio/raws"
 	"github.com/cycloidio/terraforming/util"
 	"github.com/cycloidio/terraforming/util/writer"
@@ -81,6 +84,29 @@ var (
 		// TODO: Requires to many mandatory fields
 		// let's see if we can do it later
 		//"aws_iam_user_ssh_key":           awsIAMUserSSHKey,
+		"aws_route53_delegation_set":    awsRoute53DelegationSet,
+		"aws_route53_health_check":      awsRoute53HealthCheck,
+		"aws_route53_query_log":         awsRoute53QueryLog,
+		"aws_route53_record":            awsRoute53Record,
+		"aws_route53_zone":              awsRoute53Zone,
+		"aws_route53_zone_association":  awsRoute53ZoneAssociation,
+		"aws_route53_resolver_endpoint": awsRoute53ResolverEndpoint,
+		// Issue with the ARN tags fetch on TF side
+		//"aws_route53_resolver_rule":             awsRoute53ResolverRule,
+		"aws_route53_resolver_rule_association": awsRoute53ResolverRuleAssociation,
+		"aws_ses_active_receipt_rule_set":       awsSESActiveReceiptRuleSet,
+		"aws_ses_domain_identity":               awsSESDomainIdentity,
+		"aws_ses_domain_identity_verification":  awsSESDomainIdentityVerification,
+		"aws_ses_domain_dkim":                   awsSESDomainDKIM,
+		"aws_ses_domain_mail_from":              awsSESDomainMailFrom,
+		"aws_ses_receipt_filter":                awsSESReceiptFilter,
+		"aws_ses_receipt_rule":                  awsSESReciptRule,
+		"aws_ses_receipt_rule_set":              awsSESReciptRuleSet,
+		"aws_ses_configuration_set":             awsSESConfigurationSet,
+		// Read on TF is nil so ...
+		//"aws_ses_event_destination":             awsSESEventDestination,
+		"ses_identity_notification_topic": awsSESIdentityNotificationTopic,
+		"aws_ses_template":                awsSESTemplate,
 	}
 )
 
@@ -1036,6 +1062,428 @@ func awsIAMServerCertificate(ctx context.Context, tfAWSClient interface{}, awsr 
 	return nil
 }
 
+func awsRoute53DelegationSet(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	r53DelegationSets, err := awsr.GetReusableDelegationSets(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	r53DelegationSetIDs := make([]string, 0)
+	for _, i := range r53DelegationSets[region].DelegationSets {
+		r53DelegationSetIDs = append(r53DelegationSetIDs, *i.Id)
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, r53DelegationSetIDs, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsRoute53HealthCheck(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	r53HealthChecks, err := awsr.GetHealthChecks(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	r53HealthCheckIDs := make([]string, 0)
+	for _, i := range r53HealthChecks[region].HealthChecks {
+		r53HealthCheckIDs = append(r53HealthCheckIDs, *i.Id)
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, r53HealthCheckIDs, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsRoute53QueryLog(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	r53QueryLogs, err := awsr.GetQueryLoggingConfigs(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	r53QueryLogIDs := make([]string, 0)
+	for _, i := range r53QueryLogs[region].QueryLoggingConfigs {
+		r53QueryLogIDs = append(r53QueryLogIDs, *i.Id)
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, r53QueryLogIDs, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+// TODO: Check the zones
+func awsRoute53Record(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	zones, err := getHostedZones(ctx, awsr, region)
+	if err != nil {
+		return err
+	}
+	for _, z := range zones {
+		input := &route53.ListResourceRecordSetsInput{
+			HostedZoneId: aws.String(z),
+		}
+		r53Records, err := awsr.GetResourceRecordSets(ctx, input)
+		if err != nil {
+			return err
+		}
+
+		r53RecordIDs := make([]string, 0)
+		for _, i := range r53Records[region].ResourceRecordSets {
+			id := []string{z, strings.ToLower(*i.Name), *i.Type}
+			if i.SetIdentifier != nil {
+				id = append(id, *i.SetIdentifier)
+			}
+			r53RecordIDs = append(r53RecordIDs, strings.Join(id, "_"))
+		}
+
+		err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, r53RecordIDs, nil, w)
+		if err != nil {
+			return errors.Wrap(err, "failed to ReadIDsAndWrite")
+		}
+	}
+
+	return nil
+}
+
+func awsRoute53Zone(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	r53Zones, err := awsr.GetHostedZones(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	r53ZoneIDs := make([]string, 0)
+	for _, i := range r53Zones[region].HostedZones {
+		r53ZoneIDs = append(r53ZoneIDs, *i.Id)
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, r53ZoneIDs, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsRoute53ZoneAssociation(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	zones, err := getHostedZones(ctx, awsr, region)
+	if err != nil {
+		return err
+	}
+	for _, z := range zones {
+		input := &route53.ListVPCAssociationAuthorizationsInput{
+			HostedZoneId: aws.String(z),
+		}
+		r53ZoneAssociations, err := awsr.GetVPCAssociationAuthorizations(ctx, input)
+		if err != nil {
+			return err
+		}
+
+		r53ZoneAssociationIDs := make([]string, 0)
+		for _, i := range r53ZoneAssociations[region].VPCs {
+			r53ZoneAssociationIDs = append(r53ZoneAssociationIDs, fmt.Sprintf("%s:%s", z, *i.VPCId))
+		}
+
+		err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, r53ZoneAssociationIDs, nil, w)
+		if err != nil {
+			return errors.Wrap(err, "failed to ReadIDsAndWrite")
+		}
+	}
+
+	return nil
+}
+
+func awsRoute53ResolverEndpoint(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	r53ResolverEndpoints, err := awsr.GetResolverEndpoints(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	r53ResolverEndpointIDs := make([]string, 0)
+	for _, i := range r53ResolverEndpoints[region].ResolverEndpoints {
+		r53ResolverEndpointIDs = append(r53ResolverEndpointIDs, *i.Id)
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, r53ResolverEndpointIDs, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+//func awsRoute53ResolverRule(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+//r53ResolverRules, err := awsr.GetResolverRules(ctx, nil)
+//if err != nil {
+//return err
+//}
+
+//r53ResolverRuleIDs := make([]string, 0)
+//for _, i := range r53ResolverRules[region].ResolverRules {
+//r53ResolverRuleIDs = append(r53ResolverRuleIDs, *i.Id)
+//}
+
+//err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, r53ResolverRuleIDs, nil, w)
+//if err != nil {
+//return errors.Wrap(err, "failed to ReadIDsAndWrite")
+//}
+
+//return nil
+//}
+
+func awsRoute53ResolverRuleAssociation(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	r53ResolverRuleAssociations, err := awsr.GetResolverRuleAssociations(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	r53ResolverRuleAssociationIDs := make([]string, 0)
+	for _, i := range r53ResolverRuleAssociations[region].ResolverRuleAssociations {
+		r53ResolverRuleAssociationIDs = append(r53ResolverRuleAssociationIDs, *i.Id)
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, r53ResolverRuleAssociationIDs, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsSESActiveReceiptRuleSet(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	sesActiveReceiptRuleSets, err := awsr.GetActiveReceiptRuleSet(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	//sesActiveReceiptRuleSetIDs := make([]string, 0)
+	//for _, i := range sesActiveReceiptRuleSets[region].Rules {
+	//sesActiveReceiptRuleSetIDs = append(sesActiveReceiptRuleSetIDs, *i.Name)
+	//}
+
+	if sesActiveReceiptRuleSets[region].Metadata == nil {
+		return nil
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, []string{*sesActiveReceiptRuleSets[region].Metadata.Name}, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsSESDomainIdentity(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	sesDomainIdentities, err := awsr.GetIdentities(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	sesDomainIdentityIDs := make([]string, 0)
+	for _, i := range sesDomainIdentities[region].Identities {
+		sesDomainIdentityIDs = append(sesDomainIdentityIDs, *i)
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, sesDomainIdentityIDs, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsSESDomainIdentityVerification(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	domainNames, err := getDomainNames(ctx, awsr, region)
+	if err != nil {
+		return err
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, domainNames, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsSESDomainDKIM(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	domainNames, err := getDomainNames(ctx, awsr, region)
+	if err != nil {
+		return err
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, domainNames, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsSESDomainMailFrom(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	domainNames, err := getDomainNames(ctx, awsr, region)
+	if err != nil {
+		return err
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, domainNames, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsSESReceiptFilter(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	sesReceiptFilters, err := awsr.GetReceiptFilters(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	sesReceiptFilterIDs := make([]string, 0)
+	for _, i := range sesReceiptFilters[region].Filters {
+		sesReceiptFilterIDs = append(sesReceiptFilterIDs, *i.Name)
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, sesReceiptFilterIDs, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsSESReciptRule(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	//setName, Rule.Name
+	sesActiveReceiptRuleSets, err := awsr.GetActiveReceiptRuleSet(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	sesReciptRuleIDs := make([]string, 0)
+	for _, i := range sesActiveReceiptRuleSets[region].Rules {
+		sesReciptRuleIDs = append(sesReciptRuleIDs, fmt.Sprintf("%s:%s", sesActiveReceiptRuleSets[region].Metadata.Name, *i.Name))
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, sesReciptRuleIDs, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsSESReciptRuleSet(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	sesActiveReceiptRuleSets, err := awsr.GetActiveReceiptRuleSet(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	//sesActiveReceiptRuleSetIDs := make([]string, 0)
+	//for _, i := range sesActiveReceiptRuleSets[region].Rules {
+	//sesActiveReceiptRuleSetIDs = append(sesActiveReceiptRuleSetIDs, *i.Name)
+	//}
+
+	if sesActiveReceiptRuleSets[region].Metadata == nil {
+		return nil
+	}
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, []string{*sesActiveReceiptRuleSets[region].Metadata.Name}, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsSESConfigurationSet(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	sesConfigurationSets, err := awsr.GetConfigurationSets(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	sesConfigurationSetIDs := make([]string, 0)
+	for _, i := range sesConfigurationSets[region].ConfigurationSets {
+		sesConfigurationSetIDs = append(sesConfigurationSetIDs, *i.Name)
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, sesConfigurationSetIDs, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
+func awsSESIdentityNotificationTopic(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	domainNames, err := getDomainNames(ctx, awsr, region)
+	if err != nil {
+		return err
+	}
+
+	for _, d := range domainNames {
+		// We could just pass domainNames as Identities
+		// but then we would not not which NotificationAttributes
+		// is of each identity so we have to do it one by one
+		input := &ses.GetIdentityNotificationAttributesInput{
+			Identities: []*string{&d},
+		}
+
+		sesIdentityNotificationTopics, err := awsr.GetIdentityNotificationAttributes(ctx, input)
+		if err != nil {
+			return err
+		}
+
+		sesIdentityNotificationTopicIDs := make([]string, 0)
+		for _, i := range sesIdentityNotificationTopics[region].NotificationAttributes {
+			var notType string
+			if i.BounceTopic != nil {
+				notType = *i.BounceTopic
+			} else if i.ComplaintTopic != nil {
+				notType = *i.ComplaintTopic
+			} else if i.DeliveryTopic != nil {
+				notType = *i.DeliveryTopic
+			} else {
+				// We need the topic, if fore some reason we do not have
+				// it we have to continue to the next one
+				continue
+			}
+			sesIdentityNotificationTopicIDs = append(sesIdentityNotificationTopicIDs, fmt.Sprintf("%s|%s", d, notType))
+		}
+
+		err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, sesIdentityNotificationTopicIDs, nil, w)
+		if err != nil {
+			return errors.Wrap(err, "failed to ReadIDsAndWrite")
+		}
+	}
+
+	return nil
+}
+
+func awsSESTemplate(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
+	sesTemplates, err := awsr.GetTemplates(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	sesTemplateIDs := make([]string, 0)
+	for _, i := range sesTemplates[region].TemplatesMetadata {
+		sesTemplateIDs = append(sesTemplateIDs, *i.Name)
+	}
+
+	err = util.ReadIDsAndWrite(tfAWSClient, Provider, resourceType, tags, state, sesTemplateIDs, nil, w)
+	if err != nil {
+		return errors.Wrap(err, "failed to ReadIDsAndWrite")
+	}
+
+	return nil
+}
+
 //func awsIAMUserSSHKey(ctx context.Context, tfAWSClient interface{}, awsr raws.AWSReader, resourceType, region string, tags []util.Tag, state bool, w writer.Writer) error {
 //userNames, err := getUserNames(ctx, awsr, region)
 //if err != nil {
@@ -1121,4 +1569,32 @@ func getRoleNames(ctx context.Context, awsr raws.AWSReader, region string) ([]st
 	}
 
 	return roleIDs, nil
+}
+
+func getHostedZones(ctx context.Context, awsr raws.AWSReader, region string) ([]string, error) {
+	r53Zones, err := awsr.GetHostedZones(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	r53ZoneIDs := make([]string, 0)
+	for _, i := range r53Zones[region].HostedZones {
+		r53ZoneIDs = append(r53ZoneIDs, *i.Id)
+	}
+
+	return r53ZoneIDs, nil
+}
+
+func getDomainNames(ctx context.Context, awsr raws.AWSReader, region string) ([]string, error) {
+	sesDomainIdentities, err := awsr.GetIdentities(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	sesDomainIdentityIDs := make([]string, 0)
+	for _, i := range sesDomainIdentities[region].Identities {
+		sesDomainIdentityIDs = append(sesDomainIdentityIDs, *i)
+	}
+
+	return sesDomainIdentityIDs, nil
 }
