@@ -38,7 +38,7 @@ func ReadIDsAndWrite(tfAWSClient interface{}, provider, resourceType string, tag
 			}
 		}
 
-		err := resource.Read(srd, tfAWSClient)
+		err := RetryDefault(func() error { return resource.Read(srd, tfAWSClient) })
 		if err != nil {
 			return err
 		}
