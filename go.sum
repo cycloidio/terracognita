@@ -59,6 +59,8 @@ github.com/boombuler/barcode v1.0.0/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl
 github.com/bradfitz/go-smtpd v0.0.0-20170404230938-deb6d6237625/go.mod h1:HYsPBTaaSFSlLx/70C2HPIMNZpVV8+vt/A+FMnYP11g=
 github.com/bsm/go-vlq v0.0.0-20150828105119-ec6e8d4f5f4e/go.mod h1:N+BjUcTjSxc2mtRGSCPsat1kze3CUtvJN3/jTXlp29k=
 github.com/cheggaaa/pb v1.0.27/go.mod h1:pQciLPpbU0oxA0h+VJYYLxO+XeDQb5pZijXscXHm81s=
+github.com/chr4/pwgen v1.1.0 h1:duC/1iWyXRrd/Y0I1bjR2m16ijkfqp1AxBE4E3NVn0g=
+github.com/chr4/pwgen v1.1.0/go.mod h1:Q9w8E+RunSCgs/ZyHZA/rd3PITSWhc0HW0Ik/XLCBy8=
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
 github.com/chzyer/readline v0.0.0-20161106042343-c914be64f07d/go.mod h1:nSuG5e5PlCu98SY8svDHJxuZscDgtXS6KTTbou5AhLI=
 github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1/go.mod h1:Q3SI9o4m/ZMnBNeIyt5eFwwo7qiLfzFZmjNmxjkiQlU=
@@ -71,6 +73,8 @@ github.com/coreos/go-systemd v0.0.0-20181012123002-c6f51f82210d/go.mod h1:F5haX7
 github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f/go.mod h1:E3G3o1h8I7cfcXa63jLwjI0eiQQMgzzUDFVpN/nH/eA=
 github.com/cycloidio/raws v0.0.8-0.20190507133743-7cf751de1a6c h1:fDNYhoj2/B7SLc2kfCk0NySRAExWVwcnX0ryGZWl9CA=
 github.com/cycloidio/raws v0.0.8-0.20190507133743-7cf751de1a6c/go.mod h1:PeKkmBwpPlt/zvtPXeMPTU/EtUwksIP/SPV6lBjzLE4=
+github.com/cycloidio/raws v0.0.8-0.20190509102134-0644fb2c94d8 h1:iwbMC2zvL4ERe9SvH9sleJ9NIYSXysSJlsnMA21/kos=
+github.com/cycloidio/raws v0.0.8-0.20190509102134-0644fb2c94d8/go.mod h1:PeKkmBwpPlt/zvtPXeMPTU/EtUwksIP/SPV6lBjzLE4=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
