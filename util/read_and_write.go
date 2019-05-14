@@ -3,7 +3,9 @@ package util
 import (
 	"fmt"
 	"reflect"
+	"strings"
 
+	"github.com/chr4/pwgen"
 	"github.com/cycloidio/terraforming/util/writer"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
@@ -43,6 +45,14 @@ func ReadIDsAndWrite(tfAWSClient interface{}, provider, resourceType string, tag
 			return err
 		}
 
+		// For some reason it failed to fetch the Resource, it should not be an error
+		// because it could be an account related resource that it's not delcared or
+		// is default.
+		// Therefore we just continue
+		if srd.Id() == "" {
+			continue
+		}
+
 		// It can be imported
 		if state {
 			if importer := resource.Importer; importer != nil {
@@ -63,7 +73,6 @@ func ReadIDsAndWrite(tfAWSClient interface{}, provider, resourceType string, tag
 						// Terraform
 						continue
 					}
-					name := GetNameFromTag(rd, id)
 
 					tis := rd.State()
 					if tis == nil {
@@ -78,10 +87,10 @@ func ReadIDsAndWrite(tfAWSClient interface{}, provider, resourceType string, tag
 						Provider: provider,
 					}
 
-					err := w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, name), trs)
+					err := w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, GetNameFromTag(rd, id)), trs)
 					if err != nil {
 						if errors.Cause(err) == writer.ErrAlreadyExistsKey {
-							err = w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, tis.ID), trs)
+							err = w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, pwgen.Alpha(5)), trs)
 							if err != nil {
 								return err
 							}
@@ -95,11 +104,10 @@ func ReadIDsAndWrite(tfAWSClient interface{}, provider, resourceType string, tag
 				continue
 			}
 		} else {
-			name := GetNameFromTag(srd, id)
-			err := w.Write(fmt.Sprintf("%s.%s", resourceType, name), mergeFullConfig(srd, resource.Schema, ""))
+			err := w.Write(fmt.Sprintf("%s.%s", resourceType, GetNameFromTag(srd, id)), mergeFullConfig(srd, resource.Schema, ""))
 			if err != nil {
 				if errors.Cause(err) == writer.ErrAlreadyExistsKey {
-					err = w.Write(fmt.Sprintf("%s.%s", resourceType, id), mergeFullConfig(srd, resource.Schema, ""))
+					err = w.Write(fmt.Sprintf("%s.%s", resourceType, pwgen.Alpha(5)), mergeFullConfig(srd, resource.Schema, ""))
 					if err != nil {
 						return err
 					}
@@ -139,7 +147,7 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 					continue
 				}
 
-				res[k] = normalizeSetList(s.(*schema.Set).List())
+				res[k] = normalizeSetList(sr.Schema, s.(*schema.Set).List())
 			} else if v.Type == schema.TypeList {
 				var ar interface{}
 				ar = make([]interface{}, 0, 0)
@@ -164,22 +172,33 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 		}
 
 		vv, ok := cfgr.GetOk(kk)
-		if !ok || vv == nil {
+		// If the value is Required we need to add it
+		// even if it's not send
+		if (!ok || vv == nil) && !v.Required {
 			continue
 		}
 
 		if s, ok := vv.(*schema.Set); ok {
 			res[k] = s.List()
 		} else {
-			res[k] = vv
+			res[k] = normalizeValue(vv)
 		}
 	}
 	return res
 }
 
+// normalizeValue removes the \n from the value now
+func normalizeValue(v interface{}) interface{} {
+	if s, ok := v.(string); ok {
+		return strings.Replace(s, "\n", "", -1)
+	}
+	return v
+}
+
 // normalizeSetList returns the normalization of a schema.Set.List
-// it could be a simple list or a embedded structure
-func normalizeSetList(list []interface{}) interface{} {
+// it could be a simple list or a embedded structure.
+// The sch it's used to also add required values if needed
+func normalizeSetList(sch map[string]*schema.Schema, list []interface{}) interface{} {
 	var ar interface{}
 	ar = make([]interface{}, 0, 0)
 
@@ -193,25 +212,37 @@ func normalizeSetList(list []interface{}) interface{} {
 			for k, v := range val {
 				switch vv := v.(type) {
 				case *schema.Set:
-					ns := normalizeSetList(vv.List())
-					if !isDefault(ns) {
+					nsch := make(map[string]*schema.Schema)
+					if sc, ok := sch[k]; ok {
+						if rs, ok := sc.Elem.(*schema.Resource); ok {
+							nsch = rs.Schema
+						}
+					}
+					ns := normalizeSetList(nsch, vv.List())
+					if !isDefault(sch[k], ns) {
 						res[k] = ns
 					}
 				case []interface{}:
-					ns := normalizeSetList(vv)
-					if !isDefault(ns) {
+					nsch := make(map[string]*schema.Schema)
+					if sc, ok := sch[k]; ok {
+						if rs, ok := sc.Elem.(*schema.Resource); ok {
+							nsch = rs.Schema
+						}
+					}
+					ns := normalizeSetList(nsch, vv)
+					if !isDefault(sch[k], ns) {
 						res[k] = ns
 					}
 				case interface{}:
-					if !isDefault(v) {
+					if !isDefault(sch[k], v) {
 						res[k] = v
 					}
 				}
 			}
 			ar = append(ar.([]interface{}), res)
 		case []interface{}:
-			ns := normalizeSetList(val)
-			if !isDefault(ns) {
+			ns := normalizeSetList(sch, val)
+			if !isDefault(nil, ns) {
 				ar = append(ar.([]interface{}), ns)
 			}
 		case interface{}:
@@ -219,7 +250,7 @@ func normalizeSetList(list []interface{}) interface{} {
 			// "Type: schema.TypeSet, Elm: schema.Schema{Type: schema.TypeString}"
 			// definitions on TF,
 			// example: aws_security_group.ingress.security_groups
-			if !isDefault(val) {
+			if !isDefault(nil, val) {
 				ar = append(ar.([]interface{}), val)
 			}
 		}
@@ -247,7 +278,11 @@ var (
 // TF strucure (access by key) and are stored as raw maps with some
 // default values that we don't want on the HCL output.
 // example: [], false, "", 0 ...
-func isDefault(v interface{}) bool {
+func isDefault(sch *schema.Schema, v interface{}) bool {
+	if sch != nil && sch.Required {
+		return false
+	}
+
 	for _, t := range tfTypes {
 		if reflect.DeepEqual(t.Zero(), v) {
 			return true
