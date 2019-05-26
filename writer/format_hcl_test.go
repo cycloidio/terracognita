@@ -1,9 +1,9 @@
-package util_test
+package writer_test
 
 import (
 	"testing"
 
-	"github.com/cycloidio/terraforming/util"
+	"github.com/cycloidio/terraforming/writer"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -100,7 +100,7 @@ func TestFormatHCL(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			out := util.FormatHCL(tt.in)
+			out := writer.FormatHCL(tt.in)
 			assert.Equal(t, string(tt.out), string(out))
 		})
 	}

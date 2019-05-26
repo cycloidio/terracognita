@@ -1,8 +1,16 @@
 package writer
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
 	"strings"
 
+	"github.com/hashicorp/hcl/hcl/printer"
+
+	"github.com/hashicorp/hcl"
+	"github.com/hashicorp/hcl/hcl/fmtcmd"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/pkg/errors"
 )
@@ -25,6 +33,12 @@ type Writer interface {
 	// implementation and an error can be returned normally for
 	// repeated keys
 	Write(key string, value interface{}) error
+
+	// Sync writes the content of the writer
+	// to the internal system. Each Writter may have
+	// a different implementation of it with different
+	// output formats
+	Sync() error
 }
 
 // HCLWriter it's a Writer implementation that writes to
@@ -32,14 +46,16 @@ type Writer interface {
 type HCLWriter struct {
 	// TODO: Change it to "map[string]map[string]schema.ResourceData"
 	Config map[string]interface{}
+	w      io.Writer
 }
 
 // NewHCLWriter rerturns a HCLWriter initializatioon
-func NewHCLWriter() *HCLWriter {
+func NewHCLWriter(w io.Writer) *HCLWriter {
 	cfg := make(map[string]interface{})
 	cfg["resource"] = make(map[string]map[string]interface{})
 	return &HCLWriter{
 		Config: cfg,
+		w:      w,
 	}
 }
 
@@ -77,16 +93,44 @@ func (hclw *HCLWriter) Write(key string, value interface{}) error {
 	return nil
 }
 
+func (hclw *HCLWriter) Sync() error {
+	b, err := json.Marshal(hclw.Config)
+	if err != nil {
+		return err
+	}
+
+	f, err := hcl.ParseBytes(b)
+	if err != nil {
+		return fmt.Errorf("error while 'hcl.ParseBytes': %s", err)
+	}
+
+	buff := &bytes.Buffer{}
+	err = printer.Fprint(buff, f.Node)
+	if err != nil {
+		return fmt.Errorf("error while pretty printing HCL: %s", err)
+	}
+
+	buff = bytes.NewBuffer(FormatHCL(buff.Bytes()))
+
+	err = fmtcmd.Run(nil, nil, buff, hclw.w, fmtcmd.Options{})
+	if err != nil {
+		return fmt.Errorf("error while fmt HCL: %s", err)
+	}
+	return nil
+}
+
 // TFStateWriter it's a Writer implementation that it's ment to
 // then generate a TFState
 type TFStateWriter struct {
 	Config map[string]*terraform.ResourceState
+	w      io.Writer
 }
 
 // NewTFStateWriter returns a TFStateWriter initialization
-func NewTFStateWriter() *TFStateWriter {
+func NewTFStateWriter(w io.Writer) *TFStateWriter {
 	return &TFStateWriter{
 		Config: make(map[string]*terraform.ResourceState),
+		w:      w,
 	}
 }
 
@@ -111,6 +155,29 @@ func (tfsw *TFStateWriter) Write(key string, value interface{}) error {
 	}
 
 	tfsw.Config[key] = trs
+
+	return nil
+}
+
+func (tfsw *TFStateWriter) Sync() error {
+	// Write to root because then the NewState is called
+	// it creates by default a 'root' one and then on the
+	// AddModuleState we replace that empty module for this one
+	ms := &terraform.ModuleState{
+		Path: []string{"root"},
+	}
+
+	ms.Resources = tfsw.Config
+
+	state := terraform.NewState()
+	state.AddModuleState(ms)
+
+	enc := json.NewEncoder(tfsw.w)
+	enc.SetIndent("", "  ")
+	err := enc.Encode(state)
+	if err != nil {
+		return fmt.Errorf("could not encode state due to: %s", err)
+	}
 
 	return nil
 }
