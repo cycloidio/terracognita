@@ -1,4 +1,4 @@
-package util
+package provider
 
 import (
 	"fmt"
@@ -6,108 +6,89 @@ import (
 	"strings"
 
 	"github.com/chr4/pwgen"
-	"github.com/cycloidio/terraforming/util/writer"
+	"github.com/cycloidio/terraforming/errcode"
+	"github.com/cycloidio/terraforming/filter"
+	"github.com/cycloidio/terraforming/tag"
+	"github.com/cycloidio/terraforming/util"
+	"github.com/cycloidio/terraforming/writer"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/pkg/errors"
-	tfaws "github.com/terraform-providers/terraform-provider-aws/aws"
 )
 
-type ResourceDataFn func(*schema.ResourceData) error
+type Resource struct {
+	ID         string
+	Type       string
+	TFResource *schema.Resource
+	Data       *schema.ResourceData
+	Provider   Provider
+}
 
-// ReadIDsAndWrite reades the config from the provider+resourceType ids and writes to w the state or the HCL
-func ReadIDsAndWrite(tfAWSClient interface{}, provider, resourceType string, tags []Tag, state bool, ids []string, rdfn ResourceDataFn, w writer.Writer) error {
-	for _, id := range ids {
-		p := tfaws.Provider().(*schema.Provider)
-		resource := p.ResourcesMap[resourceType]
-		srd := resource.Data(nil)
-		srd.SetId(id)
-		srd.SetType(resourceType)
+func (r *Resource) Read(f filter.Filter) error {
+	err := util.RetryDefault(func() error {
+		return r.TFResource.Read(r.Data, r.Provider.TFClient())
+	})
+	if err != nil {
+		return err
+	}
 
-		if rdfn != nil {
-			err := rdfn(srd)
-			if err != nil {
-				return err
-			}
+	// For some reason it failed to fetch the Resource, it should not be an error
+	// because it could be an account related resource that it's not delcared or
+	// is default.
+	// Therefore we just continue
+	if r.Data.Id() == "" {
+		return errors.Wrapf(errcode.ErrResourceNotRead, "the resource %q with ID %q did not return an ID", r.Type, r.ID)
+	}
+
+	// Some resources can not be filtered by tags,
+	// so we have to do it manually
+	// it's not all of them though
+	for _, t := range f.Tags {
+		if v, ok := r.Data.GetOk(fmt.Sprintf("tags.%s", t.Name)); ok && v.(string) != t.Value {
+			return errors.WithStack(errcode.ErrResourceDoNotMatchTag)
 		}
+	}
 
-		// Some resources can not be filtered by tags,
-		// so we have to do it manually
-		// it's not all of them though
-		for _, t := range tags {
-			if v, ok := srd.GetOk(fmt.Sprintf("tags.%s", t.Name)); ok && v.(string) != t.Value {
-				continue
-			}
-		}
+	return nil
+}
 
-		err := RetryDefault(func() error { return resource.Read(srd, tfAWSClient) })
+func (r *Resource) State(w writer.Writer) error {
+	if importer := r.TFResource.Importer; importer != nil {
+		resourceDatas, err := importer.State(r.Data, r.Provider.TFClient())
 		if err != nil {
 			return err
 		}
-
-		// For some reason it failed to fetch the Resource, it should not be an error
-		// because it could be an account related resource that it's not delcared or
-		// is default.
-		// Therefore we just continue
-		if srd.Id() == "" {
-			continue
-		}
-
-		// It can be imported
-		if state {
-			if importer := resource.Importer; importer != nil {
-				resourceDatas, err := importer.State(srd, tfAWSClient)
-				if err != nil {
-					return err
-				}
-				// TODO: The multple return could potentially be the `depends_on` of the
-				// terraform.ResourceState
-				// Investigate on SG
-				for i, rd := range resourceDatas {
-					if i != 0 {
-						// for now we scape all the other ones
-						// the firs one is the one we need and
-						// for what've see the others are
-						// 'aws_security_group_rules' (in aws)
-						// and are not imported by default by
-						// Terraform
-						continue
-					}
-
-					tis := rd.State()
-					if tis == nil {
-						// IDK why some times it does not have
-						// the ID (the only case in tis it's nil)
-						// so if nil we don't need it
-						continue
-					}
-					trs := &terraform.ResourceState{
-						Type:     resourceType,
-						Primary:  tis,
-						Provider: provider,
-					}
-
-					err := w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, GetNameFromTag(rd, id)), trs)
-					if err != nil {
-						if errors.Cause(err) == writer.ErrAlreadyExistsKey {
-							err = w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, pwgen.Alpha(5)), trs)
-							if err != nil {
-								return err
-							}
-							return nil
-						}
-						return err
-					}
-				}
-			} else {
-				// If it can not be imported continue
+		// TODO: The multple return could potentially be the `depends_on` of the
+		// terraform.ResourceState
+		// Investigate on SG
+		for i, rd := range resourceDatas {
+			if i != 0 {
+				// for now we scape all the other ones
+				// the firs one is the one we need and
+				// for what've see the others are
+				// 'aws_security_group_rules' (in aws)
+				// and are not imported by default by
+				// Terraform
 				continue
 			}
-		} else {
-			err := w.Write(fmt.Sprintf("%s.%s", resourceType, GetNameFromTag(srd, id)), mergeFullConfig(srd, resource.Schema, ""))
+
+			tis := rd.State()
+			if tis == nil {
+				// IDK why some times it does not have
+				// the ID (the only case in tis it's nil)
+				// so if nil we don't need it
+				continue
+			}
+			trs := &terraform.ResourceState{
+				Type:     r.Type,
+				Primary:  tis,
+				Provider: "aws",
+			}
+
+			err := w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, tag.GetNameFromTag(r.Provider.TagKey(), rd, r.ID)), trs)
 			if err != nil {
 				if errors.Cause(err) == writer.ErrAlreadyExistsKey {
-					err = w.Write(fmt.Sprintf("%s.%s", resourceType, pwgen.Alpha(5)), mergeFullConfig(srd, resource.Schema, ""))
+					err = w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, pwgen.Alpha(5)), trs)
 					if err != nil {
 						return err
 					}
@@ -117,6 +98,22 @@ func ReadIDsAndWrite(tfAWSClient interface{}, provider, resourceType string, tag
 			}
 		}
 	}
+	return nil
+}
+
+func (r *Resource) HCL(w writer.Writer) error {
+	err := w.Write(fmt.Sprintf("%s.%s", r.Type, tag.GetNameFromTag(r.Provider.TagKey(), r.Data, r.ID)), mergeFullConfig(r.Data, r.TFResource.Schema, ""))
+	if err != nil {
+		if errors.Cause(err) == writer.ErrAlreadyExistsKey {
+			err = w.Write(fmt.Sprintf("%s.%s", r.Type, pwgen.Alpha(5)), mergeFullConfig(r.Data, r.TFResource.Schema, ""))
+			if err != nil {
+				return err
+			}
+			return nil
+		}
+		return err
+	}
+
 	return nil
 }
 
