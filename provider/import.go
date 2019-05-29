@@ -9,6 +9,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Import imports from the Provider p all the resources filtered by f and writes
+// the result to the hcl or tfstate if those are not nil
 func Import(ctx context.Context, p Provider, hcl, tfstate writer.Writer, f filter.Filter) error {
 	var types []string
 
@@ -35,10 +37,16 @@ func Import(ctx context.Context, p Provider, hcl, tfstate writer.Writer, f filte
 			}
 
 			if tfstate != nil {
-				r.State(tfstate)
+				err = r.State(tfstate)
+				if err != nil {
+					return err
+				}
 			}
 			if hcl != nil {
-				r.HCL(hcl)
+				err = r.HCL(hcl)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}

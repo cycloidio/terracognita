@@ -23,7 +23,7 @@ type RetryFn func() error
 // and if it does it tries 'times' withing the 'interval'
 func Retry(rfn RetryFn, times int, interval time.Duration) error {
 	err := rfn()
-	times -= 1
+	times--
 	if err != nil {
 		if times == 0 {
 			return err

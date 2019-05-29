@@ -76,18 +76,18 @@ func init() {
 	// Required flags
 
 	awsCmd.Flags().String("access-key", "", "Access Key (required)")
-	viper.BindPFlag("access-key", awsCmd.Flags().Lookup("access-key"))
+	_ = viper.BindPFlag("access-key", awsCmd.Flags().Lookup("access-key"))
 
 	awsCmd.Flags().String("secret-key", "", "Secret Key (required)")
-	viper.BindPFlag("secret-key", awsCmd.Flags().Lookup("secret-key"))
+	_ = viper.BindPFlag("secret-key", awsCmd.Flags().Lookup("secret-key"))
 
 	awsCmd.Flags().String("region", "", "Region to search in, for now * it's not supported (required)")
-	viper.BindPFlag("region", awsCmd.Flags().Lookup("region"))
+	_ = viper.BindPFlag("region", awsCmd.Flags().Lookup("region"))
 
 	// Filter flags
 
 	awsCmd.Flags().StringSliceVarP(&tags, "tags", "t", []string{}, "List of tags to filter with format 'NAME:VALUE'")
-	viper.BindPFlag("tags", awsCmd.Flags().Lookup("tags"))
+	_ = viper.BindPFlag("tags", awsCmd.Flags().Lookup("tags"))
 
 }
 

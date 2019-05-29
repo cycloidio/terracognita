@@ -22,6 +22,7 @@ type aws struct {
 	cache cache.Cache
 }
 
+// NewProvider returns an AWS Provider
 func NewProvider(ctx context.Context, accessKey, secretKey, region string) (provider.Provider, error) {
 	awsr, err := raws.NewAWSReader(ctx, accessKey, secretKey, []string{region}, nil)
 	if err != nil {

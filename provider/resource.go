@@ -17,15 +17,28 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Resource represents the minimal information needed to
+// define a Provider resource
 type Resource struct {
-	ID         string
-	Type       string
+	// ID is the ID of the Resource
+	ID string
+
+	// Type is the type of resource (ex: aws_instance)
+	Type string
+
+	// TFResource is the definition of that resource
 	TFResource *schema.Resource
-	Data       *schema.ResourceData
-	Provider   Provider
+
+	// Data is the actual data of the Resource
+	Data *schema.ResourceData
+
+	// Provider is the Provider of that Resource
+	Provider Provider
 }
 
+// Read read the remote information of the Resource
 func (r *Resource) Read(f filter.Filter) error {
+	// Retry if any error happen
 	err := util.RetryDefault(func() error {
 		return r.TFResource.Read(r.Data, r.Provider.TFClient())
 	})
@@ -53,6 +66,8 @@ func (r *Resource) Read(f filter.Filter) error {
 	return nil
 }
 
+// State calculates the state of the Resource and
+// writes it to w
 func (r *Resource) State(w writer.Writer) error {
 	if importer := r.TFResource.Importer; importer != nil {
 		resourceDatas, err := importer.State(r.Data, r.Provider.TFClient())
@@ -102,6 +117,8 @@ func (r *Resource) State(w writer.Writer) error {
 	return nil
 }
 
+// HCL returns the HCL configuration of the Resource and
+// writes it to HCL
 func (r *Resource) HCL(w writer.Writer) error {
 	err := w.Write(fmt.Sprintf("%s.%s", r.Type, tag.GetNameFromTag(r.Provider.TagKey(), r.Data, r.ID)), mergeFullConfig(r.Data, r.TFResource.Schema, ""))
 	if err != nil {
@@ -129,47 +146,46 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 
 		// Basically calculates the needed
 		// key to the current access
-		kk := key
 		if key != "" {
-			kk = key + "." + k
+			key = key + "." + k
 		} else {
-			kk = k
+			key = k
 		}
 
 		// schema.Resource means that it has nested fields
 		if sr, ok := v.Elem.(*schema.Resource); ok {
 			// Example would be aws_security_group
 			if v.Type == schema.TypeSet {
-				s, ok := cfgr.GetOk(kk)
+				s, ok := cfgr.GetOk(key)
 				if !ok {
 					continue
 				}
 
 				res[k] = normalizeSetList(sr.Schema, s.(*schema.Set).List())
 			} else if v.Type == schema.TypeList {
-				var ar interface{}
-				ar = make([]interface{}, 0, 0)
+				//var ar interface{}
+				var ar interface{} = make([]interface{}, 0)
 
-				l, ok := cfgr.GetOk(kk)
+				l, ok := cfgr.GetOk(key)
 				if !ok {
 					continue
 				}
 
 				list := l.([]interface{})
 				for i := range list {
-					ar = append(ar.([]interface{}), mergeFullConfig(cfgr, sr.Schema, fmt.Sprintf("%s.%d", kk, i)))
+					ar = append(ar.([]interface{}), mergeFullConfig(cfgr, sr.Schema, fmt.Sprintf("%s.%d", key, i)))
 				}
 
 				res[k] = ar
 			} else {
-				res[k] = mergeFullConfig(cfgr, sr.Schema, kk)
+				res[k] = mergeFullConfig(cfgr, sr.Schema, key)
 			}
 			// As it's a nested element it does not require any of
 			// the other code as it's for singel value schemas
 			continue
 		}
 
-		vv, ok := cfgr.GetOk(kk)
+		vv, ok := cfgr.GetOk(key)
 		// If the value is Required we need to add it
 		// even if it's not send
 		if (!ok || vv == nil) && !v.Required {
@@ -208,8 +224,7 @@ func normalizeInterpolation(v interface{}) interface{} {
 // it could be a simple list or a embedded structure.
 // The sch it's used to also add required values if needed
 func normalizeSetList(sch map[string]*schema.Schema, list []interface{}) interface{} {
-	var ar interface{}
-	ar = make([]interface{}, 0, 0)
+	var ar interface{} = make([]interface{}, 0)
 
 	for _, set := range list {
 		switch val := set.(type) {

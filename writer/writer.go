@@ -75,7 +75,7 @@ func (hclw *HCLWriter) Write(key string, value interface{}) error {
 		return errors.Wrapf(ErrInvalidKey, "with key %q", key)
 	}
 
-	name := strings.Join(keys[1:len(keys)], "")
+	name := strings.Join(keys[1:], "")
 
 	if _, ok := hclw.Config["resource"].(map[string]map[string]interface{})[keys[0]][name]; ok {
 		return errors.Wrapf(ErrAlreadyExistsKey, "with key %q", key)
@@ -89,6 +89,8 @@ func (hclw *HCLWriter) Write(key string, value interface{}) error {
 	return nil
 }
 
+// Sync writes the content of the Config to the
+// internal w with the correct format
 func (hclw *HCLWriter) Sync() error {
 	b, err := json.Marshal(hclw.Config)
 	if err != nil {
@@ -155,6 +157,8 @@ func (tfsw *TFStateWriter) Write(key string, value interface{}) error {
 	return nil
 }
 
+// Sync writes the content of the Config to the
+// internal w with the correct format
 func (tfsw *TFStateWriter) Sync() error {
 	// Write to root because then the NewState is called
 	// it creates by default a 'root' one and then on the

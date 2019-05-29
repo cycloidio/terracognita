@@ -22,7 +22,7 @@ var (
 		Short: "Reads from Providers and generates a Terraform configuration",
 		Long:  "Reads from Providers and generates a Terraform configuration, all the flags can be used also with ENV (ex: --access-key == ACCESS_KEY)",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			closeOut = make([]io.Closer, 0, 0)
+			closeOut = make([]io.Closer, 0)
 			if viper.GetString("hcl") != "" {
 				f, err := os.OpenFile(viper.GetString("hcl"), os.O_APPEND|os.O_TRUNC|os.O_RDWR|os.O_CREATE, 0755)
 				if err != nil {
@@ -62,16 +62,16 @@ func init() {
 	RootCmd.AddCommand(awsCmd)
 
 	RootCmd.PersistentFlags().String("hcl", "", "HCL output file")
-	viper.BindPFlag("hcl", RootCmd.PersistentFlags().Lookup("hcl"))
+	_ = viper.BindPFlag("hcl", RootCmd.PersistentFlags().Lookup("hcl"))
 
 	RootCmd.PersistentFlags().String("tfstate", "", "TFState output file")
-	viper.BindPFlag("tfstate", RootCmd.PersistentFlags().Lookup("tfstate"))
+	_ = viper.BindPFlag("tfstate", RootCmd.PersistentFlags().Lookup("tfstate"))
 
 	RootCmd.PersistentFlags().StringSliceVarP(&include, "include", "i", []string{}, "List of resources to import, this names are the ones on TF (ex: aws_instance). If not set then means that all the resources will be imported")
-	viper.BindPFlag("include", RootCmd.PersistentFlags().Lookup("include"))
+	_ = viper.BindPFlag("include", RootCmd.PersistentFlags().Lookup("include"))
 
 	RootCmd.PersistentFlags().StringSliceVarP(&exclude, "exclude", "e", []string{}, "List of resources to not import, this names are the ones on TF (ex: aws_instance). If not set then means that none the resources will be excluded")
-	viper.BindPFlag("exclude", RootCmd.PersistentFlags().Lookup("exclude"))
+	_ = viper.BindPFlag("exclude", RootCmd.PersistentFlags().Lookup("exclude"))
 }
 
 func initViper() {

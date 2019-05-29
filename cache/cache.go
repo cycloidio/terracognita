@@ -23,6 +23,7 @@ type cache struct {
 	data map[string][]*provider.Resource
 }
 
+// New returns a new Cache implementaion
 func New() Cache {
 	return &cache{
 		data: make(map[string][]*provider.Resource),

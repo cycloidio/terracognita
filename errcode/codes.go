@@ -2,6 +2,7 @@ package errcode
 
 import "errors"
 
+// List of all the error Codes used
 var (
 	ErrResourceNotRead       = errors.New("the resource did not return an ID")
 	ErrResourceDoNotMatchTag = errors.New("the resource does not match the required tags")

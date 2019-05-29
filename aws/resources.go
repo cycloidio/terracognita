@@ -16,12 +16,16 @@ import (
 	"github.com/pkg/errors"
 )
 
+// ResourceType is the type used to define all the Resources
+// from the Provider
 type ResourceType int
 
 //go:generate enumer -type ResourceType -addprefix aws_ -transform snake -linecomment
 const (
+	// NoID it's a helper to make the code more readable
 	NoID = ""
 
+	// List of all the Resources
 	Instance ResourceType = iota
 	VPC
 	// Do not have them for now as it's not needed
@@ -214,27 +218,27 @@ func vpcs(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]*
 	return resources, nil
 }
 
-func amis(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]*provider.Resource, error) {
-	var input = &ec2.DescribeImagesInput{
-		Filters: toEC2Filters(tags),
-	}
+//func amis(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]*provider.Resource, error) {
+//var input = &ec2.DescribeImagesInput{
+//Filters: toEC2Filters(tags),
+//}
 
-	images, err := a.awsr.GetOwnImages(ctx, input)
-	if err != nil {
-		return nil, err
-	}
+//images, err := a.awsr.GetOwnImages(ctx, input)
+//if err != nil {
+//return nil, err
+//}
 
-	resources := make([]*provider.Resource, 0)
-	for _, v := range images[a.Region()].Images {
-		r, err := initializeResource(a, *v.ImageId, resourceType)
-		if err != nil {
-			return nil, err
-		}
-		resources = append(resources, r)
-	}
+//resources := make([]*provider.Resource, 0)
+//for _, v := range images[a.Region()].Images {
+//r, err := initializeResource(a, *v.ImageId, resourceType)
+//if err != nil {
+//return nil, err
+//}
+//resources = append(resources, r)
+//}
 
-	return resources, nil
-}
+//return resources, nil
+//}
 
 func securityGroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]*provider.Resource, error) {
 	var input = &ec2.DescribeSecurityGroupsInput{
@@ -302,27 +306,27 @@ func ebsVolumes(ctx context.Context, a *aws, resourceType string, tags []tag.Tag
 	return resources, nil
 }
 
-func ebsSnapshots(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]*provider.Resource, error) {
-	var input = &ec2.DescribeSnapshotsInput{
-		Filters: toEC2Filters(tags),
-	}
+//func ebsSnapshots(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]*provider.Resource, error) {
+//var input = &ec2.DescribeSnapshotsInput{
+//Filters: toEC2Filters(tags),
+//}
 
-	snapshots, err := a.awsr.GetOwnSnapshots(ctx, input)
-	if err != nil {
-		return nil, err
-	}
+//snapshots, err := a.awsr.GetOwnSnapshots(ctx, input)
+//if err != nil {
+//return nil, err
+//}
 
-	resources := make([]*provider.Resource, 0)
-	for _, v := range snapshots[a.Region()].Snapshots {
-		r, err := initializeResource(a, *v.SnapshotId, resourceType)
-		if err != nil {
-			return nil, err
-		}
-		resources = append(resources, r)
-	}
+//resources := make([]*provider.Resource, 0)
+//for _, v := range snapshots[a.Region()].Snapshots {
+//r, err := initializeResource(a, *v.SnapshotId, resourceType)
+//if err != nil {
+//return nil, err
+//}
+//resources = append(resources, r)
+//}
 
-	return resources, nil
-}
+//return resources, nil
+//}
 
 func elasticacheClusters(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]*provider.Resource, error) {
 	cacheClusters, err := a.awsr.GetElastiCacheClusters(ctx, nil)
@@ -482,7 +486,10 @@ func iamAccessKeys(ctx context.Context, a *aws, resourceType string, tags []tag.
 		if err != nil {
 			return nil, err
 		}
-		r.Data.Set("user", i.UserName)
+		err = r.Data.Set("user", i.UserName)
+		if err != nil {
+			return nil, err
+		}
 		resources = append(resources, r)
 	}
 
@@ -501,7 +508,10 @@ func iamAccountAliases(ctx context.Context, a *aws, resourceType string, tags []
 		if err != nil {
 			return nil, err
 		}
-		r.Data.Set("account_alias", *i)
+		err = r.Data.Set("account_alias", *i)
+		if err != nil {
+			return nil, err
+		}
 		resources = append(resources, r)
 	}
 
@@ -530,7 +540,10 @@ func iamGroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag)
 			return nil, err
 		}
 		// Needed for the cache
-		r.Data.Set("name", *i.GroupName)
+		err = r.Data.Set("name", *i.GroupName)
+		if err != nil {
+			return nil, err
+		}
 		resources = append(resources, r)
 	}
 
@@ -549,7 +562,10 @@ func iamGroupMemberships(ctx context.Context, a *aws, resourceType string, tags 
 		if err != nil {
 			return nil, err
 		}
-		r.Data.Set("group", i)
+		err = r.Data.Set("group", i)
+		if err != nil {
+			return nil, err
+		}
 		resources = append(resources, r)
 	}
 
@@ -607,8 +623,15 @@ func iamGroupPolicyAttachments(ctx context.Context, a *aws, resourceType string,
 			if err != nil {
 				return nil, err
 			}
-			r.Data.Set("group", gn)
-			r.Data.Set("policy_arn", *i.PolicyArn)
+			err = r.Data.Set("group", gn)
+			if err != nil {
+				return nil, err
+			}
+
+			err = r.Data.Set("policy_arn", *i.PolicyArn)
+			if err != nil {
+				return nil, err
+			}
 			resources = append(resources, r)
 		}
 	}
@@ -686,7 +709,10 @@ func iamRoles(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) 
 			return nil, err
 		}
 		// Needed for cache
-		r.Data.Set("name", *i.RoleName)
+		err = r.Data.Set("name", *i.RoleName)
+		if err != nil {
+			return nil, err
+		}
 		resources = append(resources, r)
 	}
 
@@ -742,8 +768,14 @@ func iamRolePolicyAttachments(ctx context.Context, a *aws, resourceType string, 
 			if err != nil {
 				return nil, err
 			}
-			r.Data.Set("role", rn)
-			r.Data.Set("policy_arn", *i.PolicyArn)
+			err = r.Data.Set("role", rn)
+			if err != nil {
+				return nil, err
+			}
+			err = r.Data.Set("policy_arn", *i.PolicyArn)
+			if err != nil {
+				return nil, err
+			}
 			resources = append(resources, r)
 		}
 	}
@@ -781,7 +813,10 @@ func iamServerCertificates(ctx context.Context, a *aws, resourceType string, tag
 		if err != nil {
 			return nil, err
 		}
-		r.Data.Set("name", *i.ServerCertificateName)
+		err = r.Data.Set("name", *i.ServerCertificateName)
+		if err != nil {
+			return nil, err
+		}
 		resources = append(resources, r)
 	}
 
@@ -801,7 +836,10 @@ func iamUsers(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) 
 			return nil, err
 		}
 		// Needed for cache
-		r.Data.Set("name", *i.UserName)
+		err = r.Data.Set("name", *i.UserName)
+		if err != nil {
+			return nil, err
+		}
 		resources = append(resources, r)
 	}
 
@@ -831,8 +869,14 @@ func iamUserGroupMemberships(ctx context.Context, a *aws, resourceType string, t
 		if err != nil {
 			return nil, err
 		}
-		r.Data.Set("user", un)
-		r.Data.Set("groups", groupSet)
+		err = r.Data.Set("user", un)
+		if err != nil {
+			return nil, err
+		}
+		err = r.Data.Set("groups", groupSet)
+		if err != nil {
+			return nil, err
+		}
 		resources = append(resources, r)
 	}
 
@@ -888,8 +932,14 @@ func iamUserPolicyAttachments(ctx context.Context, a *aws, resourceType string, 
 			if err != nil {
 				return nil, err
 			}
-			r.Data.Set("user", un)
-			r.Data.Set("policy_arn", *i.PolicyArn)
+			err = r.Data.Set("user", un)
+			if err != nil {
+				return nil, err
+			}
+			err = r.Data.Set("policy_arn", *i.PolicyArn)
+			if err != nil {
+				return nil, err
+			}
 			resources = append(resources, r)
 		}
 	}
@@ -1096,7 +1146,10 @@ func sesDomainIdentities(ctx context.Context, a *aws, resourceType string, tags 
 			return nil, err
 		}
 		// For the cache
-		r.Data.Set("domain", *i)
+		err = r.Data.Set("domain", *i)
+		if err != nil {
+			return nil, err
+		}
 		resources = append(resources, r)
 	}
 

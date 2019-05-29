@@ -2,6 +2,9 @@ package filter
 
 import "github.com/cycloidio/terraforming/tag"
 
+// Filter is the list of all possible
+// filters that can be used to filter
+// the results
 type Filter struct {
 	Tags    []tag.Tag
 	Include []string
@@ -10,6 +13,7 @@ type Filter struct {
 	exclude map[string]struct{}
 }
 
+// IsExcluded checks if the v is on the Exclude list
 func (f *Filter) IsExcluded(v string) bool {
 	if len(f.Exclude) == 0 {
 		return false
@@ -23,6 +27,8 @@ func (f *Filter) IsExcluded(v string) bool {
 	return ok
 }
 
+// calculateExludeMap makes a map of the Exclude so
+// it's easy to operate over them
 func (f *Filter) calculateExludeMap() {
 	aux := make(map[string]struct{})
 
