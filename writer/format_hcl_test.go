@@ -37,6 +37,23 @@ func TestFormatHCL(t *testing.T) {
 			`),
 		},
 		{
+			name: "Remove`=`Form`= {`",
+			in: []byte(`
+				"tags" = {
+					"something" = "s"
+				}
+			`),
+			// The output it's a bit wierd as it required
+			// an \n before and after the block
+			out: []byte(`
+
+				tags {
+					something = "s"
+				}
+
+			`),
+		},
+		{
 			name: "ReplaceEmptyLinesExceptBlocks",
 			in: []byte(`
 				"role" = value
@@ -56,7 +73,7 @@ func TestFormatHCL(t *testing.T) {
 				role = value
 				env = "value"
 
-				tags = {
+				tags {
 					something = "s"
 					another = "a"
 				}
@@ -87,7 +104,7 @@ func TestFormatHCL(t *testing.T) {
 				role = value
 				env = "value"
 
-				tags = {
+				tags {
 					something = "s"
 					another = "a"
 				}

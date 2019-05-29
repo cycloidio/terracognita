@@ -3,6 +3,7 @@ package provider
 import (
 	"fmt"
 	"reflect"
+	"regexp"
 	"strings"
 
 	"github.com/chr4/pwgen"
@@ -178,7 +179,7 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 		if s, ok := vv.(*schema.Set); ok {
 			res[k] = s.List()
 		} else {
-			res[k] = normalizeValue(vv)
+			res[k] = normalizeInterpolation(normalizeValue(vv))
 		}
 	}
 	return res
@@ -188,6 +189,17 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 func normalizeValue(v interface{}) interface{} {
 	if s, ok := v.(string); ok {
 		return strings.Replace(s, "\n", "", -1)
+	}
+	return v
+}
+
+var iamInternpolationRe = regexp.MustCompile(`(\$\{[^}]+\})`)
+
+// normalizeInterpolation fixes the https://github.com/hashicorp/terraform/issues/18937
+// on reading
+func normalizeInterpolation(v interface{}) interface{} {
+	if s, ok := v.(string); ok {
+		return iamInternpolationRe.ReplaceAllString(s, `$$$1`)
 	}
 	return v
 }

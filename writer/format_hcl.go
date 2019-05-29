@@ -18,13 +18,18 @@ var (
 			replace: []byte(`$1 =`),
 		},
 		{
+			// Replace all the `key = {` for `key {`
+			match:   regexp.MustCompile(`([\w\-_\.]+)\s=\s{`),
+			replace: []byte(`$1 {`),
+		},
+		{
 			// Replace all the empty lines
 			match:   regexp.MustCompile("\n\n"),
 			replace: []byte("\n"),
 		},
 		{
 			// Add new lines before blocks
-			match:   regexp.MustCompile("\n(\t*)([\\w\\-_\\.]+\\s=\\s{)"),
+			match:   regexp.MustCompile("\n(\t*)([\\w\\-_\\.]+\\s{)"),
 			replace: []byte("\n\n$1$2"),
 		},
 		{

@@ -70,10 +70,6 @@ func (hclw *HCLWriter) Write(key string, value interface{}) error {
 		return ErrRequiredValue
 	}
 
-	//keys := strings.Split(key, ".")
-	//if len(keys) != 2 {
-	//return errors.Wrapf(ErrInvalidKey, "with key %q", key)
-	//}
 	keys := strings.Split(key, ".")
 	if len(keys) < 2 {
 		return errors.Wrapf(ErrInvalidKey, "with key %q", key)
