@@ -46,6 +46,22 @@ func (r *Resource) Read(f filter.Filter) error {
 		return errors.Wrapf(err, "while reading on type %q", r.Type)
 	}
 
+	// TODO: Extreme case, it should be on an "AfterRead" function
+	// but for now we'll do it like this
+	if r.Type == "aws_iam_user_group_membership" {
+		gps := r.Data.Get("groups").(*schema.Set).List()
+		var gpsKey string
+		for _, gp := range gps {
+			if gpsKey == "" {
+				gpsKey = gp.(string)
+			}
+			gpsKey = fmt.Sprintf("%s/%s", gpsKey, gp)
+		}
+		if len(gps) != 0 {
+			r.Data.SetId(fmt.Sprintf("%s/%s", r.Data.Get("user"), gpsKey))
+		}
+	}
+
 	// For some reason it failed to fetch the Resource, it should not be an error
 	// because it could be an account related resource that it's not delcared or
 	// is default.
@@ -74,6 +90,7 @@ func (r *Resource) State(w writer.Writer) error {
 		if err != nil {
 			return err
 		}
+
 		// TODO: The multple return could potentially be the `depends_on` of the
 		// terraform.ResourceState
 		// Investigate on SG
@@ -95,6 +112,7 @@ func (r *Resource) State(w writer.Writer) error {
 				// so if nil we don't need it
 				continue
 			}
+
 			trs := &terraform.ResourceState{
 				Type:     r.Type,
 				Primary:  tis,
