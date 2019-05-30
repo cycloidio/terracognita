@@ -32,20 +32,27 @@ func Import(ctx context.Context, p Provider, hcl, tfstate writer.Writer, f filte
 		for _, r := range resources {
 			err := r.Read(f)
 			// TODO Validate the 2 errors that we do not want to return
-			if err != nil && errors.Cause(err) != errcode.ErrResourceNotRead && errors.Cause(err) != errcode.ErrResourceDoNotMatchTag {
-				return errors.Wrapf(err, "could not read resource %s: ", r.Type)
+			if err != nil {
+				if errors.Cause(err) != errcode.ErrResourceNotRead && errors.Cause(err) != errcode.ErrResourceDoNotMatchTag {
+					return errors.Wrapf(err, "could not read resource %s: ", r.Type)
+				}
+				if errors.Cause(err) == errcode.ErrResourceNotRead {
+					// As the resource could not be Read, meaning an ID == ""
+					// we'll continue to the next resource
+					continue
+				}
 			}
 
 			if tfstate != nil {
 				err = r.State(tfstate)
 				if err != nil {
-					return err
+					return errors.Wrapf(err, "error while calculating the Satate of resource %q", t)
 				}
 			}
 			if hcl != nil {
 				err = r.HCL(hcl)
 				if err != nil {
-					return err
+					return errors.Wrapf(err, "error while calculating the Config of resource %q", t)
 				}
 			}
 		}
@@ -54,14 +61,14 @@ func Import(ctx context.Context, p Provider, hcl, tfstate writer.Writer, f filte
 	if hcl != nil {
 		err := hcl.Sync()
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "error while Sync Config")
 		}
 	}
 
 	if tfstate != nil {
 		err := tfstate.Sync()
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "error while Sync State")
 		}
 	}
 

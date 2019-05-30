@@ -65,7 +65,7 @@ func (a *aws) Resources(ctx context.Context, t string, f filter.Filter) ([]*prov
 
 	resources, err := rfn(ctx, a, t, f.Tags)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "error while reading from resource %q", t)
 	}
 
 	return resources, nil

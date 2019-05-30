@@ -43,7 +43,7 @@ func (r *Resource) Read(f filter.Filter) error {
 		return r.TFResource.Read(r.Data, r.Provider.TFClient())
 	})
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "while reading on type %q", r.Type)
 	}
 
 	// For some reason it failed to fetch the Resource, it should not be an error
