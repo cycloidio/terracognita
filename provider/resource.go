@@ -141,7 +141,7 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 	res := make(map[string]interface{})
 	for k, v := range sch {
 		// If it's just a Computed value, do not add it to the output
-		if (v.Computed && !v.Optional && !v.Required) || v.Deprecated != "" {
+		if !isConfig(v) {
 			continue
 		}
 
@@ -328,9 +328,10 @@ func isDefault(sch *schema.Schema, v interface{}) bool {
 		if sch.Required {
 			return false
 		}
-		// This way deprecated values are not aded to the
-		// end result
-		if sch.Deprecated != "" {
+
+		// This way values that are not suppose
+		// to be on the config are also not added
+		if !isConfig(sch) {
 			return true
 		}
 	}
@@ -341,4 +342,13 @@ func isDefault(sch *schema.Schema, v interface{}) bool {
 		}
 	}
 	return false
+}
+
+// isConfig  checks if the sch has to be
+// set to a config opt or not
+func isConfig(sch *schema.Schema) bool {
+	if (sch.Computed && !sch.Optional && !sch.Required) || sch.Deprecated != "" {
+		return false
+	}
+	return true
 }
