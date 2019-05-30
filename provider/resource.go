@@ -120,10 +120,11 @@ func (r *Resource) State(w writer.Writer) error {
 // HCL returns the HCL configuration of the Resource and
 // writes it to HCL
 func (r *Resource) HCL(w writer.Writer) error {
-	err := w.Write(fmt.Sprintf("%s.%s", r.Type, tag.GetNameFromTag(r.Provider.TagKey(), r.Data, r.ID)), mergeFullConfig(r.Data, r.TFResource.Schema, ""))
+	cfg := mergeFullConfig(r.Data, r.TFResource.Schema, "")
+	err := w.Write(fmt.Sprintf("%s.%s", r.Type, tag.GetNameFromTag(r.Provider.TagKey(), r.Data, r.ID)), cfg)
 	if err != nil {
 		if errors.Cause(err) == writer.ErrAlreadyExistsKey {
-			err = w.Write(fmt.Sprintf("%s.%s", r.Type, pwgen.Alpha(5)), mergeFullConfig(r.Data, r.TFResource.Schema, ""))
+			err = w.Write(fmt.Sprintf("%s.%s", r.Type, pwgen.Alpha(5)), cfg)
 			if err != nil {
 				return err
 			}
@@ -140,7 +141,7 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 	res := make(map[string]interface{})
 	for k, v := range sch {
 		// If it's just a Computed value, do not add it to the output
-		if v.Computed && !v.Optional && !v.Required {
+		if (v.Computed && !v.Optional && !v.Required) || v.Deprecated != "" {
 			continue
 		}
 
@@ -185,10 +186,20 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 			continue
 		}
 
+		// This sets the singel values that we see on the
+		// end result
+
 		vv, ok := cfgr.GetOk(kk)
 		// If the value is Required we need to add it
 		// even if it's not send
 		if (!ok || vv == nil) && !v.Required {
+			continue
+		}
+
+		// A value in which this one conflicts has been set before
+		// so we should no set this one as it'll raise an error of
+		// `conflicts with *` on Terraform
+		if hasConflict(res, v.ConflictsWith) {
 			continue
 		}
 
@@ -199,6 +210,16 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 		}
 	}
 	return res
+}
+
+// hasConflict checks if any of the keys is present on the res
+func hasConflict(res map[string]interface{}, keys []string) bool {
+	for _, key := range keys {
+		if _, ok := res[key]; ok {
+			return true
+		}
+	}
+	return false
 }
 
 // normalizeValue removes the \n from the value now
@@ -303,8 +324,15 @@ var (
 // default values that we don't want on the HCL output.
 // example: [], false, "", 0 ...
 func isDefault(sch *schema.Schema, v interface{}) bool {
-	if sch != nil && sch.Required {
-		return false
+	if sch != nil {
+		if sch.Required {
+			return false
+		}
+		// This way deprecated values are not aded to the
+		// end result
+		if sch.Deprecated != "" {
+			return true
+		}
 	}
 
 	for _, t := range tfTypes {
