@@ -43,16 +43,17 @@ func Import(ctx context.Context, p Provider, hcl, tfstate writer.Writer, f filte
 				}
 			}
 
-			if tfstate != nil {
-				err = r.State(tfstate)
-				if err != nil {
-					return errors.Wrapf(err, "error while calculating the Satate of resource %q", t)
-				}
-			}
 			if hcl != nil {
 				err = r.HCL(hcl)
 				if err != nil {
 					return errors.Wrapf(err, "error while calculating the Config of resource %q", t)
+				}
+			}
+
+			if tfstate != nil {
+				err = r.State(tfstate)
+				if err != nil {
+					return errors.Wrapf(err, "error while calculating the Satate of resource %q", t)
 				}
 			}
 		}
