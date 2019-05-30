@@ -619,7 +619,7 @@ func iamGroupPolicyAttachments(ctx context.Context, a *aws, resourceType string,
 		}
 
 		for _, i := range groupPolicies[a.Region()].AttachedPolicies {
-			r, err := initializeResource(a, NoID, resourceType)
+			r, err := initializeResource(a, fmt.Sprintf("%s/%s", gn, *i.PolicyArn), resourceType)
 			if err != nil {
 				return nil, err
 			}
@@ -764,7 +764,7 @@ func iamRolePolicyAttachments(ctx context.Context, a *aws, resourceType string, 
 		}
 
 		for _, i := range rolePolicies[a.Region()].AttachedPolicies {
-			r, err := initializeResource(a, fmt.Sprintf("%s:%s", rn, *i), resourceType)
+			r, err := initializeResource(a, fmt.Sprintf("%s/%s", rn, *i.PolicyArn), resourceType)
 			if err != nil {
 				return nil, err
 			}
