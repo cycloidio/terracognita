@@ -146,46 +146,46 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 
 		// Basically calculates the needed
 		// key to the current access
+		var kk string
 		if key != "" {
-			key = key + "." + k
+			kk = key + "." + k
 		} else {
-			key = k
+			kk = k
 		}
 
 		// schema.Resource means that it has nested fields
 		if sr, ok := v.Elem.(*schema.Resource); ok {
 			// Example would be aws_security_group
 			if v.Type == schema.TypeSet {
-				s, ok := cfgr.GetOk(key)
+				s, ok := cfgr.GetOk(kk)
 				if !ok {
 					continue
 				}
 
 				res[k] = normalizeSetList(sr.Schema, s.(*schema.Set).List())
 			} else if v.Type == schema.TypeList {
-				//var ar interface{}
 				var ar interface{} = make([]interface{}, 0)
 
-				l, ok := cfgr.GetOk(key)
+				l, ok := cfgr.GetOk(kk)
 				if !ok {
 					continue
 				}
 
 				list := l.([]interface{})
 				for i := range list {
-					ar = append(ar.([]interface{}), mergeFullConfig(cfgr, sr.Schema, fmt.Sprintf("%s.%d", key, i)))
+					ar = append(ar.([]interface{}), mergeFullConfig(cfgr, sr.Schema, fmt.Sprintf("%s.%d", kk, i)))
 				}
 
 				res[k] = ar
 			} else {
-				res[k] = mergeFullConfig(cfgr, sr.Schema, key)
+				res[k] = mergeFullConfig(cfgr, sr.Schema, kk)
 			}
 			// As it's a nested element it does not require any of
 			// the other code as it's for singel value schemas
 			continue
 		}
 
-		vv, ok := cfgr.GetOk(key)
+		vv, ok := cfgr.GetOk(kk)
 		// If the value is Required we need to add it
 		// even if it's not send
 		if (!ok || vv == nil) && !v.Required {
