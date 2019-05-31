@@ -34,6 +34,11 @@ type Resource struct {
 
 	// Provider is the Provider of that Resource
 	Provider Provider
+
+	// The name it has on the config
+	// so it can be the same on the HCL
+	// and State
+	configName string
 }
 
 // Read read the remote information of the Resource
@@ -119,16 +124,30 @@ func (r *Resource) State(w writer.Writer) error {
 				Provider: "aws",
 			}
 
-			err := w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, tag.GetNameFromTag(r.Provider.TagKey(), rd, r.ID)), trs)
-			if err != nil {
-				if errors.Cause(err) == writer.ErrAlreadyExistsKey {
-					err = w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, pwgen.Alpha(5)), trs)
-					if err != nil {
-						return err
+			// If it does not have any configName we will generate one
+			// and store it, so net time it'll use that one on any config
+			if r.configName == "" {
+				configName := tag.GetNameFromTag(r.Provider.TagKey(), rd, r.ID)
+				err := w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type), trs)
+				if err != nil {
+					if errors.Cause(err) == writer.ErrAlreadyExistsKey {
+						configName = pwgen.Alpha(5)
+						err = w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, configName), trs)
+						if err != nil {
+							return err
+						}
+						r.configName = configName
+						return nil
 					}
-					return nil
+					return err
 				}
-				return err
+				r.configName = configName
+			} else {
+				err := w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, r.configName), trs)
+				if err != nil {
+					return err
+				}
+				return nil
 			}
 		}
 	}
@@ -139,16 +158,28 @@ func (r *Resource) State(w writer.Writer) error {
 // writes it to HCL
 func (r *Resource) HCL(w writer.Writer) error {
 	cfg := mergeFullConfig(r.Data, r.TFResource.Schema, "")
-	err := w.Write(fmt.Sprintf("%s.%s", r.Type, tag.GetNameFromTag(r.Provider.TagKey(), r.Data, r.ID)), cfg)
-	if err != nil {
-		if errors.Cause(err) == writer.ErrAlreadyExistsKey {
-			err = w.Write(fmt.Sprintf("%s.%s", r.Type, pwgen.Alpha(5)), cfg)
-			if err != nil {
-				return err
+
+	if r.configName == "" {
+		configName := tag.GetNameFromTag(r.Provider.TagKey(), r.Data, r.ID)
+		err := w.Write(fmt.Sprintf("%s.%s", r.Type, configName), cfg)
+		if err != nil {
+			if errors.Cause(err) == writer.ErrAlreadyExistsKey {
+				configName = pwgen.Alpha(5)
+				err = w.Write(fmt.Sprintf("%s.%s", r.Type, configName), cfg)
+				if err != nil {
+					return err
+				}
+				r.configName = configName
+				return nil
 			}
-			return nil
+			return err
 		}
-		return err
+		r.configName = configName
+	} else {
+		err := w.Write(fmt.Sprintf("%s.%s", r.Type, r.configName), cfg)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
