@@ -63,7 +63,7 @@ var (
 
 			err = provider.Import(ctx, awsP, hclW, stateW, f)
 			if err != nil {
-				return fmt.Errorf("could not import from AWS: %s", err)
+				return fmt.Errorf("could not import from AWS: %+v", err)
 			}
 
 			return nil
