@@ -46,7 +46,7 @@ const (
 	CloudfrontDistribution
 	CloudfrontOriginAccessIdentity
 	CloudfrontPublicKey
-	IAMAccessKey
+	//IAMAccessKey
 	IAMAccountAlias
 	IAMAccountPasswordPolicy
 	IAMGroup
@@ -112,7 +112,7 @@ var (
 		CloudfrontDistribution:         cloudfrontDistributions,
 		CloudfrontOriginAccessIdentity: cloudfrontOriginAccessIdentities,
 		CloudfrontPublicKey:            cloudfrontPublicKeys,
-		IAMAccessKey:                   iamAccessKeys,
+		//IAMAccessKey:                   iamAccessKeys,
 		IAMAccountAlias:                iamAccountAliases,
 		IAMAccountPasswordPolicy:       iamAccountPasswordPolicy,
 		IAMGroup:                       cacheIAMGroups,
@@ -472,29 +472,29 @@ func cloudfrontPublicKeys(ctx context.Context, a *aws, resourceType string, tags
 	return resources, nil
 }
 
-func iamAccessKeys(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]*provider.Resource, error) {
-	// I could get all the users and do the same filtering by user but it
-	// seems that it does not need it and returns all the AccessKeys
-	accessKeys, err := a.awsr.GetAccessKeys(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
+//func iamAccessKeys(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]*provider.Resource, error) {
+//// I could get all the users and do the same filtering by user but it
+//// seems that it does not need it and returns all the AccessKeys
+//accessKeys, err := a.awsr.GetAccessKeys(ctx, nil)
+//if err != nil {
+//return nil, err
+//}
 
-	resources := make([]*provider.Resource, 0)
-	for _, i := range accessKeys[a.Region()].AccessKeyMetadata {
-		r, err := initializeResource(a, *i.AccessKeyId, resourceType)
-		if err != nil {
-			return nil, err
-		}
-		err = r.Data.Set("user", i.UserName)
-		if err != nil {
-			return nil, err
-		}
-		resources = append(resources, r)
-	}
+//resources := make([]*provider.Resource, 0)
+//for _, i := range accessKeys[a.Region()].AccessKeyMetadata {
+//r, err := initializeResource(a, *i.AccessKeyId, resourceType)
+//if err != nil {
+//return nil, err
+//}
+//err = r.Data.Set("user", i.UserName)
+//if err != nil {
+//return nil, err
+//}
+//resources = append(resources, r)
+//}
 
-	return resources, nil
-}
+//return resources, nil
+//}
 
 func iamAccountAliases(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]*provider.Resource, error) {
 	accountAliases, err := a.awsr.GetAccountAliases(ctx, nil)
