@@ -142,7 +142,7 @@ func (r *Resource) State(w writer.Writer) error {
 			// and store it, so net time it'll use that one on any config
 			if r.configName == "" {
 				configName := tag.GetNameFromTag(r.Provider.TagKey(), rd, r.ID)
-				err := w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type), trs)
+				err := w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, configName), trs)
 				if err != nil {
 					if errors.Cause(err) == writer.ErrAlreadyExistsKey {
 						configName = pwgen.Alpha(5)
