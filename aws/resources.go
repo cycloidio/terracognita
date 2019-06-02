@@ -1270,10 +1270,11 @@ func sesIdentityNotificationTopics(ctx context.Context, a *aws, resourceType str
 			var notType string
 			if i.BounceTopic != nil {
 				notType = *i.BounceTopic
+				notType = ses.NotificationTypeBounce
 			} else if i.ComplaintTopic != nil {
-				notType = *i.ComplaintTopic
+				notType = ses.NotificationTypeComplaint
 			} else if i.DeliveryTopic != nil {
-				notType = *i.DeliveryTopic
+				notType = ses.NotificationTypeDelivery
 			} else {
 				// We need the topic, if fore some reason we do not have
 				// it we have to continue to the next one
