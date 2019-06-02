@@ -255,7 +255,7 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 		vv, ok := cfgr.GetOk(kk)
 		// If the value is Required we need to add it
 		// even if it's not send
-		if (!ok || vv == nil) && !v.Required && v.Default == nil {
+		if (!ok || vv == nil) && !v.Required {
 			continue
 		}
 
@@ -266,15 +266,10 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 			continue
 		}
 
-		if s, sok := vv.(*schema.Set); sok {
+		if s, ok := vv.(*schema.Set); ok {
 			res[k] = s.List()
 		} else {
-			// If it's not set but has a Default
-			if !ok && v.Default != nil {
-				res[k] = v.Default
-			} else {
-				res[k] = normalizeInterpolation(normalizeValue(vv))
-			}
+			res[k] = normalizeInterpolation(normalizeValue(vv))
 		}
 	}
 	return res
@@ -349,8 +344,6 @@ func normalizeSetList(sch map[string]*schema.Schema, list []interface{}) interfa
 				case interface{}:
 					if !isDefault(sch[k], v) {
 						res[k] = v
-					} else if sch[k].Default != nil {
-						res[k] = sch[k].Default
 					}
 				}
 			}
