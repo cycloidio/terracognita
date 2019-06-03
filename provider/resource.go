@@ -401,6 +401,15 @@ func isDefault(sch *schema.Schema, v interface{}) bool {
 
 	for _, t := range tfTypes {
 		if reflect.DeepEqual(t.Zero(), v) {
+			// If it has a default value which is different
+			// than the one v then v has to be setted.
+			// Example: Default => true, v => false
+			// the v = false has to be setted
+			if sch.Default != nil {
+				if v != sch.Default {
+					return false
+				}
+			}
 			return true
 		}
 	}
