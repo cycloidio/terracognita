@@ -1,10 +1,9 @@
-module github.com/cycloidio/terraforming
+module github.com/cycloidio/terracognita
 
 require (
 	github.com/aws/aws-sdk-go v1.19.23
 	github.com/chr4/pwgen v1.1.0
 	github.com/cycloidio/raws v0.0.8-0.20190509102134-0644fb2c94d8
-	github.com/davecgh/go-spew v1.1.1
 	github.com/hashicorp/hcl v1.0.0
 	github.com/hashicorp/hil v0.0.0-20190212132231-97b3a9cdfa93 // indirect
 	github.com/hashicorp/terraform v0.12.0-beta2
