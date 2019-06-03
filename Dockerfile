@@ -16,7 +16,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
 
 # final stage
 FROM alpine
-COPY --from=builder /app/terraforming /app/
+COPY --from=builder /app/terracognita /app/
 # https://github.com/hashicorp/terraform/issues/10779
 RUN apk --update add ca-certificates
-ENTRYPOINT ["/app/terraforming"]
+ENTRYPOINT ["/app/terracognita"]

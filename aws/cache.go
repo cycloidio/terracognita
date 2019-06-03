@@ -3,9 +3,9 @@ package aws
 import (
 	"context"
 
-	"github.com/cycloidio/terraforming/errcode"
-	"github.com/cycloidio/terraforming/provider"
-	"github.com/cycloidio/terraforming/tag"
+	"github.com/cycloidio/terracognita/errcode"
+	"github.com/cycloidio/terracognita/provider"
+	"github.com/cycloidio/terracognita/tag"
 	"github.com/pkg/errors"
 )
 

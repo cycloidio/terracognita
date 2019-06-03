@@ -3,9 +3,9 @@ package cache_test
 import (
 	"testing"
 
-	"github.com/cycloidio/terraforming/cache"
-	"github.com/cycloidio/terraforming/errcode"
-	"github.com/cycloidio/terraforming/provider"
+	"github.com/cycloidio/terracognita/cache"
+	"github.com/cycloidio/terracognita/errcode"
+	"github.com/cycloidio/terracognita/provider"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

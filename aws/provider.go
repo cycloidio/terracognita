@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/cycloidio/raws"
-	"github.com/cycloidio/terraforming/cache"
-	"github.com/cycloidio/terraforming/filter"
-	"github.com/cycloidio/terraforming/provider"
+	"github.com/cycloidio/terracognita/cache"
+	"github.com/cycloidio/terracognita/filter"
+	"github.com/cycloidio/terracognita/provider"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/pkg/errors"
 	tfaws "github.com/terraform-providers/terraform-provider-aws/aws"

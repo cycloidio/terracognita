@@ -1,6 +1,6 @@
 package filter
 
-import "github.com/cycloidio/terraforming/tag"
+import "github.com/cycloidio/terracognita/tag"
 
 // Filter is the list of all possible
 // filters that can be used to filter

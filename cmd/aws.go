@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cycloidio/terraforming/aws"
-	"github.com/cycloidio/terraforming/filter"
-	"github.com/cycloidio/terraforming/provider"
-	"github.com/cycloidio/terraforming/tag"
-	"github.com/cycloidio/terraforming/writer"
+	"github.com/cycloidio/terracognita/aws"
+	"github.com/cycloidio/terracognita/filter"
+	"github.com/cycloidio/terracognita/provider"
+	"github.com/cycloidio/terracognita/tag"
+	"github.com/cycloidio/terracognita/writer"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -20,8 +20,8 @@ var (
 
 	awsCmd = &cobra.Command{
 		Use:   "aws",
-		Short: "Terraforming reads from AWS and generates TF",
-		Long:  "Terraforming reads from AWS and generates TF",
+		Short: "Terracognita reads from AWS and generates TF",
+		Long:  "Terracognita reads from AWS and generates TF",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Validate required flags
 			if err := requiredStringFlags("access-key", "secret-key", "region"); err != nil {

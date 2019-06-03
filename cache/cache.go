@@ -1,8 +1,8 @@
 package cache
 
 import (
-	"github.com/cycloidio/terraforming/errcode"
-	"github.com/cycloidio/terraforming/provider"
+	"github.com/cycloidio/terracognita/errcode"
+	"github.com/cycloidio/terracognita/provider"
 )
 
 // Cache implements a simple cache of provider.Resource

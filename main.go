@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cycloidio/terraforming/cmd"
+	"github.com/cycloidio/terracognita/cmd"
 )
 
 func main() {

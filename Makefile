@@ -39,5 +39,5 @@ test: ## Runs the tests
 ci: lint test ## Runs the linter and the tests
 
 .PHONY: dbuild
-dbuild: ## Builds the docker image with name 'terraforming'
-	@docker build -t terraforming .
+dbuild: ## Builds the docker image with name 'terracognita'
+	@docker build -t terracognita .

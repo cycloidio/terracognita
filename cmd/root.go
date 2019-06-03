@@ -16,9 +16,9 @@ var (
 	closeOut         []io.Closer
 	include, exclude []string
 
-	// RootCmd it's the entry command for the cmd on terraforming
+	// RootCmd it's the entry command for the cmd on terracognita
 	RootCmd = &cobra.Command{
-		Use:   "terraforming",
+		Use:   "terracognita",
 		Short: "Reads from Providers and generates a Terraform configuration",
 		Long:  "Reads from Providers and generates a Terraform configuration, all the flags can be used also with ENV (ex: --access-key == ACCESS_KEY)",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {

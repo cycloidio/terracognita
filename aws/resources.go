@@ -10,8 +10,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/route53"
 	"github.com/aws/aws-sdk-go/service/ses"
-	"github.com/cycloidio/terraforming/provider"
-	"github.com/cycloidio/terraforming/tag"
+	"github.com/cycloidio/terracognita/provider"
+	"github.com/cycloidio/terracognita/tag"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/pkg/errors"
 )

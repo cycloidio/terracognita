@@ -3,9 +3,9 @@ package provider
 import (
 	"context"
 
-	"github.com/cycloidio/terraforming/errcode"
-	"github.com/cycloidio/terraforming/filter"
-	"github.com/cycloidio/terraforming/writer"
+	"github.com/cycloidio/terracognita/errcode"
+	"github.com/cycloidio/terracognita/filter"
+	"github.com/cycloidio/terracognita/writer"
 	"github.com/pkg/errors"
 )
 

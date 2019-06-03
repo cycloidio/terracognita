@@ -3,7 +3,7 @@ package provider
 import (
 	"context"
 
-	"github.com/cycloidio/terraforming/filter"
+	"github.com/cycloidio/terracognita/filter"
 )
 
 // Provider is the ggeneral interface used to abstract
