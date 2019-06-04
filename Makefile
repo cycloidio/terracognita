@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+BIN := "terracognita"
 BIN_DIR := $(GOPATH)/bin
 
 GOLANGCI_LINT := $(BIN_DIR)/golangci-lint
@@ -39,5 +41,14 @@ test: ## Runs the tests
 ci: lint test ## Runs the linter and the tests
 
 .PHONY: dbuild
-dbuild: ## Builds the docker image with name 'terracognita'
-	@docker build -t terracognita .
+dbuild: ## Builds the docker image with same name as the binary
+	@docker build -t $(BIN) .
+
+.PHONY: build
+build: ## Builds the binary
+	GO111MODULE=on CGO_ENABLED=0 GOARCH=amd64 go build -o $(BIN)
+
+.PHONY: clean
+clean: ## Removes binary and/or docker image
+	rm -f $(BIN)
+	docker rmi -f $(BIN)
