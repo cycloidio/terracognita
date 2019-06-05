@@ -9,8 +9,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// TFStateWriter it's a Writer implementation that it's ment to
-// then generate a TFState
+// TFStateWriter is a Writer implementation
+// that is meant to generate a TFState
 type TFStateWriter struct {
 	Config map[string]*terraform.ResourceState
 	w      io.Writer
