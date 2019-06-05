@@ -13,15 +13,15 @@ import (
 	"github.com/pkg/errors"
 )
 
-// HCLWriter it's a Writer implementation that writes to
-// a static map to then use to traform to HCL
+// HCLWriter is a Writer implementation that writes to
+// a static map to then transform it to HCL
 type HCLWriter struct {
 	// TODO: Change it to "map[string]map[string]schema.ResourceData"
 	Config map[string]interface{}
 	w      io.Writer
 }
 
-// NewHCLWriter rerturns a HCLWriter initializatioon
+// NewHCLWriter rerturns an HCLWriter initialization
 func NewHCLWriter(w io.Writer) *HCLWriter {
 	cfg := make(map[string]interface{})
 	cfg["resource"] = make(map[string]map[string]interface{})
@@ -43,7 +43,7 @@ func (hclw *HCLWriter) Write(key string, value interface{}) error {
 	}
 
 	keys := strings.Split(key, ".")
-	if len(keys) < 2 {
+	if len(keys) != 2 || (keys[0] == "" || keys[1] == "") {
 		return errors.Wrapf(ErrInvalidKey, "with key %q", key)
 	}
 
