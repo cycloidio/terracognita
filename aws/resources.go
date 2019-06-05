@@ -1266,7 +1266,6 @@ func sesIdentityNotificationTopics(ctx context.Context, a *aws, resourceType str
 		for _, i := range sesIdentityNotificationTopics[a.Region()].NotificationAttributes {
 			var notType string
 			if i.BounceTopic != nil {
-				notType = *i.BounceTopic
 				notType = ses.NotificationTypeBounce
 			} else if i.ComplaintTopic != nil {
 				notType = ses.NotificationTypeComplaint
