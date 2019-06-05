@@ -1,20 +1,5 @@
 package writer
 
-import (
-	"github.com/pkg/errors"
-)
-
-// The list of possible errors
-var (
-	ErrRequiredKey      = errors.New("the key it's required")
-	ErrRequiredValue    = errors.New("the value it's required")
-	ErrInvalidKey       = errors.New("invalid key")
-	ErrInvalidTypeValue = errors.New("invalid type value")
-	ErrAlreadyExistsKey = errors.New("already exists key")
-)
-
-//go:generate mockgen -destination=../mock/writer.go -mock_names=Writer=Writer -package mock github.com/cycloidio/terracognita/writer Writer
-
 // Writer it's an interface used to abstract the logic
 // of writing results to a Key Value without having to
 // deal with types or internal structures

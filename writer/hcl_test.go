@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"testing"
 
+	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/writer"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -50,7 +51,7 @@ func TestHCLWriter_Write(t *testing.T) {
 		)
 
 		err := hw.Write("", nil)
-		assert.Equal(t, writer.ErrRequiredKey, errors.Cause(err))
+		assert.Equal(t, errcode.ErrWriterRequiredKey, errors.Cause(err))
 	})
 	t.Run("ErrRequiredValue", func(t *testing.T) {
 		var (
@@ -59,7 +60,7 @@ func TestHCLWriter_Write(t *testing.T) {
 		)
 
 		err := hw.Write("type.name", nil)
-		assert.Equal(t, writer.ErrRequiredValue, errors.Cause(err))
+		assert.Equal(t, errcode.ErrWriterRequiredValue, errors.Cause(err))
 	})
 	t.Run("ErrInvalidKey", func(t *testing.T) {
 		var (
@@ -68,13 +69,13 @@ func TestHCLWriter_Write(t *testing.T) {
 		)
 
 		err := hw.Write("type.name.name", "")
-		assert.Equal(t, writer.ErrInvalidKey, errors.Cause(err))
+		assert.Equal(t, errcode.ErrWriterInvalidKey, errors.Cause(err))
 
 		err = hw.Write("type", "")
-		assert.Equal(t, writer.ErrInvalidKey, errors.Cause(err))
+		assert.Equal(t, errcode.ErrWriterInvalidKey, errors.Cause(err))
 
 		err = hw.Write("type.", "")
-		assert.Equal(t, writer.ErrInvalidKey, errors.Cause(err))
+		assert.Equal(t, errcode.ErrWriterInvalidKey, errors.Cause(err))
 	})
 	t.Run("ErrAlreadyExistsKey", func(t *testing.T) {
 		var (
@@ -86,7 +87,7 @@ func TestHCLWriter_Write(t *testing.T) {
 		require.NoError(t, err)
 
 		err = hw.Write("type.name", "")
-		assert.Equal(t, writer.ErrAlreadyExistsKey, errors.Cause(err))
+		assert.Equal(t, errcode.ErrWriterAlreadyExistsKey, errors.Cause(err))
 	})
 }
 

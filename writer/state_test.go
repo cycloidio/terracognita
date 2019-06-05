@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/writer"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/pkg/errors"
@@ -41,13 +42,13 @@ func TestTFStateWriter_Write(t *testing.T) {
 		sw := writer.NewTFStateWriter(nil)
 
 		err := sw.Write("", nil)
-		assert.Equal(t, writer.ErrRequiredKey, errors.Cause(err))
+		assert.Equal(t, errcode.ErrWriterRequiredKey, errors.Cause(err))
 	})
 	t.Run("ErrRequiredValue", func(t *testing.T) {
 		sw := writer.NewTFStateWriter(nil)
 
 		err := sw.Write("key", nil)
-		assert.Equal(t, writer.ErrRequiredValue, errors.Cause(err))
+		assert.Equal(t, errcode.ErrWriterRequiredValue, errors.Cause(err))
 	})
 	t.Run("ErrAlreadyExistsKey", func(t *testing.T) {
 		var (
@@ -60,13 +61,13 @@ func TestTFStateWriter_Write(t *testing.T) {
 		require.NoError(t, err)
 
 		err = sw.Write("key", value)
-		assert.Equal(t, writer.ErrAlreadyExistsKey, errors.Cause(err))
+		assert.Equal(t, errcode.ErrWriterAlreadyExistsKey, errors.Cause(err))
 	})
 	t.Run("ErrInvalidTypeValue", func(t *testing.T) {
 		sw := writer.NewTFStateWriter(nil)
 
 		err := sw.Write("key", 0)
-		assert.Equal(t, writer.ErrInvalidTypeValue, errors.Cause(err))
+		assert.Equal(t, errcode.ErrWriterInvalidTypeValue, errors.Cause(err))
 	})
 }
 

@@ -7,6 +7,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/cycloidio/terracognita/errcode"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/fmtcmd"
 	"github.com/hashicorp/hcl/hcl/printer"
@@ -35,22 +36,22 @@ func NewHCLWriter(w io.Writer) *HCLWriter {
 // repeated keys will report an error
 func (hclw *HCLWriter) Write(key string, value interface{}) error {
 	if key == "" {
-		return ErrRequiredKey
+		return errcode.ErrWriterRequiredKey
 	}
 
 	if value == nil {
-		return ErrRequiredValue
+		return errcode.ErrWriterRequiredValue
 	}
 
 	keys := strings.Split(key, ".")
 	if len(keys) != 2 || (keys[0] == "" || keys[1] == "") {
-		return errors.Wrapf(ErrInvalidKey, "with key %q", key)
+		return errors.Wrapf(errcode.ErrWriterInvalidKey, "with key %q", key)
 	}
 
 	name := strings.Join(keys[1:], "")
 
 	if _, ok := hclw.Config["resource"].(map[string]map[string]interface{})[keys[0]][name]; ok {
-		return errors.Wrapf(ErrAlreadyExistsKey, "with key %q", key)
+		return errors.Wrapf(errcode.ErrWriterAlreadyExistsKey, "with key %q", key)
 	}
 
 	if _, ok := hclw.Config["resource"].(map[string]map[string]interface{})[keys[0]]; !ok {

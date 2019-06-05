@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/cycloidio/terracognita/errcode"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/pkg/errors"
 )
@@ -28,20 +29,20 @@ func NewTFStateWriter(w io.Writer) *TFStateWriter {
 // repeated keys will report an error
 func (tfsw *TFStateWriter) Write(key string, value interface{}) error {
 	if key == "" {
-		return ErrRequiredKey
+		return errcode.ErrWriterRequiredKey
 	}
 
 	if value == nil {
-		return ErrRequiredValue
+		return errcode.ErrWriterRequiredValue
 	}
 
 	if _, ok := tfsw.Config[key]; ok {
-		return errors.Wrapf(ErrAlreadyExistsKey, "with key %q", key)
+		return errors.Wrapf(errcode.ErrWriterAlreadyExistsKey, "with key %q", key)
 	}
 
 	trs, ok := value.(*terraform.ResourceState)
 	if !ok {
-		return errors.Wrapf(ErrInvalidTypeValue, "expected *terraform.ResourceState, found %T", value)
+		return errors.Wrapf(errcode.ErrWriterInvalidTypeValue, "expected *terraform.ResourceState, found %T", value)
 	}
 
 	tfsw.Config[key] = trs
