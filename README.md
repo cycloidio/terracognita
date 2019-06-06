@@ -1,4 +1,4 @@
-# Terracognita (beta)
+# TerraCognita (beta)
 
 Imports your current Cloud infrastructure to an Infrastructure As Code [Terraform](https://www.terraform.io/) configuration (HCL) or/and to a Terraform State.
 
