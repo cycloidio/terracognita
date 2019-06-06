@@ -4,6 +4,7 @@ BIN_DIR := $(GOPATH)/bin
 
 GOLANGCI_LINT := $(BIN_DIR)/golangci-lint
 GOLINT := $(BIN_DIR)/golint
+MOCKGEN := $(BIN_DIR)/mockgen
 
 .PHONY: help
 help: Makefile ## This help dialog
@@ -23,9 +24,16 @@ $(GOLANGCI_LINT):
 $(GOLINT):
 	@go get -u golang.org/x/lint/golint
 
+$(MOCKGEN):
+	@go get -u github.com/golang/mock/mockgen
+
 .PHONY: lint
 lint: $(GOLANGCI_LINT) $(GOLINT) ## Runs the linter
 	@GO111MODULE=on golangci-lint run -E goimports ./... && golint -set_exit_status ./...
+
+.PHONY: generate
+generate: $(MOCKGEN) ## Generates the needed code
+	@GO111MODULE=on go generate ./...
 
 .PHONY: test
 test: ## Runs the tests
