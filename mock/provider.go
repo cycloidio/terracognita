@@ -64,7 +64,7 @@ func (mr *ProviderMockRecorder) ResourceTypes() *gomock.Call {
 }
 
 // Resources mocks base method
-func (m *Provider) Resources(arg0 context.Context, arg1 string, arg2 filter.Filter) ([]provider.Resource, error) {
+func (m *Provider) Resources(arg0 context.Context, arg1 string, arg2 *filter.Filter) ([]provider.Resource, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Resources", arg0, arg1, arg2)
 	ret0, _ := ret[0].([]provider.Resource)

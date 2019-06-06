@@ -21,7 +21,7 @@ type Provider interface {
 
 	// Resources returns all the Resources of the resourceType
 	// on the cloud provider
-	Resources(ctx context.Context, resourceType string, f filter.Filter) ([]Resource, error)
+	Resources(ctx context.Context, resourceType string, f *filter.Filter) ([]Resource, error)
 
 	// TFClient returns the Terraform client which may change
 	// on the provider

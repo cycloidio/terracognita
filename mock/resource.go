@@ -93,7 +93,7 @@ func (mr *ResourceMockRecorder) Provider() *gomock.Call {
 }
 
 // Read mocks base method
-func (m *Resource) Read(arg0 filter.Filter) error {
+func (m *Resource) Read(arg0 *filter.Filter) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Read", arg0)
 	ret0, _ := ret[0].(error)

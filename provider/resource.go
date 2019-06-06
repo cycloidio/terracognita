@@ -38,7 +38,7 @@ type Resource interface {
 	Provider() Provider
 
 	// Read read the remote information of the Resource
-	Read(f filter.Filter) error
+	Read(f *filter.Filter) error
 
 	// State calculates the state of the Resource and
 	// writes it to w
@@ -95,7 +95,7 @@ func (r *resource) Data() *schema.ResourceData { return r.data }
 
 func (r *resource) Provider() Provider { return r.provider }
 
-func (r *resource) Read(f filter.Filter) error {
+func (r *resource) Read(f *filter.Filter) error {
 	// Retry if any error happen
 	err := util.RetryDefault(func() error {
 		return r.tfResource.Read(r.data, r.provider.TFClient())

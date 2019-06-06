@@ -52,7 +52,7 @@ func (a *aws) ResourceTypes() []string {
 	return ResourceTypeStrings()
 }
 
-func (a *aws) Resources(ctx context.Context, t string, f filter.Filter) ([]provider.Resource, error) {
+func (a *aws) Resources(ctx context.Context, t string, f *filter.Filter) ([]provider.Resource, error) {
 	rt, err := ResourceTypeString(t)
 	if err != nil {
 		return nil, err

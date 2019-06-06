@@ -11,7 +11,7 @@ import (
 
 // Import imports from the Provider p all the resources filtered by f and writes
 // the result to the hcl or tfstate if those are not nil
-func Import(ctx context.Context, p Provider, hcl, tfstate writer.Writer, f filter.Filter) error {
+func Import(ctx context.Context, p Provider, hcl, tfstate writer.Writer, f *filter.Filter) error {
 	var types []string
 
 	if len(f.Include) != 0 {
@@ -24,6 +24,7 @@ func Import(ctx context.Context, p Provider, hcl, tfstate writer.Writer, f filte
 		if f.IsExcluded(t) {
 			continue
 		}
+
 		resources, err := p.Resources(ctx, t, f)
 		if err != nil {
 			return errors.WithStack(err)
