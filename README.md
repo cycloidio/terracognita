@@ -1,5 +1,7 @@
 # Terracognita (beta)
 
+[![GoDoc](https://godoc.org/github.com/cycloidio/terracognita?status.svg)](https://godoc.org/github.com/cycloidio/terracognita)
+
 Imports your current Cloud infrastructure to an Infrastructure As Code [Terraform](https://www.terraform.io/) configuration (HCL) or/and to a Terraform State.
 
 To do so, it relies on [raws](https://github.com/cycloidio/raws/) a self-generated AWS reader.
