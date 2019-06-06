@@ -14,13 +14,13 @@ import (
 func TestSetGet(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		c := cache.New()
-		r := &provider.Resource{ID: "id"}
-		err := c.Set("k", []*provider.Resource{r})
+		r := provider.NewResource("id", "", nil, nil, nil)
+		err := c.Set("k", []provider.Resource{r})
 		require.NoError(t, err)
 
 		rs, err := c.Get("k")
 		require.NoError(t, err)
-		assert.Equal(t, []*provider.Resource{r}, rs)
+		assert.Equal(t, []provider.Resource{r}, rs)
 	})
 
 	t.Run("ErrCacheKeyNotFound", func(t *testing.T) {
