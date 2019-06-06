@@ -24,6 +24,8 @@ var (
 	ErrAlreadyExistsKey = errors.New("already exists key")
 )
 
+//go:generate mockgen -destination=../mock/writer.go -mock_names=Writer=Writer -package mock github.com/cycloidio/terracognita/writer Writer
+
 // Writer it's an interface used to abstract the logic
 // of writing results to a Key Value without having to
 // deal with types or internal structures

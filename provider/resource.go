@@ -17,6 +17,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+//go:generate mockgen -destination=../mock/resource.go -mock_names=Resource=Resource -package mock github.com/cycloidio/terracognita/provider Resource
+
 // Resource represents the minimal information needed to
 // define a Provider resource
 type Resource interface {
