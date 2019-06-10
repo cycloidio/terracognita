@@ -6,6 +6,8 @@ import (
 	"github.com/cycloidio/terracognita/filter"
 )
 
+//go:generate mockgen -destination=../mock/provider.go -mock_names=Provider=Provider -package mock github.com/cycloidio/terracognita/provider Provider
+
 // Provider is the ggeneral interface used to abstract
 // a cloud provider from Terraform
 type Provider interface {
@@ -19,7 +21,7 @@ type Provider interface {
 
 	// Resources returns all the Resources of the resourceType
 	// on the cloud provider
-	Resources(ctx context.Context, resourceType string, f filter.Filter) ([]*Resource, error)
+	Resources(ctx context.Context, resourceType string, f *filter.Filter) ([]Resource, error)
 
 	// TFClient returns the Terraform client which may change
 	// on the provider

@@ -45,7 +45,7 @@ var (
 				return err
 			}
 
-			f := filter.Filter{
+			f := &filter.Filter{
 				Tags:    tags,
 				Include: include,
 				Exclude: exclude,
