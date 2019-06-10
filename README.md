@@ -7,7 +7,7 @@ At this stage, raws supports [various technologies](https://github.com/cycloidio
 
 At [Cycloid](https://www.cycloid.io/), Infrastructure As Code is in the company DNA since the beginning. To help our new customers adopting this best practice, we decided to build Terracognita to convert an existing infrastructure on AWS into Terraform code in an automated way, relying on Terraform providers built by the community. We focused on AWS for a first release, but Azure, GCP, Alibaba, Vmware and Openstack will be the next to be integrated.
 
-We decided to opensource this tool as we believe that it will help people to adopt IaC in an easy way. Cycloid provides this tool to let people import their infrastructure into [Cycloid's pipelines]([Cycloid.io](https://www.cycloid.io/devops-platform-with-ci-cd-container-pipeline), allow them to generate infrastructure diagram and manage all infra/application lifecycle from a single interface.
+We decided to opensource this tool as we believe that it will help people to adopt IaC in an easy way. Cycloid provides this tool to let people import their infrastructure into [Cycloid's pipelines](https://www.cycloid.io/devops-platform-with-ci-cd-container-pipeline), allow them to generate infrastructure diagram and manage all infra/application lifecycle from a single interface.
 
 ## Installation
 
