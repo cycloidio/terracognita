@@ -193,7 +193,7 @@ func (r *resource) State(w writer.Writer) error {
 				configName := tag.GetNameFromTag(r.provider.TagKey(), rd, r.id)
 				err := w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, configName), trs)
 				if err != nil {
-					if errors.Cause(err) == writer.ErrAlreadyExistsKey {
+					if errors.Cause(err) == errcode.ErrWriterAlreadyExistsKey {
 						configName = pwgen.Alpha(5)
 						err = w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, configName), trs)
 						if err != nil {
@@ -226,7 +226,7 @@ func (r *resource) HCL(w writer.Writer) error {
 		configName := tag.GetNameFromTag(r.provider.TagKey(), r.data, r.id)
 		err := w.Write(fmt.Sprintf("%s.%s", r.resourceType, configName), cfg)
 		if err != nil {
-			if errors.Cause(err) == writer.ErrAlreadyExistsKey {
+			if errors.Cause(err) == errcode.ErrWriterAlreadyExistsKey {
 				configName = pwgen.Alpha(5)
 				err = w.Write(fmt.Sprintf("%s.%s", r.resourceType, configName), cfg)
 				if err != nil {

@@ -10,4 +10,10 @@ var (
 
 	ErrCacheKeyNotFound        = errors.New("the key used to search was not found")
 	ErrCacheKeyAlreadyExisting = errors.New("the key already exists on the cache")
+
+	ErrWriterRequiredKey      = errors.New("the key is required")
+	ErrWriterRequiredValue    = errors.New("the value is required")
+	ErrWriterInvalidKey       = errors.New("invalid key")
+	ErrWriterInvalidTypeValue = errors.New("invalid type of value")
+	ErrWriterAlreadyExistsKey = errors.New("the key already exists")
 )

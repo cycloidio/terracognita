@@ -40,6 +40,7 @@ test: ## Runs the tests
 	@docker run --rm \
 		-v $$(pwd):/app \
 		-w /app \
+		-u $(shell id -u):$(shell id -g) \
 		-v $(shell go env GOCACHE):/tmp/gocach \
 		-e "GOCACHE=/tmp/gocach" \
 		-v $(GOPATH)/pkg/mod:/go/pkg/mod golang:1.12 \
