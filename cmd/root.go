@@ -21,41 +21,43 @@ var (
 		Use:   "terracognita",
 		Short: "Reads from Providers and generates a Terraform configuration",
 		Long:  "Reads from Providers and generates a Terraform configuration, all the flags can be used also with ENV (ex: --access-key == ACCESS_KEY)",
-		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			closeOut = make([]io.Closer, 0)
-			if viper.GetString("hcl") != "" {
-				f, err := os.OpenFile(viper.GetString("hcl"), os.O_APPEND|os.O_TRUNC|os.O_RDWR|os.O_CREATE, 0755)
-				if err != nil {
-					return fmt.Errorf("could not OpenFile %s because: %s", viper.GetString("hcl"), err)
-				}
-				hcl = f
-				closeOut = append(closeOut, f)
-			}
-			if viper.GetString("tfstate") != "" {
-				f, err := os.OpenFile(viper.GetString("tfstate"), os.O_APPEND|os.O_TRUNC|os.O_RDWR|os.O_CREATE, 0755)
-				if err != nil {
-					return fmt.Errorf("could not OpenFile %s because: %s", viper.GetString("tfstate"), err)
-				}
-				tfstate = f
-				closeOut = append(closeOut, f)
-			}
-
-			if len(closeOut) == 0 {
-				return fmt.Errorf("one of --hcl or --tfstate are required")
-			}
-			return nil
-		},
-		PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
-			for _, c := range closeOut {
-				if err := c.Close(); err != nil {
-					return err
-				}
-			}
-
-			return nil
-		},
 	}
 )
+
+func preRunEOutput(cmd *cobra.Command, args []string) error {
+	closeOut = make([]io.Closer, 0)
+	if viper.GetString("hcl") != "" {
+		f, err := os.OpenFile(viper.GetString("hcl"), os.O_APPEND|os.O_TRUNC|os.O_RDWR|os.O_CREATE, 0644)
+		if err != nil {
+			return fmt.Errorf("could not OpenFile %s because: %s", viper.GetString("hcl"), err)
+		}
+		hcl = f
+		closeOut = append(closeOut, f)
+	}
+	if viper.GetString("tfstate") != "" {
+		f, err := os.OpenFile(viper.GetString("tfstate"), os.O_APPEND|os.O_TRUNC|os.O_RDWR|os.O_CREATE, 0644)
+		if err != nil {
+			return fmt.Errorf("could not OpenFile %s because: %s", viper.GetString("tfstate"), err)
+		}
+		tfstate = f
+		closeOut = append(closeOut, f)
+	}
+
+	if len(closeOut) == 0 {
+		return fmt.Errorf("one of --hcl or --tfstate are required")
+	}
+	return nil
+}
+
+func postRunEOutput(cmd *cobra.Command, args []string) error {
+	for _, c := range closeOut {
+		if err := c.Close(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
 
 func init() {
 	cobra.OnInitialize(initViper)
