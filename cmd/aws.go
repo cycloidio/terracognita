@@ -19,9 +19,11 @@ var (
 	tags []string
 
 	awsCmd = &cobra.Command{
-		Use:   "aws",
-		Short: "Terracognita reads from AWS and generates TF",
-		Long:  "Terracognita reads from AWS and generates TF",
+		Use:      "aws",
+		Short:    "Terracognita reads from AWS and generates hcl resources and/or terraform state",
+		Long:     "Terracognita reads from AWS and generates hcl resources and/or terraform state",
+		PreRunE:  preRunEOutput,
+		PostRunE: postRunEOutput,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Validate required flags
 			if err := requiredStringFlags("access-key", "secret-key", "region"); err != nil {
@@ -72,6 +74,7 @@ var (
 )
 
 func init() {
+	awsCmd.AddCommand(awsResourcesCmd)
 
 	// Required flags
 
