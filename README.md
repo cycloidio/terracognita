@@ -47,6 +47,8 @@ build:                           Bulids the binary
 clean:                           Removes binary and/or docker image
 ```
 
+[![asciicast](https://asciinema.org/a/252604.svg)](https://asciinema.org/a/252604)
+
 ### Docker
 
 You can use directly [the image built](https://cloud.docker.com/u/cycloid/repository/docker/cycloid/terracognita/general), or you can build your own.
