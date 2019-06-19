@@ -154,6 +154,8 @@ func (r *resource) Read(f *filter.Filter) error {
 func (r *resource) State(w writer.Writer) error {
 
 	if importer := r.tfResource.Importer; importer != nil {
+
+		setRootDefaults(r.data, r.tfResource.Schema)
 		resourceDatas, err := importer.State(r.data, r.provider.TFClient())
 		if err != nil {
 			return err
@@ -248,6 +250,36 @@ func (r *resource) HCL(w writer.Writer) error {
 	return nil
 }
 
+// setRootDefaults set's the default values of the schema of the root values
+func setRootDefaults(cfgr *schema.ResourceData, sch map[string]*schema.Schema) {
+	for k, v := range sch {
+		// If it's just a Computed value, do not add it to the output
+		if !isConfig(v) {
+			continue
+		}
+
+		// schema.Resource means that it has nested fields
+		if _, ok := v.Elem.(*schema.Resource); ok {
+			continue
+		}
+
+		// This sets the single values that we see on the
+		// end result
+
+		vv, ok := cfgr.GetOk(k)
+		// If the value is Required we need to add it
+		// even if it's not sent
+		if (!ok || vv == nil) && !v.Required && v.Default == nil {
+			continue
+		}
+
+		if !ok && v.Default != nil {
+			cfgr.Set(k, v.Default)
+		}
+	}
+	return
+}
+
 // mergeFullConfig creates the key to the map and if it had a value before set it, if
 func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, key string) map[string]interface{} {
 	res := make(map[string]interface{})
@@ -294,16 +326,16 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 				res[k] = mergeFullConfig(cfgr, sr.Schema, kk)
 			}
 			// As it's a nested element it does not require any of
-			// the other code as it's for singel value schemas
+			// the other code as it's for single value schemas
 			continue
 		}
 
-		// This sets the singel values that we see on the
+		// This sets the single values that we see on the
 		// end result
 
 		vv, ok := cfgr.GetOk(kk)
 		// If the value is Required we need to add it
-		// even if it's not send
+		// even if it's not sent
 		if (!ok || vv == nil) && !v.Required {
 			continue
 		}
