@@ -15,6 +15,11 @@ func Import(ctx context.Context, p Provider, hcl, tfstate writer.Writer, f *filt
 	var types []string
 
 	if len(f.Include) != 0 {
+		for _, i := range f.Include {
+			if !p.HasResourceType(i) {
+				return errors.Wrapf(errcode.ErrProviderResourceNotSupported, "resource type %s", i)
+			}
+		}
 		types = f.Include
 	} else {
 		types = p.ResourceTypes()

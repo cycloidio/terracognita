@@ -2,6 +2,7 @@ package provider_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/cycloidio/terracognita/errcode"
@@ -9,6 +10,8 @@ import (
 	"github.com/cycloidio/terracognita/mock"
 	"github.com/cycloidio/terracognita/provider"
 	"github.com/golang/mock/gomock"
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -75,6 +78,7 @@ func TestImport(t *testing.T) {
 
 		defer ctrl.Finish()
 
+		p.EXPECT().HasResourceType("aws_instance").Return(true)
 		p.EXPECT().Resources(ctx, "aws_instance", f).Return([]provider.Resource{instanceResoure1, instanceResoure2}, nil)
 
 		instanceResoure1.EXPECT().Read(f).Return(nil)
@@ -299,5 +303,28 @@ func TestImport(t *testing.T) {
 
 		err := provider.Import(ctx, p, hw, sw, f)
 		require.NoError(t, err)
+	})
+	t.Run("ErrorWithIncorrectFilter", func(t *testing.T) {
+		var (
+			ctrl = gomock.NewController(t)
+			ctx  = context.Background()
+
+			p  = mock.NewProvider(ctrl)
+			hw = mock.NewWriter(ctrl)
+			sw = mock.NewWriter(ctrl)
+
+			f = &filter.Filter{
+				Include: []string{"aws_instance", "aws_potato"},
+			}
+		)
+
+		defer ctrl.Finish()
+
+		p.EXPECT().HasResourceType("aws_instance").Return(true)
+		p.EXPECT().HasResourceType("aws_potato").Return(false)
+
+		err := provider.Import(ctx, p, hw, sw, f)
+		fmt.Println(err)
+		assert.Equal(t, errcode.ErrProviderResourceNotSupported.Error(), errors.Cause(err).Error())
 	})
 }

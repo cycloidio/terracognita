@@ -35,6 +35,20 @@ func (m *Provider) EXPECT() *ProviderMockRecorder {
 	return m.recorder
 }
 
+// HasResourceType mocks base method
+func (m *Provider) HasResourceType(arg0 string) bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HasResourceType", arg0)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// HasResourceType indicates an expected call of HasResourceType
+func (mr *ProviderMockRecorder) HasResourceType(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HasResourceType", reflect.TypeOf((*Provider)(nil).HasResourceType), arg0)
+}
+
 // Region mocks base method
 func (m *Provider) Region() string {
 	m.ctrl.T.Helper()

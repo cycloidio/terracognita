@@ -19,6 +19,10 @@ type Provider interface {
 	// the Provider
 	ResourceTypes() []string
 
+	// HasResourceType validates if the string t is a valid
+	// resource type for this provider
+	HasResourceType(t string) bool
+
 	// Resources returns all the Resources of the resourceType
 	// on the cloud provider
 	Resources(ctx context.Context, resourceType string, f *filter.Filter) ([]Resource, error)
