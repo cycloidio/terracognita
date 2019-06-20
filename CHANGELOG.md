@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- The `version` subcommand to show the actual build version
+  ([Issue #24](https://github.com/cycloidio/terracognita/issues/24))
+
 ### Fixed
 
 - Error with the Import Filter not validating before Importing/Reading
