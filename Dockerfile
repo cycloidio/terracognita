@@ -12,7 +12,8 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
+RUN GIT_TAG=$(git describe --tags --always) && \
+  CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-X github.com/cycloidio/terracognita/cmd.Version=$GIT_TAG"
 
 # final stage
 FROM alpine
