@@ -62,6 +62,7 @@ func postRunEOutput(cmd *cobra.Command, args []string) error {
 func init() {
 	cobra.OnInitialize(initViper)
 	RootCmd.AddCommand(awsCmd)
+	RootCmd.AddCommand(versionCmd)
 
 	RootCmd.PersistentFlags().String("hcl", "", "HCL output file")
 	_ = viper.BindPFlag("hcl", RootCmd.PersistentFlags().Lookup("hcl"))
