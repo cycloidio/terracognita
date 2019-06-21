@@ -6,6 +6,11 @@ GOLANGCI_LINT := $(BIN_DIR)/golangci-lint
 GOLINT := $(BIN_DIR)/golint
 MOCKGEN := $(BIN_DIR)/mockgen
 
+VERSION= $(shell git describe --tags --always)
+
+# Setup the -ldflags option for go build here, interpolate the variable values
+LDFLAGS=-ldflags "-X github.com/cycloidio/terracognita/cmd.Version=${VERSION}"
+
 .PHONY: help
 help: Makefile ## This help dialog
 	@IFS=$$'\n' ; \
@@ -55,7 +60,7 @@ dbuild: ## Builds the docker image with same name as the binary
 
 .PHONY: build
 build: ## Builds the binary
-	GO111MODULE=on CGO_ENABLED=0 GOARCH=amd64 go build -o $(BIN)
+	GO111MODULE=on CGO_ENABLED=0 GOARCH=amd64 go build -o $(BIN) ${LDFLAGS}
 
 .PHONY: clean
 clean: ## Removes binary and/or docker image
