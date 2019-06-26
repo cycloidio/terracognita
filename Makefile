@@ -62,6 +62,10 @@ dbuild: ## Builds the docker image with same name as the binary
 build: ## Builds the binary
 	GO111MODULE=on CGO_ENABLED=0 GOARCH=amd64 go build -o $(BIN) ${LDFLAGS}
 
+.PHONY: install
+install: ## Install the binary
+	GO111MODULE=on CGO_ENABLED=0 GOARCH=amd64 go install ${LDFLAGS}
+
 .PHONY: clean
 clean: ## Removes binary and/or docker image
 	rm -f $(BIN)
