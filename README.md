@@ -13,14 +13,20 @@ We decided to opensource this tool as we believe that it will help people to ado
 
 ## Installation
 
-It uses Go Modules, so GO 11 or higher is required.
+It uses Go Modules, so GO 1.11+ is required.
 If you wish to run it via docker then `docker` binary is required.
 While if you wish to run it locally; you will need to have the extra `brz` lib installed.
 
+You have 2 options to get the package:
+
+* Clone the repository to `$GOPATH/src/github.com/cycloidio/terracognita`
+* `go get -d github.com/cycloidio/terracognita`
+
+Then feel free to play with it :)
+
 ```
-$> go get -u github.com/cycloidio/terracognita
 $> cd $GOPATH/src/github/cycloidio/terracognita
-$> go install .
+$> make install
 ```
 
 ## Versions
