@@ -11,6 +11,7 @@ import (
 	filter "github.com/cycloidio/terracognita/filter"
 	provider "github.com/cycloidio/terracognita/provider"
 	gomock "github.com/golang/mock/gomock"
+	schema "github.com/hashicorp/terraform/helper/schema"
 )
 
 // Provider is a mock of Provider interface
@@ -119,6 +120,20 @@ func (m *Provider) TFClient() interface{} {
 func (mr *ProviderMockRecorder) TFClient() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TFClient", reflect.TypeOf((*Provider)(nil).TFClient))
+}
+
+// TFProvider mocks base method
+func (m *Provider) TFProvider() *schema.Provider {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TFProvider")
+	ret0, _ := ret[0].(*schema.Provider)
+	return ret0
+}
+
+// TFProvider indicates an expected call of TFProvider
+func (mr *ProviderMockRecorder) TFProvider() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TFProvider", reflect.TypeOf((*Provider)(nil).TFProvider))
 }
 
 // TagKey mocks base method

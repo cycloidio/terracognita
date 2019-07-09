@@ -361,6 +361,7 @@ github.com/hashicorp/terraform v0.12.6 h1:mWItQdLZQ7f3kBYBu2Kgdg+E5iZb1KtCq73V10
 github.com/hashicorp/terraform v0.12.6/go.mod h1:udmq5rU8CO9pEIh/A/Xrs3zb3yYU/W9ce1pp8K1ysHA=
 github.com/hashicorp/terraform v0.12.7 h1:4pD+XguGRMGBnERUO3Wbtmv23R26ovWpGSQ2yqIL73Q=
 github.com/hashicorp/terraform v0.12.7/go.mod h1:dpIRVHTSvPpGZPDKBLEw3U7nNQaJCybZoZkeJSYxg/w=
+github.com/hashicorp/terraform v0.12.12 h1:c71+dDT8TbiVDCaQPvkEhdvTqyrP55s7POa6D5aUBSM=
 github.com/hashicorp/terraform-config-inspect v0.0.0-20190327195015-8022a2663a70 h1:oZm5nE11yhzsTRz/YrUyDMSvixePqjoZihwn8ipuOYI=
 github.com/hashicorp/terraform-config-inspect v0.0.0-20190327195015-8022a2663a70/go.mod h1:ItvqtvbC3K23FFET62ZwnkwtpbKZm8t8eMcWjmVVjD8=
 github.com/hashicorp/terraform-config-inspect v0.0.0-20190821133035-82a99dc22ef4 h1:fTkL0YwjohGyN7AqsDhz6bwcGBpT+xBqi3Qhpw58Juw=
