@@ -1,9 +1,16 @@
 ## [Unreleased]
 
+This version changes the format of the TFState to the Terraform 0.12+ [format](https://www.terraform.io/upgrade-guides/0-12.html)
+
 ### Fixed
 
 - HCL formatter to ignore some special keys that fail on the `fmtcmd` of HCL
   ([Issue #36](https://github.com/cycloidio/terracognita/issues/36))
+
+### Changed
+
+- The Terraform version from 0.11 to 0.12 with all the implications (file formats) https://www.terraform.io/upgrade-guides/0-12.html
+  ([PR #33](https://github.com/cycloidio/terracognita/pull/33))
 
 ## [0.1.6] _2019-07-18_
 
