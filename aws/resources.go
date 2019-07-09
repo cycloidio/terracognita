@@ -499,7 +499,7 @@ func iamAccountAliases(ctx context.Context, a *aws, resourceType string, tags []
 
 func iamAccountPasswordPolicy(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
 	// As it's for the full account we'll tell TF to fetch it directly with a "" id
-	r, err := initializeResource(a, NoID, resourceType)
+	r, err := initializeResource(a, "iam-account-password-policy", resourceType)
 	if err != nil {
 		return nil, err
 	}
