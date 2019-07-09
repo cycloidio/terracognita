@@ -12,7 +12,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/ses"
 	"github.com/cycloidio/terracognita/provider"
 	"github.com/cycloidio/terracognita/tag"
-	"github.com/pkg/errors"
 )
 
 // ResourceType is the type used to define all the Resources
@@ -153,19 +152,7 @@ var (
 )
 
 func initializeResource(a *aws, ID, t string) (provider.Resource, error) {
-	tfr, ok := a.tfProvider.ResourcesMap[t]
-	if !ok {
-		return nil, errors.Errorf("the resource %q does not exists on Terraform", t)
-	}
-
-	data := tfr.Data(nil)
-	data.SetId(ID)
-	data.SetType(t)
-
-	return provider.NewResource(
-		ID, t, tfr,
-		data, a,
-	), nil
+	return provider.NewResource(ID, t, a), nil
 }
 
 func instances(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
@@ -815,6 +802,7 @@ func iamUserGroupMemberships(ctx context.Context, a *aws, resourceType string, t
 
 	resources := make([]provider.Resource, 0)
 	for _, un := range userNames {
+		// The format expected by TF is <user-name>/<group-name1>/...
 		r, err := initializeResource(a, strings.Join(append([]string{un}, groupNames...), "/"), resourceType)
 		if err != nil {
 			return nil, err

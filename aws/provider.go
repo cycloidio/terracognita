@@ -43,10 +43,13 @@ func NewProvider(ctx context.Context, accessKey, secretKey, region string) (prov
 		return nil, fmt.Errorf("could not initialize 'terraform/aws.Config.Client()' because: %s", err)
 	}
 
+	tfp := tfaws.Provider().(*schema.Provider)
+	tfp.SetMeta(awsClient)
+
 	return &aws{
 		awsr:        awsr,
 		tfAWSClient: awsClient,
-		tfProvider:  tfaws.Provider().(*schema.Provider),
+		tfProvider:  tfp,
 		cache:       cache.New(),
 	}, nil
 }
@@ -76,6 +79,10 @@ func (a *aws) Resources(ctx context.Context, t string, f *filter.Filter) ([]prov
 
 func (a *aws) TFClient() interface{} {
 	return a.tfAWSClient
+}
+
+func (a *aws) TFProvider() *schema.Provider {
+	return a.tfProvider
 }
 
 func (a *aws) String() string { return "aws" }
