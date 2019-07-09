@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/cycloidio/terracognita/filter"
+	"github.com/hashicorp/terraform/helper/schema"
 )
 
 //go:generate mockgen -destination=../mock/provider.go -mock_names=Provider=Provider -package mock github.com/cycloidio/terracognita/provider Provider
@@ -30,6 +31,9 @@ type Provider interface {
 	// TFClient returns the Terraform client which may change
 	// on the provider
 	TFClient() interface{}
+
+	// TFProvider returns the Terraform provider
+	TFProvider() *schema.Provider
 
 	// String returns the string representation of the Provider
 	// which is the shorted version (Amazon Web Services = aws)
