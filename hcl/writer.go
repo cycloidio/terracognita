@@ -72,10 +72,10 @@ func (w *Writer) Write(key string, value interface{}) error {
 	return nil
 }
 
-// Has checks if the given key it's already present or not
+// Has checks if the given key is already present or not
 func (w *Writer) Has(key string) (bool, error) {
 	keys := strings.Split(key, ".")
-	if len(keys) != 2 || (keys[0] == "" || keys[1] == "") {
+	if len(keys) != 2 || keys[0] == "" || keys[1] == "" {
 		return false, errors.Wrapf(errcode.ErrWriterInvalidKey, "with key %q", key)
 	}
 

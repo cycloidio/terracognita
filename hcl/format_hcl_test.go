@@ -46,19 +46,23 @@ func TestFormat(t *testing.T) {
 				"ebs_block_device" = {
 					"volume_size" = 24
 				}
-				"tags" = {
+				"=tc=tags" = {
+					"some.thing" = "s"
+				}
+				"=tc=volume_tags" = {
 					"some.thing" = "s"
 				}
 			`),
-			// The output it's a bit wierd as it required
-			// an \n before and after the block
 			out: []byte(`
-
 				ebs_block_device {
 					volume_size = 24
 				}
 
 				tags = {
+					"some.thing" = "s"
+				}
+
+				volume_tags = {
 					"some.thing" = "s"
 				}
 
@@ -71,7 +75,7 @@ func TestFormat(t *testing.T) {
 
 				"env" = "value"
 
-				"tags" = {
+				"=tc=tags" = {
 					"something" = "s"
 
 					"another" = "a"
@@ -101,7 +105,7 @@ func TestFormat(t *testing.T) {
 
 				"env" = "value"
 
-				"tags" = {
+				"=tc=tags" = {
 					"something" = "s"
 
 					"another" = "a"
