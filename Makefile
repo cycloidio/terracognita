@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-BIN := "terracognita"
+BIN := terracognita
 BIN_DIR := $(GOPATH)/bin
 
 GOLANGCI_LINT := $(BIN_DIR)/golangci-lint
@@ -7,6 +7,9 @@ GOLINT := $(BIN_DIR)/golint
 MOCKGEN := $(BIN_DIR)/mockgen
 
 VERSION= $(shell git describe --tags --always)
+PLATFORMS=darwin linux windows
+ARCHITECTURES=386 amd64
+BUILD_PATH := builds
 
 # Setup the -ldflags option for go build here, interpolate the variable values
 LDFLAGS=-ldflags "-X github.com/cycloidio/terracognita/cmd.Version=${VERSION}"
@@ -61,6 +64,17 @@ dbuild: ## Builds the docker image with same name as the binary
 .PHONY: build
 build: ## Builds the binary
 	GO111MODULE=on CGO_ENABLED=0 GOARCH=amd64 go build -o $(BIN) ${LDFLAGS}
+
+.PHONY: build-all build-compress
+build-all: ## Builds the binaries
+	$(foreach GOOS, $(PLATFORMS),\
+	$(foreach GOARCH, $(ARCHITECTURES),\
+	$(shell export GO111MODULE=on; export CGO_ENABLED=0; export GOOS=$(GOOS); export GOARCH=$(GOARCH); go build -v -o $(BUILD_PATH)/$(BIN)-$(GOOS)-$(GOARCH) ${LDFLAGS})))
+
+build-compress: build-all ## Builds and compress the binaries
+	$(foreach GOOS, $(PLATFORMS),\
+	$(foreach GOARCH, $(ARCHITECTURES),\
+	$(shell export GOOS=$(GOOS); export GOARCH=$(GOARCH); tar -C $(BUILD_PATH) -czf $(BUILD_PATH)/$(BIN)-$(GOOS)-$(GOARCH).tar.gz $(BIN)-$(GOOS)-$(GOARCH))))
 
 .PHONY: install
 install: ## Install the binary
