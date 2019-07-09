@@ -1,4 +1,4 @@
-package writer
+package hcl
 
 import (
 	"regexp"
@@ -45,9 +45,9 @@ var (
 	}
 )
 
-// FormatHCL format the hcl to have a better formatter thatn the default one
+// Format format the hcl to have a better formatter thatn the default one
 // returend from HCL printer.Fprint
-func FormatHCL(hcl []byte) []byte {
+func Format(hcl []byte) []byte {
 	for _, m := range transformers {
 		hcl = m.match.ReplaceAll(hcl, m.replace)
 	}

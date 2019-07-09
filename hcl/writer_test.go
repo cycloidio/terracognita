@@ -1,11 +1,11 @@
-package writer_test
+package hcl_test
 
 import (
 	"bytes"
 	"testing"
 
 	"github.com/cycloidio/terracognita/errcode"
-	"github.com/cycloidio/terracognita/writer"
+	"github.com/cycloidio/terracognita/hcl"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -13,7 +13,7 @@ import (
 
 func TestNewHCLWriter(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		hw := writer.NewHCLWriter(nil)
+		hw := hcl.NewWriter(nil)
 
 		assert.Equal(t, map[string]interface{}{
 			"resource": make(map[string]map[string]interface{}),
@@ -25,7 +25,7 @@ func TestHCLWriter_Write(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		var (
 			b     = &bytes.Buffer{}
-			hw    = writer.NewHCLWriter(b)
+			hw    = hcl.NewWriter(b)
 			value = map[string]interface{}{
 				"key": "value",
 			}
@@ -47,7 +47,7 @@ func TestHCLWriter_Write(t *testing.T) {
 	t.Run("ErrRequiredKey", func(t *testing.T) {
 		var (
 			b  = &bytes.Buffer{}
-			hw = writer.NewHCLWriter(b)
+			hw = hcl.NewWriter(b)
 		)
 
 		err := hw.Write("", nil)
@@ -56,7 +56,7 @@ func TestHCLWriter_Write(t *testing.T) {
 	t.Run("ErrRequiredValue", func(t *testing.T) {
 		var (
 			b  = &bytes.Buffer{}
-			hw = writer.NewHCLWriter(b)
+			hw = hcl.NewWriter(b)
 		)
 
 		err := hw.Write("type.name", nil)
@@ -65,7 +65,7 @@ func TestHCLWriter_Write(t *testing.T) {
 	t.Run("ErrInvalidKey", func(t *testing.T) {
 		var (
 			b  = &bytes.Buffer{}
-			hw = writer.NewHCLWriter(b)
+			hw = hcl.NewWriter(b)
 		)
 
 		err := hw.Write("type.name.name", "")
@@ -80,7 +80,7 @@ func TestHCLWriter_Write(t *testing.T) {
 	t.Run("ErrAlreadyExistsKey", func(t *testing.T) {
 		var (
 			b  = &bytes.Buffer{}
-			hw = writer.NewHCLWriter(b)
+			hw = hcl.NewWriter(b)
 		)
 
 		err := hw.Write("type.name", "")
@@ -95,7 +95,7 @@ func TestHCLWriter_Sync(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		var (
 			b     = &bytes.Buffer{}
-			hw    = writer.NewHCLWriter(b)
+			hw    = hcl.NewWriter(b)
 			value = map[string]interface{}{
 				"key": "value",
 			}

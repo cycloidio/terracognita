@@ -1,4 +1,4 @@
-package writer
+package hcl
 
 import (
 	"bytes"
@@ -17,27 +17,27 @@ import (
 	"github.com/pkg/errors"
 )
 
-// HCLWriter is a Writer implementation that writes to
+// Writer is a Writer implementation that writes to
 // a static map to then transform it to HCL
-type HCLWriter struct {
+type Writer struct {
 	// TODO: Change it to "map[string]map[string]schema.ResourceData"
 	Config map[string]interface{}
-	w      io.Writer
+	writer io.Writer
 }
 
-// NewHCLWriter rerturns an HCLWriter initialization
-func NewHCLWriter(w io.Writer) *HCLWriter {
+// NewWriter rerturns an Writer initialization
+func NewWriter(w io.Writer) *Writer {
 	cfg := make(map[string]interface{})
 	cfg["resource"] = make(map[string]map[string]interface{})
-	return &HCLWriter{
+	return &Writer{
 		Config: cfg,
-		w:      w,
+		writer: w,
 	}
 }
 
 // Write expects a key similar to "aws_instance.your_name"
 // repeated keys will report an error
-func (hclw *HCLWriter) Write(key string, value interface{}) error {
+func (w *Writer) Write(key string, value interface{}) error {
 	if key == "" {
 		return errcode.ErrWriterRequiredKey
 	}
@@ -53,12 +53,12 @@ func (hclw *HCLWriter) Write(key string, value interface{}) error {
 
 	name := strings.Join(keys[1:], "")
 
-	if _, ok := hclw.Config["resource"].(map[string]map[string]interface{})[keys[0]][name]; ok {
+	if _, ok := w.Config["resource"].(map[string]map[string]interface{})[keys[0]][name]; ok {
 		return errors.Wrapf(errcode.ErrWriterAlreadyExistsKey, "with key %q", key)
 	}
 
-	if _, ok := hclw.Config["resource"].(map[string]map[string]interface{})[keys[0]]; !ok {
-		hclw.Config["resource"].(map[string]map[string]interface{})[keys[0]] = make(map[string]interface{})
+	if _, ok := w.Config["resource"].(map[string]map[string]interface{})[keys[0]]; !ok {
+		w.Config["resource"].(map[string]map[string]interface{})[keys[0]] = make(map[string]interface{})
 	}
 
 	b, err := json.Marshal(value)
@@ -67,17 +67,33 @@ func (hclw *HCLWriter) Write(key string, value interface{}) error {
 	}
 	log.Get().Log("func", "writer.Write(HCL)", "msg", "writing to internal config", "key", keys[0], "content", string(b))
 
-	hclw.Config["resource"].(map[string]map[string]interface{})[keys[0]][name] = value
+	w.Config["resource"].(map[string]map[string]interface{})[keys[0]][name] = value
 
 	return nil
 }
 
+// Has checks if the given key it's already present or not
+func (w *Writer) Has(key string) (bool, error) {
+	keys := strings.Split(key, ".")
+	if len(keys) != 2 || (keys[0] == "" || keys[1] == "") {
+		return false, errors.Wrapf(errcode.ErrWriterInvalidKey, "with key %q", key)
+	}
+
+	name := strings.Join(keys[1:], "")
+
+	if _, ok := w.Config["resource"].(map[string]map[string]interface{})[keys[0]][name]; ok {
+		return false, errors.Wrapf(errcode.ErrWriterAlreadyExistsKey, "with key %q", key)
+	}
+
+	return true, nil
+}
+
 // Sync writes the content of the Config to the
 // internal w with the correct format
-func (hclw *HCLWriter) Sync() error {
+func (w *Writer) Sync() error {
 	logger := log.Get()
 	logger = kitlog.With(logger, "func", "writer.Write(HCL)")
-	b, err := json.Marshal(hclw.Config)
+	b, err := json.Marshal(w.Config)
 	if err != nil {
 		return err
 	}
@@ -101,7 +117,7 @@ func (hclw *HCLWriter) Sync() error {
 
 	buff = bytes.NewBuffer(formattedHCL)
 
-	err = fmtcmd.Run(nil, nil, buff, hclw.w, fmtcmd.Options{})
+	err = fmtcmd.Run(nil, nil, buff, w.writer, fmtcmd.Options{})
 	if err != nil {
 		return fmt.Errorf("error while fmt HCL: %s", err)
 	}
