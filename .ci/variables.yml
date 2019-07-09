@@ -1,0 +1,35 @@
+#
+# Default variables that shouldn't be changed except if needed
+#
+project: ($ project $)
+env: ($ environment $)
+customer: ($ organization_canonical $)
+
+ci-context: terracognita
+
+# Git repository
+github-repo-uri: git@github.com:cycloidio/terracognita.git
+github-repo-owner: cycloidio
+github-repo-name: terracognita
+github-access-token: ((github_access_token.data))
+github-private-key: ((git_github.ssh_key))
+
+# Docker image version
+docker-image: golang
+docker-image-tag: 1.12
+docker-hub-username: ((docker_hub.username))
+docker-hub-password: ((docker_hub.password))
+
+# Default branch
+branch: master
+
+# Cache path: used for dependencies
+cache-path: go/pkg/mod
+
+script: go test ./...
+
+# Release initial version
+initial-version: 1.0.0
+
+# Slack notification
+slack-deployment-url: ((slack_webhook.url))
