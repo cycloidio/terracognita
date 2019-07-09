@@ -10,8 +10,10 @@ import (
 
 	"github.com/cycloidio/terracognita/aws"
 	"github.com/cycloidio/terracognita/filter"
+	"github.com/cycloidio/terracognita/hcl"
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/provider"
+	"github.com/cycloidio/terracognita/state"
 	"github.com/cycloidio/terracognita/tag"
 	"github.com/cycloidio/terracognita/writer"
 	"github.com/spf13/cobra"
@@ -60,14 +62,14 @@ var (
 
 			var hclW, stateW writer.Writer
 
-			if hcl != nil {
+			if hclOut != nil {
 				logger.Log("msg", "initialzing HCL writer")
-				hclW = writer.NewHCLWriter(hcl)
+				hclW = hcl.NewWriter(hclOut)
 			}
 
-			if tfstate != nil {
+			if stateOut != nil {
 				logger.Log("msg", "initialzing TFState writer")
-				stateW = writer.NewTFStateWriter(tfstate)
+				stateW = state.NewWriter(stateOut)
 			}
 
 			logger.Log("msg", "importing")
