@@ -85,6 +85,8 @@ github.com/coreos/go-systemd v0.0.0-20181012123002-c6f51f82210d/go.mod h1:F5haX7
 github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f/go.mod h1:E3G3o1h8I7cfcXa63jLwjI0eiQQMgzzUDFVpN/nH/eA=
 github.com/cycloidio/raws v1.0.0 h1:Sy5h+meu6y6k85eInantamuZfJUmLDJImR5tkAreKEM=
 github.com/cycloidio/raws v1.0.0/go.mod h1:cVgpisA66wxryE3KiRnIOcM0VDQ/nVqu68z9k+nByos=
+github.com/cycloidio/raws v1.0.1 h1:hh3Yl5YKo3r2tumgcPeAyygp+MomDY3aa4+15+74ttg=
+github.com/cycloidio/raws v1.0.1/go.mod h1:cVgpisA66wxryE3KiRnIOcM0VDQ/nVqu68z9k+nByos=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
