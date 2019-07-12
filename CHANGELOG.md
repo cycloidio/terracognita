@@ -15,3 +15,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Error with the Import Filter not validating before Importing/Reading
   ([PR #22](https://github.com/cycloidio/terracognita/pull/22))
+- Update to version 1.0.1 of `raws` to fix panic on importing `aws_s3_bucket`
+  ([Issue #29](https://github.com/cycloidio/terracognita/issues/29))
