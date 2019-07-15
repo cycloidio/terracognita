@@ -26,10 +26,6 @@ branch: master
 # Cache path: used for dependencies
 cache-path: go/pkg/mod
 
-script: |
-  make lint
-  go test ./...
-
 # Release initial version
 initial-version: 1.0.0
 

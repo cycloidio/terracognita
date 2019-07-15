@@ -17,7 +17,8 @@ shared:
     - |
       export GOPATH=${PWD}/go
       cd code
-      ((script))
+      make lint
+      go test ./...
 
 groups:
   - name: all
