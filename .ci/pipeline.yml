@@ -1,0 +1,488 @@
+shared:
+  - &slack-alert
+    author_name: cycloid.io
+    author_link: https://www.cycloid.io/
+    title_link: https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID
+    fields:
+      - title: Project
+        value: ((project))
+        short: true
+      - title: Environment
+        value: ((env))
+        short: true
+
+  - &run-unit-tests
+    args:
+    - '-ec'
+    - |
+      export GOPATH=${PWD}/go
+      cd code
+      make lint
+      go test ./...
+
+groups:
+  - name: all
+    jobs:
+      - test-pr
+      - test-((branch))
+      - version-((branch))
+      - release-((branch))
+      - publish-docker-image-master
+      - bump-to-next-patch-version
+      - bump-to-next-minor-version
+      - bump-to-next-major-version
+
+  - name: tests
+    jobs:
+      - test-pr
+      - test-((branch))
+
+  - name: release
+    jobs:
+      - test-((branch))
+      - version-((branch))
+      - release-((branch))
+      - publish-docker-image-master
+      - bump-to-next-patch-version
+      - bump-to-next-minor-version
+      - bump-to-next-major-version
+
+resource_types:
+  - name: slack-notification
+    type: docker-image
+    source:
+      repository: cfcommunity/slack-notification-resource
+      tag: latest
+
+  - name: pull-request
+    type: docker-image
+    source:
+      repository: teliaoss/github-pr-resource
+      tag: v0.15.0
+
+  - name: report-github-status
+    type: docker-image
+    source:
+      repository: cycloid/github-status-resource
+      tag: latest
+
+  - name: cycloid-events
+    type: docker-image
+    source:
+      repository: cycloid/cycloid-events-resource
+      tag: latest
+    privileged: false
+
+resources:
+  - name: report-status-((branch))
+    type: report-github-status
+    source:
+      access_token: ((github-access-token))
+      branch: ((branch))
+      repository: ((github-repo-owner))/((github-repo-name))
+
+  - name: golang-image
+    type: docker-image
+    source:
+      repository: golang
+      tag: 1.12
+
+  - name: cycloid-events
+    type: cycloid-events
+    source:
+      api_login: ((event-login))
+      api_password: ((event-password))
+      api_url: 'https://http-api.cycloid.io'
+      icon: fa-code-branch
+      organization: ((customer))
+      severity: info
+      tags:
+        - key: project
+          value: ((env))
+        - key: env
+          value: ((branch))
+      type: Custom
+
+  - name: ((project))-docker-image
+    type: docker-image
+    source:
+      password: ((docker-hub-password))
+      repository: cycloid/((project))
+      username: ((docker-hub-username))
+
+  - name: pull-request
+    type: pull-request
+    source:
+      repository: ((github-repo-owner))/((github-repo-name))
+      access_token: ((github-access-token))
+
+  - name: repo-((branch))
+    type: git
+    source:
+      uri: ((github-repo-uri))
+      branch: ((branch))
+      private_key: ((github-private-key))
+
+  - name: gh-release
+    type: github-release
+    source:
+      owner: ((github-repo-owner))
+      repository: ((github-repo-name))
+      access_token: ((github-access-token))
+
+  - name: final-version
+    type: semver
+    source:
+      driver: git
+      uri: ((github-repo-uri))
+      branch: version/final
+      private_key: ((github-private-key))
+      file: rc-version
+      initial_version: ((initial-version))
+
+  - name: repo-version
+    type: semver
+    source:
+      driver: git
+      uri: ((github-repo-uri))
+      branch: version/rc
+      private_key: ((github-private-key))
+      file: version
+      initial_version: ((initial-version))
+
+  - name: slack-alert
+    type: slack-notification
+    source:
+      url: ((slack-deployment-url))
+
+  - name: alpine-image
+    type: docker-image
+    source:
+      repository: alpine
+
+jobs:
+  - name: test-pr
+    max_in_flight: 1
+    build_logs_to_retain: 20
+    serial: true
+    plan:
+      - get: pull-request
+        resource: pull-request
+        trigger: true
+        version: every
+
+      - put: pull-request
+        params:
+          context: ((ci-context))
+          path: pull-request
+          status: pending
+          target_url: 'https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME'
+
+      - task: unit-tests
+        privileged: true
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: ((docker-image))
+              tag: ((docker-image-tag))
+          run:
+            path: /bin/bash
+            <<: *run-unit-tests
+          inputs:
+            - name: pull-request
+              path: code
+          caches:
+            - path: ((cache-path))
+        on_failure:
+          put: pull-request
+          params:
+            context: ((ci-context))
+            path: pull-request
+            status: failure
+            target_url: 'https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME'
+        on_success:
+          put: pull-request
+          params:
+            context: ((ci-context))
+            path: pull-request
+            status: success
+            target_url: 'https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME'
+
+  - name: test-((branch))
+    build_logs_to_retain: 20
+    max_in_flight: 1
+    plan:
+      - get: ((branch))
+        resource: repo-((env))
+        trigger: false
+
+      - get: repo-version
+        trigger: true
+
+      - task: run-test
+        privileged: true
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: ((docker-image))
+              tag: ((docker-image-tag))
+          run:
+            path: /bin/bash
+            <<: *run-unit-tests
+          inputs:
+            - name: ((branch))
+              path: code
+          caches:
+            - path: ((cache-path))
+        on_success:
+          try:
+            put: report-status-((branch))
+            params:
+              commit: ((branch))
+              context: ((ci-context))
+              state: success
+              target_url: 'https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID'
+        on_failure:
+          try:
+            put: report-status-((branch))
+            params:
+              commit: ((branch))
+              context: ((ci-context))
+              state: failure
+              target_url: 'https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID'
+
+  - name: version-((branch))
+    build_logs_to_retain: 20
+    serial: true
+    serial_groups: [ update-version ]
+    plan:
+      - aggregate:
+        - get: ((branch))
+          resource: repo-((branch))
+          passed: [ test-((branch)) ]
+          trigger: true
+        - get: repo-version
+          params: { bump: final }
+      - put: final-version
+        params: { file: repo-version/version }
+
+  - name: release-((branch))
+    serial: true
+    build_logs_to_retain: 20
+    plan:
+      - aggregate:
+        - get: ((branch))
+          resource: repo-((branch))
+          passed: [ version-((branch)) ]
+          trigger: true
+        - get: final-version
+          passed: [ version-((branch)) ]
+        - get: repo-version
+          trigger: false
+        - put: slack-alert
+          params:
+            attachments:
+              - <<: *slack-alert
+                fallback: "start - DEPLOY of ((project)) [In progress ...]"
+                color: "#039BE5"
+                title: "[Release: In progress ...]"
+
+      - task: extract-changelog
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: cycloid/cycloid-toolkit
+              tag: latest
+          run:
+            path: /bin/sh
+            args:
+              - '-c'
+              - |
+                sed '0,/^## \[.*\] _[0-9].*$/d' master/CHANGELOG.md | sed '/^## \[.*\] _[0-9].*$/Q' > changelog-extracted/CHANGELOG.md
+                echo "v`cat final-version/version`" > final-version-with-v/with-v
+          inputs:
+            - name: ((branch))
+            - name: final-version
+          outputs:
+            - name: changelog-extracted
+            - name: final-version-with-v
+      - task: generate-binaries
+        privileged: true
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: ((docker-image))
+              tag: ((docker-image-tag))
+          run:
+            path: /bin/bash
+            args:
+              - '-c'
+              - |
+                export GOPATH=${PWD}/go
+                cd code
+                make build-compress BUILD_PATH=../builds
+          inputs:
+            - name: ((branch))
+              path: code
+          outputs:
+            - name: builds
+          caches:
+            - path: ((cache-path))
+      - put: gh-release
+        params:
+          name: final-version-with-v/with-v
+          tag: final-version-with-v/with-v
+          body: changelog-extracted/CHANGELOG.md
+          globs:
+            - builds/*.tar.gz
+    on_failure:
+      do:
+      - put: slack-alert
+        params:
+          attachments:
+            - <<: *slack-alert
+              fallback: "end - DEPLOY of ((project)) [FAIL]"
+              color: danger
+              title: "[Release: FAIL]"
+      - put: cycloid-events
+        params:
+          severity: crit
+          message: |
+                   A new deployment of ((project)) version $VERSION has failed on ((env)) environment
+                   </br>
+                   <ul>
+                   <li><em><a href="https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID">Build link</a></em></li>
+                   <li><em><a href="https://github.com/cycloidio/((project))/releases/tag/v$VERSION">Changelog</a></em></li>
+                   </ul>
+          title: Fail deployment of ((project)) version $VERSION on ((env)) environment
+
+    on_success:
+      do:
+      - put: slack-alert
+        params:
+          attachments:
+            - <<: *slack-alert
+              fallback: "end - DEPLOY of ((project)) [SUCCESS]"
+              color: good
+              title: "[Release: SUCCESS]"
+      - put: cycloid-events
+        params:
+          message: |
+                   A new deployment of ((project)) version $VERSION has been done on ((env)) environment
+                   </br>
+                   <ul>
+                   <li><em><a href="https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID">Build link</a></em></li>
+                   <li><em><a href="https://github.com/cycloidio/((project))/releases/tag/v$VERSION">Changelog</a></em></li>
+                   </ul>
+          title: Success deployment of ((project)) version $VERSION on ((env)) environment
+
+  - name: publish-docker-image-master
+    serial: true
+    max_in_flight: 1
+    build_logs_to_retain: 20
+    plan:
+      - do:
+          - get: ((branch))
+            resource: repo-((branch))
+            passed: [ version-((branch)) ]
+            trigger: true
+          - get: repo-version
+            trigger: false
+          - get: final-version
+            passed: [ version-((branch)) ]
+          - get: golang
+            resource: golang-image
+            params:
+              save: true
+          - get: alpine
+            resource: alpine-image
+            params:
+              save: true
+          - put: slack-alert
+            params:
+              attachments:
+                - <<: *slack-alert
+                  fallback: "start - BUILD and PUBLISH of ((project)) [In progress ...]"
+                  color: "#039BE5"
+                  title: "[Docker: In progress ...]"
+          - put: ((project))-docker-image
+            params:
+              build: master
+              load_bases:
+                - golang
+                - alpine
+              tag_file: final-version/version
+              tag_prefix: v
+              tag_as_latest: true
+        on_failure:
+          do:
+            - put: slack-alert
+              params:
+                attachments:
+                  - <<: *slack-alert
+                    fallback: "end - BUILD and PUBLISH of ((project)) [FAIL]"
+                    color: danger
+                    title: "[Docker: FAIL]"
+            - put: cycloid-events
+              params:
+                message: |
+                  A new build image of terracognita has failed on master environment
+                  </br>
+                  <ul>
+                  <li><em><a href="https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID">Build link</a></em></li>
+                  </ul>
+                severity: critical
+                title: Fail build image of terracognita on master environment
+        on_success:
+          do:
+            - put: slack-alert
+              params:
+                attachments:
+                  - <<: *slack-alert
+                    fallback: "end - BUILD and PUBLISH of ((project)) [SUCCESS]"
+                    color: good
+                    title: '[Docker: SUCCESS]'
+            - put: cycloid-events
+              params:
+                message: |
+                  A new build image of terracognita has been done on master environment
+                  </br>
+                  <ul>
+                  <li><em><a href="https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID">Build link</a></em></li>
+                  </ul>
+                title: Success build image of terracognita on master environment
+
+  - name: bump-to-next-patch-version
+    serial: true
+    serial_groups: [ update-version ]
+    plan:
+      - get: repo-((branch))
+      - get: repo-version
+      - put: repo-version
+        params: { bump: patch }
+
+  - name: bump-to-next-minor-version
+    serial: true
+    serial_groups: [ update-version ]
+    plan:
+      - get: repo-((branch))
+      - get: repo-version
+      - put: repo-version
+        params: { bump: minor }
+
+  - name: bump-to-next-major-version
+    serial: true
+    serial_groups: [ update-version ]
+    plan:
+      - get: repo-((branch))
+      - get: repo-version
+      - put: repo-version
+        params: { bump: major }
