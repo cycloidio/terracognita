@@ -89,8 +89,8 @@ resources:
   - name: cycloid-events
     type: cycloid-events
     source:
-      api_login: ((cycloid_bot_account.login))
-      api_password: ((cycloid_bot_account.password))
+      api_login: ((event-login))
+      api_password: ((event-password))
       api_url: 'https://http-api.cycloid.io'
       icon: fa-code-branch
       organization: ((customer))

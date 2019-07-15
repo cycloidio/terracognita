@@ -33,5 +33,7 @@ script: |
 # Release initial version
 initial-version: 1.0.0
 
-# Slack notification
+# Notifications
 slack-deployment-url: ((slack_webhook.url))
+event-login: ((cycloid_bot_account.login))
+event-password: ((cycloid_bot_account.password))
