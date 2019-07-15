@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The `version` subcommand to show the actual build version
   ([Issue #24](https://github.com/cycloidio/terracognita/issues/24))
+- CI/CD pipeline
+
+### Changed
+
+- Update CI/CD pipeline which now also has pre-built binaries, automate github release and docker release image.
+  ([Issue #31](https://github.com/cycloidio/terracognita/issues/31))
 
 ### Fixed
 
