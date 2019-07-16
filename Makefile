@@ -37,7 +37,7 @@ $(MOCKGEN):
 
 .PHONY: lint
 lint: $(GOLANGCI_LINT) $(GOLINT) ## Runs the linter
-	@GO111MODULE=on golangci-lint run -E goimports ./... && golint -set_exit_status ./...
+	@GO111MODULE=on golangci-lint run -D errcheck -E goimports ./... && golint -set_exit_status ./...
 
 .PHONY: generate
 generate: $(MOCKGEN) ## Generates the needed code

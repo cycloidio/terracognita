@@ -84,8 +84,5 @@ func (a *aws) Region() string { return a.awsr.GetRegions()[0] }
 func (a *aws) TagKey() string { return "tags" }
 func (a *aws) HasResourceType(t string) bool {
 	_, err := ResourceTypeString(t)
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }

@@ -277,7 +277,6 @@ func setRootDefaults(cfgr *schema.ResourceData, sch map[string]*schema.Schema) {
 			cfgr.Set(k, v.Default)
 		}
 	}
-	return
 }
 
 // mergeFullConfig creates the key to the map and if it had a value before set it, if
