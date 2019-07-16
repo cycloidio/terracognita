@@ -4,6 +4,8 @@ require (
 	github.com/aws/aws-sdk-go v1.19.47
 	github.com/chr4/pwgen v1.1.0
 	github.com/cycloidio/raws v1.0.1
+	github.com/go-kit/kit v0.9.0
+	github.com/go-logfmt/logfmt v0.4.0 // indirect
 	github.com/golang/mock v1.2.0
 	github.com/hashicorp/hcl v1.0.0
 	github.com/hashicorp/hil v0.0.0-20190212132231-97b3a9cdfa93 // indirect
