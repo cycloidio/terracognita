@@ -16,6 +16,7 @@ shared:
     - '-ec'
     - |
       export GOPATH=${PWD}/go
+      export PATH="$GOPATH/bin:$PATH"
       cd code
       make lint
       go test ./...
@@ -327,6 +328,7 @@ jobs:
               - '-c'
               - |
                 export GOPATH=${PWD}/go
+                export PATH="$GOPATH/bin:$PATH"
                 cd code
                 make build-compress BUILD_PATH=../builds
           inputs:
