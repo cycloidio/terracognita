@@ -5,6 +5,7 @@ project: ($ project $)
 env: ($ environment $)
 customer: ($ organization_canonical $)
 
+base-context: cycloid-ci
 ci-context: terracognita
 
 # Git repository
