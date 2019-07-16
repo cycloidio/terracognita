@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/cycloidio/terracognita/log"
 )
 
 const (
@@ -30,6 +31,7 @@ func Retry(rfn RetryFn, times int, interval time.Duration) error {
 		}
 		if awsErr, ok := err.(awserr.Error); ok {
 			if awsErr.Code() == AWSThrottlingCode {
+				log.Get().Log("func", "utils.Retry", "msg", "waiting for Throttling error", "times-left", times)
 				time.Sleep(interval)
 				return Retry(rfn, times, interval)
 			}

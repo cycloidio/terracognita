@@ -1,6 +1,10 @@
 package filter
 
-import "github.com/cycloidio/terracognita/tag"
+import (
+	"fmt"
+
+	"github.com/cycloidio/terracognita/tag"
+)
 
 // Filter is the list of all possible
 // filters that can be used to filter
@@ -25,6 +29,15 @@ func (f *Filter) IsExcluded(v string) bool {
 
 	_, ok := f.exclude[v]
 	return ok
+}
+
+// String returns an stringification of the Filter
+func (f *Filter) String() string {
+	return fmt.Sprintf(`
+	Tags:    %s,
+	Include: %s,
+	Exclude: %s,
+`, f.Tags, f.Include, f.Exclude)
 }
 
 // calculateExludeMap makes a map of the Exclude so

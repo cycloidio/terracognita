@@ -3,9 +3,11 @@ package cmd
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"strings"
 
+	"github.com/cycloidio/terracognita/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -15,12 +17,26 @@ var (
 	tfstate          io.Writer
 	closeOut         []io.Closer
 	include, exclude []string
+	logsOut          io.Writer
 
 	// RootCmd it's the entry command for the cmd on terracognita
 	RootCmd = &cobra.Command{
 		Use:   "terracognita",
 		Short: "Reads from Providers and generates a Terraform configuration",
 		Long:  "Reads from Providers and generates a Terraform configuration, all the flags can be used also with ENV (ex: --access-key == ACCESS_KEY)",
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			// Initialize the logs by setting by default the logs
+			// to Stdout, but if 'v' or 'd' is defined the logger
+			// will be initialized and structured logs will be used
+			// and if 'd' it's defined TF_LOG will be used too
+			if viper.GetBool("verbose") || viper.GetBool("debug") {
+				logsOut = ioutil.Discard
+				log.Init(os.Stdout, viper.GetBool("debug"))
+			} else {
+				logsOut = os.Stdout
+				log.Init(ioutil.Discard, false)
+			}
+		},
 	}
 )
 
@@ -60,6 +76,7 @@ func postRunEOutput(cmd *cobra.Command, args []string) error {
 }
 
 func init() {
+
 	cobra.OnInitialize(initViper)
 	RootCmd.AddCommand(awsCmd)
 	RootCmd.AddCommand(versionCmd)
@@ -75,6 +92,12 @@ func init() {
 
 	RootCmd.PersistentFlags().StringSliceVarP(&exclude, "exclude", "e", []string{}, "List of resources to not import, this names are the ones on TF (ex: aws_instance). If not set then means that none the resources will be excluded")
 	_ = viper.BindPFlag("exclude", RootCmd.PersistentFlags().Lookup("exclude"))
+
+	RootCmd.PersistentFlags().BoolP("verbose", "v", false, "Activate the verbose mode")
+	_ = viper.BindPFlag("verbose", RootCmd.PersistentFlags().Lookup("verbose"))
+
+	RootCmd.PersistentFlags().BoolP("debug", "d", false, "Activate the debug mode wich includes TF logs via TF_LOG=TRACE|DEBUG|INFO|WARN|ERROR configuration https://www.terraform.io/docs/internals/debugging.html")
+	_ = viper.BindPFlag("debug", RootCmd.PersistentFlags().Lookup("debug"))
 }
 
 func initViper() {

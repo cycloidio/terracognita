@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/cycloidio/terracognita/errcode"
+	"github.com/cycloidio/terracognita/log"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/pkg/errors"
 )
@@ -45,6 +46,8 @@ func (tfsw *TFStateWriter) Write(key string, value interface{}) error {
 		return errors.Wrapf(errcode.ErrWriterInvalidTypeValue, "expected *terraform.ResourceState, found %T", value)
 	}
 
+	log.Get().Log("func", "writer.Write(State)", "msg", "writing to internal config", "key", key, "content", &trs)
+
 	tfsw.Config[key] = trs
 
 	return nil
@@ -65,11 +68,12 @@ func (tfsw *TFStateWriter) Sync() error {
 	state := terraform.NewState()
 	state.AddModuleState(ms)
 
+	log.Get().Log("func", "writer.Write(State)", "msg", "transforming internal config to TFState JSON")
 	enc := json.NewEncoder(tfsw.w)
 	enc.SetIndent("", "  ")
 	err := enc.Encode(state)
 	if err != nil {
-		return fmt.Errorf("could not encode state due to: %s", err)
+		return fmt.Errorf("could not encode yestate due to: %s", err)
 	}
 
 	return nil

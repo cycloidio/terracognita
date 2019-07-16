@@ -7,7 +7,10 @@ import (
 	"io"
 	"strings"
 
+	kitlog "github.com/go-kit/kit/log"
+
 	"github.com/cycloidio/terracognita/errcode"
+	"github.com/cycloidio/terracognita/log"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/fmtcmd"
 	"github.com/hashicorp/hcl/hcl/printer"
@@ -57,6 +60,13 @@ func (hclw *HCLWriter) Write(key string, value interface{}) error {
 	if _, ok := hclw.Config["resource"].(map[string]map[string]interface{})[keys[0]]; !ok {
 		hclw.Config["resource"].(map[string]map[string]interface{})[keys[0]] = make(map[string]interface{})
 	}
+
+	b, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
+	log.Get().Log("func", "writer.Write(HCL)", "msg", "writing to internal config", "key", keys[0], "content", string(b))
+
 	hclw.Config["resource"].(map[string]map[string]interface{})[keys[0]][name] = value
 
 	return nil
@@ -65,11 +75,14 @@ func (hclw *HCLWriter) Write(key string, value interface{}) error {
 // Sync writes the content of the Config to the
 // internal w with the correct format
 func (hclw *HCLWriter) Sync() error {
+	logger := log.Get()
+	logger = kitlog.With(logger, "func", "writer.Write(HCL)")
 	b, err := json.Marshal(hclw.Config)
 	if err != nil {
 		return err
 	}
 
+	logger.Log("msg", "parsing internal config to HCL", "json", string(b))
 	f, err := hcl.ParseBytes(b)
 	if err != nil {
 		return fmt.Errorf("error while 'hcl.ParseBytes': %s", err)
@@ -80,6 +93,8 @@ func (hclw *HCLWriter) Sync() error {
 	if err != nil {
 		return fmt.Errorf("error while pretty printing HCL: %s", err)
 	}
+
+	logger.Log("msg", "formatting HCL", "hcl", buff.String())
 
 	buff = bytes.NewBuffer(FormatHCL(buff.Bytes()))
 
