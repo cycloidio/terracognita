@@ -16,6 +16,7 @@ shared:
     - '-ec'
     - |
       export GOPATH=${PWD}/go
+      export PATH="$GOPATH/bin:$PATH"
       cd code
       make lint
       go test ./...
@@ -173,6 +174,7 @@ jobs:
 
       - put: pull-request
         params:
+          base_context: ((base-context))
           context: ((ci-context))
           path: pull-request
           status: pending
@@ -198,6 +200,7 @@ jobs:
         on_failure:
           put: pull-request
           params:
+            base_context: ((base-context))
             context: ((ci-context))
             path: pull-request
             status: failure
@@ -205,6 +208,7 @@ jobs:
         on_success:
           put: pull-request
           params:
+            base_context: ((base-context))
             context: ((ci-context))
             path: pull-request
             status: success
@@ -327,6 +331,7 @@ jobs:
               - '-c'
               - |
                 export GOPATH=${PWD}/go
+                export PATH="$GOPATH/bin:$PATH"
                 cd code
                 make build-compress BUILD_PATH=../builds
           inputs:
