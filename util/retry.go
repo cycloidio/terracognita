@@ -3,17 +3,13 @@ package util
 import (
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/cycloidio/terracognita/log"
 )
 
 const (
-	// AWSThrottlingCode it's the code used for AWS services
-	// to anounce the API limit
-	AWSThrottlingCode = "Throttling"
-
 	timesDefault    = 3
-	intervalDefault = 10 * time.Second
+	intervalDefault = 30 * time.Second
 )
 
 // RetryFn it's a type to represent the function wrapped for the
@@ -29,12 +25,10 @@ func Retry(rfn RetryFn, times int, interval time.Duration) error {
 		if times == 0 {
 			return err
 		}
-		if awsErr, ok := err.(awserr.Error); ok {
-			if awsErr.Code() == AWSThrottlingCode {
-				log.Get().Log("func", "utils.Retry", "msg", "waiting for Throttling error", "times-left", times)
-				time.Sleep(interval)
-				return Retry(rfn, times, interval)
-			}
+		if request.IsErrorRetryable(err) || request.IsErrorThrottle(err) || request.IsErrorExpiredCreds(err) {
+			log.Get().Log("func", "utils.Retry", "msg", "waiting for Throttling error", "times-left", times)
+			time.Sleep(interval)
+			return Retry(rfn, times, interval)
 		}
 	}
 
