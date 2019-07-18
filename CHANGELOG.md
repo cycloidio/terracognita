@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.6] - 2019-07-18
+
 ### Added
 
 - The `version` subcommand to show the actual build version
