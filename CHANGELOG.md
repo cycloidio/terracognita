@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The `version` subcommand to show the actual build version
   ([Issue #24](https://github.com/cycloidio/terracognita/issues/24))
 - CI/CD pipeline
+  ([Issue #31](https://github.com/cycloidio/terracognita/pull/34))
+- The `-verbose` and `-debug` options
+  ([Issue #17](https://github.com/cycloidio/terracognita/issues/17))
 
 ### Changed
 

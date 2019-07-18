@@ -2,7 +2,7 @@ package provider_test
 
 import (
 	"context"
-	"fmt"
+	"io/ioutil"
 	"testing"
 
 	"github.com/cycloidio/terracognita/errcode"
@@ -39,6 +39,11 @@ func TestImport(t *testing.T) {
 		p.EXPECT().Resources(ctx, "aws_instance", f).Return([]provider.Resource{instanceResoure1, instanceResoure2}, nil)
 		p.EXPECT().Resources(ctx, "aws_iam_user", f).Return([]provider.Resource{iamUser1, iamUser2}, nil)
 
+		instanceResoure1.EXPECT().ID().Return("1")
+		instanceResoure2.EXPECT().ID().Return("2")
+		iamUser1.EXPECT().ID().Return("3")
+		iamUser2.EXPECT().ID().Return("4")
+
 		instanceResoure1.EXPECT().Read(f).Return(nil)
 		instanceResoure2.EXPECT().Read(f).Return(nil)
 		iamUser1.EXPECT().Read(f).Return(nil)
@@ -57,7 +62,7 @@ func TestImport(t *testing.T) {
 		hw.EXPECT().Sync().Return(nil)
 		sw.EXPECT().Sync().Return(nil)
 
-		err := provider.Import(ctx, p, hw, sw, f)
+		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
 		require.NoError(t, err)
 	})
 	t.Run("SuccessWithFilterInclude", func(t *testing.T) {
@@ -81,6 +86,9 @@ func TestImport(t *testing.T) {
 		p.EXPECT().HasResourceType("aws_instance").Return(true)
 		p.EXPECT().Resources(ctx, "aws_instance", f).Return([]provider.Resource{instanceResoure1, instanceResoure2}, nil)
 
+		instanceResoure1.EXPECT().ID().Return("1")
+		instanceResoure2.EXPECT().ID().Return("2")
+
 		instanceResoure1.EXPECT().Read(f).Return(nil)
 		instanceResoure2.EXPECT().Read(f).Return(nil)
 
@@ -93,7 +101,7 @@ func TestImport(t *testing.T) {
 		hw.EXPECT().Sync().Return(nil)
 		sw.EXPECT().Sync().Return(nil)
 
-		err := provider.Import(ctx, p, hw, sw, f)
+		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
 		require.NoError(t, err)
 	})
 	t.Run("SuccessWithExclude", func(t *testing.T) {
@@ -114,9 +122,13 @@ func TestImport(t *testing.T) {
 
 		defer ctrl.Finish()
 
+		p.EXPECT().HasResourceType("aws_instance").Return(true)
 		p.EXPECT().ResourceTypes().Return([]string{"aws_instance", "aws_iam_user"})
 
 		p.EXPECT().Resources(ctx, "aws_iam_user", f).Return([]provider.Resource{iamUser1, iamUser2}, nil)
+
+		iamUser1.EXPECT().ID().Return("1")
+		iamUser2.EXPECT().ID().Return("2")
 
 		iamUser1.EXPECT().Read(f).Return(nil)
 		iamUser2.EXPECT().Read(f).Return(nil)
@@ -130,7 +142,7 @@ func TestImport(t *testing.T) {
 		hw.EXPECT().Sync().Return(nil)
 		sw.EXPECT().Sync().Return(nil)
 
-		err := provider.Import(ctx, p, hw, sw, f)
+		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
 		require.NoError(t, err)
 	})
 	t.Run("SuccessWithErrProviderResourceDoNotMatchTag", func(t *testing.T) {
@@ -151,9 +163,13 @@ func TestImport(t *testing.T) {
 
 		defer ctrl.Finish()
 
+		p.EXPECT().HasResourceType("aws_instance").Return(true)
 		p.EXPECT().ResourceTypes().Return([]string{"aws_instance", "aws_iam_user"})
 
 		p.EXPECT().Resources(ctx, "aws_iam_user", f).Return([]provider.Resource{iamUser1, iamUser2}, nil)
+
+		iamUser1.EXPECT().ID().Return("1")
+		iamUser2.EXPECT().ID().Return("2")
 
 		iamUser1.EXPECT().Read(f).Return(errcode.ErrProviderResourceDoNotMatchTag)
 		iamUser2.EXPECT().Read(f).Return(nil)
@@ -167,7 +183,7 @@ func TestImport(t *testing.T) {
 		hw.EXPECT().Sync().Return(nil)
 		sw.EXPECT().Sync().Return(nil)
 
-		err := provider.Import(ctx, p, hw, sw, f)
+		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
 		require.NoError(t, err)
 	})
 	t.Run("SuccessWithNoHCLWriter", func(t *testing.T) {
@@ -187,9 +203,13 @@ func TestImport(t *testing.T) {
 
 		defer ctrl.Finish()
 
+		p.EXPECT().HasResourceType("aws_instance").Return(true)
 		p.EXPECT().ResourceTypes().Return([]string{"aws_instance", "aws_iam_user"})
 
 		p.EXPECT().Resources(ctx, "aws_iam_user", f).Return([]provider.Resource{iamUser1, iamUser2}, nil)
+
+		iamUser1.EXPECT().ID().Return("1")
+		iamUser2.EXPECT().ID().Return("2")
 
 		iamUser1.EXPECT().Read(f).Return(errcode.ErrProviderResourceDoNotMatchTag)
 		iamUser2.EXPECT().Read(f).Return(nil)
@@ -199,7 +219,7 @@ func TestImport(t *testing.T) {
 
 		sw.EXPECT().Sync().Return(nil)
 
-		err := provider.Import(ctx, p, nil, sw, f)
+		err := provider.Import(ctx, p, nil, sw, f, ioutil.Discard)
 		require.NoError(t, err)
 	})
 	t.Run("SuccessWithNoTFStateWriter", func(t *testing.T) {
@@ -219,9 +239,13 @@ func TestImport(t *testing.T) {
 
 		defer ctrl.Finish()
 
+		p.EXPECT().HasResourceType("aws_instance").Return(true)
 		p.EXPECT().ResourceTypes().Return([]string{"aws_instance", "aws_iam_user"})
 
 		p.EXPECT().Resources(ctx, "aws_iam_user", f).Return([]provider.Resource{iamUser1, iamUser2}, nil)
+
+		iamUser1.EXPECT().ID().Return("1")
+		iamUser2.EXPECT().ID().Return("2")
 
 		iamUser1.EXPECT().Read(f).Return(errcode.ErrProviderResourceDoNotMatchTag)
 		iamUser2.EXPECT().Read(f).Return(nil)
@@ -231,7 +255,7 @@ func TestImport(t *testing.T) {
 
 		hw.EXPECT().Sync().Return(nil)
 
-		err := provider.Import(ctx, p, hw, nil, f)
+		err := provider.Import(ctx, p, hw, nil, f, ioutil.Discard)
 		require.NoError(t, err)
 	})
 	t.Run("ErrorWithErrProviderResourceNotRead", func(t *testing.T) {
@@ -252,9 +276,13 @@ func TestImport(t *testing.T) {
 
 		defer ctrl.Finish()
 
+		p.EXPECT().HasResourceType("aws_instance").Return(true)
 		p.EXPECT().ResourceTypes().Return([]string{"aws_instance", "aws_iam_user"})
 
 		p.EXPECT().Resources(ctx, "aws_iam_user", f).Return([]provider.Resource{iamUser1, iamUser2}, nil)
+
+		iamUser1.EXPECT().ID().Return("1")
+		iamUser2.EXPECT().ID().Return("2")
 
 		iamUser1.EXPECT().Read(f).Return(errcode.ErrProviderResourceNotRead)
 		iamUser2.EXPECT().Read(f).Return(nil)
@@ -266,7 +294,7 @@ func TestImport(t *testing.T) {
 		hw.EXPECT().Sync().Return(nil)
 		sw.EXPECT().Sync().Return(nil)
 
-		err := provider.Import(ctx, p, hw, sw, f)
+		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
 		require.NoError(t, err)
 	})
 	t.Run("ErrorWithErrProviderResourceAutogenerated", func(t *testing.T) {
@@ -287,9 +315,13 @@ func TestImport(t *testing.T) {
 
 		defer ctrl.Finish()
 
+		p.EXPECT().HasResourceType("aws_instance").Return(true)
 		p.EXPECT().ResourceTypes().Return([]string{"aws_instance", "aws_iam_user"})
 
 		p.EXPECT().Resources(ctx, "aws_iam_user", f).Return([]provider.Resource{iamUser1, iamUser2}, nil)
+
+		iamUser1.EXPECT().ID().Return("1")
+		iamUser2.EXPECT().ID().Return("2")
 
 		iamUser1.EXPECT().Read(f).Return(errcode.ErrProviderResourceAutogenerated)
 		iamUser2.EXPECT().Read(f).Return(nil)
@@ -301,10 +333,10 @@ func TestImport(t *testing.T) {
 		hw.EXPECT().Sync().Return(nil)
 		sw.EXPECT().Sync().Return(nil)
 
-		err := provider.Import(ctx, p, hw, sw, f)
+		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
 		require.NoError(t, err)
 	})
-	t.Run("ErrorWithIncorrectFilter", func(t *testing.T) {
+	t.Run("ErrorWithIncorrectFilterInclude", func(t *testing.T) {
 		var (
 			ctrl = gomock.NewController(t)
 			ctx  = context.Background()
@@ -323,8 +355,31 @@ func TestImport(t *testing.T) {
 		p.EXPECT().HasResourceType("aws_instance").Return(true)
 		p.EXPECT().HasResourceType("aws_potato").Return(false)
 
-		err := provider.Import(ctx, p, hw, sw, f)
-		fmt.Println(err)
+		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
+		assert.Equal(t, errcode.ErrProviderResourceNotSupported.Error(), errors.Cause(err).Error())
+	})
+
+	t.Run("ErrorWithIncorrectFilterExclude", func(t *testing.T) {
+		var (
+			ctrl = gomock.NewController(t)
+			ctx  = context.Background()
+
+			p  = mock.NewProvider(ctrl)
+			hw = mock.NewWriter(ctrl)
+			sw = mock.NewWriter(ctrl)
+
+			f = &filter.Filter{
+				Exclude: []string{"aws_instance", "aws_potato"},
+			}
+		)
+
+		defer ctrl.Finish()
+
+		p.EXPECT().ResourceTypes().Return([]string{})
+		p.EXPECT().HasResourceType("aws_instance").Return(true)
+		p.EXPECT().HasResourceType("aws_potato").Return(false)
+
+		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
 		assert.Equal(t, errcode.ErrProviderResourceNotSupported.Error(), errors.Cause(err).Error())
 	})
 }

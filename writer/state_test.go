@@ -123,6 +123,7 @@ func TestTFStateWriter_Sync(t *testing.T) {
 
 		var est map[string]interface{}
 		err = json.Unmarshal([]byte(state), &est)
+		require.NoError(t, err)
 
 		assert.Equal(t, est, st)
 	})

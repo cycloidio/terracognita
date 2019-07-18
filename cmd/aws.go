@@ -6,8 +6,11 @@ import (
 	"fmt"
 	"strings"
 
+	kitlog "github.com/go-kit/kit/log"
+
 	"github.com/cycloidio/terracognita/aws"
 	"github.com/cycloidio/terracognita/filter"
+	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/provider"
 	"github.com/cycloidio/terracognita/tag"
 	"github.com/cycloidio/terracognita/writer"
@@ -25,6 +28,8 @@ var (
 		PreRunE:  preRunEOutput,
 		PostRunE: postRunEOutput,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			logger := log.Get()
+			logger = kitlog.With(logger, "func", "cmd.aws.RunE")
 			// Validate required flags
 			if err := requiredStringFlags("access-key", "secret-key", "region"); err != nil {
 				return err
@@ -56,14 +61,17 @@ var (
 			var hclW, stateW writer.Writer
 
 			if hcl != nil {
+				logger.Log("msg", "initialzing HCL writer")
 				hclW = writer.NewHCLWriter(hcl)
 			}
 
 			if tfstate != nil {
+				logger.Log("msg", "initialzing TFState writer")
 				stateW = writer.NewTFStateWriter(tfstate)
 			}
 
-			err = provider.Import(ctx, awsP, hclW, stateW, f)
+			logger.Log("msg", "importing")
+			err = provider.Import(ctx, awsP, hclW, stateW, f, logsOut)
 			if err != nil {
 				return fmt.Errorf("could not import from AWS: %+v", err)
 			}

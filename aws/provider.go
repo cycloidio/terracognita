@@ -7,6 +7,7 @@ import (
 	"github.com/cycloidio/raws"
 	"github.com/cycloidio/terracognita/cache"
 	"github.com/cycloidio/terracognita/filter"
+	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/provider"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/pkg/errors"
@@ -24,6 +25,7 @@ type aws struct {
 
 // NewProvider returns an AWS Provider
 func NewProvider(ctx context.Context, accessKey, secretKey, region string) (provider.Provider, error) {
+	log.Get().Log("func", "aws.NewProvider", "msg", "configuring raws Reader")
 	awsr, err := raws.NewAWSReader(ctx, accessKey, secretKey, []string{region}, nil)
 	if err != nil {
 		return nil, fmt.Errorf("could not initialize 'raws' because: %s", err)
@@ -35,6 +37,7 @@ func NewProvider(ctx context.Context, accessKey, secretKey, region string) (prov
 		Region:    region,
 	}
 
+	log.Get().Log("func", "aws.NewProvider", "msg", "configuring TF Client")
 	awsClient, err := cfg.Client()
 	if err != nil {
 		return nil, fmt.Errorf("could not initialize 'terraform/aws.Config.Client()' because: %s", err)
@@ -81,8 +84,5 @@ func (a *aws) Region() string { return a.awsr.GetRegions()[0] }
 func (a *aws) TagKey() string { return "tags" }
 func (a *aws) HasResourceType(t string) bool {
 	_, err := ResourceTypeString(t)
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
