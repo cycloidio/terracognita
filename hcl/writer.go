@@ -112,7 +112,7 @@ func (w *Writer) Sync() error {
 
 	logger.Log("msg", "formatting HCL", "hcl", buff.String())
 
-	formattedHCL := FormatHCL(buff.Bytes())
+	formattedHCL := Format(buff.Bytes())
 	logger.Log("msg", "formatted HCL", "hcl", formattedHCL)
 
 	buff = bytes.NewBuffer(formattedHCL)

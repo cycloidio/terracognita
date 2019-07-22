@@ -63,8 +63,8 @@ func Import(ctx context.Context, p Provider, hcl, tfstate writer.Writer, f *filt
 		}
 
 		resourceLen := len(resources)
-		for _, re := range resources {
-			logger := kitlog.With(logger, "id", r.ID(), "total", resourceLen, "current", i+1)
+		for i, re := range resources {
+			logger := kitlog.With(logger, "id", re.ID(), "total", resourceLen, "current", i+1)
 			fmt.Fprintf(out, "\rImporting %s [%d/%d]", t, i+1, resourceLen)
 
 			logger.Log("msg", "reading from TF")

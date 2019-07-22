@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/cycloidio/terracognita/errcode"
+	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/provider"
 	"github.com/hashicorp/terraform/addrs"
 	"github.com/hashicorp/terraform/states"
@@ -80,6 +81,7 @@ func (w *Writer) Write(key string, value interface{}) error {
 
 	w.state.SetResourceInstanceCurrent(absAddr, src, absProviderConf)
 
+	log.Get().Log("func", "state.Write(State)", "msg", "writing to internal config", "key", key, "content", r)
 	w.Config[key] = r
 
 	return nil
@@ -98,6 +100,7 @@ func (w *Writer) Sync() error {
 	lstate := w.state.Lock()
 	defer w.state.Unlock()
 
+	log.Get().Log("func", "state.Sync(State)", "msg", "writting state to state file")
 	file := statemgr.NewStateFile()
 	file.State = lstate
 
