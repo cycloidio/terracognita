@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Fixed
+
+- HCL formatter to ignore some special keys that fail on the `fmtcmd` of HCL
+  ([Issue #36](https://github.com/cycloidio/terracognita/issues/36))
+
 ## [0.1.6] _2019-07-18_
 
 ### Added

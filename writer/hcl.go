@@ -96,7 +96,10 @@ func (hclw *HCLWriter) Sync() error {
 
 	logger.Log("msg", "formatting HCL", "hcl", buff.String())
 
-	buff = bytes.NewBuffer(FormatHCL(buff.Bytes()))
+	formattedHCL := FormatHCL(buff.Bytes())
+	logger.Log("msg", "formatted HCL", "hcl", formattedHCL)
+
+	buff = bytes.NewBuffer(formattedHCL)
 
 	err = fmtcmd.Run(nil, nil, buff, hclw.w, fmtcmd.Options{})
 	if err != nil {

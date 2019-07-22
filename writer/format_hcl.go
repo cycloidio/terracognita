@@ -14,7 +14,7 @@ var (
 	}{
 		{
 			// Replace all the `"key" = "value"` for `key = "value"`
-			match:   regexp.MustCompile(`"([\w\-_\.]+)"\s=`),
+			match:   regexp.MustCompile(`"([^\d][\w\-_\.]+)"\s=`),
 			replace: []byte(`$1 =`),
 		},
 		{

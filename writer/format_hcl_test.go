@@ -18,10 +18,14 @@ func TestFormatHCL(t *testing.T) {
 			in: []byte(`
 				"role" = value
 				"en.v" = "value"
+				"2tag" = "2value"
+				"t2tag" = "t2value"
 			`),
 			out: []byte(`
 				role = value
 				en.v = "value"
+				"2tag" = "2value"
+				t2tag = "t2value"
 			`),
 		},
 		{
