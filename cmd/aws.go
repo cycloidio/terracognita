@@ -71,6 +71,9 @@ var (
 			}
 
 			logger.Log("msg", "importing")
+
+			fmt.Fprintf(logsOut, "Starting Terracognita with version %s\n", Version)
+			logger.Log("msg", "starting terracognita", "version", Version)
 			err = provider.Import(ctx, awsP, hclW, stateW, f, logsOut)
 			if err != nil {
 				return fmt.Errorf("could not import from AWS: %+v", err)
