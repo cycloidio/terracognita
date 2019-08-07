@@ -26,7 +26,7 @@ You have 2 options to get the package:
 Then feel free to play with it :)
 
 ```
-$> cd $GOPATH/src/github/cycloidio/terracognita
+$> cd $GOPATH/src/github.com/cycloidio/terracognita
 $> make install
 ```
 
