@@ -20,6 +20,8 @@
 
 - Update CI/CD pipeline which now also has pre-built binaries, automate github release and docker release image.
   ([Issue #31](https://github.com/cycloidio/terracognita/issues/31))
+- Better management of Throttle errors from AWS
+  ([PR #49](https://github.com/cycloidio/terracognita/pull/49))
 
 ### Fixed
 
