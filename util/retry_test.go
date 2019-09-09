@@ -10,6 +10,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const (
+	throttlingErr = "Throttling"
+)
+
 func TestRetry(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		var count int
@@ -27,7 +31,7 @@ func TestRetry(t *testing.T) {
 		fn := func() error {
 			count++
 			if count == 1 {
-				return awserr.New(util.AWSThrottlingCode, "message", nil)
+				return awserr.New(throttlingErr, "message", nil)
 			}
 			return nil
 		}
@@ -40,11 +44,11 @@ func TestRetry(t *testing.T) {
 		var count int
 		fn := func() error {
 			count++
-			return awserr.New(util.AWSThrottlingCode, "message", nil)
+			return awserr.New(throttlingErr, "message", nil)
 		}
 
 		err := util.Retry(fn, 3, 0*time.Second)
-		require.Equal(t, err, awserr.New(util.AWSThrottlingCode, "message", nil))
+		require.Equal(t, err, awserr.New(throttlingErr, "message", nil))
 		assert.Equal(t, 3, count)
 	})
 }
