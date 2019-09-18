@@ -133,7 +133,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## About Cycloid
 <p align="center">
-  <img width="300" height="300" src="https://pbs.twimg.com/profile_images/786183670080086016/0O9JzolW_400x400.jpg">
+  <img src="https://user-images.githubusercontent.com/393324/65147266-0b010100-da1e-11e9-9a49-d27e5035c4c4.png">
 </p>
 
 [Cycloid](https://www.cycloid.io/our-culture) is a European fully-remote company, building a product to **simplify**, **accelerate** and **optimize your DevOps and Cloud adoption**.
