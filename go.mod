@@ -21,3 +21,4 @@ require (
 	k8s.io/apimachinery v0.0.0-20190213030929-f84a4639d8e8 // indirect
 	k8s.io/klog v0.2.0 // indirect
 )
+replace git.apache.org/thrift.git => github.com/apache/thrift v0.0.0-20180902110319-2566ecd5d999
