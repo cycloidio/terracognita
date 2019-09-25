@@ -3,13 +3,14 @@ BIN := terracognita
 BIN_DIR := $(GOPATH)/bin
 
 GOLANGCI_LINT := $(BIN_DIR)/golangci-lint
-GOLINT := $(BIN_DIR)/golint
 MOCKGEN := $(BIN_DIR)/mockgen
 
 VERSION= $(shell git describe --tags --always)
 PLATFORMS=darwin linux windows
 ARCHITECTURES=386 amd64
 BUILD_PATH := builds
+
+IS_CI := 0
 
 # Setup the -ldflags option for go build here, interpolate the variable values
 LDFLAGS=-ldflags "-X github.com/cycloidio/terracognita/cmd.Version=${VERSION}"
@@ -27,17 +28,18 @@ help: Makefile ## This help dialog
 	done
 
 $(GOLANGCI_LINT):
-	@go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
-
-$(GOLINT):
-	@go get -u golang.org/x/lint/golint
+ifeq ($(IS_CI), 1)
+	curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(shell go env GOPATH)/bin v1.19.0
+else
+	@go get github.com/golangci/golangci-lint/cmd/golangci-lint@1.19.0
+endif
 
 $(MOCKGEN):
 	@go get -u github.com/golang/mock/mockgen
 
 .PHONY: lint
-lint: $(GOLANGCI_LINT) $(GOLINT) ## Runs the linter
-	@GO111MODULE=on golangci-lint run -D errcheck -E goimports ./... && golint -set_exit_status ./...
+lint: $(GOLANGCI_LINT) ## Runs the linter
+	GO111MODULE=on golangci-lint run --exclude-use-default=false -D errcheck -E goimports -E golint --deadline 5m ./...
 
 .PHONY: generate
 generate: $(MOCKGEN) ## Generates the needed code

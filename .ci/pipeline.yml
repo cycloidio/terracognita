@@ -18,7 +18,7 @@ shared:
       export GOPATH=${PWD}/go
       export PATH="$GOPATH/bin:$PATH"
       cd code
-      make lint
+      make IS_CI=1 lint
       go test ./...
 
 groups:
@@ -171,6 +171,8 @@ jobs:
         resource: pull-request
         trigger: true
         version: every
+        params:
+          integration_tool: checkout
 
       - put: pull-request
         params:
