@@ -79,6 +79,7 @@ func init() {
 
 	cobra.OnInitialize(initViper)
 	RootCmd.AddCommand(awsCmd)
+	RootCmd.AddCommand(googleCmd)
 	RootCmd.AddCommand(versionCmd)
 
 	RootCmd.PersistentFlags().String("hcl", "", "HCL output file")
