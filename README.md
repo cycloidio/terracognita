@@ -32,12 +32,13 @@ $> make install
 
 ## Versions
 
-Terracognita currently imports only AWS cloud provider as terraform resource/state.
+Terracognita currently imports AWS and GCP cloud provider as terraform resource/state.
 Please see the following versions as follow:
 
 Terraform: 0.12.7
 Providers:
  * AWS: 2.31.0
+ * GCP: 2.17.0
 
 ## Usage
 
