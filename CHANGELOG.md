@@ -29,3 +29,5 @@
   ([PR #22](https://github.com/cycloidio/terracognita/pull/22))
 - Update to version 1.0.1 of `raws` to fix panic on importing `aws_s3_bucket`
   ([Issue #29](https://github.com/cycloidio/terracognita/issues/29))
+- Vendor issue with AWS TF provider and updated it to 2.31.0
+  ([PR #54](https://github.com/cycloidio/terracognita/pull/54))
