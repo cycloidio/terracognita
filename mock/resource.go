@@ -5,12 +5,13 @@
 package mock
 
 import (
+	reflect "reflect"
+
 	filter "github.com/cycloidio/terracognita/filter"
 	provider "github.com/cycloidio/terracognita/provider"
 	writer "github.com/cycloidio/terracognita/writer"
 	gomock "github.com/golang/mock/gomock"
 	schema "github.com/hashicorp/terraform/helper/schema"
-	reflect "reflect"
 )
 
 // Resource is a mock of Resource interface
