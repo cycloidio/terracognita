@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws/request"
@@ -23,6 +24,13 @@ func Retry(rfn RetryFn, times int, interval time.Duration) error {
 	times--
 	if err != nil {
 		if times == 0 {
+			return err
+		}
+		// If the error is from the stdlib we just continue with them
+		// This is a fix because 'request.IsErrorRetryable(err)' will always
+		// retry normal errors "just in case" and we do not want to retry errors
+		// that we return
+		if fmt.Sprintf("%T", err) == "*errors.errorString" {
 			return err
 		}
 		if request.IsErrorRetryable(err) || request.IsErrorThrottle(err) || request.IsErrorExpiredCreds(err) {
