@@ -6,10 +6,11 @@ package mock
 
 import (
 	context "context"
+	reflect "reflect"
+
 	filter "github.com/cycloidio/terracognita/filter"
 	provider "github.com/cycloidio/terracognita/provider"
 	gomock "github.com/golang/mock/gomock"
-	reflect "reflect"
 )
 
 // Provider is a mock of Provider interface

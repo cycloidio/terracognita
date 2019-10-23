@@ -2,7 +2,8 @@ SHELL := /bin/bash
 BIN := terracognita
 BIN_DIR := $(GOPATH)/bin
 
-GOLANGCI_LINT := $(BIN_DIR)/golangci-lint
+GOLINT := $(BIN_DIR)/golinter
+GOIMPORTS := $(BIN_DIR)/goimports
 MOCKGEN := $(BIN_DIR)/mockgen
 
 VERSION= $(shell git describe --tags --always)
@@ -27,23 +28,23 @@ help: Makefile ## This help dialog
 		printf "%-30s %s\n" $$help_command $$help_info ; \
 	done
 
-$(GOLANGCI_LINT):
-ifeq ($(IS_CI), 1)
-	curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(shell go env GOPATH)/bin v1.19.0
-else
-	@go get github.com/golangci/golangci-lint/cmd/golangci-lint@1.19.0
-endif
-
 $(MOCKGEN):
 	@go get -u github.com/golang/mock/mockgen
 
+$(GOIMPORTS):
+	@go get -u golang.org/x/tools/cmd/goimports
+
+$(GOLINT):
+	@go get -u golang.org/x/lint/golint
+
 .PHONY: lint
-lint: $(GOLANGCI_LINT) ## Runs the linter
-	GO111MODULE=on golangci-lint run --exclude-use-default=false -D errcheck -E goimports -E golint --deadline 5m ./...
+lint: $(GOLINT) $(GOIMPORTS) ## Runs the linter
+	@GO111MODULE=on golint -set_exit_status ./... && test -z "`go list -f {{.Dir}} ./... | xargs goimports -l | tee /dev/stderr`"
 
 .PHONY: generate
 generate: $(MOCKGEN) ## Generates the needed code
 	@GO111MODULE=on go generate ./...
+	@GO111MODULE=on goimports -w ./mock
 
 .PHONY: test
 test: ## Runs the tests
