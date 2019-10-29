@@ -40,7 +40,7 @@ func getIAMGroupNames(ctx context.Context, a *aws, rt string, tags []tag.Tag) ([
 	// TODO cach this result too
 	names := make([]string, 0, len(rs))
 	for _, i := range rs {
-		names = append(names, i.Data().Get("name").(string))
+		names = append(names, i.ID())
 	}
 
 	return names, nil
@@ -77,7 +77,7 @@ func getIAMRoleNames(ctx context.Context, a *aws, rt string, tags []tag.Tag) ([]
 	// TODO cach this result too
 	names := make([]string, 0, len(rs))
 	for _, i := range rs {
-		names = append(names, i.Data().Get("name").(string))
+		names = append(names, i.ID())
 	}
 
 	return names, nil
@@ -114,7 +114,7 @@ func getIAMUserNames(ctx context.Context, a *aws, rt string, tags []tag.Tag) ([]
 	// TODO cach this result too
 	names := make([]string, 0, len(rs))
 	for _, i := range rs {
-		names = append(names, i.Data().Get("name").(string))
+		names = append(names, i.ID())
 	}
 
 	return names, nil
@@ -151,7 +151,7 @@ func getRoute53ZoneIDs(ctx context.Context, a *aws, rt string, tags []tag.Tag) (
 	// TODO cach this result too
 	ids := make([]string, 0, len(rs))
 	for _, i := range rs {
-		ids = append(ids, i.Data().Id())
+		ids = append(ids, i.ID())
 	}
 
 	return ids, nil
@@ -188,7 +188,7 @@ func getSESDomainIdentityDomains(ctx context.Context, a *aws, rt string, tags []
 	// TODO cach this result too
 	domains := make([]string, 0, len(rs))
 	for _, i := range rs {
-		domains = append(domains, i.Data().Get("domain").(string))
+		domains = append(domains, i.ID())
 	}
 
 	return domains, nil

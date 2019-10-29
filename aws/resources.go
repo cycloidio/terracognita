@@ -12,8 +12,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/ses"
 	"github.com/cycloidio/terracognita/provider"
 	"github.com/cycloidio/terracognita/tag"
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/pkg/errors"
 )
 
 // ResourceType is the type used to define all the Resources
@@ -154,19 +152,7 @@ var (
 )
 
 func initializeResource(a *aws, ID, t string) (provider.Resource, error) {
-	tfr, ok := a.tfProvider.ResourcesMap[t]
-	if !ok {
-		return nil, errors.Errorf("the resource %q does not exists on Terraform", t)
-	}
-
-	data := tfr.Data(nil)
-	data.SetId(ID)
-	data.SetType(t)
-
-	return provider.NewResource(
-		ID, t, tfr,
-		data, a,
-	), nil
+	return provider.NewResource(ID, t, a), nil
 }
 
 func instances(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
@@ -505,10 +491,6 @@ func iamAccountAliases(ctx context.Context, a *aws, resourceType string, tags []
 		if err != nil {
 			return nil, err
 		}
-		err = r.Data().Set("account_alias", *i)
-		if err != nil {
-			return nil, err
-		}
 		resources = append(resources, r)
 	}
 
@@ -517,7 +499,7 @@ func iamAccountAliases(ctx context.Context, a *aws, resourceType string, tags []
 
 func iamAccountPasswordPolicy(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
 	// As it's for the full account we'll tell TF to fetch it directly with a "" id
-	r, err := initializeResource(a, NoID, resourceType)
+	r, err := initializeResource(a, "iam-account-password-policy", resourceType)
 	if err != nil {
 		return nil, err
 	}
@@ -533,11 +515,6 @@ func iamGroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag)
 	resources := make([]provider.Resource, 0)
 	for _, i := range groups[a.Region()].Groups {
 		r, err := initializeResource(a, *i.GroupName, resourceType)
-		if err != nil {
-			return nil, err
-		}
-		// Needed for the cache
-		err = r.Data().Set("name", *i.GroupName)
 		if err != nil {
 			return nil, err
 		}
@@ -620,15 +597,6 @@ func iamGroupPolicyAttachments(ctx context.Context, a *aws, resourceType string,
 			if err != nil {
 				return nil, err
 			}
-			err = r.Data().Set("group", gn)
-			if err != nil {
-				return nil, err
-			}
-
-			err = r.Data().Set("policy_arn", *i.PolicyArn)
-			if err != nil {
-				return nil, err
-			}
 			resources = append(resources, r)
 		}
 	}
@@ -705,11 +673,6 @@ func iamRoles(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) 
 		if err != nil {
 			return nil, err
 		}
-		// Needed for cache
-		err = r.Data().Set("name", *i.RoleName)
-		if err != nil {
-			return nil, err
-		}
 		resources = append(resources, r)
 	}
 
@@ -765,14 +728,6 @@ func iamRolePolicyAttachments(ctx context.Context, a *aws, resourceType string, 
 			if err != nil {
 				return nil, err
 			}
-			err = r.Data().Set("role", rn)
-			if err != nil {
-				return nil, err
-			}
-			err = r.Data().Set("policy_arn", *i.PolicyArn)
-			if err != nil {
-				return nil, err
-			}
 			resources = append(resources, r)
 		}
 	}
@@ -810,10 +765,6 @@ func iamServerCertificates(ctx context.Context, a *aws, resourceType string, tag
 		if err != nil {
 			return nil, err
 		}
-		err = r.Data().Set("name", *i.ServerCertificateName)
-		if err != nil {
-			return nil, err
-		}
 		resources = append(resources, r)
 	}
 
@@ -829,11 +780,6 @@ func iamUsers(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) 
 	resources := make([]provider.Resource, 0)
 	for _, i := range users[a.Region()].Users {
 		r, err := initializeResource(a, *i.UserName, resourceType)
-		if err != nil {
-			return nil, err
-		}
-		// Needed for cache
-		err = r.Data().Set("name", *i.UserName)
 		if err != nil {
 			return nil, err
 		}
@@ -854,23 +800,10 @@ func iamUserGroupMemberships(ctx context.Context, a *aws, resourceType string, t
 		return nil, err
 	}
 
-	gni := make([]interface{}, len(groupNames))
-	for i, gn := range groupNames {
-		gni[i] = gn
-	}
-	groupSet := schema.NewSet(schema.HashString, gni)
-
 	resources := make([]provider.Resource, 0)
 	for _, un := range userNames {
-		r, err := initializeResource(a, NoID, resourceType)
-		if err != nil {
-			return nil, err
-		}
-		err = r.Data().Set("user", un)
-		if err != nil {
-			return nil, err
-		}
-		err = r.Data().Set("groups", groupSet)
+		// The format expected by TF is <user-name>/<group-name1>/...
+		r, err := initializeResource(a, strings.Join(append([]string{un}, groupNames...), "/"), resourceType)
 		if err != nil {
 			return nil, err
 		}
@@ -925,15 +858,7 @@ func iamUserPolicyAttachments(ctx context.Context, a *aws, resourceType string, 
 		}
 
 		for _, i := range userPolicies[a.Region()].AttachedPolicies {
-			r, err := initializeResource(a, NoID, resourceType)
-			if err != nil {
-				return nil, err
-			}
-			err = r.Data().Set("user", un)
-			if err != nil {
-				return nil, err
-			}
-			err = r.Data().Set("policy_arn", *i.PolicyArn)
+			r, err := initializeResource(a, fmt.Sprintf("%s/%s", un, *i.PolicyArn), resourceType)
 			if err != nil {
 				return nil, err
 			}
@@ -1139,11 +1064,6 @@ func sesDomainIdentities(ctx context.Context, a *aws, resourceType string, tags 
 	resources := make([]provider.Resource, 0)
 	for _, i := range sesDomainIdentities[a.Region()].Identities {
 		r, err := initializeResource(a, *i, resourceType)
-		if err != nil {
-			return nil, err
-		}
-		// For the cache
-		err = r.Data().Set("domain", *i)
 		if err != nil {
 			return nil, err
 		}

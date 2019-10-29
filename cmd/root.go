@@ -13,8 +13,8 @@ import (
 )
 
 var (
-	hcl              io.Writer
-	tfstate          io.Writer
+	hclOut           io.Writer
+	stateOut         io.Writer
 	closeOut         []io.Closer
 	include, exclude []string
 	logsOut          io.Writer
@@ -47,7 +47,7 @@ func preRunEOutput(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return fmt.Errorf("could not OpenFile %s because: %s", viper.GetString("hcl"), err)
 		}
-		hcl = f
+		hclOut = f
 		closeOut = append(closeOut, f)
 	}
 	if viper.GetString("tfstate") != "" {
@@ -55,7 +55,7 @@ func preRunEOutput(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return fmt.Errorf("could not OpenFile %s because: %s", viper.GetString("tfstate"), err)
 		}
-		tfstate = f
+		stateOut = f
 		closeOut = append(closeOut, f)
 	}
 

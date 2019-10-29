@@ -1,13 +1,13 @@
-package writer_test
+package hcl_test
 
 import (
 	"testing"
 
-	"github.com/cycloidio/terracognita/writer"
+	"github.com/cycloidio/terracognita/hcl"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFormatHCL(t *testing.T) {
+func TestFormat(t *testing.T) {
 	tests := []struct {
 		name string
 		in   []byte
@@ -23,7 +23,7 @@ func TestFormatHCL(t *testing.T) {
 			`),
 			out: []byte(`
 				role = value
-				en.v = "value"
+				"en.v" = "value"
 				"2tag" = "2value"
 				t2tag = "t2value"
 			`),
@@ -41,18 +41,29 @@ func TestFormatHCL(t *testing.T) {
 			`),
 		},
 		{
-			name: "Remove`=`Form`= {`",
+			name: "Remove`=`Form`= {` but not on tags",
 			in: []byte(`
-				"tags" = {
-					"something" = "s"
+				"ebs_block_device" = {
+					"volume_size" = 24
+				}
+				"=tc=tags" = {
+					"some.thing" = "s"
+				}
+				"=tc=volume_tags" = {
+					"some.thing" = "s"
 				}
 			`),
-			// The output it's a bit wierd as it required
-			// an \n before and after the block
 			out: []byte(`
+				ebs_block_device {
+					volume_size = 24
+				}
 
-				tags {
-					something = "s"
+				tags = {
+					"some.thing" = "s"
+				}
+
+				volume_tags = {
+					"some.thing" = "s"
 				}
 
 			`),
@@ -64,7 +75,7 @@ func TestFormatHCL(t *testing.T) {
 
 				"env" = "value"
 
-				"tags" = {
+				"=tc=tags" = {
 					"something" = "s"
 
 					"another" = "a"
@@ -77,7 +88,7 @@ func TestFormatHCL(t *testing.T) {
 				role = value
 				env = "value"
 
-				tags {
+				tags = {
 					something = "s"
 					another = "a"
 				}
@@ -94,7 +105,7 @@ func TestFormatHCL(t *testing.T) {
 
 				"env" = "value"
 
-				"tags" = {
+				"=tc=tags" = {
 					"something" = "s"
 
 					"another" = "a"
@@ -108,7 +119,7 @@ func TestFormatHCL(t *testing.T) {
 				role = value
 				env = "value"
 
-				tags {
+				tags = {
 					something = "s"
 					another = "a"
 				}
@@ -121,7 +132,7 @@ func TestFormatHCL(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			out := writer.FormatHCL(tt.in)
+			out := hcl.Format(tt.in)
 			assert.Equal(t, string(tt.out), string(out))
 		})
 	}

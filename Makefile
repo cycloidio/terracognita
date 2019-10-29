@@ -43,8 +43,9 @@ lint: $(GOLINT) $(GOIMPORTS) ## Runs the linter
 
 .PHONY: generate
 generate: $(MOCKGEN) ## Generates the needed code
-	@GO111MODULE=on go generate ./...
-	@GO111MODULE=on goimports -w ./mock
+	@GO111MODULE=on rm -rf ./mock/a && \
+		go generate ./... && \
+		goimports -w ./mock
 
 .PHONY: test
 test: ## Runs the tests

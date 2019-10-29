@@ -33,6 +33,21 @@ func (m *Writer) EXPECT() *WriterMockRecorder {
 	return m.recorder
 }
 
+// Has mocks base method
+func (m *Writer) Has(arg0 string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Has", arg0)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Has indicates an expected call of Has
+func (mr *WriterMockRecorder) Has(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Has", reflect.TypeOf((*Writer)(nil).Has), arg0)
+}
+
 // Sync mocks base method
 func (m *Writer) Sync() error {
 	m.ctrl.T.Helper()

@@ -14,7 +14,7 @@ import (
 func TestSetGet(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		c := cache.New()
-		r := provider.NewResource("id", "", nil, nil, nil)
+		r := provider.NewResource("id", "", nil)
 		err := c.Set("k", []provider.Resource{r})
 		require.NoError(t, err)
 

@@ -1,20 +1,27 @@
 package provider
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/chr4/pwgen"
 	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/filter"
+	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/tag"
-	"github.com/cycloidio/terracognita/util"
 	"github.com/cycloidio/terracognita/writer"
+	"github.com/hashicorp/terraform/configs/configschema"
+	"github.com/hashicorp/terraform/configs/hcl2shim"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/providers"
+	"github.com/hashicorp/terraform/states"
 	"github.com/hashicorp/terraform/terraform"
 	"github.com/pkg/errors"
+	"github.com/zclconf/go-cty/cty"
 )
 
 //go:generate mockgen -destination=../mock/resource.go -mock_names=Resource=Resource -package mock github.com/cycloidio/terracognita/provider Resource
@@ -37,7 +44,15 @@ type Resource interface {
 	// Provider is the Provider of that Resource
 	Provider() Provider
 
-	// Read read the remote information of the Resource
+	// ImportResourceState imports the Resource state
+	// to the Resource and could return []Resource if
+	// it imported more than one state, this list does not
+	// include the actual Resource on parameters, so if
+	// len([]Resource) == 0 means only the Resource is imported
+	ImportState() ([]Resource, error)
+
+	// Read read the remote information of the Resource to the
+	// state and calculates the ResourceInstanceObject
 	Read(f *filter.Filter) error
 
 	// State calculates the state of the Resource and
@@ -47,6 +62,17 @@ type Resource interface {
 	// HCL returns the HCL configuration of the Resource and
 	// writes it to HCL
 	HCL(w writer.Writer) error
+
+	// InstanceInfo returns the InstanceInfo of this Resource
+	InstanceInfo() *terraform.InstanceInfo
+
+	// CoreConfigSchema returns the configschema.Block of the
+	// Resource
+	CoreConfigSchema() *configschema.Block
+
+	// ResourceInstanceObject is the calculated states.ResourceInstanceObject
+	// after 'Read' has been called
+	ResourceInstanceObject() *states.ResourceInstanceObject
 }
 
 // resources is a general implementation of Resource interface
@@ -60,7 +86,8 @@ type resource struct {
 
 	tfResource *schema.Resource
 
-	data *schema.ResourceData
+	data  *schema.ResourceData
+	state *terraform.InstanceState
 
 	provider Provider
 
@@ -68,6 +95,8 @@ type resource struct {
 	// so it can be the same on the HCL
 	// and State
 	configName string
+
+	resourceInstanceObject *states.ResourceInstanceObject
 }
 
 var (
@@ -75,12 +104,10 @@ var (
 )
 
 // NewResource returns an implementation of the Resource
-func NewResource(id, tp string, tfResource *schema.Resource, data *schema.ResourceData, p Provider) Resource {
+func NewResource(id, rt string, p Provider) Resource {
 	return &resource{
 		id:           id,
-		resourceType: tp,
-		tfResource:   tfResource,
-		data:         data,
+		resourceType: rt,
 		provider:     p,
 	}
 }
@@ -89,44 +116,86 @@ func (r *resource) ID() string { return r.id }
 
 func (r *resource) Type() string { return r.resourceType }
 
-func (r *resource) TFResource() *schema.Resource { return r.tfResource }
+func (r *resource) TFResource() *schema.Resource {
+	if r.tfResource != nil {
+		return r.tfResource
+	}
 
-func (r *resource) Data() *schema.ResourceData { return r.data }
+	tfr, ok := r.provider.TFProvider().ResourcesMap[r.resourceType]
+	if !ok {
+		panic(fmt.Sprintf("the resource %s does not exists on TF", r.resourceType))
+	}
+	r.tfResource = tfr
+	return r.tfResource
+}
+
+func (r *resource) Data() *schema.ResourceData {
+	if r.data == nil {
+		r.data = r.TFResource().Data(nil)
+	}
+	return r.data
+}
 
 func (r *resource) Provider() Provider { return r.provider }
 
-func (r *resource) Read(f *filter.Filter) error {
-	// Retry if any error happen
-	err := util.RetryDefault(func() error {
-		return r.tfResource.Read(r.data, r.provider.TFClient())
-	})
+func (r *resource) ImportState() ([]Resource, error) {
+	logger := log.Get()
+	// If it does not support import do not try
+	if r.TFResource().Importer == nil {
+		logger.Log("func", "ImportState", "resource", r.Type(), "msg", "This resource it's not Importable")
+		return nil, nil
+	}
+	newInstanceStates, err := r.provider.TFProvider().ImportState(r.InstanceInfo(), r.ID())
 	if err != nil {
-		return errors.Wrapf(err, "while reading on type %q", r.resourceType)
+		return nil, errors.Wrapf(err, "could not import resource %s with id %s", r.resourceType, r.id)
 	}
 
-	// TODO: Extreme case, it should be on an "AfterRead" function
-	// but for now we'll do it like this
-	if r.resourceType == "aws_iam_user_group_membership" {
-		gps := r.data.Get("groups").(*schema.Set).List()
-		var gpsKey string
-		for _, gp := range gps {
-			if gpsKey == "" {
-				gpsKey = gp.(string)
-			}
-			gpsKey = fmt.Sprintf("%s/%s", gpsKey, gp)
+	resources := make([]Resource, 0, len(newInstanceStates)-1)
+	// We assume that the first state is the one for this Resource
+	// so the following ones after the first one are from other types
+	// and are, for that reason, other Resources which should be returned
+	for i, is := range newInstanceStates {
+		// copy the ID again just to be sure it wasn't missed
+		is.Attributes["id"] = is.ID
+
+		resourceType := is.Ephemeral.Type
+		if resourceType == "" {
+			resourceType = r.Type()
 		}
-		if len(gps) != 0 {
-			r.data.SetId(fmt.Sprintf("%s/%s", r.data.Get("user"), gpsKey))
+
+		if i != 0 {
+			res := NewResource(is.ID, resourceType, r.provider)
+			res.(*resource).state = is
+			resources = append(resources, res)
+		} else {
+			r.state = is
 		}
+
 	}
 
-	// For some reason it failed to fetch the Resource, it should not be an error
-	// because it could be an account related resource that it's not delcared or
-	// is default.
-	// Therefore we just continue
-	if r.data.Id() == "" {
+	return resources, nil
+}
+
+func (r *resource) Read(f *filter.Filter) error {
+
+	// If we did not need the 'data' this should be
+	// r.provider.TFProvider().RefreshWithoutUpgrade()
+	// but that way we would not have the data and we need
+	// it to generate the HCL
+	newInstanceState, data, err := r.refreshWithoutUpgrade(r.state, r.provider.TFClient())
+	if err != nil {
+		return err
+	}
+	r.state = newInstanceState
+
+	// The old provider API used an empty id to signal that the remote
+	// object appears to have been deleted, but our new protocol expects
+	// to see a null value (in the cty sense) in that case.
+	if newInstanceState == nil || newInstanceState.ID == "" {
 		return errors.Wrapf(errcode.ErrProviderResourceNotRead, "the resource %q with ID %q did not return an ID", r.resourceType, r.id)
 	}
+
+	r.data = data
 
 	// Some resources can not be filtered by tags,
 	// so we have to do it manually
@@ -146,74 +215,155 @@ func (r *resource) Read(f *filter.Filter) error {
 		}
 	}
 
+	// helper/schema should always copy the ID over, but do it again just to be safe
+	newInstanceState.Attributes["id"] = newInstanceState.ID
+
+	newStateVal, err := hcl2shim.HCL2ValueFromFlatmap(newInstanceState.Attributes, r.CoreConfigSchema().ImpliedType())
+	if err != nil {
+		return err
+	}
+
+	// In case it's not Imported we need a state
+	if r.state == nil {
+		r.state = &terraform.InstanceState{}
+	}
+
+	oldStateVal, err := hcl2shim.HCL2ValueFromFlatmap(r.state.Attributes, r.CoreConfigSchema().ImpliedType())
+	if err != nil {
+		return err
+	}
+
+	newStateVal = normalizeNullValues(newStateVal, oldStateVal, false)
+	newStateVal = copyTimeoutValues(newStateVal, oldStateVal)
+
+	meta, err := json.Marshal(r.state.Meta)
+	if err != nil {
+		return err
+	}
+
+	rio := providers.ImportedResource{
+		TypeName: r.resourceType,
+		Private:  meta,
+		State:    newStateVal,
+	}.AsInstanceObject()
+
+	r.resourceInstanceObject = rio
+
 	return nil
+}
+
+// refreshWithoutUpgrade reads the instance state, but does not call
+// MigrateState or the StateUpgraders, since those are now invoked in a
+// separate API call.
+// RefreshWithoutUpgrade is part of the new plugin shims.
+//
+// Copied from TF directly as we need the schema.ResourceData to generate
+// the HCL for now and with this we can get it
+func (r *resource) refreshWithoutUpgrade(s *terraform.InstanceState, meta interface{}) (*terraform.InstanceState, *schema.ResourceData, error) {
+	logger := log.Get()
+	// If there is no InstanceState means that it's not importable but we have to
+	// read it to put it on the config
+	if s != nil {
+		// If the ID is already somehow blank, it doesn't exist
+		if s.ID == "" {
+			return nil, nil, nil
+		}
+
+		rt := schema.ResourceTimeout{}
+		if _, ok := s.Meta[schema.TimeoutKey]; ok {
+			if err := rt.StateDecode(s); err != nil {
+				logger.Log("func", "refreshWithoutUpgrade", "resource", r.Type(), "msg", fmt.Sprintf("[ERR] Error decoding ResourceTimeout: %s", err))
+			}
+		}
+
+		if r.TFResource().Exists != nil {
+			// Make a copy of data so that if it is modified it doesn't
+			// affect our Read later.
+			data, err := schema.InternalMap(r.TFResource().Schema).Data(s, nil)
+			if err != nil {
+				return nil, nil, err
+			}
+
+			exists, err := r.TFResource().Exists(data, meta)
+			if err != nil {
+				return nil, nil, err
+			}
+
+			if !exists {
+				return nil, nil, nil
+			}
+		}
+	}
+
+	data, err := schema.InternalMap(r.TFResource().Schema).Data(s, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// If the resouorce it's not Importer then the state it's not important
+	// and we can use the already created Data.
+	// This may only happen when the Read requires something that it's not
+	// and ID
+	if r.Data() != nil && r.tfResource.Importer == nil {
+		data = r.Data()
+	}
+
+	// If it has no ID on the data but yes on the resource set it
+	// this happens in resources which are not Imported (data will be nil)
+	// and the ID was setted only to the Resource on the initialization of
+	// the provider
+	if (data == nil || data.Id() == "") && r.ID() != "" {
+		data = r.Data()
+		data.SetId(r.ID())
+	}
+
+	err = r.TFResource().Read(data, meta)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	state := data.State()
+	if state != nil && state.ID == "" {
+		state = nil
+	}
+
+	if state != nil && r.TFResource().SchemaVersion > 0 {
+		if state.Meta == nil {
+			state.Meta = make(map[string]interface{})
+		}
+		state.Meta["schema_version"] = strconv.Itoa(r.TFResource().SchemaVersion)
+	}
+
+	return state, data, nil
 }
 
 // State calculates the state of the Resource and
 // writes it to w
 func (r *resource) State(w writer.Writer) error {
-
 	if importer := r.tfResource.Importer; importer != nil {
-
-		setRootDefaults(r.data, r.tfResource.Schema)
-		resourceDatas, err := importer.State(r.data, r.provider.TFClient())
-		if err != nil {
-			return err
-		}
-
-		// TODO: The multple return could potentially be the `depends_on` of the
-		// terraform.ResourceState
-		// Investigate on SG
-		for i, rd := range resourceDatas {
-			if i != 0 {
-				// for now we scape all the other ones
-				// the firs one is the one we need and
-				// for what've see the others are
-				// 'aws_security_group_rules' (in aws)
-				// and are not imported by default by
-				// Terraform
-				continue
+		// If it does not have any configName we will generate one
+		// and store it, so net time it'll use that one on any config
+		if r.configName == "" {
+			configName := tag.GetNameFromTag(r.provider.TagKey(), r.data, r.id)
+			if ok, err := w.Has(configName); err != nil {
+				return err
+			} else if ok {
+				configName = pwgen.Alpha(5)
 			}
 
-			tis := rd.State()
-			if tis == nil {
-				// IDK why some times it does not have
-				// the ID (the only case in tis it's nil)
-				// so if nil we don't need it
-				continue
+			err := w.Write(fmt.Sprintf("%s.%s", r.resourceType, configName), r)
+			if err != nil {
+				return err
 			}
 
-			trs := &terraform.ResourceState{
-				Type:     r.resourceType,
-				Primary:  tis,
-				Provider: r.Provider().String(),
+			r.configName = configName
+		} else {
+			err := w.Write(fmt.Sprintf("%s.%s", r.resourceType, r.configName), r)
+			if err != nil {
+				return err
 			}
 
-			// If it does not have any configName we will generate one
-			// and store it, so net time it'll use that one on any config
-			if r.configName == "" {
-				configName := tag.GetNameFromTag(r.provider.TagKey(), rd, r.id)
-				err := w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, configName), trs)
-				if err != nil {
-					if errors.Cause(err) == errcode.ErrWriterAlreadyExistsKey {
-						configName = pwgen.Alpha(5)
-						err = w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, configName), trs)
-						if err != nil {
-							return err
-						}
-						r.configName = configName
-						return nil
-					}
-					return err
-				}
-				r.configName = configName
-			} else {
-				err := w.Write(fmt.Sprintf("%s.%s", tis.Ephemeral.Type, r.configName), trs)
-				if err != nil {
-					return err
-				}
-				return nil
-			}
+			return nil
 		}
 	}
 	return nil
@@ -224,21 +374,21 @@ func (r *resource) State(w writer.Writer) error {
 func (r *resource) HCL(w writer.Writer) error {
 	cfg := mergeFullConfig(r.data, r.tfResource.Schema, "")
 
+	// If it does not have any configName we will generate one
+	// and store it, so net time it'll use that one on any config
 	if r.configName == "" {
-		configName := tag.GetNameFromTag(r.provider.TagKey(), r.data, r.id)
+		configName := fmt.Sprintf("%s.%s", r.resourceType, tag.GetNameFromTag(r.provider.TagKey(), r.data, r.id))
+		if ok, err := w.Has(configName); err != nil {
+			return err
+		} else if ok {
+			configName = pwgen.Alpha(5)
+		}
+
 		err := w.Write(fmt.Sprintf("%s.%s", r.resourceType, configName), cfg)
 		if err != nil {
-			if errors.Cause(err) == errcode.ErrWriterAlreadyExistsKey {
-				configName = pwgen.Alpha(5)
-				err = w.Write(fmt.Sprintf("%s.%s", r.resourceType, configName), cfg)
-				if err != nil {
-					return err
-				}
-				r.configName = configName
-				return nil
-			}
 			return err
 		}
+
 		r.configName = configName
 	} else {
 		err := w.Write(fmt.Sprintf("%s.%s", r.resourceType, r.configName), cfg)
@@ -250,38 +400,30 @@ func (r *resource) HCL(w writer.Writer) error {
 	return nil
 }
 
-// setRootDefaults set's the default values of the schema of the root values
-func setRootDefaults(cfgr *schema.ResourceData, sch map[string]*schema.Schema) {
-	for k, v := range sch {
-		// If it's just a Computed value, do not add it to the output
-		if !isConfig(v) {
-			continue
-		}
-
-		// schema.Resource means that it has nested fields
-		if _, ok := v.Elem.(*schema.Resource); ok {
-			continue
-		}
-
-		// This sets the single values that we see on the
-		// end result
-
-		vv, ok := cfgr.GetOk(k)
-		// If the value is Required we need to add it
-		// even if it's not sent
-		if (!ok || vv == nil) && !v.Required && v.Default == nil {
-			continue
-		}
-
-		if !ok && v.Default != nil {
-			cfgr.Set(k, v.Default)
-		}
+func (r *resource) InstanceInfo() *terraform.InstanceInfo {
+	return &terraform.InstanceInfo{
+		Id:   r.id,
+		Type: r.resourceType,
 	}
+}
+
+func (r *resource) CoreConfigSchema() *configschema.Block {
+	return r.tfResource.CoreConfigSchema()
+}
+
+func (r *resource) ResourceInstanceObject() *states.ResourceInstanceObject {
+	return r.resourceInstanceObject
 }
 
 // mergeFullConfig creates the key to the map and if it had a value before set it, if
 func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, key string) map[string]interface{} {
 	res := make(map[string]interface{})
+	// conflicts has all the possible conflicts that we can have at this level
+	// of the schema, so we do not add a conflicted attribute after the other.
+	// The structure is:
+	// * key: Value that is Conflicted with
+	// * value: Attribute that has Clonflicts
+	conflicts := make(map[string]string)
 	for k, v := range sch {
 		// If it's just a Computed value, do not add it to the output
 		if !isConfig(v) {
@@ -317,10 +459,19 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 
 				list := l.([]interface{})
 				for i := range list {
-					ar = append(ar.([]interface{}), mergeFullConfig(cfgr, sr.Schema, fmt.Sprintf("%s.%d", kk, i)))
+					fc := mergeFullConfig(cfgr, sr.Schema, fmt.Sprintf("%s.%d", kk, i))
+					// It can be possible that there are no actual values insight, so to not add
+					// an empty entity we validate it
+					if len(fc) > 0 {
+						ar = append(ar.([]interface{}), fc)
+					}
 				}
 
-				res[k] = ar
+				// If no element on the ar, then we just
+				// ignore it to not add empty values
+				if len(ar.([]interface{})) > 0 {
+					res[k] = ar
+				}
 			} else {
 				res[k] = mergeFullConfig(cfgr, sr.Schema, kk)
 			}
@@ -346,6 +497,28 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 			continue
 		}
 
+		// If any of the attributes added before has
+		// a conflict with the current key we have to delete
+		// the old one and use this one
+		if c, ok := conflicts[k]; ok {
+			delete(res, c)
+		}
+
+		// If the ConflictsWith has values we store them on the
+		// conflicts map so none of those attributes is added after
+		// this one has been added
+		if len(v.ConflictsWith) != 0 {
+			for _, c := range v.ConflictsWith {
+				conflicts[c] = k
+			}
+		}
+
+		// If it's a type map, we'll prefix the key with '=tc=' to know
+		// that it's an attribute so we have to keep the '=' when formatting
+		// the HCL
+		if v.Type == schema.TypeMap {
+			k = "=tc=" + k
+		}
 		if s, ok := vv.(*schema.Set); ok {
 			res[k] = s.List()
 		} else {
@@ -503,4 +676,205 @@ func isConfig(sch *schema.Schema) bool {
 		return false
 	}
 	return true
+}
+
+// COPIED FROM TF AS THOSE ARE PRIVATE BUT NEEDED
+
+// Zero values and empty containers may be interchanged by the apply process.
+// When there is a discrepency between src and dst value being null or empty,
+// prefer the src value. This takes a little more liberty with set types, since
+// we can't correlate modified set values. In the case of sets, if the src set
+// was wholly known we assume the value was correctly applied and copy that
+// entirely to the new value.
+// While apply prefers the src value, during plan we prefer dst whenever there
+// is an unknown or a set is involved, since the plan can alter the value
+// however it sees fit. This however means that a CustomizeDiffFunction may not
+// be able to change a null to an empty value or vice versa, but that should be
+// very uncommon nor was it reliable before 0.12 either.
+func normalizeNullValues(dst, src cty.Value, apply bool) cty.Value {
+	ty := dst.Type()
+	if !src.IsNull() && !src.IsKnown() {
+		// Return src during plan to retain unknown interpolated placeholders,
+		// which could be lost if we're only updating a resource. If this is a
+		// read scenario, then there shouldn't be any unknowns at all.
+		if dst.IsNull() && !apply {
+			return src
+		}
+		return dst
+	}
+
+	// Handle null/empty changes for collections during apply.
+	// A change between null and empty values prefers src to make sure the state
+	// is consistent between plan and apply.
+	if ty.IsCollectionType() && apply {
+		dstEmpty := !dst.IsNull() && dst.IsKnown() && dst.LengthInt() == 0
+		srcEmpty := !src.IsNull() && src.IsKnown() && src.LengthInt() == 0
+
+		if (src.IsNull() && dstEmpty) || (srcEmpty && dst.IsNull()) {
+			return src
+		}
+	}
+
+	if src.IsNull() || !src.IsKnown() || !dst.IsKnown() {
+		return dst
+	}
+
+	switch {
+	case ty.IsMapType(), ty.IsObjectType():
+		var dstMap map[string]cty.Value
+		if !dst.IsNull() {
+			dstMap = dst.AsValueMap()
+		}
+		if dstMap == nil {
+			dstMap = map[string]cty.Value{}
+		}
+
+		srcMap := src.AsValueMap()
+		for key, v := range srcMap {
+			dstVal, ok := dstMap[key]
+			if !ok && apply && ty.IsMapType() {
+				// don't transfer old map values to dst during apply
+				continue
+			}
+
+			if dstVal == cty.NilVal {
+				if !apply && ty.IsMapType() {
+					// let plan shape this map however it wants
+					continue
+				}
+				dstVal = cty.NullVal(v.Type())
+			}
+
+			dstMap[key] = normalizeNullValues(dstVal, v, apply)
+		}
+
+		// you can't call MapVal/ObjectVal with empty maps, but nothing was
+		// copied in anyway. If the dst is nil, and the src is known, assume the
+		// src is correct.
+		if len(dstMap) == 0 {
+			if dst.IsNull() && src.IsWhollyKnown() && apply {
+				return src
+			}
+			return dst
+		}
+
+		if ty.IsMapType() {
+			// helper/schema will populate an optional+computed map with
+			// unknowns which we have to fixup here.
+			// It would be preferable to simply prevent any known value from
+			// becoming unknown, but concessions have to be made to retain the
+			// broken legacy behavior when possible.
+			for k, srcVal := range srcMap {
+				if !srcVal.IsNull() && srcVal.IsKnown() {
+					dstVal, ok := dstMap[k]
+					if !ok {
+						continue
+					}
+
+					if !dstVal.IsNull() && !dstVal.IsKnown() {
+						dstMap[k] = srcVal
+					}
+				}
+			}
+
+			return cty.MapVal(dstMap)
+		}
+
+		return cty.ObjectVal(dstMap)
+
+	case ty.IsSetType():
+		// If the original was wholly known, then we expect that is what the
+		// provider applied. The apply process loses too much information to
+		// reliably re-create the set.
+		if src.IsWhollyKnown() && apply {
+			return src
+		}
+
+	case ty.IsListType(), ty.IsTupleType():
+		// If the dst is null, and the src is known, then we lost an empty value
+		// so take the original.
+		if dst.IsNull() {
+			if src.IsWhollyKnown() && src.LengthInt() == 0 && apply {
+				return src
+			}
+
+			// if dst is null and src only contains unknown values, then we lost
+			// those during a read or plan.
+			if !apply && !src.IsNull() {
+				allUnknown := true
+				for _, v := range src.AsValueSlice() {
+					if v.IsKnown() {
+						allUnknown = false
+						break
+					}
+				}
+				if allUnknown {
+					return src
+				}
+			}
+
+			return dst
+		}
+
+		// if the lengths are identical, then iterate over each element in succession.
+		srcLen := src.LengthInt()
+		dstLen := dst.LengthInt()
+		if srcLen == dstLen && srcLen > 0 {
+			srcs := src.AsValueSlice()
+			dsts := dst.AsValueSlice()
+
+			for i := 0; i < srcLen; i++ {
+				dsts[i] = normalizeNullValues(dsts[i], srcs[i], apply)
+			}
+
+			if ty.IsTupleType() {
+				return cty.TupleVal(dsts)
+			}
+			return cty.ListVal(dsts)
+		}
+
+	case ty.IsPrimitiveType():
+		if dst.IsNull() && src.IsWhollyKnown() && apply {
+			return src
+		}
+	}
+
+	return dst
+}
+
+// helper/schema throws away timeout values from the config and stores them in
+// the Private/Meta fields. we need to copy those values into the planned state
+// so that core doesn't see a perpetual diff with the timeout block.
+func copyTimeoutValues(to cty.Value, from cty.Value) cty.Value {
+	// if `to` is null we are planning to remove it altogether.
+	if to.IsNull() {
+		return to
+	}
+	toAttrs := to.AsValueMap()
+	// We need to remove the key since the hcl2shims will add a non-null block
+	// because we can't determine if a single block was null from the flatmapped
+	// values. This needs to conform to the correct schema for marshaling, so
+	// change the value to null rather than deleting it from the object map.
+	timeouts, ok := toAttrs[schema.TimeoutsConfigKey]
+	if ok {
+		toAttrs[schema.TimeoutsConfigKey] = cty.NullVal(timeouts.Type())
+	}
+
+	// if from is null then there are no timeouts to copy
+	if from.IsNull() {
+		return cty.ObjectVal(toAttrs)
+	}
+
+	fromAttrs := from.AsValueMap()
+	timeouts, ok = fromAttrs[schema.TimeoutsConfigKey]
+
+	// timeouts shouldn't be unknown, but don't copy possibly invalid values either
+	if !ok || timeouts.IsNull() || !timeouts.IsWhollyKnown() {
+		// no timeouts block to copy
+		return cty.ObjectVal(toAttrs)
+	}
+
+	toAttrs[schema.TimeoutsConfigKey] = timeouts
+
+	return cty.ObjectVal(toAttrs)
 }

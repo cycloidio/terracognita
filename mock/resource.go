@@ -11,7 +11,10 @@ import (
 	provider "github.com/cycloidio/terracognita/provider"
 	writer "github.com/cycloidio/terracognita/writer"
 	gomock "github.com/golang/mock/gomock"
+	configschema "github.com/hashicorp/terraform/configs/configschema"
 	schema "github.com/hashicorp/terraform/helper/schema"
+	states "github.com/hashicorp/terraform/states"
+	terraform "github.com/hashicorp/terraform/terraform"
 )
 
 // Resource is a mock of Resource interface
@@ -35,6 +38,20 @@ func NewResource(ctrl *gomock.Controller) *Resource {
 // EXPECT returns an object that allows the caller to indicate expected use
 func (m *Resource) EXPECT() *ResourceMockRecorder {
 	return m.recorder
+}
+
+// CoreConfigSchema mocks base method
+func (m *Resource) CoreConfigSchema() *configschema.Block {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CoreConfigSchema")
+	ret0, _ := ret[0].(*configschema.Block)
+	return ret0
+}
+
+// CoreConfigSchema indicates an expected call of CoreConfigSchema
+func (mr *ResourceMockRecorder) CoreConfigSchema() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CoreConfigSchema", reflect.TypeOf((*Resource)(nil).CoreConfigSchema))
 }
 
 // Data mocks base method
@@ -79,6 +96,35 @@ func (mr *ResourceMockRecorder) ID() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ID", reflect.TypeOf((*Resource)(nil).ID))
 }
 
+// ImportState mocks base method
+func (m *Resource) ImportState() ([]provider.Resource, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ImportState")
+	ret0, _ := ret[0].([]provider.Resource)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ImportState indicates an expected call of ImportState
+func (mr *ResourceMockRecorder) ImportState() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ImportState", reflect.TypeOf((*Resource)(nil).ImportState))
+}
+
+// InstanceInfo mocks base method
+func (m *Resource) InstanceInfo() *terraform.InstanceInfo {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InstanceInfo")
+	ret0, _ := ret[0].(*terraform.InstanceInfo)
+	return ret0
+}
+
+// InstanceInfo indicates an expected call of InstanceInfo
+func (mr *ResourceMockRecorder) InstanceInfo() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstanceInfo", reflect.TypeOf((*Resource)(nil).InstanceInfo))
+}
+
 // Provider mocks base method
 func (m *Resource) Provider() provider.Provider {
 	m.ctrl.T.Helper()
@@ -105,6 +151,20 @@ func (m *Resource) Read(arg0 *filter.Filter) error {
 func (mr *ResourceMockRecorder) Read(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Read", reflect.TypeOf((*Resource)(nil).Read), arg0)
+}
+
+// ResourceInstanceObject mocks base method
+func (m *Resource) ResourceInstanceObject() *states.ResourceInstanceObject {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ResourceInstanceObject")
+	ret0, _ := ret[0].(*states.ResourceInstanceObject)
+	return ret0
+}
+
+// ResourceInstanceObject indicates an expected call of ResourceInstanceObject
+func (mr *ResourceMockRecorder) ResourceInstanceObject() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResourceInstanceObject", reflect.TypeOf((*Resource)(nil).ResourceInstanceObject))
 }
 
 // State mocks base method

@@ -35,9 +35,9 @@ $> make install
 Terracognita currently imports only AWS cloud provider as terraform resource/state.
 Please see the following versions as follow:
 
-Terraform: 0.11.14
+Terraform: 0.12.7
 Providers:
- * AWS: 2.12.0
+ * AWS: 2.31.0
 
 ## Usage
 
