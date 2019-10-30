@@ -16,6 +16,7 @@ type ResourceType int
 //go:generate enumer -type ResourceType -addprefix google_ -transform snake -linecomment
 const (
 	ComputeInstance ResourceType = iota
+	ComputeFirewall
 )
 
 type rtFn func(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error)
@@ -23,6 +24,7 @@ type rtFn func(ctx context.Context, g *google, resourceType string, tags []tag.T
 var (
 	resources = map[ResourceType]rtFn{
 		ComputeInstance: computeInstance,
+		ComputeFirewall: computeFirewall,
 	}
 )
 
@@ -50,6 +52,23 @@ func computeInstance(ctx context.Context, g *google, resourceType string, tags [
 			}
 			resources = append(resources, r)
 		}
+	}
+	return resources, nil
+}
+
+func computeFirewall(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	f := initializeFilter(tags)
+	firewalls, err := g.gcpr.ListFirewalls(ctx, f)
+	if err != nil {
+		return nil, err
+	}
+	resources := make([]provider.Resource, 0)
+	for _, firewall := range firewalls {
+		r := provider.NewResource(firewall.Name, resourceType, g)
+		if err != nil {
+			return nil, err
+		}
+		resources = append(resources, r)
 	}
 	return resources, nil
 }

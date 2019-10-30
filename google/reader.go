@@ -71,3 +71,21 @@ func (r *GCPReader) ListInstances(ctx context.Context, filter string) (map[strin
 	}
 	return instancesList, nil
 }
+
+// ListFirewalls return a list of firewalls in the project
+func (r *GCPReader) ListFirewalls(ctx context.Context, filter string) ([]compute.Firewall, error) {
+	is := compute.NewFirewallsService(r.compute)
+	// 500 is the current `maxResults`
+	firewalls := make([]compute.Firewall, 0, 500)
+	if err := is.List(r.project).
+		Filter(filter).
+		Pages(ctx, func(list *compute.FirewallList) error {
+			for _, firewall := range list.Items {
+				firewalls = append(firewalls, *firewall)
+			}
+			return nil
+		}); err != nil {
+		return nil, err
+	}
+	return firewalls, nil
+}
