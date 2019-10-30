@@ -89,3 +89,21 @@ func (r *GCPReader) ListFirewalls(ctx context.Context, filter string) ([]compute
 	}
 	return firewalls, nil
 }
+
+// ListNetworks return a list of networks in the project
+func (r *GCPReader) ListNetworks(ctx context.Context, filter string) ([]compute.Network, error) {
+	ns := compute.NewNetworksService(r.compute)
+	// 500 is the current `maxResults`
+	networks := make([]compute.Network, 0, 500)
+	if err := ns.List(r.project).
+		Filter(filter).
+		Pages(ctx, func(list *compute.NetworkList) error {
+			for _, network := range list.Items {
+				networks = append(networks, *network)
+			}
+			return nil
+		}); err != nil {
+		return nil, err
+	}
+	return networks, nil
+}
