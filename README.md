@@ -58,7 +58,7 @@ clean:                           Removes binary and/or docker image
 
 ### Docker
 
-You can use directly [the image built](https://cloud.docker.com/u/cycloid/repository/docker/cycloid/terracognita/general), or you can build your own.
+You can use directly [the image built](https://hub.docker.com/r/cycloid/terracognita), or you can build your own.
 To build your Docker image just run:
 
 ```bash
