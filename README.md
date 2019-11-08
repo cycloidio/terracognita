@@ -36,6 +36,7 @@ Terracognita currently imports AWS and GCP cloud provider as terraform resource/
 Please see the following versions as follow:
 
 Terraform: 0.12.7
+
 Providers:
  * AWS: 2.31.0
  * GCP: 2.16.0
