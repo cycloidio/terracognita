@@ -106,13 +106,3 @@ func init() {
 	_ = viper.BindPFlag("tags", awsCmd.Flags().Lookup("tags"))
 
 }
-
-func requiredStringFlags(names ...string) error {
-	for _, n := range names {
-		if viper.GetString(n) == "" {
-			return fmt.Errorf("the flag %q is required", n)
-		}
-	}
-
-	return nil
-}

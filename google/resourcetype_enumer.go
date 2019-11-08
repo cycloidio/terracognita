@@ -6,11 +6,11 @@ import (
 	"fmt"
 )
 
-const _ResourceTypeName = "google_not_implemented"
+const _ResourceTypeName = "google_compute_instance"
 
-var _ResourceTypeIndex = [...]uint8{0, 22}
+var _ResourceTypeIndex = [...]uint8{0, 23}
 
-const _ResourceTypeLowerName = "google_not_implemented"
+const _ResourceTypeLowerName = "google_compute_instance"
 
 func (i ResourceType) String() string {
 	if i < 0 || i >= ResourceType(len(_ResourceTypeIndex)-1) {
@@ -22,12 +22,12 @@ func (i ResourceType) String() string {
 var _ResourceTypeValues = []ResourceType{0}
 
 var _ResourceTypeNameToValueMap = map[string]ResourceType{
-	_ResourceTypeName[0:22]:      0,
-	_ResourceTypeLowerName[0:22]: 0,
+	_ResourceTypeName[0:23]:      0,
+	_ResourceTypeLowerName[0:23]: 0,
 }
 
 var _ResourceTypeNames = []string{
-	_ResourceTypeName[0:22],
+	_ResourceTypeName[0:23],
 }
 
 // ResourceTypeString retrieves an enum value from the enum constants string name.

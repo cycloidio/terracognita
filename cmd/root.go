@@ -75,6 +75,16 @@ func postRunEOutput(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func requiredStringFlags(names ...string) error {
+	for _, n := range names {
+		if viper.GetString(n) == "" {
+			return fmt.Errorf("the flag %q is required", n)
+		}
+	}
+
+	return nil
+}
+
 func init() {
 
 	cobra.OnInitialize(initViper)
