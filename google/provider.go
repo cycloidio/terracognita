@@ -34,7 +34,7 @@ func NewProvider(ctx context.Context, project, region, credentials string) (prov
 	}
 
 	tfp := tfgoogle.Provider().(*schema.Provider)
-	tfp.SetMeta(cfg)
+	tfp.SetMeta(&cfg)
 
 	log.Get().Log("func", "google.NewProvider", "msg", "loading GCP client")
 	reader, err := NewGcpReader(ctx, project, region, credentials)

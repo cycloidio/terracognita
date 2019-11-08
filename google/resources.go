@@ -16,6 +16,8 @@ type ResourceType int
 //go:generate enumer -type ResourceType -addprefix google_ -transform snake -linecomment
 const (
 	ComputeInstance ResourceType = iota
+	ComputeFirewall
+	ComputeNetwork
 )
 
 type rtFn func(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error)
@@ -23,6 +25,8 @@ type rtFn func(ctx context.Context, g *google, resourceType string, tags []tag.T
 var (
 	resources = map[ResourceType]rtFn{
 		ComputeInstance: computeInstance,
+		ComputeFirewall: computeFirewall,
+		ComputeNetwork:  computeNetwork,
 	}
 )
 
@@ -50,6 +54,40 @@ func computeInstance(ctx context.Context, g *google, resourceType string, tags [
 			}
 			resources = append(resources, r)
 		}
+	}
+	return resources, nil
+}
+
+func computeFirewall(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	f := initializeFilter(tags)
+	firewalls, err := g.gcpr.ListFirewalls(ctx, f)
+	if err != nil {
+		return nil, err
+	}
+	resources := make([]provider.Resource, 0)
+	for _, firewall := range firewalls {
+		r := provider.NewResource(firewall.Name, resourceType, g)
+		if err != nil {
+			return nil, err
+		}
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func computeNetwork(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	f := initializeFilter(tags)
+	networks, err := g.gcpr.ListNetworks(ctx, f)
+	if err != nil {
+		return nil, err
+	}
+	resources := make([]provider.Resource, 0)
+	for _, network := range networks {
+		r := provider.NewResource(network.Name, resourceType, g)
+		if err != nil {
+			return nil, err
+		}
+		resources = append(resources, r)
 	}
 	return resources, nil
 }

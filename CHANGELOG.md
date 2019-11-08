@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+### Added
+
+- google resource: compute instance
+  ([PR #56](https://github.com/cycloidio/terracognita/pull/56))
+- google resource: compute networks and compute firewalls
+  ([PR #61](https://github.com/cycloidio/terracognita/pull/61))
+
 ## [0.2.0] _2019-10-29_
 
 This version changes the format of the TFState to the Terraform 0.12+ [format](https://www.terraform.io/upgrade-guides/0-12.html)
