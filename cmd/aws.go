@@ -24,10 +24,16 @@ var (
 	tags []string
 
 	awsCmd = &cobra.Command{
-		Use:      "aws",
-		Short:    "Terracognita reads from AWS and generates hcl resources and/or terraform state",
-		Long:     "Terracognita reads from AWS and generates hcl resources and/or terraform state",
-		PreRunE:  preRunEOutput,
+		Use:   "aws",
+		Short: "Terracognita reads from AWS and generates hcl resources and/or terraform state",
+		Long:  "Terracognita reads from AWS and generates hcl resources and/or terraform state",
+		PreRun: func(cmd *cobra.Command, args []string) {
+			preRunEOutput(cmd, args)
+			viper.BindPFlag("access-key", cmd.Flags().Lookup("access-key"))
+			viper.BindPFlag("secret-key", cmd.Flags().Lookup("secret-key"))
+			viper.BindPFlag("region", cmd.Flags().Lookup("region"))
+			viper.BindPFlag("tags", cmd.Flags().Lookup("tags"))
+		},
 		PostRunE: postRunEOutput,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			logger := log.Get()
@@ -90,19 +96,10 @@ func init() {
 	awsCmd.AddCommand(awsResourcesCmd)
 
 	// Required flags
-
 	awsCmd.Flags().String("access-key", "", "Access Key (required)")
-	_ = viper.BindPFlag("access-key", awsCmd.Flags().Lookup("access-key"))
-
 	awsCmd.Flags().String("secret-key", "", "Secret Key (required)")
-	_ = viper.BindPFlag("secret-key", awsCmd.Flags().Lookup("secret-key"))
-
 	awsCmd.Flags().String("region", "", "Region to search in, for now * it's not supported (required)")
-	_ = viper.BindPFlag("region", awsCmd.Flags().Lookup("region"))
 
 	// Filter flags
-
 	awsCmd.Flags().StringSliceVarP(&tags, "tags", "t", []string{}, "List of tags to filter with format 'NAME:VALUE'")
-	_ = viper.BindPFlag("tags", awsCmd.Flags().Lookup("tags"))
-
 }
