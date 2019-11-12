@@ -40,7 +40,18 @@ var (
 	}
 )
 
+func requiredStringFlags(names ...string) error {
+	for _, n := range names {
+		if viper.GetString(n) == "" {
+			return fmt.Errorf("the flag %q is required", n)
+		}
+	}
+
+	return nil
+}
+
 func preRunEOutput(cmd *cobra.Command, args []string) error {
+	// Initializes/Validates the HCL and TFSTATE flags
 	closeOut = make([]io.Closer, 0)
 	if viper.GetString("hcl") != "" {
 		f, err := os.OpenFile(viper.GetString("hcl"), os.O_APPEND|os.O_TRUNC|os.O_RDWR|os.O_CREATE, 0644)
@@ -66,6 +77,7 @@ func preRunEOutput(cmd *cobra.Command, args []string) error {
 }
 
 func postRunEOutput(cmd *cobra.Command, args []string) error {
+	// Closes all the opened files
 	for _, c := range closeOut {
 		if err := c.Close(); err != nil {
 			return err
@@ -75,18 +87,7 @@ func postRunEOutput(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func requiredStringFlags(names ...string) error {
-	for _, n := range names {
-		if viper.GetString(n) == "" {
-			return fmt.Errorf("the flag %q is required", n)
-		}
-	}
-
-	return nil
-}
-
 func init() {
-
 	cobra.OnInitialize(initViper)
 	RootCmd.AddCommand(awsCmd)
 	RootCmd.AddCommand(googleCmd)

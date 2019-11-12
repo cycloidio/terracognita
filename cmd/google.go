@@ -22,10 +22,16 @@ import (
 
 var (
 	googleCmd = &cobra.Command{
-		Use:      "google",
-		Short:    "Terracognita reads from GCP and generates hcl resources and/or terraform state",
-		Long:     "Terracognita reads from GCP and generates hcl resources and/or terraform state",
-		PreRunE:  preRunEOutput,
+		Use:   "google",
+		Short: "Terracognita reads from GCP and generates hcl resources and/or terraform state",
+		Long:  "Terracognita reads from GCP and generates hcl resources and/or terraform state",
+		PreRun: func(cmd *cobra.Command, args []string) {
+			preRunEOutput(cmd, args)
+			viper.BindPFlag("credentials", cmd.Flags().Lookup("credentials"))
+			viper.BindPFlag("project", cmd.Flags().Lookup("project"))
+			viper.BindPFlag("region", cmd.Flags().Lookup("region"))
+			viper.BindPFlag("labels", cmd.Flags().Lookup("labels"))
+		},
 		PostRunE: postRunEOutput,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			logger := log.Get()
@@ -91,20 +97,12 @@ var (
 
 func init() {
 	googleCmd.AddCommand(googleResourcesCmd)
+
 	// Required flags
-
 	googleCmd.Flags().String("credentials", "", "path to the JSON credential (required)")
-	_ = viper.BindPFlag("credentials", googleCmd.Flags().Lookup("credentials"))
-
 	googleCmd.Flags().String("project", "", "project (required)")
-	_ = viper.BindPFlag("project", googleCmd.Flags().Lookup("project"))
-
 	googleCmd.Flags().String("region", "", "region (required)")
-	_ = viper.BindPFlag("region", googleCmd.Flags().Lookup("region"))
 
 	// Filter flags
-
 	googleCmd.Flags().StringSliceVarP(&tags, "labels", "t", []string{}, "List of labels to filter with format 'NAME:VALUE'")
-	_ = viper.BindPFlag("labels", googleCmd.Flags().Lookup("labels"))
-
 }
