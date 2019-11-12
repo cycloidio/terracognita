@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 
 	kitlog "github.com/go-kit/kit/log"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -31,6 +31,7 @@ var (
 			viper.BindPFlag("project", cmd.Flags().Lookup("project"))
 			viper.BindPFlag("region", cmd.Flags().Lookup("region"))
 			viper.BindPFlag("labels", cmd.Flags().Lookup("labels"))
+			viper.BindPFlag("max-results", cmd.Flags().Lookup("max-results"))
 		},
 		PostRunE: postRunEOutput,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -55,6 +56,7 @@ var (
 
 			googleP, err := google.NewProvider(
 				ctx,
+				viper.GetUint64("max-results"),
 				viper.GetString("project"),
 				viper.GetString("region"),
 				viper.GetString("credentials"),
@@ -87,7 +89,7 @@ var (
 			logger.Log("msg", "starting terracognita", "version", Version)
 			err = provider.Import(ctx, googleP, hclW, stateW, f, logsOut)
 			if err != nil {
-				return fmt.Errorf("could not import from google: %+v", err)
+				return errors.Wrap(err, "could not import from google")
 			}
 
 			return nil
@@ -105,4 +107,7 @@ func init() {
 
 	// Filter flags
 	googleCmd.Flags().StringSliceVarP(&tags, "labels", "t", []string{}, "List of labels to filter with format 'NAME:VALUE'")
+
+	// Optional flags
+	googleCmd.Flags().Uint64("max-results", 500, "max results to fetch when pagination is used")
 }
