@@ -7,6 +7,11 @@
 - google resource: compute networks and compute firewalls
   ([PR #61](https://github.com/cycloidio/terracognita/pull/61))
 
+## Fixed
+
+- '--region' flag working for different subcommands
+  ([PR #63](https://github.com/cycloidio/terracognita/pull/63))
+
 ## [0.2.0] _2019-10-29_
 
 This version changes the format of the TFState to the Terraform 0.12+ [format](https://www.terraform.io/upgrade-guides/0-12.html)
