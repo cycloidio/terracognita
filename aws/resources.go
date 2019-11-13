@@ -88,6 +88,9 @@ const (
 	// SESEventDestination
 	SESIdentityNotificationTopic
 	SESTemplate
+	LaunchConfiguration
+	LaunchTemplate
+	AutoscalingGroup
 )
 
 type rtFn func(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error)
@@ -148,6 +151,9 @@ var (
 		SESConfigurationSet:            sesConfigurationSets,
 		SESIdentityNotificationTopic:   sesIdentityNotificationTopics,
 		SESTemplate:                    sesTemplates,
+		LaunchConfiguration:            launchConfigurations,
+		LaunchTemplate:                 launchtemplates,
+		AutoscalingGroup:               autoscalinggroups,
 	}
 )
 
@@ -1219,6 +1225,69 @@ func sesTemplates(ctx context.Context, a *aws, resourceType string, tags []tag.T
 		if err != nil {
 			return nil, err
 		}
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func launchConfigurations(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	launchConfigurations, err := a.awsr.GetLaunchConfigurations(ctx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range launchConfigurations[a.Region()].LaunchConfigurations {
+
+		r, err := initializeResource(a, *i.LaunchConfigurationName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func launchtemplates(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	launchtemplates, err := a.awsr.GetLaunchTemplates(ctx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range launchtemplates[a.Region()].LaunchTemplates {
+
+		r, err := initializeResource(a, *i.LaunchTemplateId, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func autoscalinggroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	autoscalinggroups, err := a.awsr.GetAutoScalingGroups(ctx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range autoscalinggroups[a.Region()].AutoScalingGroups {
+
+		r, err := initializeResource(a, *i.AutoScalingGroupName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
 		resources = append(resources, r)
 	}
 
