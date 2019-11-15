@@ -81,11 +81,11 @@ func Import(ctx context.Context, p Provider, hcl, tfstate writer.Writer, f *filt
 				if err != nil {
 					cause := errors.Cause(err)
 
-					// All those ignored errors are types of errors to identify that something happend, but not that something went wrong
-					// some of them are to skip the resource and others just informative
-					// we'll continue to the next resource
-					fmt.Fprintf(out, "\ncould not read resource: %s.%s\n", re.Type(), re.ID())
+					// Errors are ignored. If a resource is invalid we assume it can be skipped, it can be related to inconsistencies in deployed resources.
+					// So instead of failing and stopping execution we ignore them and continue (we log them if -v is specified)
+
 					logger.Log("error", cause)
+
 					continue
 				}
 
