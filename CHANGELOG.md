@@ -6,6 +6,8 @@
   ([PR #56](https://github.com/cycloidio/terracognita/pull/56))
 - google resource: compute networks and compute firewalls
   ([PR #61](https://github.com/cycloidio/terracognita/pull/61))
+- google reader functions are now generated from go:generate
+  ([PR #65](https://github.com/cycloidio/terracognita/pull/65))
 
 ## Fixed
 
