@@ -20,7 +20,7 @@ type google struct {
 }
 
 // NewProvider returns a Gooogle Provider
-func NewProvider(ctx context.Context, project, region, credentials string) (provider.Provider, error) {
+func NewProvider(ctx context.Context, maxResults uint64, project, region, credentials string) (provider.Provider, error) {
 	cfg := tfgoogle.Config{
 		Credentials: credentials,
 		Project:     project,
@@ -37,7 +37,7 @@ func NewProvider(ctx context.Context, project, region, credentials string) (prov
 	tfp.SetMeta(&cfg)
 
 	log.Get().Log("func", "google.NewProvider", "msg", "loading GCP client")
-	reader, err := NewGcpReader(ctx, project, region, credentials)
+	reader, err := NewGcpReader(ctx, maxResults, project, region, credentials)
 	if err != nil {
 		return nil, fmt.Errorf("unable to initialize GCPReader: %v", err)
 	}
