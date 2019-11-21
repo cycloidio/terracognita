@@ -97,7 +97,7 @@ func computeNetwork(ctx context.Context, g *google, resourceType string, tags []
 
 func computeHealthCheck(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
 	f := initializeFilter(tags)
-	checks, err := g.gcpr.ListHealthCheck(ctx, f)
+	checks, err := g.gcpr.ListHealthChecks(ctx, f)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list health checks from reader")
 	}
@@ -111,7 +111,7 @@ func computeHealthCheck(ctx context.Context, g *google, resourceType string, tag
 
 func computeInstanceGroup(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
 	f := initializeFilter(tags)
-	instanceGroups, err := g.gcpr.ListInstanceGroup(ctx, f)
+	instanceGroups, err := g.gcpr.ListInstanceGroups(ctx, f)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list instance groups from reader")
 	}
@@ -127,7 +127,7 @@ func computeInstanceGroup(ctx context.Context, g *google, resourceType string, t
 
 func computeBackendService(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
 	f := initializeFilter(tags)
-	backends, err := g.gcpr.ListBackendService(ctx, f)
+	backends, err := g.gcpr.ListBackendServices(ctx, f)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list backend services from reader")
 	}
