@@ -2,10 +2,17 @@
 
 ### Added
 
+- aws resource: `aws_launch_configuration`, `aws_launch_template` and `aws_autoscaling_group`
+  ([PR #68](https://github.com/cycloidio/terracognita/pull/68))
 - google resource: compute instance
   ([PR #56](https://github.com/cycloidio/terracognita/pull/56))
 - google resource: compute networks and compute firewalls
   ([PR #61](https://github.com/cycloidio/terracognita/pull/61))
+
+### Changed
+
+- During import if a resource is invalid we assume it can be skipped
+  ([PR #68](https://github.com/cycloidio/terracognita/pull/68))
 
 ## Fixed
 
