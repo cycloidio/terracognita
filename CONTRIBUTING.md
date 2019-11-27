@@ -90,6 +90,8 @@ Now, you can write your `computeInstance` function. Check-out the other function
 
 We are using [RAWS](https://github.com/cycloidio/raws) in order to add abstraction between AWS APIs and Terracognita. This is the [list](https://github.com/cycloidio/raws/issues/8) of all the methods implemented by RAWS. If you do not find the one you are looking for: feel free to submit a PR or to add a comment in the issue.
 
+:warning: This section will certainly be updated, since we are going to move RAWS inside this project. See [# 69](https://github.com/cycloidio/terracognita/issues/69) :warning:
+
 ##### GCP Middleware layer
 
 In `reader.go`, you can add your middleware function `ListInstances`. You will need to be equiped with this [documentation](https://godoc.org/google.golang.org/api/compute/v1). Google SDK is pretty standard, APIs are most of the time used in a similar way.
