@@ -100,7 +100,6 @@ func init() {
 	awsCmd.Flags().String("secret-key", "", "Secret Key (required)")
 	awsCmd.Flags().String("region", "", "Region to search in, for now * it's not supported (required)")
 
-
 	// Filter flags
 	awsCmd.Flags().StringSliceVarP(&tags, "tags", "t", []string{}, "List of tags to filter with format 'NAME:VALUE'")
 }

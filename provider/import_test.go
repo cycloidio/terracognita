@@ -188,10 +188,8 @@ func TestImport(t *testing.T) {
 		iamUser1.EXPECT().Read(f).Return(errcode.ErrProviderResourceDoNotMatchTag)
 		iamUser2.EXPECT().Read(f).Return(nil)
 
-		iamUser1.EXPECT().HCL(hw).Return(nil)
 		iamUser2.EXPECT().HCL(hw).Return(nil)
 
-		iamUser1.EXPECT().State(sw).Return(nil)
 		iamUser2.EXPECT().State(sw).Return(nil)
 
 		hw.EXPECT().Sync().Return(nil)
@@ -231,7 +229,6 @@ func TestImport(t *testing.T) {
 		iamUser1.EXPECT().Read(f).Return(errcode.ErrProviderResourceDoNotMatchTag)
 		iamUser2.EXPECT().Read(f).Return(nil)
 
-		iamUser1.EXPECT().State(sw).Return(nil)
 		iamUser2.EXPECT().State(sw).Return(nil)
 
 		sw.EXPECT().Sync().Return(nil)
@@ -270,7 +267,6 @@ func TestImport(t *testing.T) {
 		iamUser1.EXPECT().Read(f).Return(errcode.ErrProviderResourceDoNotMatchTag)
 		iamUser2.EXPECT().Read(f).Return(nil)
 
-		iamUser1.EXPECT().HCL(hw).Return(nil)
 		iamUser2.EXPECT().HCL(hw).Return(nil)
 
 		hw.EXPECT().Sync().Return(nil)

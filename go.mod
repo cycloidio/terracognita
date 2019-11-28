@@ -5,7 +5,7 @@ require (
 	cloud.google.com/go/storage v1.0.0 // indirect
 	github.com/aws/aws-sdk-go v1.25.4
 	github.com/chr4/pwgen v1.1.0
-	github.com/cycloidio/raws v1.0.1
+	github.com/cycloidio/raws v1.0.2
 	github.com/go-kit/kit v0.9.0
 	github.com/golang/mock v1.3.1
 	github.com/golang/snappy v0.0.1 // indirect
