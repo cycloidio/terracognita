@@ -6,11 +6,11 @@ import (
 	"fmt"
 )
 
-const _ResourceTypeName = "aws_instanceaws_vpcaws_security_groupaws_subnetaws_ebs_volumeaws_elasticache_clusteraws_elbaws_albaws_db_instanceaws_s3_bucketaws_cloudfront_distributionaws_cloudfront_origin_access_identityaws_cloudfront_public_keyaws_iam_account_aliasaws_iam_account_password_policyaws_iam_groupaws_iam_group_membershipaws_iam_group_policyaws_iam_group_policy_attachmentaws_iam_instance_profileaws_iam_openid_connect_provideraws_iam_policyaws_iam_roleaws_iam_role_policyaws_iam_role_policy_attachmentaws_iam_saml_provideraws_iam_server_certificateaws_iam_useraws_iam_user_group_membershipaws_iam_user_policyaws_iam_user_policy_attachmentaws_route53_delegation_setaws_route53_health_checkaws_route53_query_logaws_route53_recordaws_route53_zoneaws_route53_zone_associationaws_route53_resolver_endpointaws_route53_resolver_rule_associationaws_ses_active_receipt_rule_setaws_ses_domain_identityaws_ses_domain_identity_verificationaws_ses_domain_dkimaws_ses_domain_mail_fromaws_ses_receipt_filteraws_ses_receipt_ruleaws_ses_receipt_rule_setaws_ses_configuration_setaws_ses_identity_notification_topicaws_ses_template"
+const _ResourceTypeName = "aws_instanceaws_vpcaws_security_groupaws_subnetaws_ebs_volumeaws_elasticache_clusteraws_elbaws_albaws_db_instanceaws_s3_bucketaws_cloudfront_distributionaws_cloudfront_origin_access_identityaws_cloudfront_public_keyaws_iam_account_aliasaws_iam_account_password_policyaws_iam_groupaws_iam_group_membershipaws_iam_group_policyaws_iam_group_policy_attachmentaws_iam_instance_profileaws_iam_openid_connect_provideraws_iam_policyaws_iam_roleaws_iam_role_policyaws_iam_role_policy_attachmentaws_iam_saml_provideraws_iam_server_certificateaws_iam_useraws_iam_user_group_membershipaws_iam_user_policyaws_iam_user_policy_attachmentaws_route53_delegation_setaws_route53_health_checkaws_route53_query_logaws_route53_recordaws_route53_zoneaws_route53_zone_associationaws_route53_resolver_endpointaws_route53_resolver_rule_associationaws_ses_active_receipt_rule_setaws_ses_domain_identityaws_ses_domain_identity_verificationaws_ses_domain_dkimaws_ses_domain_mail_fromaws_ses_receipt_filteraws_ses_receipt_ruleaws_ses_receipt_rule_setaws_ses_configuration_setaws_ses_identity_notification_topicaws_ses_templateaws_launch_configurationaws_launch_templateaws_autoscaling_group"
 
-var _ResourceTypeIndex = [...]uint16{0, 12, 19, 37, 47, 61, 84, 91, 98, 113, 126, 153, 190, 215, 236, 267, 280, 304, 324, 355, 379, 410, 424, 436, 455, 485, 506, 532, 544, 573, 592, 622, 648, 672, 693, 711, 727, 755, 784, 821, 852, 875, 911, 930, 954, 976, 996, 1020, 1045, 1080, 1096}
+var _ResourceTypeIndex = [...]uint16{0, 12, 19, 37, 47, 61, 84, 91, 98, 113, 126, 153, 190, 215, 236, 267, 280, 304, 324, 355, 379, 410, 424, 436, 455, 485, 506, 532, 544, 573, 592, 622, 648, 672, 693, 711, 727, 755, 784, 821, 852, 875, 911, 930, 954, 976, 996, 1020, 1045, 1080, 1096, 1120, 1139, 1160}
 
-const _ResourceTypeLowerName = "aws_instanceaws_vpcaws_security_groupaws_subnetaws_ebs_volumeaws_elasticache_clusteraws_elbaws_albaws_db_instanceaws_s3_bucketaws_cloudfront_distributionaws_cloudfront_origin_access_identityaws_cloudfront_public_keyaws_iam_account_aliasaws_iam_account_password_policyaws_iam_groupaws_iam_group_membershipaws_iam_group_policyaws_iam_group_policy_attachmentaws_iam_instance_profileaws_iam_openid_connect_provideraws_iam_policyaws_iam_roleaws_iam_role_policyaws_iam_role_policy_attachmentaws_iam_saml_provideraws_iam_server_certificateaws_iam_useraws_iam_user_group_membershipaws_iam_user_policyaws_iam_user_policy_attachmentaws_route53_delegation_setaws_route53_health_checkaws_route53_query_logaws_route53_recordaws_route53_zoneaws_route53_zone_associationaws_route53_resolver_endpointaws_route53_resolver_rule_associationaws_ses_active_receipt_rule_setaws_ses_domain_identityaws_ses_domain_identity_verificationaws_ses_domain_dkimaws_ses_domain_mail_fromaws_ses_receipt_filteraws_ses_receipt_ruleaws_ses_receipt_rule_setaws_ses_configuration_setaws_ses_identity_notification_topicaws_ses_template"
+const _ResourceTypeLowerName = "aws_instanceaws_vpcaws_security_groupaws_subnetaws_ebs_volumeaws_elasticache_clusteraws_elbaws_albaws_db_instanceaws_s3_bucketaws_cloudfront_distributionaws_cloudfront_origin_access_identityaws_cloudfront_public_keyaws_iam_account_aliasaws_iam_account_password_policyaws_iam_groupaws_iam_group_membershipaws_iam_group_policyaws_iam_group_policy_attachmentaws_iam_instance_profileaws_iam_openid_connect_provideraws_iam_policyaws_iam_roleaws_iam_role_policyaws_iam_role_policy_attachmentaws_iam_saml_provideraws_iam_server_certificateaws_iam_useraws_iam_user_group_membershipaws_iam_user_policyaws_iam_user_policy_attachmentaws_route53_delegation_setaws_route53_health_checkaws_route53_query_logaws_route53_recordaws_route53_zoneaws_route53_zone_associationaws_route53_resolver_endpointaws_route53_resolver_rule_associationaws_ses_active_receipt_rule_setaws_ses_domain_identityaws_ses_domain_identity_verificationaws_ses_domain_dkimaws_ses_domain_mail_fromaws_ses_receipt_filteraws_ses_receipt_ruleaws_ses_receipt_rule_setaws_ses_configuration_setaws_ses_identity_notification_topicaws_ses_templateaws_launch_configurationaws_launch_templateaws_autoscaling_group"
 
 func (i ResourceType) String() string {
 	i -= 1
@@ -20,7 +20,7 @@ func (i ResourceType) String() string {
 	return _ResourceTypeName[_ResourceTypeIndex[i]:_ResourceTypeIndex[i+1]]
 }
 
-var _ResourceTypeValues = []ResourceType{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50}
+var _ResourceTypeValues = []ResourceType{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53}
 
 var _ResourceTypeNameToValueMap = map[string]ResourceType{
 	_ResourceTypeName[0:12]:           1,
@@ -123,6 +123,12 @@ var _ResourceTypeNameToValueMap = map[string]ResourceType{
 	_ResourceTypeLowerName[1045:1080]: 49,
 	_ResourceTypeName[1080:1096]:      50,
 	_ResourceTypeLowerName[1080:1096]: 50,
+	_ResourceTypeName[1096:1120]:      51,
+	_ResourceTypeLowerName[1096:1120]: 51,
+	_ResourceTypeName[1120:1139]:      52,
+	_ResourceTypeLowerName[1120:1139]: 52,
+	_ResourceTypeName[1139:1160]:      53,
+	_ResourceTypeLowerName[1139:1160]: 53,
 }
 
 var _ResourceTypeNames = []string{
@@ -176,6 +182,9 @@ var _ResourceTypeNames = []string{
 	_ResourceTypeName[1020:1045],
 	_ResourceTypeName[1045:1080],
 	_ResourceTypeName[1080:1096],
+	_ResourceTypeName[1096:1120],
+	_ResourceTypeName[1120:1139],
+	_ResourceTypeName[1139:1160],
 }
 
 // ResourceTypeString retrieves an enum value from the enum constants string name.
