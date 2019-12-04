@@ -23,9 +23,9 @@ const (
 
 	// functionTmpl it's the implementation of a reader function
 	functionTmpl = `
-	// List{{ .Resource }}s will returns a list of {{ .Resource }} within a project {{ if .Zone }}and a zone {{ end }}
-	func (r *GCPReader) List{{ .Resource}}s(ctx context.Context, filter string) ({{ if .Zone }}map[string]{{end}}[]compute.{{ .Resource }}, error) {
-		service := compute.New{{ .Resource}}sService(r.compute)
+	// List{{ .Name }} returns a list of {{ .Name }} within a project {{ if .Zone }}and a zone {{ end }}
+	func (r *GCPReader) List{{ .Name}}(ctx context.Context, filter string) ({{ if .Zone }}map[string]{{end}}[]compute.{{ .Resource }}, error) {
+		service := compute.New{{ .ServiceName}}Service(r.compute)
 		{{ if .Zone }}
 		list := make(map[string][]compute.{{ .Resource }})
 		zones, err := r.getZones()
@@ -87,11 +87,28 @@ type Function struct {
 
 	// Zone is used to determine whether the resource is located within google zones or not
 	Zone bool
+
+	// Name is the function name to be generated
+	// it can be useful if you `Resource` is `SslCertificate`, which is not `go`
+	// compliant, `Name` will be `SSLCertificate`, your Function name will be
+	// `ListSSLCertificates`
+	Name string
+
+	// ServiceName is name of the Google SDK service name
+	// If your service is `TargetHttpProxy`, your service name will
+	// be `TargetHttpProxies`
+	ServiceName string
 }
 
 // Execute uses the fnTmpl to interpolate f
 // and write the result to w
 func (f Function) Execute(w io.Writer) error {
+	if len(f.Name) == 0 {
+		f.Name = f.Resource + "s"
+	}
+	if len(f.ServiceName) == 0 {
+		f.ServiceName = f.Resource + "s"
+	}
 	if err := fnTmpl.Execute(w, f); err != nil {
 		return errors.Wrapf(err, "failed to Execute with Function %+v", f)
 	}
