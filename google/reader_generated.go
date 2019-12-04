@@ -9,7 +9,7 @@ import (
 	"google.golang.org/api/compute/v1"
 )
 
-// ListInstances will returns a list of Instance within a project and a zone
+// ListInstances returns a list of Instances within a project and a zone
 func (r *GCPReader) ListInstances(ctx context.Context, filter string) (map[string][]compute.Instance, error) {
 	service := compute.NewInstancesService(r.compute)
 
@@ -40,7 +40,7 @@ func (r *GCPReader) ListInstances(ctx context.Context, filter string) (map[strin
 
 }
 
-// ListFirewalls will returns a list of Firewall within a project
+// ListFirewalls returns a list of Firewalls within a project
 func (r *GCPReader) ListFirewalls(ctx context.Context, filter string) ([]compute.Firewall, error) {
 	service := compute.NewFirewallsService(r.compute)
 
@@ -62,7 +62,7 @@ func (r *GCPReader) ListFirewalls(ctx context.Context, filter string) ([]compute
 
 }
 
-// ListNetworks will returns a list of Network within a project
+// ListNetworks returns a list of Networks within a project
 func (r *GCPReader) ListNetworks(ctx context.Context, filter string) ([]compute.Network, error) {
 	service := compute.NewNetworksService(r.compute)
 
@@ -84,7 +84,7 @@ func (r *GCPReader) ListNetworks(ctx context.Context, filter string) ([]compute.
 
 }
 
-// ListInstanceGroups will returns a list of InstanceGroup within a project and a zone
+// ListInstanceGroups returns a list of InstanceGroups within a project and a zone
 func (r *GCPReader) ListInstanceGroups(ctx context.Context, filter string) (map[string][]compute.InstanceGroup, error) {
 	service := compute.NewInstanceGroupsService(r.compute)
 
@@ -115,7 +115,7 @@ func (r *GCPReader) ListInstanceGroups(ctx context.Context, filter string) (map[
 
 }
 
-// ListBackendServices will returns a list of BackendService within a project
+// ListBackendServices returns a list of BackendServices within a project
 func (r *GCPReader) ListBackendServices(ctx context.Context, filter string) ([]compute.BackendService, error) {
 	service := compute.NewBackendServicesService(r.compute)
 
@@ -137,7 +137,7 @@ func (r *GCPReader) ListBackendServices(ctx context.Context, filter string) ([]c
 
 }
 
-// ListHealthChecks will returns a list of HealthCheck within a project
+// ListHealthChecks returns a list of HealthChecks within a project
 func (r *GCPReader) ListHealthChecks(ctx context.Context, filter string) ([]compute.HealthCheck, error) {
 	service := compute.NewHealthChecksService(r.compute)
 
@@ -153,6 +153,94 @@ func (r *GCPReader) ListHealthChecks(ctx context.Context, filter string) ([]comp
 			return nil
 		}); err != nil {
 		return nil, errors.Wrap(err, "unable to list compute HealthCheck from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListURLMaps returns a list of URLMaps within a project
+func (r *GCPReader) ListURLMaps(ctx context.Context, filter string) ([]compute.UrlMap, error) {
+	service := compute.NewUrlMapsService(r.compute)
+
+	resources := make([]compute.UrlMap, 0)
+
+	if err := service.List(r.project).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.UrlMapList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		}); err != nil {
+		return nil, errors.Wrap(err, "unable to list compute UrlMap from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListTargetHTTPProxies returns a list of TargetHTTPProxies within a project
+func (r *GCPReader) ListTargetHTTPProxies(ctx context.Context, filter string) ([]compute.TargetHttpProxy, error) {
+	service := compute.NewTargetHttpProxiesService(r.compute)
+
+	resources := make([]compute.TargetHttpProxy, 0)
+
+	if err := service.List(r.project).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.TargetHttpProxyList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		}); err != nil {
+		return nil, errors.Wrap(err, "unable to list compute TargetHttpProxy from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListTargetHTTPSProxies returns a list of TargetHTTPSProxies within a project
+func (r *GCPReader) ListTargetHTTPSProxies(ctx context.Context, filter string) ([]compute.TargetHttpsProxy, error) {
+	service := compute.NewTargetHttpsProxiesService(r.compute)
+
+	resources := make([]compute.TargetHttpsProxy, 0)
+
+	if err := service.List(r.project).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.TargetHttpsProxyList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		}); err != nil {
+		return nil, errors.Wrap(err, "unable to list compute TargetHttpsProxy from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListSSLCertificates returns a list of SSLCertificates within a project
+func (r *GCPReader) ListSSLCertificates(ctx context.Context, filter string) ([]compute.SslCertificate, error) {
+	service := compute.NewSslCertificatesService(r.compute)
+
+	resources := make([]compute.SslCertificate, 0)
+
+	if err := service.List(r.project).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.SslCertificateList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		}); err != nil {
+		return nil, errors.Wrap(err, "unable to list compute SslCertificate from google APIs")
 	}
 
 	return resources, nil
