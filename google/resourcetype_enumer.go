@@ -6,11 +6,11 @@ import (
 	"fmt"
 )
 
-const _ResourceTypeName = "google_compute_instancegoogle_compute_firewallgoogle_compute_networkgoogle_compute_health_checkgoogle_compute_instance_groupgoogle_compute_backend_service"
+const _ResourceTypeName = "google_compute_instancegoogle_compute_firewallgoogle_compute_networkgoogle_compute_health_checkgoogle_compute_instance_groupgoogle_compute_backend_servicegoogle_compute_ssl_certificategoogle_compute_target_http_proxygoogle_compute_target_https_proxygoogle_compute_url_map"
 
-var _ResourceTypeIndex = [...]uint8{0, 23, 46, 68, 95, 124, 154}
+var _ResourceTypeIndex = [...]uint16{0, 23, 46, 68, 95, 124, 154, 184, 216, 249, 271}
 
-const _ResourceTypeLowerName = "google_compute_instancegoogle_compute_firewallgoogle_compute_networkgoogle_compute_health_checkgoogle_compute_instance_groupgoogle_compute_backend_service"
+const _ResourceTypeLowerName = "google_compute_instancegoogle_compute_firewallgoogle_compute_networkgoogle_compute_health_checkgoogle_compute_instance_groupgoogle_compute_backend_servicegoogle_compute_ssl_certificategoogle_compute_target_http_proxygoogle_compute_target_https_proxygoogle_compute_url_map"
 
 func (i ResourceType) String() string {
 	if i < 0 || i >= ResourceType(len(_ResourceTypeIndex)-1) {
@@ -19,7 +19,7 @@ func (i ResourceType) String() string {
 	return _ResourceTypeName[_ResourceTypeIndex[i]:_ResourceTypeIndex[i+1]]
 }
 
-var _ResourceTypeValues = []ResourceType{0, 1, 2, 3, 4, 5}
+var _ResourceTypeValues = []ResourceType{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 
 var _ResourceTypeNameToValueMap = map[string]ResourceType{
 	_ResourceTypeName[0:23]:         0,
@@ -34,6 +34,14 @@ var _ResourceTypeNameToValueMap = map[string]ResourceType{
 	_ResourceTypeLowerName[95:124]:  4,
 	_ResourceTypeName[124:154]:      5,
 	_ResourceTypeLowerName[124:154]: 5,
+	_ResourceTypeName[154:184]:      6,
+	_ResourceTypeLowerName[154:184]: 6,
+	_ResourceTypeName[184:216]:      7,
+	_ResourceTypeLowerName[184:216]: 7,
+	_ResourceTypeName[216:249]:      8,
+	_ResourceTypeLowerName[216:249]: 8,
+	_ResourceTypeName[249:271]:      9,
+	_ResourceTypeLowerName[249:271]: 9,
 }
 
 var _ResourceTypeNames = []string{
@@ -43,6 +51,10 @@ var _ResourceTypeNames = []string{
 	_ResourceTypeName[68:95],
 	_ResourceTypeName[95:124],
 	_ResourceTypeName[124:154],
+	_ResourceTypeName[154:184],
+	_ResourceTypeName[184:216],
+	_ResourceTypeName[216:249],
+	_ResourceTypeName[249:271],
 }
 
 // ResourceTypeString retrieves an enum value from the enum constants string name.
