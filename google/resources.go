@@ -27,18 +27,26 @@ const (
 	ComputeHealthCheck
 	ComputeInstanceGroup
 	ComputeBackendService
+	ComputeSSLCertificate
+	ComputeTargetHTTPProxy
+	ComputeTargetHTTPSProxy
+	ComputeURLMap
 )
 
 type rtFn func(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error)
 
 var (
 	resources = map[ResourceType]rtFn{
-		ComputeInstance:       computeInstance,
-		ComputeFirewall:       computeFirewall,
-		ComputeNetwork:        computeNetwork,
-		ComputeHealthCheck:    computeHealthCheck,
-		ComputeInstanceGroup:  computeInstanceGroup,
-		ComputeBackendService: computeBackendService,
+		ComputeInstance:         computeInstance,
+		ComputeFirewall:         computeFirewall,
+		ComputeNetwork:          computeNetwork,
+		ComputeHealthCheck:      computeHealthCheck,
+		ComputeInstanceGroup:    computeInstanceGroup,
+		ComputeBackendService:   computeBackendService,
+		ComputeSSLCertificate:   computeSSLCertificate,
+		ComputeTargetHTTPProxy:  computeTargetHTTPProxy,
+		ComputeTargetHTTPSProxy: computeTargetHTTPSProxy,
+		ComputeURLMap:           computeURLMap,
 	}
 )
 
@@ -134,6 +142,62 @@ func computeBackendService(ctx context.Context, g *google, resourceType string, 
 	resources := make([]provider.Resource, 0)
 	for _, backend := range backends {
 		r := provider.NewResource(backend.Name, resourceType, g)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func computeURLMap(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	f := initializeFilter(tags)
+	maps, err := g.gcpr.ListURLMaps(ctx, f)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list URL maps from reader")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, urlMap := range maps {
+		r := provider.NewResource(urlMap.Name, resourceType, g)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func computeTargetHTTPProxy(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	f := initializeFilter(tags)
+	targets, err := g.gcpr.ListTargetHTTPProxies(ctx, f)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list target http proxies from reader")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, target := range targets {
+		r := provider.NewResource(target.Name, resourceType, g)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func computeTargetHTTPSProxy(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	f := initializeFilter(tags)
+	targets, err := g.gcpr.ListTargetHTTPSProxies(ctx, f)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list target https proxies from reader")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, target := range targets {
+		r := provider.NewResource(target.Name, resourceType, g)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func computeSSLCertificate(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	f := initializeFilter(tags)
+	certs, err := g.gcpr.ListSSLCertificates(ctx, f)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list SSL certificates from reader")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, cert := range certs {
+		r := provider.NewResource(cert.Name, resourceType, g)
 		resources = append(resources, r)
 	}
 	return resources, nil
