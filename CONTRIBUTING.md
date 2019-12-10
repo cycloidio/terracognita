@@ -88,9 +88,7 @@ Now, you can write your `computeInstance` function. Check-out the other function
 
 ##### AWS Middleware layer
 
-We are using [RAWS](https://github.com/cycloidio/raws) in order to add abstraction between AWS APIs and Terracognita. This is the [list](https://github.com/cycloidio/raws/issues/8) of all the methods implemented by RAWS. If you do not find the one you are looking for: feel free to submit a PR or to add a comment in the issue.
-
-:warning: This section will certainly be updated, since we are going to move RAWS inside this project. See [# 69](https://github.com/cycloidio/terracognita/issues/69) :warning:
+We have an `aws/cmd` that generates the `aws/reader` interface, which is then used by each resource. To add a new call you have to add a new Function to the list in `aws/cmd/functions.go` and run `make generate`, you'll have the code fully generated for that function. If it has a specific implementation, which is too different from the others you can check the `ListBuckets` Function.
 
 ##### GCP Middleware layer
 
