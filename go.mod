@@ -5,7 +5,6 @@ require (
 	cloud.google.com/go/storage v1.0.0 // indirect
 	github.com/aws/aws-sdk-go v1.25.4
 	github.com/chr4/pwgen v1.1.0
-	github.com/cycloidio/raws v1.0.2
 	github.com/go-kit/kit v0.9.0
 	github.com/golang/mock v1.3.1
 	github.com/golang/snappy v0.0.1 // indirect
@@ -27,7 +26,8 @@ require (
 	github.com/terraform-providers/terraform-provider-google v1.20.1-0.20190924213132-8cb5c9efd9d7
 	github.com/zclconf/go-cty v1.1.0
 	golang.org/x/exp v0.0.0-20190912063710-ac5d2bfcbfe0 // indirect
-	golang.org/x/tools v0.0.0-20190917162342-3b4f30a44f3b // indirect
+	golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f // indirect
+	golang.org/x/tools v0.0.0-20191209225234-22774f7dae43 // indirect
 	google.golang.org/api v0.9.0
 	google.golang.org/grpc v1.23.0 // indirect
 	k8s.io/apimachinery v0.0.0-20190213030929-f84a4639d8e8 // indirect
