@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cycloidio/raws"
+	"github.com/cycloidio/terracognita/aws/reader"
 	"github.com/cycloidio/terracognita/cache"
 	"github.com/cycloidio/terracognita/filter"
 	"github.com/cycloidio/terracognita/log"
@@ -15,7 +15,7 @@ import (
 )
 
 type aws struct {
-	awsr raws.AWSReader
+	awsr reader.Reader
 
 	tfAWSClient interface{}
 	tfProvider  *schema.Provider
@@ -25,10 +25,10 @@ type aws struct {
 
 // NewProvider returns an AWS Provider
 func NewProvider(ctx context.Context, accessKey, secretKey, region string) (provider.Provider, error) {
-	log.Get().Log("func", "aws.NewProvider", "msg", "configuring raws Reader")
-	awsr, err := raws.NewAWSReader(ctx, accessKey, secretKey, []string{region}, nil)
+	log.Get().Log("func", "reader.New", "msg", "configuring aws Reader")
+	awsr, err := reader.New(ctx, accessKey, secretKey, region, nil)
 	if err != nil {
-		return nil, fmt.Errorf("could not initialize 'raws' because: %s", err)
+		return nil, fmt.Errorf("could not initialize 'reader' because: %s", err)
 	}
 
 	cfg := tfaws.Config{
@@ -87,7 +87,7 @@ func (a *aws) TFProvider() *schema.Provider {
 
 func (a *aws) String() string { return "aws" }
 
-func (a *aws) Region() string { return a.awsr.GetRegions()[0] }
+func (a *aws) Region() string { return a.awsr.GetRegion() }
 func (a *aws) TagKey() string { return "tags" }
 func (a *aws) HasResourceType(t string) bool {
 	_, err := ResourceTypeString(t)
