@@ -23,7 +23,7 @@ const (
 	// With Google, an HTTP(S) load balancer has 3 parts:
 	// * backend configuration: instance_group, backend_service and health_check
 	// * host and path rules: url_map
-	// * frontend configuration: target_http(s)_proxy
+	// * frontend configuration: target_http(s)_proxy + global_forwarding_rule
 	ComputeHealthCheck
 	ComputeInstanceGroup
 	ComputeBackendService
@@ -31,22 +31,24 @@ const (
 	ComputeTargetHTTPProxy
 	ComputeTargetHTTPSProxy
 	ComputeURLMap
+	ComputeGlobalForwardingRule
 )
 
 type rtFn func(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error)
 
 var (
 	resources = map[ResourceType]rtFn{
-		ComputeInstance:         computeInstance,
-		ComputeFirewall:         computeFirewall,
-		ComputeNetwork:          computeNetwork,
-		ComputeHealthCheck:      computeHealthCheck,
-		ComputeInstanceGroup:    computeInstanceGroup,
-		ComputeBackendService:   computeBackendService,
-		ComputeSSLCertificate:   computeSSLCertificate,
-		ComputeTargetHTTPProxy:  computeTargetHTTPProxy,
-		ComputeTargetHTTPSProxy: computeTargetHTTPSProxy,
-		ComputeURLMap:           computeURLMap,
+		ComputeInstance:             computeInstance,
+		ComputeFirewall:             computeFirewall,
+		ComputeNetwork:              computeNetwork,
+		ComputeHealthCheck:          computeHealthCheck,
+		ComputeInstanceGroup:        computeInstanceGroup,
+		ComputeBackendService:       computeBackendService,
+		ComputeSSLCertificate:       computeSSLCertificate,
+		ComputeTargetHTTPProxy:      computeTargetHTTPProxy,
+		ComputeTargetHTTPSProxy:     computeTargetHTTPSProxy,
+		ComputeURLMap:               computeURLMap,
+		ComputeGlobalForwardingRule: computeGlobalForwardingRule,
 	}
 )
 
@@ -198,6 +200,20 @@ func computeSSLCertificate(ctx context.Context, g *google, resourceType string, 
 	resources := make([]provider.Resource, 0)
 	for _, cert := range certs {
 		r := provider.NewResource(cert.Name, resourceType, g)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func computeGlobalForwardingRule(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	f := initializeFilter(tags)
+	rules, err := g.gcpr.ListGlobalForwardingRules(ctx, f)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list global forwarding rules from reader")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, rule := range rules {
+		r := provider.NewResource(rule.Name, resourceType, g)
 		resources = append(resources, r)
 	}
 	return resources, nil
