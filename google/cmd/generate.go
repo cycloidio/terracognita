@@ -20,6 +20,7 @@ var functions = []Function{
 	Function{Resource: "TargetHttpProxy", Zone: false, Name: "TargetHTTPProxies", ServiceName: "TargetHttpProxies"},
 	Function{Resource: "TargetHttpsProxy", Zone: false, Name: "TargetHTTPSProxies", ServiceName: "TargetHttpsProxies"},
 	Function{Resource: "SslCertificate", Zone: false, Name: "SSLCertificates"},
+	Function{Resource: "ForwardingRule", Zone: false, Name: "GlobalForwardingRules", ServiceName: "GlobalForwardingRules"},
 }
 
 func main() {
