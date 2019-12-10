@@ -246,3 +246,25 @@ func (r *GCPReader) ListSSLCertificates(ctx context.Context, filter string) ([]c
 	return resources, nil
 
 }
+
+// ListGlobalForwardingRules returns a list of GlobalForwardingRules within a project
+func (r *GCPReader) ListGlobalForwardingRules(ctx context.Context, filter string) ([]compute.ForwardingRule, error) {
+	service := compute.NewGlobalForwardingRulesService(r.compute)
+
+	resources := make([]compute.ForwardingRule, 0)
+
+	if err := service.List(r.project).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.ForwardingRuleList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		}); err != nil {
+		return nil, errors.Wrap(err, "unable to list compute ForwardingRule from google APIs")
+	}
+
+	return resources, nil
+
+}
