@@ -268,3 +268,25 @@ func (r *GCPReader) ListGlobalForwardingRules(ctx context.Context, filter string
 	return resources, nil
 
 }
+
+// ListForwardingRules returns a list of ForwardingRules within a project
+func (r *GCPReader) ListForwardingRules(ctx context.Context, filter string) ([]compute.ForwardingRule, error) {
+	service := compute.NewForwardingRulesService(r.compute)
+
+	resources := make([]compute.ForwardingRule, 0)
+
+	if err := service.List(r.project, r.region).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.ForwardingRuleList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		}); err != nil {
+		return nil, errors.Wrap(err, "unable to list compute ForwardingRule from google APIs")
+	}
+
+	return resources, nil
+
+}

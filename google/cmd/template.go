@@ -37,6 +37,8 @@ const (
 		resources := make([]compute.{{ .Resource }}, 0)
 		{{ if .Zone }}
 		if err := service.List(r.project, zone).
+		{{ else if .Region }}
+		if err := service.List(r.project, r.region).
 		{{ else }}
 		if err := service.List(r.project).
 		{{ end }}
@@ -98,6 +100,9 @@ type Function struct {
 	// If your service is `TargetHttpProxy`, your service name will
 	// be `TargetHttpProxies`
 	ServiceName string
+
+	// Region is used to determine whether the resource is dedicated to a region or not
+	Region bool
 }
 
 // Execute uses the fnTmpl to interpolate f

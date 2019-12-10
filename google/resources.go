@@ -32,6 +32,7 @@ const (
 	ComputeTargetHTTPSProxy
 	ComputeURLMap
 	ComputeGlobalForwardingRule
+	ComputeForwardingRule
 )
 
 type rtFn func(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error)
@@ -49,6 +50,7 @@ var (
 		ComputeTargetHTTPSProxy:     computeTargetHTTPSProxy,
 		ComputeURLMap:               computeURLMap,
 		ComputeGlobalForwardingRule: computeGlobalForwardingRule,
+		ComputeForwardingRule:       computeForwardingRule,
 	}
 )
 
@@ -208,6 +210,20 @@ func computeSSLCertificate(ctx context.Context, g *google, resourceType string, 
 func computeGlobalForwardingRule(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
 	f := initializeFilter(tags)
 	rules, err := g.gcpr.ListGlobalForwardingRules(ctx, f)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list global forwarding rules from reader")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, rule := range rules {
+		r := provider.NewResource(rule.Name, resourceType, g)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func computeForwardingRule(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	f := initializeFilter(tags)
+	rules, err := g.gcpr.ListForwardingRules(ctx, f)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list global forwarding rules from reader")
 	}
