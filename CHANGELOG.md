@@ -2,6 +2,10 @@
 
 ### Added
 
+- google resource: `ComputeSSLCertificate`, `ComputeTargetHTTPProxy`, `ComputeTargetHTTPSProxy` and `ComputeURLMap`
+  ([PR #67](https://github.com/cycloidio/terracognita/pull/67))
+- google resource: `ComputeHealthCheck`, `ComputeInstanceGroup` and `ComputeBackendService`
+  ([PR #64](https://github.com/cycloidio/terracognita/pull/64))
 - aws resource: `aws_launch_configuration`, `aws_launch_template` and `aws_autoscaling_group`
   ([PR #68](https://github.com/cycloidio/terracognita/pull/68))
 - google resource: compute instance
