@@ -22,6 +22,7 @@ var functions = []Function{
 	Function{Resource: "SslCertificate", Zone: false, Name: "SSLCertificates"},
 	Function{Resource: "ForwardingRule", Zone: false, Name: "GlobalForwardingRules", ServiceName: "GlobalForwardingRules"},
 	Function{Resource: "ForwardingRule", Region: true},
+	Function{Resource: "Disk", Zone: true},
 }
 
 func main() {

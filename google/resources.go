@@ -33,6 +33,7 @@ const (
 	ComputeURLMap
 	ComputeGlobalForwardingRule
 	ComputeForwardingRule
+	ComputeDisk
 )
 
 type rtFn func(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error)
@@ -51,6 +52,7 @@ var (
 		ComputeURLMap:               computeURLMap,
 		ComputeGlobalForwardingRule: computeGlobalForwardingRule,
 		ComputeForwardingRule:       computeForwardingRule,
+		ComputeDisk:                 computeDisk,
 	}
 )
 
@@ -231,6 +233,22 @@ func computeForwardingRule(ctx context.Context, g *google, resourceType string, 
 	for _, rule := range rules {
 		r := provider.NewResource(rule.Name, resourceType, g)
 		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func computeDisk(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	f := initializeFilter(tags)
+	disksList, err := g.gcpr.ListDisks(ctx, f)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list disks from reader")
+	}
+	resources := make([]provider.Resource, 0)
+	for z, disks := range disksList {
+		for _, disk := range disks {
+			r := provider.NewResource(fmt.Sprintf("%s/%s", z, disk.Name), resourceType, g)
+			resources = append(resources, r)
+		}
 	}
 	return resources, nil
 }
