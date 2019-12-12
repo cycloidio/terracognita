@@ -290,3 +290,34 @@ func (r *GCPReader) ListForwardingRules(ctx context.Context, filter string) ([]c
 	return resources, nil
 
 }
+
+// ListDisks returns a list of Disks within a project and a zone
+func (r *GCPReader) ListDisks(ctx context.Context, filter string) (map[string][]compute.Disk, error) {
+	service := compute.NewDisksService(r.compute)
+
+	list := make(map[string][]compute.Disk)
+	zones, err := r.getZones()
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get zones in region")
+	}
+	for _, zone := range zones {
+
+		resources := make([]compute.Disk, 0)
+
+		if err := service.List(r.project, zone).
+			Filter(filter).
+			MaxResults(int64(r.maxResults)).
+			Pages(ctx, func(list *compute.DiskList) error {
+				for _, res := range list.Items {
+					resources = append(resources, *res)
+				}
+				return nil
+			}); err != nil {
+			return nil, errors.Wrap(err, "unable to list compute Disk from google APIs")
+		}
+
+		list[zone] = resources
+	}
+	return list, nil
+
+}
