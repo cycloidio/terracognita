@@ -34,6 +34,7 @@ const (
 	ComputeGlobalForwardingRule
 	ComputeForwardingRule
 	ComputeDisk
+	StorageBucket
 )
 
 type rtFn func(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error)
@@ -53,6 +54,7 @@ var (
 		ComputeGlobalForwardingRule: computeGlobalForwardingRule,
 		ComputeForwardingRule:       computeForwardingRule,
 		ComputeDisk:                 computeDisk,
+		StorageBucket:               storageBucket,
 	}
 )
 
@@ -249,6 +251,19 @@ func computeDisk(ctx context.Context, g *google, resourceType string, tags []tag
 			r := provider.NewResource(fmt.Sprintf("%s/%s", z, disk.Name), resourceType, g)
 			resources = append(resources, r)
 		}
+	}
+	return resources, nil
+}
+
+func storageBucket(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	rules, err := g.gcpr.ListBuckets(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list global forwarding rules from reader")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, rule := range rules {
+		r := provider.NewResource(rule.Name, resourceType, g)
+		resources = append(resources, r)
 	}
 	return resources, nil
 }

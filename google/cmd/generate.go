@@ -23,6 +23,7 @@ var functions = []Function{
 	Function{Resource: "ForwardingRule", Zone: false, Name: "GlobalForwardingRules", ServiceName: "GlobalForwardingRules"},
 	Function{Resource: "ForwardingRule", Region: true},
 	Function{Resource: "Disk", Zone: true},
+	Function{Resource: "Bucket", NoFilter: true, API: "storage", ResourceList: "Buckets"},
 }
 
 func main() {
