@@ -8,6 +8,7 @@ import (
 
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/option"
+	"google.golang.org/api/storage/v1"
 )
 
 //go:generate go run ./cmd
@@ -15,6 +16,7 @@ import (
 // GCPReader is the middleware between TC and GCP
 type GCPReader struct {
 	compute    *compute.Service
+	storage    *storage.Service
 	project    string
 	region     string
 	zones      []string
@@ -31,8 +33,13 @@ func NewGcpReader(ctx context.Context, maxResults uint64, project, region, crede
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to create compute service")
 	}
+	storage, err := storage.NewService(ctx, option.WithCredentialsFile(credentials))
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to create storage service")
+	}
 	return &GCPReader{
 		compute:    comp,
+		storage:    storage,
 		project:    project,
 		region:     region,
 		zones:      []string{},

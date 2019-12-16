@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 
 	"google.golang.org/api/compute/v1"
+	"google.golang.org/api/storage/v1"
 )
 
 // ListInstances returns a list of Instances within a project and a zone
@@ -319,5 +320,26 @@ func (r *GCPReader) ListDisks(ctx context.Context, filter string) (map[string][]
 		list[zone] = resources
 	}
 	return list, nil
+
+}
+
+// ListBuckets returns a list of Buckets within a project
+func (r *GCPReader) ListBuckets(ctx context.Context) ([]storage.Bucket, error) {
+	service := storage.NewBucketsService(r.storage)
+
+	resources := make([]storage.Bucket, 0)
+
+	if err := service.List(r.project).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *storage.Buckets) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		}); err != nil {
+		return nil, errors.Wrap(err, "unable to list storage Bucket from google APIs")
+	}
+
+	return resources, nil
 
 }
