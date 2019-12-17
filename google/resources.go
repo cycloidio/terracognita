@@ -35,6 +35,7 @@ const (
 	ComputeForwardingRule
 	ComputeDisk
 	StorageBucket
+	SQLDatabaseInstance
 )
 
 type rtFn func(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error)
@@ -55,6 +56,7 @@ var (
 		ComputeForwardingRule:       computeForwardingRule,
 		ComputeDisk:                 computeDisk,
 		StorageBucket:               storageBucket,
+		SQLDatabaseInstance:         sqlDatabaseInstance,
 	}
 )
 
@@ -263,6 +265,20 @@ func storageBucket(ctx context.Context, g *google, resourceType string, tags []t
 	resources := make([]provider.Resource, 0)
 	for _, rule := range rules {
 		r := provider.NewResource(rule.Name, resourceType, g)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func sqlDatabaseInstance(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	f := initializeFilter(tags)
+	instances, err := g.gcpr.ListStorageInstances(ctx, f)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list sql storage instances rules from reader")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, instance := range instances {
+		r := provider.NewResource(instance.Name, resourceType, g)
 		resources = append(resources, r)
 	}
 	return resources, nil

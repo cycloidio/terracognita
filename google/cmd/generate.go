@@ -24,6 +24,7 @@ var functions = []Function{
 	Function{Resource: "ForwardingRule", Region: true},
 	Function{Resource: "Disk", Zone: true},
 	Function{Resource: "Bucket", NoFilter: true, API: "storage", ResourceList: "Buckets"},
+	Function{Resource: "DatabaseInstance", Name: "StorageInstances", API: "sqladmin", ResourceList: "InstancesListResponse", ServiceName: "Instances"},
 }
 
 func main() {

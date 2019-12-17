@@ -6,11 +6,11 @@ import (
 	"fmt"
 )
 
-const _ResourceTypeName = "google_compute_instancegoogle_compute_firewallgoogle_compute_networkgoogle_compute_health_checkgoogle_compute_instance_groupgoogle_compute_backend_servicegoogle_compute_ssl_certificategoogle_compute_target_http_proxygoogle_compute_target_https_proxygoogle_compute_url_mapgoogle_compute_global_forwarding_rulegoogle_compute_forwarding_rulegoogle_compute_diskgoogle_storage_bucket"
+const _ResourceTypeName = "google_compute_instancegoogle_compute_firewallgoogle_compute_networkgoogle_compute_health_checkgoogle_compute_instance_groupgoogle_compute_backend_servicegoogle_compute_ssl_certificategoogle_compute_target_http_proxygoogle_compute_target_https_proxygoogle_compute_url_mapgoogle_compute_global_forwarding_rulegoogle_compute_forwarding_rulegoogle_compute_diskgoogle_storage_bucketgoogle_sql_database_instance"
 
-var _ResourceTypeIndex = [...]uint16{0, 23, 46, 68, 95, 124, 154, 184, 216, 249, 271, 308, 338, 357, 378}
+var _ResourceTypeIndex = [...]uint16{0, 23, 46, 68, 95, 124, 154, 184, 216, 249, 271, 308, 338, 357, 378, 406}
 
-const _ResourceTypeLowerName = "google_compute_instancegoogle_compute_firewallgoogle_compute_networkgoogle_compute_health_checkgoogle_compute_instance_groupgoogle_compute_backend_servicegoogle_compute_ssl_certificategoogle_compute_target_http_proxygoogle_compute_target_https_proxygoogle_compute_url_mapgoogle_compute_global_forwarding_rulegoogle_compute_forwarding_rulegoogle_compute_diskgoogle_storage_bucket"
+const _ResourceTypeLowerName = "google_compute_instancegoogle_compute_firewallgoogle_compute_networkgoogle_compute_health_checkgoogle_compute_instance_groupgoogle_compute_backend_servicegoogle_compute_ssl_certificategoogle_compute_target_http_proxygoogle_compute_target_https_proxygoogle_compute_url_mapgoogle_compute_global_forwarding_rulegoogle_compute_forwarding_rulegoogle_compute_diskgoogle_storage_bucketgoogle_sql_database_instance"
 
 func (i ResourceType) String() string {
 	if i < 0 || i >= ResourceType(len(_ResourceTypeIndex)-1) {
@@ -19,7 +19,7 @@ func (i ResourceType) String() string {
 	return _ResourceTypeName[_ResourceTypeIndex[i]:_ResourceTypeIndex[i+1]]
 }
 
-var _ResourceTypeValues = []ResourceType{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}
+var _ResourceTypeValues = []ResourceType{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}
 
 var _ResourceTypeNameToValueMap = map[string]ResourceType{
 	_ResourceTypeName[0:23]:         0,
@@ -50,6 +50,8 @@ var _ResourceTypeNameToValueMap = map[string]ResourceType{
 	_ResourceTypeLowerName[338:357]: 12,
 	_ResourceTypeName[357:378]:      13,
 	_ResourceTypeLowerName[357:378]: 13,
+	_ResourceTypeName[378:406]:      14,
+	_ResourceTypeLowerName[378:406]: 14,
 }
 
 var _ResourceTypeNames = []string{
@@ -67,6 +69,7 @@ var _ResourceTypeNames = []string{
 	_ResourceTypeName[308:338],
 	_ResourceTypeName[338:357],
 	_ResourceTypeName[357:378],
+	_ResourceTypeName[378:406],
 }
 
 // ResourceTypeString retrieves an enum value from the enum constants string name.

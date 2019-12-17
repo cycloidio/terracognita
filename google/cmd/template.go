@@ -18,6 +18,7 @@ const (
 		"github.com/pkg/errors"
 
 		"google.golang.org/api/compute/v1"
+		"google.golang.org/api/sqladmin/v1beta4"
 		"google.golang.org/api/storage/v1"
 	)
 	`
