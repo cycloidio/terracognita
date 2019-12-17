@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 
 	"google.golang.org/api/compute/v1"
+	sqladmin "google.golang.org/api/sqladmin/v1beta4"
 	"google.golang.org/api/storage/v1"
 )
 
@@ -338,6 +339,28 @@ func (r *GCPReader) ListBuckets(ctx context.Context) ([]storage.Bucket, error) {
 			return nil
 		}); err != nil {
 		return nil, errors.Wrap(err, "unable to list storage Bucket from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListStorageInstances returns a list of StorageInstances within a project
+func (r *GCPReader) ListStorageInstances(ctx context.Context, filter string) ([]sqladmin.DatabaseInstance, error) {
+	service := sqladmin.NewInstancesService(r.sqladmin)
+
+	resources := make([]sqladmin.DatabaseInstance, 0)
+
+	if err := service.List(r.project).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *sqladmin.InstancesListResponse) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		}); err != nil {
+		return nil, errors.Wrap(err, "unable to list sqladmin DatabaseInstance from google APIs")
 	}
 
 	return resources, nil
