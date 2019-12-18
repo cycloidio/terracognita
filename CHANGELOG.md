@@ -19,6 +19,8 @@
 
 - During import if a resource is invalid we assume it can be skipped
   ([PR #68](https://github.com/cycloidio/terracognita/pull/68))
+- 'raws' lib to be an internal library instead of a dependency
+  ([Issue #69](https://github.com/cycloidio/terracognita/issues/69))
 
 ## Fixed
 

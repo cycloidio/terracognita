@@ -172,7 +172,7 @@ func instances(ctx context.Context, a *aws, resourceType string, tags []tag.Tag)
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, v := range instances[a.Region()].Reservations {
+	for _, v := range instances.Reservations {
 		for _, vv := range v.Instances {
 			r, err := initializeResource(a, *vv.InstanceId, resourceType)
 			if err != nil {
@@ -196,7 +196,7 @@ func vpcs(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]p
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, v := range vpcs[a.Region()].Vpcs {
+	for _, v := range vpcs.Vpcs {
 		r, err := initializeResource(a, *v.VpcId, resourceType)
 		if err != nil {
 			return nil, err
@@ -218,7 +218,7 @@ func vpcs(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]p
 //}
 
 //resources := make([]provider.Resource, 0)
-//for _, v := range images[a.Region()].Images {
+//for _, v := range images.Images {
 //r, err := initializeResource(a, *v.ImageId, resourceType)
 //if err != nil {
 //return nil, err
@@ -240,7 +240,7 @@ func securityGroups(ctx context.Context, a *aws, resourceType string, tags []tag
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, v := range sgs[a.Region()].SecurityGroups {
+	for _, v := range sgs.SecurityGroups {
 		r, err := initializeResource(a, *v.GroupId, resourceType)
 		if err != nil {
 			return nil, err
@@ -262,7 +262,7 @@ func subnets(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) (
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, v := range subnets[a.Region()].Subnets {
+	for _, v := range subnets.Subnets {
 		r, err := initializeResource(a, *v.SubnetId, resourceType)
 		if err != nil {
 			return nil, err
@@ -284,7 +284,7 @@ func ebsVolumes(ctx context.Context, a *aws, resourceType string, tags []tag.Tag
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, v := range volumes[a.Region()].Volumes {
+	for _, v := range volumes.Volumes {
 		r, err := initializeResource(a, *v.VolumeId, resourceType)
 		if err != nil {
 			return nil, err
@@ -306,7 +306,7 @@ func ebsVolumes(ctx context.Context, a *aws, resourceType string, tags []tag.Tag
 //}
 
 //resources := make([]provider.Resource, 0)
-//for _, v := range snapshots[a.Region()].Snapshots {
+//for _, v := range snapshots.Snapshots {
 //r, err := initializeResource(a, *v.SnapshotId, resourceType)
 //if err != nil {
 //return nil, err
@@ -324,7 +324,7 @@ func elasticacheClusters(ctx context.Context, a *aws, resourceType string, tags 
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, v := range cacheClusters[a.Region()].CacheClusters {
+	for _, v := range cacheClusters.CacheClusters {
 		r, err := initializeResource(a, *v.CacheClusterId, resourceType)
 		if err != nil {
 			return nil, err
@@ -342,7 +342,7 @@ func elbs(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]p
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, v := range lbs[a.Region()].LoadBalancerDescriptions {
+	for _, v := range lbs.LoadBalancerDescriptions {
 		r, err := initializeResource(a, *v.LoadBalancerName, resourceType)
 		if err != nil {
 			return nil, err
@@ -360,7 +360,7 @@ func albs(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]p
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, v := range lbs[a.Region()].LoadBalancers {
+	for _, v := range lbs.LoadBalancers {
 		r, err := initializeResource(a, *v.LoadBalancerArn, resourceType)
 		if err != nil {
 			return nil, err
@@ -378,7 +378,7 @@ func dbInstances(ctx context.Context, a *aws, resourceType string, tags []tag.Ta
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, v := range dbs[a.Region()].DBInstances {
+	for _, v := range dbs.DBInstances {
 		r, err := initializeResource(a, *v.DBInstanceIdentifier, resourceType)
 		if err != nil {
 			return nil, err
@@ -396,7 +396,7 @@ func s3Buckets(ctx context.Context, a *aws, resourceType string, tags []tag.Tag)
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, v := range buckets[a.Region()].Buckets {
+	for _, v := range buckets.Buckets {
 		r, err := initializeResource(a, *v.Name, resourceType)
 		if err != nil {
 			return nil, err
@@ -414,7 +414,7 @@ func cloudfrontDistributions(ctx context.Context, a *aws, resourceType string, t
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range distributions[a.Region()].DistributionList.Items {
+	for _, i := range distributions.DistributionList.Items {
 		r, err := initializeResource(a, *i.Id, resourceType)
 		if err != nil {
 			return nil, err
@@ -432,7 +432,7 @@ func cloudfrontOriginAccessIdentities(ctx context.Context, a *aws, resourceType 
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range identitys[a.Region()].CloudFrontOriginAccessIdentityList.Items {
+	for _, i := range identitys.CloudFrontOriginAccessIdentityList.Items {
 		r, err := initializeResource(a, *i.Id, resourceType)
 		if err != nil {
 			return nil, err
@@ -450,7 +450,7 @@ func cloudfrontPublicKeys(ctx context.Context, a *aws, resourceType string, tags
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range publicKeys[a.Region()].PublicKeyList.Items {
+	for _, i := range publicKeys.PublicKeyList.Items {
 		r, err := initializeResource(a, *i.Id, resourceType)
 		if err != nil {
 			return nil, err
@@ -470,7 +470,7 @@ func cloudfrontPublicKeys(ctx context.Context, a *aws, resourceType string, tags
 //}
 
 //resources := make([]provider.Resource, 0)
-//for _, i := range accessKeys[a.Region()].AccessKeyMetadata {
+//for _, i := range accessKeys.AccessKeyMetadata {
 //r, err := initializeResource(a, *i.AccessKeyId, resourceType)
 //if err != nil {
 //return nil, err
@@ -492,7 +492,7 @@ func iamAccountAliases(ctx context.Context, a *aws, resourceType string, tags []
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range accountAliases[a.Region()].AccountAliases {
+	for _, i := range accountAliases.AccountAliases {
 		r, err := initializeResource(a, *i, resourceType)
 		if err != nil {
 			return nil, err
@@ -519,7 +519,7 @@ func iamGroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag)
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range groups[a.Region()].Groups {
+	for _, i := range groups.Groups {
 		r, err := initializeResource(a, *i.GroupName, resourceType)
 		if err != nil {
 			return nil, err
@@ -568,7 +568,7 @@ func iamGroupPolicies(ctx context.Context, a *aws, resourceType string, tags []t
 			return nil, err
 		}
 
-		for _, i := range groupPolicies[a.Region()].PolicyNames {
+		for _, i := range groupPolicies.PolicyNames {
 			// It needs the ID to be "GN:PN"
 			// https://github.com/terraform-providers/terraform-provider-aws/blob/master/aws/resource_aws_iam_group_policy.go#L134:6
 			r, err := initializeResource(a, fmt.Sprintf("%s:%s", gn, *i), resourceType)
@@ -598,7 +598,7 @@ func iamGroupPolicyAttachments(ctx context.Context, a *aws, resourceType string,
 			return nil, err
 		}
 
-		for _, i := range groupPolicies[a.Region()].AttachedPolicies {
+		for _, i := range groupPolicies.AttachedPolicies {
 			r, err := initializeResource(a, fmt.Sprintf("%s/%s", gn, *i.PolicyArn), resourceType)
 			if err != nil {
 				return nil, err
@@ -617,7 +617,7 @@ func iamInstanceProfiles(ctx context.Context, a *aws, resourceType string, tags 
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range instanceProfiles[a.Region()].InstanceProfiles {
+	for _, i := range instanceProfiles.InstanceProfiles {
 		r, err := initializeResource(a, *i.InstanceProfileName, resourceType)
 		if err != nil {
 			return nil, err
@@ -635,7 +635,7 @@ func iamOpenidConnectProviders(ctx context.Context, a *aws, resourceType string,
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range openIDConnectProviders[a.Region()].OpenIDConnectProviderList {
+	for _, i := range openIDConnectProviders.OpenIDConnectProviderList {
 		r, err := initializeResource(a, *i.Arn, resourceType)
 		if err != nil {
 			return nil, err
@@ -656,7 +656,7 @@ func iamPolicies(ctx context.Context, a *aws, resourceType string, tags []tag.Ta
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range policies[a.Region()].Policies {
+	for _, i := range policies.Policies {
 		r, err := initializeResource(a, *i.Arn, resourceType)
 		if err != nil {
 			return nil, err
@@ -674,7 +674,7 @@ func iamRoles(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) 
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range roles[a.Region()].Roles {
+	for _, i := range roles.Roles {
 		r, err := initializeResource(a, *i.RoleName, resourceType)
 		if err != nil {
 			return nil, err
@@ -701,7 +701,7 @@ func iamRolePolicies(ctx context.Context, a *aws, resourceType string, tags []ta
 			return nil, err
 		}
 
-		for _, i := range rolePolicies[a.Region()].PolicyNames {
+		for _, i := range rolePolicies.PolicyNames {
 			r, err := initializeResource(a, fmt.Sprintf("%s:%s", rn, *i), resourceType)
 			if err != nil {
 				return nil, err
@@ -729,7 +729,7 @@ func iamRolePolicyAttachments(ctx context.Context, a *aws, resourceType string, 
 			return nil, err
 		}
 
-		for _, i := range rolePolicies[a.Region()].AttachedPolicies {
+		for _, i := range rolePolicies.AttachedPolicies {
 			r, err := initializeResource(a, fmt.Sprintf("%s/%s", rn, *i.PolicyArn), resourceType)
 			if err != nil {
 				return nil, err
@@ -748,7 +748,7 @@ func iamSAMLProviders(ctx context.Context, a *aws, resourceType string, tags []t
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range samalProviders[a.Region()].SAMLProviderList {
+	for _, i := range samalProviders.SAMLProviderList {
 		r, err := initializeResource(a, *i.Arn, resourceType)
 		if err != nil {
 			return nil, err
@@ -766,7 +766,7 @@ func iamServerCertificates(ctx context.Context, a *aws, resourceType string, tag
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range serverCertificates[a.Region()].ServerCertificateMetadataList {
+	for _, i := range serverCertificates.ServerCertificateMetadataList {
 		r, err := initializeResource(a, *i.ServerCertificateName, resourceType)
 		if err != nil {
 			return nil, err
@@ -784,7 +784,7 @@ func iamUsers(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) 
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range users[a.Region()].Users {
+	for _, i := range users.Users {
 		r, err := initializeResource(a, *i.UserName, resourceType)
 		if err != nil {
 			return nil, err
@@ -835,7 +835,7 @@ func iamUserPolicies(ctx context.Context, a *aws, resourceType string, tags []ta
 			return nil, err
 		}
 
-		for _, i := range userPolicies[a.Region()].PolicyNames {
+		for _, i := range userPolicies.PolicyNames {
 			r, err := initializeResource(a, fmt.Sprintf("%s:%s", un, *i), resourceType)
 			if err != nil {
 				return nil, err
@@ -863,7 +863,7 @@ func iamUserPolicyAttachments(ctx context.Context, a *aws, resourceType string, 
 			return nil, err
 		}
 
-		for _, i := range userPolicies[a.Region()].AttachedPolicies {
+		for _, i := range userPolicies.AttachedPolicies {
 			r, err := initializeResource(a, fmt.Sprintf("%s/%s", un, *i.PolicyArn), resourceType)
 			if err != nil {
 				return nil, err
@@ -882,7 +882,7 @@ func route53DelegationSets(ctx context.Context, a *aws, resourceType string, tag
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range r53DelegationSets[a.Region()].DelegationSets {
+	for _, i := range r53DelegationSets.DelegationSets {
 		r, err := initializeResource(a, *i.Id, resourceType)
 		if err != nil {
 			return nil, err
@@ -900,7 +900,7 @@ func route53HealthChecks(ctx context.Context, a *aws, resourceType string, tags 
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range r53HealthChecks[a.Region()].HealthChecks {
+	for _, i := range r53HealthChecks.HealthChecks {
 		r, err := initializeResource(a, *i.Id, resourceType)
 		if err != nil {
 			return nil, err
@@ -918,7 +918,7 @@ func route53QueryLogs(ctx context.Context, a *aws, resourceType string, tags []t
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range r53QueryLogs[a.Region()].QueryLoggingConfigs {
+	for _, i := range r53QueryLogs.QueryLoggingConfigs {
 		r, err := initializeResource(a, *i.Id, resourceType)
 		if err != nil {
 			return nil, err
@@ -936,7 +936,7 @@ func route53Zones(ctx context.Context, a *aws, resourceType string, tags []tag.T
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range r53Zones[a.Region()].HostedZones {
+	for _, i := range r53Zones.HostedZones {
 		r, err := initializeResource(a, *i.Id, resourceType)
 		if err != nil {
 			return nil, err
@@ -963,7 +963,7 @@ func route53Records(ctx context.Context, a *aws, resourceType string, tags []tag
 			return nil, err
 		}
 
-		for _, i := range r53Records[a.Region()].ResourceRecordSets {
+		for _, i := range r53Records.ResourceRecordSets {
 			id := []string{z, strings.ToLower(*i.Name), *i.Type}
 			if i.SetIdentifier != nil {
 				id = append(id, *i.SetIdentifier)
@@ -995,7 +995,7 @@ func route53ZoneAssociations(ctx context.Context, a *aws, resourceType string, t
 			return nil, err
 		}
 
-		for _, i := range r53ZoneAssociations[a.Region()].VPCs {
+		for _, i := range r53ZoneAssociations.VPCs {
 			r, err := initializeResource(a, fmt.Sprintf("%s:%s", z, *i.VPCId), resourceType)
 			if err != nil {
 				return nil, err
@@ -1014,7 +1014,7 @@ func route53ResolverEndpoints(ctx context.Context, a *aws, resourceType string, 
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range r53ResolverEndpoints[a.Region()].ResolverEndpoints {
+	for _, i := range r53ResolverEndpoints.ResolverEndpoints {
 		r, err := initializeResource(a, *i.Id, resourceType)
 		if err != nil {
 			return nil, err
@@ -1032,7 +1032,7 @@ func route53ResolverRuleAssociation(ctx context.Context, a *aws, resourceType st
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range r53ResolverRuleAssociations[a.Region()].ResolverRuleAssociations {
+	for _, i := range r53ResolverRuleAssociations.ResolverRuleAssociations {
 		r, err := initializeResource(a, *i.Id, resourceType)
 		if err != nil {
 			return nil, err
@@ -1049,11 +1049,11 @@ func sesActiveReceiptRuleSets(ctx context.Context, a *aws, resourceType string, 
 		return nil, err
 	}
 
-	if sesActiveReceiptRuleSets[a.Region()].Metadata == nil {
+	if sesActiveReceiptRuleSets.Metadata == nil {
 		return nil, nil
 	}
 
-	r, err := initializeResource(a, *sesActiveReceiptRuleSets[a.Region()].Metadata.Name, resourceType)
+	r, err := initializeResource(a, *sesActiveReceiptRuleSets.Metadata.Name, resourceType)
 	if err != nil {
 		return nil, err
 	}
@@ -1068,7 +1068,7 @@ func sesDomainIdentities(ctx context.Context, a *aws, resourceType string, tags 
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range sesDomainIdentities[a.Region()].Identities {
+	for _, i := range sesDomainIdentities.Identities {
 		r, err := initializeResource(a, *i, resourceType)
 		if err != nil {
 			return nil, err
@@ -1104,7 +1104,7 @@ func sesReceiptFilters(ctx context.Context, a *aws, resourceType string, tags []
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range sesReceiptFilters[a.Region()].Filters {
+	for _, i := range sesReceiptFilters.Filters {
 		r, err := initializeResource(a, *i.Name, resourceType)
 		if err != nil {
 			return nil, err
@@ -1122,8 +1122,8 @@ func sesReceiptRules(ctx context.Context, a *aws, resourceType string, tags []ta
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range sesActiveReceiptRuleSets[a.Region()].Rules {
-		r, err := initializeResource(a, fmt.Sprintf("%s:%s", *sesActiveReceiptRuleSets[a.Region()].Metadata.Name, *i.Name), resourceType)
+	for _, i := range sesActiveReceiptRuleSets.Rules {
+		r, err := initializeResource(a, fmt.Sprintf("%s:%s", *sesActiveReceiptRuleSets.Metadata.Name, *i.Name), resourceType)
 		if err != nil {
 			return nil, err
 		}
@@ -1139,11 +1139,11 @@ func sesReceiptRuleSets(ctx context.Context, a *aws, resourceType string, tags [
 		return nil, err
 	}
 
-	if sesActiveReceiptRuleSets[a.Region()].Metadata == nil {
+	if sesActiveReceiptRuleSets.Metadata == nil {
 		return nil, nil
 	}
 
-	r, err := initializeResource(a, *sesActiveReceiptRuleSets[a.Region()].Metadata.Name, resourceType)
+	r, err := initializeResource(a, *sesActiveReceiptRuleSets.Metadata.Name, resourceType)
 	if err != nil {
 		return nil, err
 	}
@@ -1158,7 +1158,7 @@ func sesConfigurationSets(ctx context.Context, a *aws, resourceType string, tags
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range sesConfigurationSets[a.Region()].ConfigurationSets {
+	for _, i := range sesConfigurationSets.ConfigurationSets {
 		r, err := initializeResource(a, *i.Name, resourceType)
 		if err != nil {
 			return nil, err
@@ -1189,7 +1189,7 @@ func sesIdentityNotificationTopics(ctx context.Context, a *aws, resourceType str
 			return nil, err
 		}
 
-		for _, i := range sesIdentityNotificationTopics[a.Region()].NotificationAttributes {
+		for _, i := range sesIdentityNotificationTopics.NotificationAttributes {
 			var notType string
 			if i.BounceTopic != nil {
 				notType = ses.NotificationTypeBounce
@@ -1220,7 +1220,7 @@ func sesTemplates(ctx context.Context, a *aws, resourceType string, tags []tag.T
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range sesTemplates[a.Region()].TemplatesMetadata {
+	for _, i := range sesTemplates.TemplatesMetadata {
 		r, err := initializeResource(a, *i.Name, resourceType)
 		if err != nil {
 			return nil, err
@@ -1239,7 +1239,7 @@ func launchConfigurations(ctx context.Context, a *aws, resourceType string, tags
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range launchConfigurations[a.Region()].LaunchConfigurations {
+	for _, i := range launchConfigurations.LaunchConfigurations {
 
 		r, err := initializeResource(a, *i.LaunchConfigurationName, resourceType)
 		if err != nil {
@@ -1260,7 +1260,7 @@ func launchtemplates(ctx context.Context, a *aws, resourceType string, tags []ta
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range launchtemplates[a.Region()].LaunchTemplates {
+	for _, i := range launchtemplates.LaunchTemplates {
 
 		r, err := initializeResource(a, *i.LaunchTemplateId, resourceType)
 		if err != nil {
@@ -1281,7 +1281,7 @@ func autoscalinggroups(ctx context.Context, a *aws, resourceType string, tags []
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range autoscalinggroups[a.Region()].AutoScalingGroups {
+	for _, i := range autoscalinggroups.AutoScalingGroups {
 
 		r, err := initializeResource(a, *i.AutoScalingGroupName, resourceType)
 		if err != nil {
