@@ -207,7 +207,7 @@ var (
 
 		// s3
 		Function{
-			// TODO: https://github.com/cycloidio/raws/issues/44
+			// TODO: https://github.com/cycloidio/terracognita/issues/76
 			FnName:       "ListBuckets",
 			Entity:       "Buckets",
 			Prefix:       "List",
@@ -230,7 +230,7 @@ var (
 			`,
 		},
 		Function{
-			// TODO: https://github.com/cycloidio/raws/issues/44
+			// TODO: https://github.com/cycloidio/terracognita/issues/76
 			FnName:  "ListObjects",
 			Entity:  "Objects",
 			Prefix:  "List",
