@@ -2,6 +2,8 @@
 
 ### Added
 
+- google resource: `ComputeDisk`, `StorageBucket` and `SqlDatabaseInstance`
+  ([PR #73](https://github.com/cycloidio/terracognita/pull/73))
 - google resource: `ComputeSSLCertificate`, `ComputeTargetHTTPProxy`, `ComputeTargetHTTPSProxy` and `ComputeURLMap`
   ([PR #67](https://github.com/cycloidio/terracognita/pull/67))
 - google resource: `ComputeHealthCheck`, `ComputeInstanceGroup` and `ComputeBackendService`
