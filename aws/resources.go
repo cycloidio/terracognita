@@ -39,6 +39,7 @@ const (
 	ELB
 	ALB
 	DBInstance
+	DBParameterGroup
 	S3Bucket
 	//S3BucketObject
 	CloudfrontDistribution
@@ -108,6 +109,7 @@ var (
 		ELB:                elbs,
 		ALB:                albs,
 		DBInstance:         dbInstances,
+		DBParameterGroup:   dbParameterGroups,
 		S3Bucket:           s3Buckets,
 		//S3BucketObject:      s3_bucket_objects,
 		CloudfrontDistribution:         cloudfrontDistributions,
@@ -383,6 +385,27 @@ func dbInstances(ctx context.Context, a *aws, resourceType string, tags []tag.Ta
 		if err != nil {
 			return nil, err
 		}
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func dbParameterGroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	dbParameterGroups, err := a.awsr.GetDBParameterGroups(ctx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range dbParameterGroups.DBParameterGroups {
+
+		r, err := initializeResource(a, *i.DBParameterGroupName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
 		resources = append(resources, r)
 	}
 

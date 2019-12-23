@@ -204,6 +204,15 @@ var (
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
+		Function{
+			Entity:  "DBParameterGroups",
+			Prefix:  "Describe",
+			Service: "rds",
+			Documentation: `
+			// GetDBParameterGroups returns all DB parameterGroups based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
 
 		// s3
 		Function{
