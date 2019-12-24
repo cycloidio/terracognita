@@ -2,6 +2,8 @@
 
 ### Added
 
+- aws resource: `aws_db_parameter_group`, `aws_iam_access_key`
+  ([PR #78](https://github.com/cycloidio/terracognita/pull/78))
 - google resource: `ComputeDisk`, `StorageBucket` and `SqlDatabaseInstance`
   ([PR #73](https://github.com/cycloidio/terracognita/pull/73))
 - google resource: `ComputeSSLCertificate`, `ComputeTargetHTTPProxy`, `ComputeTargetHTTPSProxy` and `ComputeURLMap`

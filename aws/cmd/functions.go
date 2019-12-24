@@ -460,14 +460,15 @@ var (
 			`,
 		},
 		Function{
-			Entity:  "SSHPublicKey",
-			Prefix:  "Get",
+			Entity:  "SSHPublicKeys",
+			Prefix:  "List",
 			Service: "iam",
 			Documentation: `
-			// GetSSHPublicKey returns the IAM SSHPublicKey on the given input
+			// GetSSHPublicKeys returns the IAM SSHPublicKeys on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
+
 		// ses
 		Function{
 			Entity:  "ActiveReceiptRuleSet",
