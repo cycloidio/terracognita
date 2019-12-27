@@ -4,6 +4,17 @@ var (
 	// functions is the list of fuctions that will be added
 	// to the AWSReader with the corresponding implementation
 	functions = []Function{
+		// cloudwatch
+		Function{
+			Entity:  "Alarms",
+			Prefix:  "Describe",
+			Service: "cloudwatch",
+			Documentation: `
+			// GetAlarms returns all cloudwatch alarms based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
 		// ec2
 		Function{
 			Entity:  "Instances",

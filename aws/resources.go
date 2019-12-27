@@ -45,6 +45,7 @@ const (
 	CloudfrontDistribution
 	CloudfrontOriginAccessIdentity
 	CloudfrontPublicKey
+	CloudwatchMetricAlarm
 	IAMAccessKey
 	IAMAccountAlias
 	IAMAccountPasswordPolicy
@@ -116,6 +117,7 @@ var (
 		CloudfrontDistribution:         cloudfrontDistributions,
 		CloudfrontOriginAccessIdentity: cloudfrontOriginAccessIdentities,
 		CloudfrontPublicKey:            cloudfrontPublicKeys,
+		CloudwatchMetricAlarm:          cloudwatchMetricAlarms,
 		IAMAccessKey:                   iamAccessKeys,
 		IAMAccountAlias:                iamAccountAliases,
 		IAMAccountPasswordPolicy:       iamAccountPasswordPolicy,
@@ -480,6 +482,25 @@ func cloudfrontPublicKeys(ctx context.Context, a *aws, resourceType string, tags
 		if err != nil {
 			return nil, err
 		}
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func cloudwatchMetricAlarms(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	alarms, err := a.awsr.GetAlarms(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range alarms.MetricAlarms {
+		r, err := initializeResource(a, *i.AlarmName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
 		resources = append(resources, r)
 	}
 

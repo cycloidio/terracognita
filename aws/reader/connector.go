@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/autoscaling/autoscalingiface"
 	"github.com/aws/aws-sdk-go/service/cloudfront/cloudfrontiface"
+	"github.com/aws/aws-sdk-go/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go/service/configservice/configserviceiface"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
@@ -95,6 +96,7 @@ type serviceConnector struct {
 	elasticache     elasticacheiface.ElastiCacheAPI
 	configservice   configserviceiface.ConfigServiceAPI
 	cloudfront      cloudfrontiface.CloudFrontAPI
+	cloudwatch      cloudwatchiface.CloudWatchAPI
 	iam             iamiface.IAMAPI
 	ses             sesiface.SESAPI
 	route53         route53iface.Route53API
