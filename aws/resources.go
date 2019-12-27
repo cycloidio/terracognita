@@ -94,6 +94,7 @@ const (
 	LaunchConfiguration
 	LaunchTemplate
 	AutoscalingGroup
+	AutoscalingPolicy
 )
 
 type rtFn func(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error)
@@ -158,8 +159,9 @@ var (
 		SESIdentityNotificationTopic:   sesIdentityNotificationTopics,
 		SESTemplate:                    sesTemplates,
 		LaunchConfiguration:            launchConfigurations,
-		LaunchTemplate:                 launchtemplates,
-		AutoscalingGroup:               autoscalinggroups,
+		LaunchTemplate:                 launchTemplates,
+		AutoscalingGroup:               autoscalingGroups,
+		AutoscalingPolicy:              autoscalingPolicies,
 	}
 )
 
@@ -1343,15 +1345,15 @@ func launchConfigurations(ctx context.Context, a *aws, resourceType string, tags
 	return resources, nil
 }
 
-func launchtemplates(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	launchtemplates, err := a.awsr.GetLaunchTemplates(ctx, nil)
+func launchTemplates(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	launchTemplates, err := a.awsr.GetLaunchTemplates(ctx, nil)
 
 	if err != nil {
 		return nil, err
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range launchtemplates.LaunchTemplates {
+	for _, i := range launchTemplates.LaunchTemplates {
 
 		r, err := initializeResource(a, *i.LaunchTemplateId, resourceType)
 		if err != nil {
@@ -1364,17 +1366,38 @@ func launchtemplates(ctx context.Context, a *aws, resourceType string, tags []ta
 	return resources, nil
 }
 
-func autoscalinggroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	autoscalinggroups, err := a.awsr.GetAutoScalingGroups(ctx, nil)
+func autoscalingGroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	autoscalingGroups, err := a.awsr.GetAutoScalingGroups(ctx, nil)
 
 	if err != nil {
 		return nil, err
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range autoscalinggroups.AutoScalingGroups {
+	for _, i := range autoscalingGroups.AutoScalingGroups {
 
 		r, err := initializeResource(a, *i.AutoScalingGroupName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func autoscalingPolicies(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	autoscalingPolicies, err := a.awsr.GetAutoScalingPolicies(ctx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range autoscalingPolicies.ScalingPolicies {
+
+		r, err := initializeResource(a, *i.AutoScalingGroupName+"/"+*i.PolicyName, resourceType)
 		if err != nil {
 			return nil, err
 		}

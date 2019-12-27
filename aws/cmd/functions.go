@@ -128,6 +128,16 @@ var (
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
+		Function{
+			FnName:  "GetAutoScalingPolicies",
+			Entity:  "Policies",
+			Prefix:  "Describe",
+			Service: "autoscaling",
+			Documentation: `
+		  // GetAutoScalingPolicies returns all AutoScalingPolicies belonging to the Account ID based on the input given.
+		  // Returned values are commented in the interface doc comment block.
+		  `,
+		},
 
 		// elasticache
 		Function{
