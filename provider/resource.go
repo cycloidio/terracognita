@@ -35,6 +35,13 @@ type Resource interface {
 	// Type is the type of resource (ex: aws_instance)
 	Type() string
 
+	// InstanceState is the Terraform state of the resource
+	// it contains important elements like `Attributes`
+	InstanceState() *terraform.InstanceState
+
+	// Name is the resource name given by Terracognita
+	Name() string
+
 	// TFResource is the definition of that resource
 	TFResource() *schema.Resource
 
@@ -115,6 +122,10 @@ func NewResource(id, rt string, p Provider) Resource {
 func (r *resource) ID() string { return r.id }
 
 func (r *resource) Type() string { return r.resourceType }
+
+func (r *resource) Name() string { return r.configName }
+
+func (r *resource) InstanceState() *terraform.InstanceState { return r.state }
 
 func (r *resource) TFResource() *schema.Resource {
 	if r.tfResource != nil {
