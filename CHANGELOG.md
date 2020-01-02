@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.3.0] _2020-01-02_
+
 ### Added
 
 - google resource: `ComputeDisk`, `StorageBucket` and `SqlDatabaseInstance`
