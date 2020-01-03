@@ -13,11 +13,11 @@ import (
 )
 
 var (
-	hclOut           io.Writer
-	stateOut         io.Writer
-	closeOut         []io.Closer
-	include, exclude []string
-	logsOut          io.Writer
+	hclOut                    io.Writer
+	stateOut                  io.Writer
+	closeOut                  []io.Closer
+	include, exclude, targets []string
+	logsOut                   io.Writer
 
 	// RootCmd it's the entry command for the cmd on terracognita
 	RootCmd = &cobra.Command{
@@ -104,6 +104,9 @@ func init() {
 
 	RootCmd.PersistentFlags().StringSliceVarP(&exclude, "exclude", "e", []string{}, "List of resources to not import, this names are the ones on TF (ex: aws_instance). If not set then means that none the resources will be excluded")
 	_ = viper.BindPFlag("exclude", RootCmd.PersistentFlags().Lookup("exclude"))
+
+	RootCmd.PersistentFlags().StringSliceVar(&targets, "target", []string{}, "List of resources to import via ID, those IDs are the ones documented on Terraform that are needed to Import. The format is 'aws_instance.ID'")
+	_ = viper.BindPFlag("target", RootCmd.PersistentFlags().Lookup("target"))
 
 	RootCmd.PersistentFlags().BoolP("verbose", "v", false, "Activate the verbose mode")
 	_ = viper.BindPFlag("verbose", RootCmd.PersistentFlags().Lookup("verbose"))
