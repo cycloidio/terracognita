@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Added
+
+- New flag `--target` to allow specific resource+id import
+  ([Issue #40](https://github.com/cycloidio/terracognita/issues/40))
+
 ## [0.3.0] _2020-01-02_
 
 ### Added
