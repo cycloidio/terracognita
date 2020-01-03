@@ -64,6 +64,7 @@ var (
 				Tags:    tags,
 				Include: include,
 				Exclude: exclude,
+				Targets: targets,
 			}
 
 			var hclW, stateW writer.Writer

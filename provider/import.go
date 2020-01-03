@@ -21,25 +21,43 @@ func Import(ctx context.Context, p Provider, hcl, tfstate writer.Writer, f *filt
 	logger := log.Get()
 	logger = kitlog.With(logger, "func", "provider.Import")
 
-	var types []string
-
-	// Validate if the Include filter is right
-	if len(f.Include) != 0 {
-		for _, i := range f.Include {
-			if !p.HasResourceType(i) {
-				return errors.Wrapf(errcode.ErrProviderResourceNotSupported, "type %s on Include filter", i)
-			}
-		}
-		types = f.Include
-	} else {
-		types = p.ResourceTypes()
+	if err := f.Validate(); err != nil {
+		return err
 	}
 
-	// Validate if the Exclude filter is right
-	if len(f.Exclude) != 0 {
-		for _, e := range f.Exclude {
-			if !p.HasResourceType(e) {
-				return errors.Wrapf(errcode.ErrProviderResourceNotSupported, "type %s on Exclude filter", e)
+	var (
+		err          error
+		types        []string
+		typesWithIDs map[string][]string
+	)
+
+	if len(f.Targets) != 0 {
+		typesWithIDs = f.TargetsTypesWithIDs()
+		for k := range typesWithIDs {
+			if !p.HasResourceType(k) {
+				return errors.Wrapf(errcode.ErrProviderResourceNotSupported, "type %s on Target filter", k)
+			}
+			types = append(types, k)
+		}
+	} else {
+		// Validate if the Include filter is right
+		if len(f.Include) != 0 {
+			for _, i := range f.Include {
+				if !p.HasResourceType(i) {
+					return errors.Wrapf(errcode.ErrProviderResourceNotSupported, "type %s on Include filter", i)
+				}
+			}
+			types = f.Include
+		} else {
+			types = p.ResourceTypes()
+		}
+
+		// Validate if the Exclude filter is right
+		if len(f.Exclude) != 0 {
+			for _, e := range f.Exclude {
+				if !p.HasResourceType(e) {
+					return errors.Wrapf(errcode.ErrProviderResourceNotSupported, "type %s on Exclude filter", e)
+				}
 			}
 		}
 	}
@@ -57,9 +75,17 @@ func Import(ctx context.Context, p Provider, hcl, tfstate writer.Writer, f *filt
 
 		logger.Log("msg", "fetching the list of resources")
 
-		resources, err := p.Resources(ctx, t, f)
-		if err != nil {
-			return errors.WithStack(err)
+		var resources []Resource
+
+		if typesWithIDs != nil {
+			for _, ID := range typesWithIDs[t] {
+				resources = append(resources, NewResource(ID, t, p))
+			}
+		} else {
+			resources, err = p.Resources(ctx, t, f)
+			if err != nil {
+				return errors.WithStack(err)
+			}
 		}
 
 		resourceLen := len(resources)
