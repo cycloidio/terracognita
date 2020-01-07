@@ -36,33 +36,38 @@ func TestImport(t *testing.T) {
 
 		p.EXPECT().ResourceTypes().Return([]string{"aws_instance", "aws_iam_user"})
 
-		p.EXPECT().Resources(ctx, "aws_instance", f).Return([]provider.Resource{instanceResoure1, instanceResoure2}, nil)
+		p.EXPECT().Resources(ctx, "aws_instance", f).Return([]provider.Resource{instanceResource1, instanceResource2}, nil)
 		p.EXPECT().Resources(ctx, "aws_iam_user", f).Return([]provider.Resource{iamUser1, iamUser2}, nil)
 
-		instanceResoure1.EXPECT().ID().Return("1")
-		instanceResoure2.EXPECT().ID().Return("2")
+		instanceResource1.EXPECT().ID().Return("1")
+		instanceResource2.EXPECT().ID().Return("2")
 		iamUser1.EXPECT().ID().Return("3")
 		iamUser2.EXPECT().ID().Return("4")
 
-		instanceResoure1.EXPECT().ImportState().Return(nil, nil)
-		instanceResoure2.EXPECT().ImportState().Return(nil, nil)
+		instanceResource1.EXPECT().ImportState().Return(nil, nil)
+		instanceResource2.EXPECT().ImportState().Return(nil, nil)
 		iamUser1.EXPECT().ImportState().Return(nil, nil)
 		iamUser2.EXPECT().ImportState().Return(nil, nil)
 
-		instanceResoure1.EXPECT().Read(f).Return(nil)
-		instanceResoure2.EXPECT().Read(f).Return(nil)
+		instanceResource1.EXPECT().Read(f).Return(nil)
+		instanceResource2.EXPECT().Read(f).Return(nil)
 		iamUser1.EXPECT().Read(f).Return(nil)
 		iamUser2.EXPECT().Read(f).Return(nil)
 
-		instanceResoure1.EXPECT().HCL(hw).Return(nil)
-		instanceResoure2.EXPECT().HCL(hw).Return(nil)
+		instanceResource1.EXPECT().HCL(hw).Return(nil)
+		instanceResource2.EXPECT().HCL(hw).Return(nil)
 		iamUser1.EXPECT().HCL(hw).Return(nil)
 		iamUser2.EXPECT().HCL(hw).Return(nil)
 
-		instanceResoure1.EXPECT().State(sw).Return(nil)
-		instanceResoure2.EXPECT().State(sw).Return(nil)
+		instanceResource1.EXPECT().State(sw).Return(nil)
+		instanceResource2.EXPECT().State(sw).Return(nil)
 		iamUser1.EXPECT().State(sw).Return(nil)
 		iamUser2.EXPECT().State(sw).Return(nil)
+
+		instanceResource1.EXPECT().InstanceState().Return(nil)
+		instanceResource2.EXPECT().InstanceState().Return(nil)
+		iamUser1.EXPECT().InstanceState().Return(nil)
+		iamUser2.EXPECT().InstanceState().Return(nil)
 
 		hw.EXPECT().Sync().Return(nil)
 		sw.EXPECT().Sync().Return(nil)
@@ -89,22 +94,25 @@ func TestImport(t *testing.T) {
 		defer ctrl.Finish()
 
 		p.EXPECT().HasResourceType("aws_instance").Return(true)
-		p.EXPECT().Resources(ctx, "aws_instance", f).Return([]provider.Resource{instanceResoure1, instanceResoure2}, nil)
+		p.EXPECT().Resources(ctx, "aws_instance", f).Return([]provider.Resource{instanceResource1, instanceResource2}, nil)
 
-		instanceResoure1.EXPECT().ID().Return("1")
-		instanceResoure2.EXPECT().ID().Return("2")
+		instanceResource1.EXPECT().ID().Return("1")
+		instanceResource2.EXPECT().ID().Return("2")
 
-		instanceResoure1.EXPECT().ImportState().Return(nil, nil)
-		instanceResoure2.EXPECT().ImportState().Return(nil, nil)
+		instanceResource1.EXPECT().ImportState().Return(nil, nil)
+		instanceResource2.EXPECT().ImportState().Return(nil, nil)
 
-		instanceResoure1.EXPECT().Read(f).Return(nil)
-		instanceResoure2.EXPECT().Read(f).Return(nil)
+		instanceResource1.EXPECT().Read(f).Return(nil)
+		instanceResource2.EXPECT().Read(f).Return(nil)
 
-		instanceResoure1.EXPECT().HCL(hw).Return(nil)
-		instanceResoure2.EXPECT().HCL(hw).Return(nil)
+		instanceResource1.EXPECT().HCL(hw).Return(nil)
+		instanceResource2.EXPECT().HCL(hw).Return(nil)
 
-		instanceResoure1.EXPECT().State(sw).Return(nil)
-		instanceResoure2.EXPECT().State(sw).Return(nil)
+		instanceResource1.EXPECT().State(sw).Return(nil)
+		instanceResource2.EXPECT().State(sw).Return(nil)
+
+		instanceResource1.EXPECT().InstanceState().Return(nil)
+		instanceResource2.EXPECT().InstanceState().Return(nil)
 
 		hw.EXPECT().Sync().Return(nil)
 		sw.EXPECT().Sync().Return(nil)
