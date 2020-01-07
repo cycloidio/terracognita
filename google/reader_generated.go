@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 
 	"google.golang.org/api/compute/v1"
+	"google.golang.org/api/dns/v1"
 	sqladmin "google.golang.org/api/sqladmin/v1beta4"
 	"google.golang.org/api/storage/v1"
 )
@@ -361,6 +362,27 @@ func (r *GCPReader) ListStorageInstances(ctx context.Context, filter string) ([]
 			return nil
 		}); err != nil {
 		return nil, errors.Wrap(err, "unable to list sqladmin DatabaseInstance from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListManagedZones returns a list of ManagedZones within a project
+func (r *GCPReader) ListManagedZones(ctx context.Context) ([]dns.ManagedZone, error) {
+	service := dns.NewManagedZonesService(r.dns)
+
+	resources := make([]dns.ManagedZone, 0)
+
+	if err := service.List(r.project).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *dns.ManagedZonesListResponse) error {
+			for _, res := range list.ManagedZones {
+				resources = append(resources, *res)
+			}
+			return nil
+		}); err != nil {
+		return nil, errors.Wrap(err, "unable to list dns ManagedZone from google APIs")
 	}
 
 	return resources, nil
