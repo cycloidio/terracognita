@@ -25,6 +25,7 @@ var functions = []Function{
 	Function{Resource: "Disk", Zone: true},
 	Function{Resource: "Bucket", NoFilter: true, API: "storage", ResourceList: "Buckets"},
 	Function{Resource: "DatabaseInstance", Name: "StorageInstances", API: "sqladmin", ResourceList: "InstancesListResponse", ServiceName: "Instances"},
+	Function{Resource: "ManagedZone", API: "dns", ResourceList: "ManagedZonesListResponse", NoFilter: true, ItemName: "ManagedZones"},
 }
 
 func main() {

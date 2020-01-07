@@ -34,6 +34,7 @@ const (
 	ComputeGlobalForwardingRule
 	ComputeForwardingRule
 	ComputeDisk
+	DNSManagedZone
 	StorageBucket
 	SQLDatabaseInstance
 )
@@ -55,6 +56,7 @@ var (
 		ComputeGlobalForwardingRule: computeGlobalForwardingRule,
 		ComputeForwardingRule:       computeForwardingRule,
 		ComputeDisk:                 computeDisk,
+		DNSManagedZone:              managedZoneDNS,
 		StorageBucket:               storageBucket,
 		SQLDatabaseInstance:         sqlDatabaseInstance,
 	}
@@ -279,6 +281,19 @@ func sqlDatabaseInstance(ctx context.Context, g *google, resourceType string, ta
 	resources := make([]provider.Resource, 0)
 	for _, instance := range instances {
 		r := provider.NewResource(instance.Name, resourceType, g)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func managedZoneDNS(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	zones, err := g.gcpr.ListManagedZones(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list DNS managed zone from reader")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, zone := range zones {
+		r := provider.NewResource(zone.Name, resourceType, g)
 		resources = append(resources, r)
 	}
 	return resources, nil
