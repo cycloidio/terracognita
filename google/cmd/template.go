@@ -49,7 +49,7 @@ const (
 		{{ end }}
 			MaxResults(int64(r.maxResults)).
 			Pages(ctx, func(list *{{ .API }}.{{ .ResourceList }}) error {
-				for _, res := range list.Items {
+				for _, res := range list.{{ .ItemName }}{
 					resources = append(resources, *res)
 				}
 				return nil
@@ -126,6 +126,11 @@ type Function struct {
 	// for the components Instance, the list struct is `InstanceList`
 	// but for the components Bucket, the list struct is `Buckets`
 	ResourceList string
+
+	// ItemName overrides the default name of
+	// of the list of resources inside the List elements
+	// fetch by TC
+	ItemName string
 }
 
 // Execute uses the fnTmpl to interpolate f
@@ -142,6 +147,9 @@ func (f Function) Execute(w io.Writer) error {
 	}
 	if len(f.ServiceName) == 0 {
 		f.ServiceName = f.Resource + "s"
+	}
+	if len(f.ItemName) == 0 {
+		f.ItemName = "Items"
 	}
 	if err := fnTmpl.Execute(w, f); err != nil {
 		return errors.Wrapf(err, "failed to Execute with Function %+v", f)
