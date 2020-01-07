@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 
 	"google.golang.org/api/compute/v1"
+	"google.golang.org/api/dns/v1"
 	"google.golang.org/api/option"
 	sqladmin "google.golang.org/api/sqladmin/v1beta4"
 	"google.golang.org/api/storage/v1"
@@ -19,6 +20,7 @@ type GCPReader struct {
 	compute    *compute.Service
 	storage    *storage.Service
 	sqladmin   *sqladmin.Service
+	dns        *dns.Service
 	project    string
 	region     string
 	zones      []string
@@ -43,12 +45,17 @@ func NewGcpReader(ctx context.Context, maxResults uint64, project, region, crede
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to create sqladmin service")
 	}
+	d, err := dns.NewService(ctx, option.WithCredentialsFile(credentials))
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to create sqladmin service")
+	}
 	return &GCPReader{
 		compute:    comp,
 		storage:    storage,
 		sqladmin:   sql,
 		project:    project,
 		region:     region,
+		dns:        d,
 		zones:      []string{},
 		maxResults: maxResults,
 	}, nil
