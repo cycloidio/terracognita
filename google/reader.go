@@ -81,3 +81,29 @@ func (r *GCPReader) getZones() ([]string, error) {
 	r.zones = zones
 	return zones, nil
 }
+
+// ListResourceRecordSets returns a list of ResourceRecordSets within a project and a zone
+func (r *GCPReader) ListResourceRecordSets(ctx context.Context, managedZone []string) (map[string][]dns.ResourceRecordSet, error) {
+	service := dns.NewResourceRecordSetsService(r.dns)
+
+	list := make(map[string][]dns.ResourceRecordSet)
+	for _, zone := range managedZone {
+
+		resources := make([]dns.ResourceRecordSet, 0)
+
+		if err := service.List(r.project, zone).
+			MaxResults(int64(r.maxResults)).
+			Pages(ctx, func(list *dns.ResourceRecordSetsListResponse) error {
+				for _, res := range list.Rrsets {
+					resources = append(resources, *res)
+				}
+				return nil
+			}); err != nil {
+			return nil, errors.Wrap(err, "unable to list dns ResourceRecordSet from google APIs")
+		}
+
+		list[zone] = resources
+	}
+	return list, nil
+
+}
