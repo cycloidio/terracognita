@@ -35,6 +35,7 @@ const (
 	ComputeForwardingRule
 	ComputeDisk
 	DNSManagedZone
+	DNSRecordSet
 	StorageBucket
 	SQLDatabaseInstance
 )
@@ -57,6 +58,7 @@ var (
 		ComputeForwardingRule:       computeForwardingRule,
 		ComputeDisk:                 computeDisk,
 		DNSManagedZone:              managedZoneDNS,
+		DNSRecordSet:                recordSetDNS,
 		StorageBucket:               storageBucket,
 		SQLDatabaseInstance:         sqlDatabaseInstance,
 	}
@@ -295,6 +297,29 @@ func managedZoneDNS(ctx context.Context, g *google, resourceType string, tags []
 	for _, zone := range zones {
 		r := provider.NewResource(zone.Name, resourceType, g)
 		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func recordSetDNS(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	managedZones, err := managedZoneDNS(ctx, g, resourceType, tags)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to previously fetch managed zones")
+	}
+	zones := make([]string, 0, len(managedZones))
+	for _, zone := range managedZones {
+		zones = append(zones, zone.ID())
+	}
+	rrsetsList, err := g.gcpr.ListResourceRecordSets(ctx, zones)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list resources record se record sett from reader")
+	}
+	resources := make([]provider.Resource, 0)
+	for z, rrsets := range rrsetsList {
+		for _, rrset := range rrsets {
+			r := provider.NewResource(fmt.Sprintf("%s/%s/%s", z, rrset.Name, rrset.Type), resourceType, g)
+			resources = append(resources, r)
+		}
 	}
 	return resources, nil
 }
