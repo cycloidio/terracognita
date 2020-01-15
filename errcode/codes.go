@@ -17,4 +17,6 @@ var (
 	ErrWriterInvalidKey       = errors.New("invalid key")
 	ErrWriterInvalidTypeValue = errors.New("invalid type of value")
 	ErrWriterAlreadyExistsKey = errors.New("the key already exists")
+
+	ErrFilterTargetsInvalid = errors.New("the filter targets has an invalid format")
 )
