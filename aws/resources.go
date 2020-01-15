@@ -69,7 +69,7 @@ const (
 	IAMUserGroupMembership
 	IAMUserPolicy
 	IAMUserPolicyAttachment
-	//IAMUserSshKey
+	IAMUserSshKey
 	Route53DelegationSet
 	Route53HealthCheck
 	Route53QueryLog
@@ -138,7 +138,7 @@ var (
 		IAMUserGroupMembership:         iamUserGroupMemberships,
 		IAMUserPolicy:                  iamUserPolicies,
 		IAMUserPolicyAttachment:        iamUserPolicyAttachments,
-		//IAMUserSshKey:                  iamUserSshKeys,
+		IAMUserSshKey:                  iamUserSshKeys,
 		Route53DelegationSet:           route53DelegationSets,
 		Route53HealthCheck:             route53HealthChecks,
 		Route53QueryLog:                route53QueryLogs,
@@ -932,41 +932,36 @@ func iamUserPolicyAttachments(ctx context.Context, a *aws, resourceType string, 
 	return resources, nil
 }
 
-// Not working properly could not import from AWS: unexpected format of ID ("APKXXXXXXX"), UserName:SSHPublicKeyId:Encoding
-// In progress
-//func iamUserSshKeys(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-//
-//	// Get the users list
-//	userNames, err := getIAMUserNames(ctx, a, IAMUser.String(), tags)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	resources := make([]provider.Resource, 0)
-//
-//	for _, un := range userNames {
-//		// get ssh pub Keys from a user
-//		sshPublicKeys, err := a.awsr.GetSSHPublicKeys(ctx, &iam.ListSSHPublicKeysInput{UserName: awsSDK.String(un)})
-//		if err != nil {
-//			return nil, err
-//		}
-//
-//		for _, i := range sshPublicKeys.SSHPublicKeys {
-//			r, err := initializeResource(a, *i.SSHPublicKeyId, resourceType)
-//			if err != nil {
-//				return nil, err
-//			}
-//
-//			err = r.Data().Set("username", i.UserName)
-//			if err != nil {
-//				return nil, err
-//			}
-//			resources = append(resources, r)
-//		}
-//	}
-//
-//	return resources, nil
-//}
+func iamUserSshKeys(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+
+	// Get the users list
+	userNames, err := getIAMUserNames(ctx, a, IAMUser.String(), tags)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+
+	for _, un := range userNames {
+		// get ssh pub Keys from a user
+		sshPublicKeys, err := a.awsr.GetSSHPublicKeys(ctx, &iam.ListSSHPublicKeysInput{UserName: awsSDK.String(un)})
+		if err != nil {
+			return nil, err
+		}
+
+		for _, i := range sshPublicKeys.SSHPublicKeys {
+
+			r, err := initializeResource(a, fmt.Sprintf("%s:%s:%s", *i.UserName, *i.SSHPublicKeyId, "SSH"), resourceType)
+			if err != nil {
+				return nil, err
+			}
+
+			resources = append(resources, r)
+		}
+	}
+
+	return resources, nil
+}
 
 func route53DelegationSets(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
 	r53DelegationSets, err := a.awsr.GetReusableDelegationSets(ctx, nil)
