@@ -69,7 +69,7 @@ const (
 	IAMUserGroupMembership
 	IAMUserPolicy
 	IAMUserPolicyAttachment
-	IAMUserSshKey
+	IAMUserSSHKey
 	Route53DelegationSet
 	Route53HealthCheck
 	Route53QueryLog
@@ -138,7 +138,7 @@ var (
 		IAMUserGroupMembership:         iamUserGroupMemberships,
 		IAMUserPolicy:                  iamUserPolicies,
 		IAMUserPolicyAttachment:        iamUserPolicyAttachments,
-		IAMUserSshKey:                  iamUserSshKeys,
+		IAMUserSSHKey:                  iamUserSSHKeys,
 		Route53DelegationSet:           route53DelegationSets,
 		Route53HealthCheck:             route53HealthChecks,
 		Route53QueryLog:                route53QueryLogs,
@@ -932,7 +932,7 @@ func iamUserPolicyAttachments(ctx context.Context, a *aws, resourceType string, 
 	return resources, nil
 }
 
-func iamUserSshKeys(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func iamUserSSHKeys(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
 
 	// Get the users list
 	userNames, err := getIAMUserNames(ctx, a, IAMUser.String(), tags)
