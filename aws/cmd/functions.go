@@ -4,6 +4,17 @@ var (
 	// functions is the list of fuctions that will be added
 	// to the AWSReader with the corresponding implementation
 	functions = []Function{
+		// cloudwatch
+		Function{
+			Entity:  "Alarms",
+			Prefix:  "Describe",
+			Service: "cloudwatch",
+			Documentation: `
+			// GetAlarms returns all cloudwatch alarms based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
 		// ec2
 		Function{
 			Entity:  "Instances",
@@ -117,6 +128,16 @@ var (
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
+		Function{
+			FnName:  "GetAutoScalingPolicies",
+			Entity:  "Policies",
+			Prefix:  "Describe",
+			Service: "autoscaling",
+			Documentation: `
+		  // GetAutoScalingPolicies returns all AutoScalingPolicies belonging to the Account ID based on the input given.
+		  // Returned values are commented in the interface doc comment block.
+		  `,
+		},
 
 		// elasticache
 		Function{
@@ -201,6 +222,15 @@ var (
 			Service: "rds",
 			Documentation: `
 			// GetDBInstancesTags returns a list of tags from an ARN, extra filters for tags can also be provided.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "DBParameterGroups",
+			Prefix:  "Describe",
+			Service: "rds",
+			Documentation: `
+			// GetDBParameterGroups returns all DB parameterGroups based on the input given.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
@@ -451,14 +481,15 @@ var (
 			`,
 		},
 		Function{
-			Entity:  "SSHPublicKey",
-			Prefix:  "Get",
+			Entity:  "SSHPublicKeys",
+			Prefix:  "List",
 			Service: "iam",
 			Documentation: `
-			// GetSSHPublicKey returns the IAM SSHPublicKey on the given input
+			// GetSSHPublicKeys returns the IAM SSHPublicKeys on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
+
 		// ses
 		Function{
 			Entity:  "ActiveReceiptRuleSet",

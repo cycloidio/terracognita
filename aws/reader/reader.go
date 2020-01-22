@@ -5,6 +5,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/service/autoscaling"
 	"github.com/aws/aws-sdk-go/service/cloudfront"
+	"github.com/aws/aws-sdk-go/service/cloudwatch"
 	"github.com/aws/aws-sdk-go/service/configservice"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/elasticache"
@@ -43,6 +44,10 @@ type Reader interface {
 
 	// GetRegion returns the currently used region for the Connector
 	GetRegion() string
+
+	// GetAlarms returns all cloudwatch alarms based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetAlarms(ctx context.Context, input *cloudwatch.DescribeAlarmsInput) (*cloudwatch.DescribeAlarmsOutput, error)
 
 	// GetInstances returns all EC2 instances based on the input given.
 	// Returned values are commented in the interface doc comment block.
@@ -92,6 +97,10 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetLaunchConfigurations(ctx context.Context, input *autoscaling.DescribeLaunchConfigurationsInput) (*autoscaling.DescribeLaunchConfigurationsOutput, error)
 
+	// GetAutoScalingPolicies returns all AutoScalingPolicies belonging to the Account ID based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetAutoScalingPolicies(ctx context.Context, input *autoscaling.DescribePoliciesInput) (*autoscaling.DescribePoliciesOutput, error)
+
 	// GetElastiCacheClusters returns all Elasticache clusters based on the input given.
 	// Returned values are commented in the interface doc comment block.
 	GetElastiCacheClusters(ctx context.Context, input *elasticache.DescribeCacheClustersInput) (*elasticache.DescribeCacheClustersOutput, error)
@@ -123,6 +132,10 @@ type Reader interface {
 	// GetDBInstancesTags returns a list of tags from an ARN, extra filters for tags can also be provided.
 	// Returned values are commented in the interface doc comment block.
 	GetDBInstancesTags(ctx context.Context, input *rds.ListTagsForResourceInput) (*rds.ListTagsForResourceOutput, error)
+
+	// GetDBParameterGroups returns all DB parameterGroups based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetDBParameterGroups(ctx context.Context, input *rds.DescribeDBParameterGroupsInput) (*rds.DescribeDBParameterGroupsOutput, error)
 
 	// ListBuckets returns all S3 buckets based on the input given and specifically
 	// filtering by Location as ListBuckets does not do it by itself
@@ -228,9 +241,9 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetAttachedUserPolicies(ctx context.Context, input *iam.ListAttachedUserPoliciesInput) (*iam.ListAttachedUserPoliciesOutput, error)
 
-	// GetSSHPublicKey returns the IAM SSHPublicKey on the given input
+	// GetSSHPublicKeys returns the IAM SSHPublicKeys on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetSSHPublicKey(ctx context.Context, input *iam.GetSSHPublicKeyInput) (*iam.GetSSHPublicKeyOutput, error)
+	GetSSHPublicKeys(ctx context.Context, input *iam.ListSSHPublicKeysInput) (*iam.ListSSHPublicKeysOutput, error)
 
 	// GetActiveReceiptRuleSet returns the SES ActiveReceiptRuleSet on the given input
 	// Returned values are commented in the interface doc comment block.
@@ -291,6 +304,19 @@ type Reader interface {
 	// GetResolverRuleAssociations returns the Route53Resolver ResolverRuleAssociations on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetResolverRuleAssociations(ctx context.Context, input *route53resolver.ListResolverRuleAssociationsInput) (*route53resolver.ListResolverRuleAssociationsOutput, error)
+}
+
+func (c *connector) GetAlarms(ctx context.Context, input *cloudwatch.DescribeAlarmsInput) (*cloudwatch.DescribeAlarmsOutput, error) {
+	if c.svc.cloudwatch == nil {
+		c.svc.cloudwatch = cloudwatch.New(c.svc.session)
+	}
+
+	opt, err := c.svc.cloudwatch.DescribeAlarmsWithContext(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	return opt, nil
 }
 
 func (c *connector) GetInstances(ctx context.Context, input *ec2.DescribeInstancesInput) (*ec2.DescribeInstancesOutput, error) {
@@ -459,6 +485,19 @@ func (c *connector) GetLaunchConfigurations(ctx context.Context, input *autoscal
 	return opt, nil
 }
 
+func (c *connector) GetAutoScalingPolicies(ctx context.Context, input *autoscaling.DescribePoliciesInput) (*autoscaling.DescribePoliciesOutput, error) {
+	if c.svc.autoscaling == nil {
+		c.svc.autoscaling = autoscaling.New(c.svc.session)
+	}
+
+	opt, err := c.svc.autoscaling.DescribePoliciesWithContext(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	return opt, nil
+}
+
 func (c *connector) GetElastiCacheClusters(ctx context.Context, input *elasticache.DescribeCacheClustersInput) (*elasticache.DescribeCacheClustersOutput, error) {
 	if c.svc.elasticache == nil {
 		c.svc.elasticache = elasticache.New(c.svc.session)
@@ -556,6 +595,19 @@ func (c *connector) GetDBInstancesTags(ctx context.Context, input *rds.ListTagsF
 	}
 
 	opt, err := c.svc.rds.ListTagsForResourceWithContext(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetDBParameterGroups(ctx context.Context, input *rds.DescribeDBParameterGroupsInput) (*rds.DescribeDBParameterGroupsOutput, error) {
+	if c.svc.rds == nil {
+		c.svc.rds = rds.New(c.svc.session)
+	}
+
+	opt, err := c.svc.rds.DescribeDBParameterGroupsWithContext(ctx, input)
 	if err != nil {
 		return nil, err
 	}
@@ -875,12 +927,12 @@ func (c *connector) GetAttachedUserPolicies(ctx context.Context, input *iam.List
 	return opt, nil
 }
 
-func (c *connector) GetSSHPublicKey(ctx context.Context, input *iam.GetSSHPublicKeyInput) (*iam.GetSSHPublicKeyOutput, error) {
+func (c *connector) GetSSHPublicKeys(ctx context.Context, input *iam.ListSSHPublicKeysInput) (*iam.ListSSHPublicKeysOutput, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt, err := c.svc.iam.GetSSHPublicKeyWithContext(ctx, input)
+	opt, err := c.svc.iam.ListSSHPublicKeysWithContext(ctx, input)
 	if err != nil {
 		return nil, err
 	}

@@ -39,12 +39,14 @@ const (
 	ELB
 	ALB
 	DBInstance
+	DBParameterGroup
 	S3Bucket
 	//S3BucketObject
 	CloudfrontDistribution
 	CloudfrontOriginAccessIdentity
 	CloudfrontPublicKey
-	//IAMAccessKey
+	CloudwatchMetricAlarm
+	IAMAccessKey
 	IAMAccountAlias
 	IAMAccountPasswordPolicy
 	IAMGroup
@@ -67,6 +69,7 @@ const (
 	IAMUserGroupMembership
 	IAMUserPolicy
 	IAMUserPolicyAttachment
+	IAMUserSSHKey
 	Route53DelegationSet
 	Route53HealthCheck
 	Route53QueryLog
@@ -91,6 +94,7 @@ const (
 	LaunchConfiguration
 	LaunchTemplate
 	AutoscalingGroup
+	AutoscalingPolicy
 )
 
 type rtFn func(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error)
@@ -108,12 +112,14 @@ var (
 		ELB:                elbs,
 		ALB:                albs,
 		DBInstance:         dbInstances,
+		DBParameterGroup:   dbParameterGroups,
 		S3Bucket:           s3Buckets,
 		//S3BucketObject:      s3_bucket_objects,
 		CloudfrontDistribution:         cloudfrontDistributions,
 		CloudfrontOriginAccessIdentity: cloudfrontOriginAccessIdentities,
 		CloudfrontPublicKey:            cloudfrontPublicKeys,
-		//IAMAccessKey:                   iamAccessKeys,
+		CloudwatchMetricAlarm:          cloudwatchMetricAlarms,
+		IAMAccessKey:                   iamAccessKeys,
 		IAMAccountAlias:                iamAccountAliases,
 		IAMAccountPasswordPolicy:       iamAccountPasswordPolicy,
 		IAMGroup:                       cacheIAMGroups,
@@ -132,6 +138,7 @@ var (
 		IAMUserGroupMembership:         iamUserGroupMemberships,
 		IAMUserPolicy:                  iamUserPolicies,
 		IAMUserPolicyAttachment:        iamUserPolicyAttachments,
+		IAMUserSSHKey:                  iamUserSSHKeys,
 		Route53DelegationSet:           route53DelegationSets,
 		Route53HealthCheck:             route53HealthChecks,
 		Route53QueryLog:                route53QueryLogs,
@@ -152,8 +159,9 @@ var (
 		SESIdentityNotificationTopic:   sesIdentityNotificationTopics,
 		SESTemplate:                    sesTemplates,
 		LaunchConfiguration:            launchConfigurations,
-		LaunchTemplate:                 launchtemplates,
-		AutoscalingGroup:               autoscalinggroups,
+		LaunchTemplate:                 launchTemplates,
+		AutoscalingGroup:               autoscalingGroups,
+		AutoscalingPolicy:              autoscalingPolicies,
 	}
 )
 
@@ -389,6 +397,27 @@ func dbInstances(ctx context.Context, a *aws, resourceType string, tags []tag.Ta
 	return resources, nil
 }
 
+func dbParameterGroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	dbParameterGroups, err := a.awsr.GetDBParameterGroups(ctx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range dbParameterGroups.DBParameterGroups {
+
+		r, err := initializeResource(a, *i.DBParameterGroupName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
 func s3Buckets(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
 	buckets, err := a.awsr.ListBuckets(ctx, nil)
 	if err != nil {
@@ -461,29 +490,57 @@ func cloudfrontPublicKeys(ctx context.Context, a *aws, resourceType string, tags
 	return resources, nil
 }
 
-//func iamAccessKeys(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-//// I could get all the users and do the same filtering by user but it
-//// seems that it does not need it and returns all the AccessKeys
-//accessKeys, err := a.awsr.GetAccessKeys(ctx, nil)
-//if err != nil {
-//return nil, err
-//}
+func cloudwatchMetricAlarms(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	alarms, err := a.awsr.GetAlarms(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
 
-//resources := make([]provider.Resource, 0)
-//for _, i := range accessKeys.AccessKeyMetadata {
-//r, err := initializeResource(a, *i.AccessKeyId, resourceType)
-//if err != nil {
-//return nil, err
-//}
-//err = r.Data().Set("user", i.UserName)
-//if err != nil {
-//return nil, err
-//}
-//resources = append(resources, r)
-//}
+	resources := make([]provider.Resource, 0)
+	for _, i := range alarms.MetricAlarms {
+		r, err := initializeResource(a, *i.AlarmName, resourceType)
+		if err != nil {
+			return nil, err
+		}
 
-//return resources, nil
-//}
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func iamAccessKeys(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+
+	// Get the users list
+	userNames, err := getIAMUserNames(ctx, a, IAMUser.String(), tags)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+
+	for _, un := range userNames {
+		// get access keys from a user
+		iamAccessKeys, err := a.awsr.GetAccessKeys(ctx, &iam.ListAccessKeysInput{UserName: awsSDK.String(un)})
+		if err != nil {
+			return nil, err
+		}
+
+		for _, i := range iamAccessKeys.AccessKeyMetadata {
+			r, err := initializeResource(a, *i.AccessKeyId, resourceType)
+			if err != nil {
+				return nil, err
+			}
+			err = r.Data().Set("user", i.UserName)
+			if err != nil {
+				return nil, err
+			}
+			resources = append(resources, r)
+		}
+	}
+
+	return resources, nil
+}
 
 func iamAccountAliases(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
 	accountAliases, err := a.awsr.GetAccountAliases(ctx, nil)
@@ -875,6 +932,37 @@ func iamUserPolicyAttachments(ctx context.Context, a *aws, resourceType string, 
 	return resources, nil
 }
 
+func iamUserSSHKeys(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+
+	// Get the users list
+	userNames, err := getIAMUserNames(ctx, a, IAMUser.String(), tags)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+
+	for _, un := range userNames {
+		// get ssh pub Keys from a user
+		sshPublicKeys, err := a.awsr.GetSSHPublicKeys(ctx, &iam.ListSSHPublicKeysInput{UserName: awsSDK.String(un)})
+		if err != nil {
+			return nil, err
+		}
+
+		for _, i := range sshPublicKeys.SSHPublicKeys {
+
+			r, err := initializeResource(a, fmt.Sprintf("%s:%s:%s", *i.UserName, *i.SSHPublicKeyId, "SSH"), resourceType)
+			if err != nil {
+				return nil, err
+			}
+
+			resources = append(resources, r)
+		}
+	}
+
+	return resources, nil
+}
+
 func route53DelegationSets(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
 	r53DelegationSets, err := a.awsr.GetReusableDelegationSets(ctx, nil)
 	if err != nil {
@@ -1252,15 +1340,15 @@ func launchConfigurations(ctx context.Context, a *aws, resourceType string, tags
 	return resources, nil
 }
 
-func launchtemplates(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	launchtemplates, err := a.awsr.GetLaunchTemplates(ctx, nil)
+func launchTemplates(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	launchTemplates, err := a.awsr.GetLaunchTemplates(ctx, nil)
 
 	if err != nil {
 		return nil, err
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range launchtemplates.LaunchTemplates {
+	for _, i := range launchTemplates.LaunchTemplates {
 
 		r, err := initializeResource(a, *i.LaunchTemplateId, resourceType)
 		if err != nil {
@@ -1273,17 +1361,38 @@ func launchtemplates(ctx context.Context, a *aws, resourceType string, tags []ta
 	return resources, nil
 }
 
-func autoscalinggroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	autoscalinggroups, err := a.awsr.GetAutoScalingGroups(ctx, nil)
+func autoscalingGroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	autoscalingGroups, err := a.awsr.GetAutoScalingGroups(ctx, nil)
 
 	if err != nil {
 		return nil, err
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range autoscalinggroups.AutoScalingGroups {
+	for _, i := range autoscalingGroups.AutoScalingGroups {
 
 		r, err := initializeResource(a, *i.AutoScalingGroupName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func autoscalingPolicies(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	autoscalingPolicies, err := a.awsr.GetAutoScalingPolicies(ctx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range autoscalingPolicies.ScalingPolicies {
+
+		r, err := initializeResource(a, *i.AutoScalingGroupName+"/"+*i.PolicyName, resourceType)
 		if err != nil {
 			return nil, err
 		}
