@@ -2,6 +2,8 @@
 
 ### Added
 
+- Terraform variable interpolation is available on string values
+  ([PR #81](https://github.com/cycloidio/terracognita/pull/81))
 - aws resource: `aws_db_parameter_group`, `aws_iam_access_key`, `aws_cloudwatch_metric_alarm`, `aws_autoscaling_policy`, `aws_iam_user_ssh_key`
   ([PR #78](https://github.com/cycloidio/terracognita/pull/78))
 - New flag `--target` to allow specific resource+id import
