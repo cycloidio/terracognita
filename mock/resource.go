@@ -40,6 +40,21 @@ func (m *Resource) EXPECT() *ResourceMockRecorder {
 	return m.recorder
 }
 
+// AttributesReference mocks base method
+func (m *Resource) AttributesReference() ([]string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AttributesReference")
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AttributesReference indicates an expected call of AttributesReference
+func (mr *ResourceMockRecorder) AttributesReference() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AttributesReference", reflect.TypeOf((*Resource)(nil).AttributesReference))
+}
+
 // CoreConfigSchema mocks base method
 func (m *Resource) CoreConfigSchema() *configschema.Block {
 	m.ctrl.T.Helper()
