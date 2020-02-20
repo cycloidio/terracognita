@@ -111,3 +111,6 @@ func (w *Writer) Sync() error {
 
 	return nil
 }
+
+// Interpolate does nothing in `state` context
+func (w *Writer) Interpolate(i map[string]string) {}

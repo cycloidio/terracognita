@@ -21,13 +21,14 @@ func TestImport(t *testing.T) {
 			ctrl = gomock.NewController(t)
 			ctx  = context.Background()
 
-			p                = mock.NewProvider(ctrl)
-			hw               = mock.NewWriter(ctrl)
-			sw               = mock.NewWriter(ctrl)
-			instanceResoure1 = mock.NewResource(ctrl)
-			instanceResoure2 = mock.NewResource(ctrl)
-			iamUser1         = mock.NewResource(ctrl)
-			iamUser2         = mock.NewResource(ctrl)
+			p                 = mock.NewProvider(ctrl)
+			hw                = mock.NewWriter(ctrl)
+			sw                = mock.NewWriter(ctrl)
+			i                 = make(map[string]string)
+			instanceResource1 = mock.NewResource(ctrl)
+			instanceResource2 = mock.NewResource(ctrl)
+			iamUser1          = mock.NewResource(ctrl)
+			iamUser2          = mock.NewResource(ctrl)
 
 			f = &filter.Filter{}
 		)
@@ -70,6 +71,7 @@ func TestImport(t *testing.T) {
 		iamUser2.EXPECT().InstanceState().Return(nil)
 
 		hw.EXPECT().Sync().Return(nil)
+		hw.EXPECT().Interpolate(i)
 		sw.EXPECT().Sync().Return(nil)
 
 		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
@@ -80,11 +82,12 @@ func TestImport(t *testing.T) {
 			ctrl = gomock.NewController(t)
 			ctx  = context.Background()
 
-			p                = mock.NewProvider(ctrl)
-			hw               = mock.NewWriter(ctrl)
-			sw               = mock.NewWriter(ctrl)
-			instanceResoure1 = mock.NewResource(ctrl)
-			instanceResoure2 = mock.NewResource(ctrl)
+			p                 = mock.NewProvider(ctrl)
+			hw                = mock.NewWriter(ctrl)
+			sw                = mock.NewWriter(ctrl)
+			instanceResource1 = mock.NewResource(ctrl)
+			instanceResource2 = mock.NewResource(ctrl)
+			i                 = make(map[string]string)
 
 			f = &filter.Filter{
 				Include: []string{"aws_instance"},
@@ -115,6 +118,7 @@ func TestImport(t *testing.T) {
 		instanceResource2.EXPECT().InstanceState().Return(nil)
 
 		hw.EXPECT().Sync().Return(nil)
+		hw.EXPECT().Interpolate(i)
 		sw.EXPECT().Sync().Return(nil)
 
 		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
@@ -130,6 +134,7 @@ func TestImport(t *testing.T) {
 			sw       = mock.NewWriter(ctrl)
 			iamUser1 = mock.NewResource(ctrl)
 			iamUser2 = mock.NewResource(ctrl)
+			i        = make(map[string]string)
 
 			f = &filter.Filter{
 				Exclude: []string{"aws_instance"},
@@ -158,7 +163,11 @@ func TestImport(t *testing.T) {
 		iamUser1.EXPECT().State(sw).Return(nil)
 		iamUser2.EXPECT().State(sw).Return(nil)
 
+		iamUser1.EXPECT().InstanceState().Return(nil)
+		iamUser2.EXPECT().InstanceState().Return(nil)
+
 		hw.EXPECT().Sync().Return(nil)
+		hw.EXPECT().Interpolate(i)
 		sw.EXPECT().Sync().Return(nil)
 
 		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
@@ -174,6 +183,7 @@ func TestImport(t *testing.T) {
 			sw       = mock.NewWriter(ctrl)
 			iamUser1 = mock.NewResource(ctrl)
 			iamUser2 = mock.NewResource(ctrl)
+			i        = make(map[string]string)
 
 			f = &filter.Filter{
 				Exclude: []string{"aws_instance"},
@@ -193,6 +203,8 @@ func TestImport(t *testing.T) {
 		iamUser1.EXPECT().ImportState().Return(nil, nil)
 		iamUser2.EXPECT().ImportState().Return(nil, nil)
 
+		iamUser2.EXPECT().InstanceState().Return(nil)
+
 		iamUser1.EXPECT().Read(f).Return(errcode.ErrProviderResourceDoNotMatchTag)
 		iamUser2.EXPECT().Read(f).Return(nil)
 
@@ -201,6 +213,7 @@ func TestImport(t *testing.T) {
 		iamUser2.EXPECT().State(sw).Return(nil)
 
 		hw.EXPECT().Sync().Return(nil)
+		hw.EXPECT().Interpolate(i)
 		sw.EXPECT().Sync().Return(nil)
 
 		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
@@ -238,6 +251,7 @@ func TestImport(t *testing.T) {
 		iamUser2.EXPECT().Read(f).Return(nil)
 
 		iamUser2.EXPECT().State(sw).Return(nil)
+		iamUser2.EXPECT().InstanceState().Return(nil)
 
 		sw.EXPECT().Sync().Return(nil)
 
@@ -253,6 +267,7 @@ func TestImport(t *testing.T) {
 			hw       = mock.NewWriter(ctrl)
 			iamUser1 = mock.NewResource(ctrl)
 			iamUser2 = mock.NewResource(ctrl)
+			i        = make(map[string]string)
 
 			f = &filter.Filter{
 				Exclude: []string{"aws_instance"},
@@ -276,8 +291,10 @@ func TestImport(t *testing.T) {
 		iamUser2.EXPECT().Read(f).Return(nil)
 
 		iamUser2.EXPECT().HCL(hw).Return(nil)
+		iamUser2.EXPECT().InstanceState().Return(nil)
 
 		hw.EXPECT().Sync().Return(nil)
+		hw.EXPECT().Interpolate(i)
 
 		err := provider.Import(ctx, p, hw, nil, f, ioutil.Discard)
 		require.NoError(t, err)
@@ -292,6 +309,7 @@ func TestImport(t *testing.T) {
 			sw       = mock.NewWriter(ctrl)
 			iamUser1 = mock.NewResource(ctrl)
 			iamUser2 = mock.NewResource(ctrl)
+			i        = make(map[string]string)
 
 			f = &filter.Filter{
 				Exclude: []string{"aws_instance"},
@@ -317,8 +335,10 @@ func TestImport(t *testing.T) {
 		iamUser2.EXPECT().HCL(hw).Return(nil)
 
 		iamUser2.EXPECT().State(sw).Return(nil)
+		iamUser2.EXPECT().InstanceState().Return(nil)
 
 		hw.EXPECT().Sync().Return(nil)
+		hw.EXPECT().Interpolate(i)
 		sw.EXPECT().Sync().Return(nil)
 
 		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
@@ -334,6 +354,7 @@ func TestImport(t *testing.T) {
 			sw       = mock.NewWriter(ctrl)
 			iamUser1 = mock.NewResource(ctrl)
 			iamUser2 = mock.NewResource(ctrl)
+			i        = make(map[string]string)
 
 			f = &filter.Filter{
 				Exclude: []string{"aws_instance"},
@@ -359,8 +380,10 @@ func TestImport(t *testing.T) {
 		iamUser2.EXPECT().HCL(hw).Return(nil)
 
 		iamUser2.EXPECT().State(sw).Return(nil)
+		iamUser2.EXPECT().InstanceState().Return(nil)
 
 		hw.EXPECT().Sync().Return(nil)
+		hw.EXPECT().Interpolate(i)
 		sw.EXPECT().Sync().Return(nil)
 
 		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)

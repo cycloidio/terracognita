@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"reflect"
 	"strings"
 
 	kitlog "github.com/go-kit/kit/log"
@@ -122,4 +123,83 @@ func (w *Writer) Sync() error {
 		return fmt.Errorf("error while fmt HCL: %s", err)
 	}
 	return nil
+}
+
+// Interpolate replaces the hardcoded resources link
+// with TF interpolation
+func (w *Writer) Interpolate(i map[string]string) {
+	resources := w.Config["resource"]
+	// we need to isolate each resource
+	// getting each resource is easier to avoid cycle
+	// or interpolaception.
+	// We first loop over resource type (e.g: aws_instance)
+	for rt, resource := range resources.(map[string]map[string]interface{}) {
+		// we loop over a resource (e.g: aws_instance.oDSOj)
+		for name, block := range resource {
+			src := reflect.ValueOf(block)
+
+			// this will store the updated block
+			dest := reflect.New(src.Type()).Elem()
+
+			// walk through the resources to interpolate the good values
+			walk(dest, src, i, name, rt)
+
+			// remove reflect.Value wrapper from dest
+			resources.(map[string]map[string]interface{})[rt][name] = dest.Interface()
+		}
+	}
+}
+
+// walk through a resource block. it's easier since we do not know how the block is made
+// `dest` will be the new "block" with the values inteprolated from `interpolate`
+func walk(dest, src reflect.Value, interpolate map[string]string, name string, resourceType string) {
+	switch src.Kind() {
+	// it's an interface, so we basically need
+	// to extract the elem and walk through it
+	// as the initial call
+	case reflect.Interface:
+		srcValue := src.Elem()
+		destValue := reflect.New(srcValue.Type()).Elem()
+		walk(destValue, srcValue, interpolate, name, resourceType)
+		dest.Set(destValue)
+
+	// if the current `src` is a slice
+	// we iterate on each element.
+	case reflect.Array, reflect.Slice:
+		dest.Set(reflect.MakeSlice(src.Type(), src.Len(), src.Cap()))
+		for i := 0; i < src.Len(); i++ {
+			walk(dest.Index(i), src.Index(i), interpolate, name, resourceType)
+		}
+
+	// it's a map
+	case reflect.Map:
+		dest.Set(reflect.MakeMap(src.Type()))
+		iter := src.MapRange()
+		for iter.Next() {
+			// New gives us a pointer, but again we want the value
+			destValue := reflect.New(iter.Value().Type()).Elem()
+			walk(destValue, iter.Value(), interpolate, name, resourceType)
+			dest.SetMapIndex(iter.Key(), destValue)
+		}
+
+	// what we want to interpolate is a string
+	// we do not interpolate a custom tag (like cycloid.io) since it's key.
+	// for now, only "strings" are interpolated since it's not that easy to interpolate
+	// a bool / an int without more context.
+	case reflect.String:
+		// we check if there is a value to interpolate
+		if interpolatedValue, ok := interpolate[src.Interface().(string)]; ok {
+			// avoid to interpolate a resource by "itself" (interpolaception) and avoid to interpolate a resource type with resource
+			// of the same type (cyclic interpolation)
+			if !(strings.Contains(interpolatedValue, name) || strings.Contains(interpolatedValue, resourceType)) {
+				dest.SetString(interpolatedValue)
+			} else {
+				dest.SetString(src.Interface().(string))
+			}
+		} else {
+			dest.SetString(src.Interface().(string))
+		}
+	default:
+		dest.Set(src)
+	}
 }

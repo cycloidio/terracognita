@@ -140,6 +140,34 @@ func (mr *ResourceMockRecorder) InstanceInfo() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstanceInfo", reflect.TypeOf((*Resource)(nil).InstanceInfo))
 }
 
+// InstanceState mocks base method
+func (m *Resource) InstanceState() *terraform.InstanceState {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InstanceState")
+	ret0, _ := ret[0].(*terraform.InstanceState)
+	return ret0
+}
+
+// InstanceState indicates an expected call of InstanceState
+func (mr *ResourceMockRecorder) InstanceState() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstanceState", reflect.TypeOf((*Resource)(nil).InstanceState))
+}
+
+// Name mocks base method
+func (m *Resource) Name() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Name")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// Name indicates an expected call of Name
+func (mr *ResourceMockRecorder) Name() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Name", reflect.TypeOf((*Resource)(nil).Name))
+}
+
 // Provider mocks base method
 func (m *Resource) Provider() provider.Provider {
 	m.ctrl.T.Helper()
