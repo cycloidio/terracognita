@@ -21,4 +21,8 @@ type Writer interface {
 	// a different implementation of it with different
 	// output formats
 	Sync() error
+
+	// Interpolate replaces the hardcoded resources link
+	// with TF interpolation
+	Interpolate(map[string]string)
 }

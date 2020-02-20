@@ -114,3 +114,66 @@ func TestHCLWriter_Sync(t *testing.T) {
 		assert.Equal(t, hcl, b.String())
 	})
 }
+
+func TestHCLWriter_Interpolate(t *testing.T) {
+	t.Run("Success", func(t *testing.T) {
+		var (
+			b     = &bytes.Buffer{}
+			hw    = hcl.NewWriter(b)
+			value = map[string]interface{}{
+				"network": "to-be-interpolated",
+			}
+			network = map[string]interface{}{
+				"id": "interpolated",
+			}
+			i   = make(map[string]string)
+			hcl = `resource "aType" "aName" {
+  id = "interpolated"
+}
+
+resource "type" "name" {
+  network = "${aType.aName.id}"
+}
+`
+		)
+		i["to-be-interpolated"] = "${aType.aName.id}"
+		hw.Write("type.name", value)
+		hw.Write("aType.aName", network)
+
+		hw.Interpolate(i)
+		hw.Sync()
+
+		assert.Equal(t, hcl, b.String())
+	})
+	t.Run("SuccessAvoidInterpolaception", func(t *testing.T) {
+		var (
+			b     = &bytes.Buffer{}
+			hw    = hcl.NewWriter(b)
+			value = map[string]interface{}{
+				"network": "to-be-interpolated",
+			}
+			network = map[string]interface{}{
+				"id":   "interpolated",
+				"name": "to-be-interpolated",
+			}
+			i   = make(map[string]string)
+			hcl = `resource "aType" "aName" {
+  id   = "interpolated"
+  name = "to-be-interpolated"
+}
+
+resource "type" "name" {
+  network = "${aType.aName.id}"
+}
+`
+		)
+		i["to-be-interpolated"] = "${aType.aName.id}"
+		hw.Write("type.name", value)
+		hw.Write("aType.aName", network)
+
+		hw.Interpolate(i)
+		hw.Sync()
+
+		assert.Equal(t, hcl, b.String())
+	})
+}
