@@ -9,6 +9,15 @@ At [Cycloid](https://www.cycloid.io/), Infrastructure As Code is in the company 
 
 We decided to opensource this tool as we believe that it will help people to adopt IaC in an easy way. Cycloid provides this tool to let people import their infrastructure into [Cycloid's pipelines](https://www.cycloid.io/devops-platform-with-ci-cd-container-pipeline), allow them to generate infrastructure diagram and manage all infra/application lifecycle from a single interface.
 
+## Cloud providers
+
+Terracognita currently imports AWS and GCP cloud provider as terraform (0.12.7) resource/state.
+Please see the following versions as follow:
+
+Providers:
+ * AWS: 2.31.0
+ * GCP: 2.16.0
+
 ## Installation
 
 ### Binary
@@ -43,17 +52,6 @@ aur/terracognita 1:0.3.0-1 (+0 0.00%)
 aur/terracognita-git 1:v0.3.0.r27.gdfc5a99-1 (+0 0.00%) 
     Reads from existing Cloud Providers (reverse Terraform) and generates your infrastructure as code on Terraform configuration
 ```
-
-## Versions
-
-Terracognita currently imports AWS and GCP cloud provider as terraform resource/state.
-Please see the following versions as follow:
-
-Terraform: 0.12.7
-
-Providers:
- * AWS: 2.31.0
- * GCP: 2.16.0
 
 ## Usage
 
