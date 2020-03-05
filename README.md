@@ -11,20 +11,37 @@ We decided to opensource this tool as we believe that it will help people to ado
 
 ## Installation
 
-It uses Go Modules, so GO 1.11+ is required.
-If you wish to run it via docker then `docker` binary is required.
-While if you wish to run it locally; you will need to have the extra `brz` lib installed.
+### Binary
 
-You have 2 options to get the package:
+Visit the [releases](https://github.com/cycloidio/terracognita/releases) page to select your system, architecture and version you need. Then:
 
-* Clone the repository to `$GOPATH/src/github.com/cycloidio/terracognita`
-* `go get -d github.com/cycloidio/terracognita`
-
-Then feel free to play with it :)
-
+```shell
+$ curl -L https://github.com/cycloidio/terracognita/releases/download/v0.3.0/terracognita-linux-amd64.tar.gz -o terracognita-linux-amd64.tar.gz
+$ tar -xf terracognita-linux-amd64.tar.gz
+$ chmod u+x terracognita-linux-amd64
+$ sudo mv terracognita-linux-amd64 /usr/local/bin/terracognita
 ```
-$> cd $GOPATH/src/github.com/cycloidio/terracognita
-$> make install
+
+### Development
+
+You can build and install with the latest sources, you will enjoy the new features and bugfixes. It uses Go Modules, so GO 1.11+ is required.
+
+```shell
+$ git clone https://github.com/cycloidio/terracognita
+$ cd terracognita
+$ make install
+```
+
+### Arch Linux
+
+There are two entries in the AUR: [terracognita-git](https://aur.archlinux.org/packages/terracognita-git/) (targets the latest git commit) and [terracognita](https://aur.archlinux.org/packages/terracognita) (targets the latest stable release).
+
+```shell
+$ yay -Ss terracognita
+aur/terracognita 1:0.3.0-1 (+0 0.00%) 
+    Reads from existing Cloud Providers (reverse Terraform) and generates your infrastructure as code on Terraform configuration
+aur/terracognita-git 1:v0.3.0.r27.gdfc5a99-1 (+0 0.00%) 
+    Reads from existing Cloud Providers (reverse Terraform) and generates your infrastructure as code on Terraform configuration
 ```
 
 ## Versions
