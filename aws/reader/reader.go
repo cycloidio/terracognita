@@ -57,6 +57,10 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) (*ec2.DescribeVpcsOutput, error)
 
+	// GetVpcPeeringConnections returns all VpcPeeringConnections based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetVpcPeeringConnections(ctx context.Context, input *ec2.DescribeVpcPeeringConnectionsInput) (*ec2.DescribeVpcPeeringConnectionsOutput, error)
+
 	// GetImages returns all EC2 AMI based on the input given.
 	// Returned values are commented in the interface doc comment block.
 	GetImages(ctx context.Context, input *ec2.DescribeImagesInput) (*ec2.DescribeImagesOutput, error)
@@ -64,6 +68,10 @@ type Reader interface {
 	// GetOwnImages returns all EC2 AMI belonging to the Account ID based on the input given.
 	// Returned values are commented in the interface doc comment block.
 	GetOwnImages(ctx context.Context, input *ec2.DescribeImagesInput) (*ec2.DescribeImagesOutput, error)
+
+	// GetKeyPairs returns all KeyPairs based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetKeyPairs(ctx context.Context, input *ec2.DescribeKeyPairsInput) (*ec2.DescribeKeyPairsOutput, error)
 
 	// GetSecurityGroups returns all EC2 security groups based on the input given.
 	// Returned values are commented in the interface doc comment block.
@@ -125,6 +133,22 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetLoadBalancersV2Tags(ctx context.Context, input *elbv2.DescribeTagsInput) (*elbv2.DescribeTagsOutput, error)
 
+	// GetLoadBalancersV2Listeners returns a list of Listeners based on the input from the different regions.
+	// Returned values are commented in the interface doc comment block.
+	GetLoadBalancersV2Listeners(ctx context.Context, input *elbv2.DescribeListenersInput) (*elbv2.DescribeListenersOutput, error)
+
+	// GetLoadBalancersV2TargetGroups returns a list of TargetGroups based on the input from the different regions.
+	// Returned values are commented in the interface doc comment block.
+	GetLoadBalancersV2TargetGroups(ctx context.Context, input *elbv2.DescribeTargetGroupsInput) (*elbv2.DescribeTargetGroupsOutput, error)
+
+	// GetListenerCertificates returns a list of ListenerCertificates based on the input from the different regions.
+	// Returned values are commented in the interface doc comment block.
+	GetListenerCertificates(ctx context.Context, input *elbv2.DescribeListenerCertificatesInput) (*elbv2.DescribeListenerCertificatesOutput, error)
+
+	// GetLoadBalancersV2Rules returns a list of Rules based on the input from the different regions.
+	// Returned values are commented in the interface doc comment block.
+	GetLoadBalancersV2Rules(ctx context.Context, input *elbv2.DescribeRulesInput) (*elbv2.DescribeRulesOutput, error)
+
 	// GetDBInstances returns all DB instances based on the input given.
 	// Returned values are commented in the interface doc comment block.
 	GetDBInstances(ctx context.Context, input *rds.DescribeDBInstancesInput) (*rds.DescribeDBInstancesOutput, error)
@@ -136,6 +160,10 @@ type Reader interface {
 	// GetDBParameterGroups returns all DB parameterGroups based on the input given.
 	// Returned values are commented in the interface doc comment block.
 	GetDBParameterGroups(ctx context.Context, input *rds.DescribeDBParameterGroupsInput) (*rds.DescribeDBParameterGroupsOutput, error)
+
+	// GetDBSubnetGroups returns all DB DBSubnetGroups based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetDBSubnetGroups(ctx context.Context, input *rds.DescribeDBSubnetGroupsInput) (*rds.DescribeDBSubnetGroupsOutput, error)
 
 	// ListBuckets returns all S3 buckets based on the input given and specifically
 	// filtering by Location as ListBuckets does not do it by itself
@@ -345,6 +373,19 @@ func (c *connector) GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) (
 	return opt, nil
 }
 
+func (c *connector) GetVpcPeeringConnections(ctx context.Context, input *ec2.DescribeVpcPeeringConnectionsInput) (*ec2.DescribeVpcPeeringConnectionsOutput, error) {
+	if c.svc.ec2 == nil {
+		c.svc.ec2 = ec2.New(c.svc.session)
+	}
+
+	opt, err := c.svc.ec2.DescribeVpcPeeringConnectionsWithContext(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	return opt, nil
+}
+
 func (c *connector) GetImages(ctx context.Context, input *ec2.DescribeImagesInput) (*ec2.DescribeImagesOutput, error) {
 	if c.svc.ec2 == nil {
 		c.svc.ec2 = ec2.New(c.svc.session)
@@ -369,6 +410,19 @@ func (c *connector) GetOwnImages(ctx context.Context, input *ec2.DescribeImagesI
 	}
 
 	opt, err := c.svc.ec2.DescribeImagesWithContext(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetKeyPairs(ctx context.Context, input *ec2.DescribeKeyPairsInput) (*ec2.DescribeKeyPairsOutput, error) {
+	if c.svc.ec2 == nil {
+		c.svc.ec2 = ec2.New(c.svc.session)
+	}
+
+	opt, err := c.svc.ec2.DescribeKeyPairsWithContext(ctx, input)
 	if err != nil {
 		return nil, err
 	}
@@ -576,6 +630,58 @@ func (c *connector) GetLoadBalancersV2Tags(ctx context.Context, input *elbv2.Des
 	return opt, nil
 }
 
+func (c *connector) GetLoadBalancersV2Listeners(ctx context.Context, input *elbv2.DescribeListenersInput) (*elbv2.DescribeListenersOutput, error) {
+	if c.svc.elbv2 == nil {
+		c.svc.elbv2 = elbv2.New(c.svc.session)
+	}
+
+	opt, err := c.svc.elbv2.DescribeListenersWithContext(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetLoadBalancersV2TargetGroups(ctx context.Context, input *elbv2.DescribeTargetGroupsInput) (*elbv2.DescribeTargetGroupsOutput, error) {
+	if c.svc.elbv2 == nil {
+		c.svc.elbv2 = elbv2.New(c.svc.session)
+	}
+
+	opt, err := c.svc.elbv2.DescribeTargetGroupsWithContext(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetListenerCertificates(ctx context.Context, input *elbv2.DescribeListenerCertificatesInput) (*elbv2.DescribeListenerCertificatesOutput, error) {
+	if c.svc.elbv2 == nil {
+		c.svc.elbv2 = elbv2.New(c.svc.session)
+	}
+
+	opt, err := c.svc.elbv2.DescribeListenerCertificatesWithContext(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetLoadBalancersV2Rules(ctx context.Context, input *elbv2.DescribeRulesInput) (*elbv2.DescribeRulesOutput, error) {
+	if c.svc.elbv2 == nil {
+		c.svc.elbv2 = elbv2.New(c.svc.session)
+	}
+
+	opt, err := c.svc.elbv2.DescribeRulesWithContext(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	return opt, nil
+}
+
 func (c *connector) GetDBInstances(ctx context.Context, input *rds.DescribeDBInstancesInput) (*rds.DescribeDBInstancesOutput, error) {
 	if c.svc.rds == nil {
 		c.svc.rds = rds.New(c.svc.session)
@@ -608,6 +714,19 @@ func (c *connector) GetDBParameterGroups(ctx context.Context, input *rds.Describ
 	}
 
 	opt, err := c.svc.rds.DescribeDBParameterGroupsWithContext(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetDBSubnetGroups(ctx context.Context, input *rds.DescribeDBSubnetGroupsInput) (*rds.DescribeDBSubnetGroupsOutput, error) {
+	if c.svc.rds == nil {
+		c.svc.rds = rds.New(c.svc.session)
+	}
+
+	opt, err := c.svc.rds.DescribeDBSubnetGroupsWithContext(ctx, input)
 	if err != nil {
 		return nil, err
 	}
