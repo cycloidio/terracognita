@@ -2,6 +2,8 @@
 
 ### Added
 
+- aws resources: `aws_db_subnet_group`, `aws_key_pair`, `aws_vpc_peering_connection`, `aws_alb_target_group`, `aws_alb_listener`, `aws_alb_listener_rule`
+  ([PR #87](https://github.com/cycloidio/terracognita/pull/87))
 - Terraform variable interpolation is available on string values
   ([PR #81](https://github.com/cycloidio/terracognita/pull/81))
 - aws resource: `aws_db_parameter_group`, `aws_iam_access_key`, `aws_cloudwatch_metric_alarm`, `aws_autoscaling_policy`, `aws_iam_user_ssh_key`
