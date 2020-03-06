@@ -40,6 +40,7 @@ const (
 	ALB
 	DBInstance
 	DBParameterGroup
+	DBSubnetGroup
 	S3Bucket
 	//S3BucketObject
 	CloudfrontDistribution
@@ -113,6 +114,7 @@ var (
 		ALB:                albs,
 		DBInstance:         dbInstances,
 		DBParameterGroup:   dbParameterGroups,
+		DBSubnetGroup:      dbSubnetGroups,
 		S3Bucket:           s3Buckets,
 		//S3BucketObject:      s3_bucket_objects,
 		CloudfrontDistribution:         cloudfrontDistributions,
@@ -408,6 +410,27 @@ func dbParameterGroups(ctx context.Context, a *aws, resourceType string, tags []
 	for _, i := range dbParameterGroups.DBParameterGroups {
 
 		r, err := initializeResource(a, *i.DBParameterGroupName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func dbSubnetGroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	dbSubnetGroups, err := a.awsr.GetDBSubnetGroups(ctx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range dbSubnetGroups.DBSubnetGroups {
+
+		r, err := initializeResource(a, *i.DBSubnetGroupName, resourceType)
 		if err != nil {
 			return nil, err
 		}
