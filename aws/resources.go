@@ -26,6 +26,7 @@ const (
 	// List of all the Resources
 	Instance ResourceType = iota
 	VPC
+	VPCPeeringConnection
 	KeyPair
 	// Do not have them for now as it's not needed
 	// but works
@@ -103,9 +104,10 @@ type rtFn func(ctx context.Context, a *aws, resourceType string, tags []tag.Tag)
 
 var (
 	resources = map[ResourceType]rtFn{
-		Instance: instances,
-		VPC:      vpcs,
-		KeyPair:  keyPairs,
+		Instance:             instances,
+		VPC:                  vpcs,
+		VPCPeeringConnection: vpcPeeringConnections,
+		KeyPair:              keyPairs,
 		//AMI:      ami,
 		SecurityGroup: securityGroups,
 		Subnet:        subnets,
@@ -240,6 +242,27 @@ func vpcs(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]p
 
 //return resources, nil
 //}
+
+func vpcPeeringConnections(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	vpcPeeringConnections, err := a.awsr.GetVpcPeeringConnections(ctx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range vpcPeeringConnections.VpcPeeringConnections {
+
+		r, err := initializeResource(a, *i.VpcPeeringConnectionId, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
 
 func keyPairs(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
 	keyPairs, err := a.awsr.GetKeyPairs(ctx, nil)

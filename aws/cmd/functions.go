@@ -35,6 +35,16 @@ var (
 			`,
 		},
 		Function{
+			Entity:  "VpcPeeringConnections",
+			Prefix:  "Describe",
+			Service: "ec2",
+			Documentation: `
+			// GetVpcPeeringConnections returns all VpcPeeringConnections based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		Function{
 			Entity:  "Images",
 			Prefix:  "Describe",
 			Service: "ec2",
