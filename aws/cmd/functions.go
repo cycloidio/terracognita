@@ -54,6 +54,15 @@ var (
 			`,
 		},
 		Function{
+			Entity:  "KeyPairs",
+			Prefix:  "Describe",
+			Service: "ec2",
+			Documentation: `
+			// GetKeyPairs returns all KeyPairs based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
 			Entity:  "SecurityGroups",
 			Prefix:  "Describe",
 			Service: "ec2",

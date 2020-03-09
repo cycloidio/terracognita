@@ -26,6 +26,7 @@ const (
 	// List of all the Resources
 	Instance ResourceType = iota
 	VPC
+	KeyPair
 	// Do not have them for now as it's not needed
 	// but works
 	//AMI
@@ -104,6 +105,7 @@ var (
 	resources = map[ResourceType]rtFn{
 		Instance: instances,
 		VPC:      vpcs,
+		KeyPair:  keyPairs,
 		//AMI:      ami,
 		SecurityGroup: securityGroups,
 		Subnet:        subnets,
@@ -238,6 +240,27 @@ func vpcs(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]p
 
 //return resources, nil
 //}
+
+func keyPairs(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	keyPairs, err := a.awsr.GetKeyPairs(ctx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range keyPairs.KeyPairs {
+
+		r, err := initializeResource(a, *i.KeyName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
 
 func securityGroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
 	var input = &ec2.DescribeSecurityGroupsInput{
