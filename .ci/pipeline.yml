@@ -275,6 +275,12 @@ jobs:
           params: { bump: final }
       - put: final-version
         params: { file: repo-version/version }
+      - put: ((branch))
+        resource: repo-((branch))
+        params:
+          repository: ((branch))
+          tag: repo-version/version
+          tag_prefix: v
 
   - name: release-((branch))
     serial: true
