@@ -7,6 +7,7 @@ import (
 
 	awsSDK "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/aws/aws-sdk-go/service/elbv2"
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/route53"
 	"github.com/aws/aws-sdk-go/service/ses"
@@ -40,6 +41,10 @@ const (
 	ElasticacheCluster
 	ELB
 	ALB
+	ALBListener
+	ALBListenerRule
+	ALBListenerCertificate
+	ALBTargetGroup
 	DBInstance
 	DBParameterGroup
 	DBSubnetGroup
@@ -113,13 +118,17 @@ var (
 		Subnet:        subnets,
 		EBSVolume:     ebsVolumes,
 		//EBSSnapshot:         ebsSnapshots,
-		ElasticacheCluster: elasticacheClusters,
-		ELB:                elbs,
-		ALB:                albs,
-		DBInstance:         dbInstances,
-		DBParameterGroup:   dbParameterGroups,
-		DBSubnetGroup:      dbSubnetGroups,
-		S3Bucket:           s3Buckets,
+		ElasticacheCluster:     elasticacheClusters,
+		ELB:                    elbs,
+		ALB:                    cacheLoadBalancersV2,
+		ALBListener:            cacheLoadBalancersV2Listeners,
+		ALBListenerRule:        albListenerRules,
+		ALBListenerCertificate: albListenerCertificates,
+		ALBTargetGroup:         albTargetGroups,
+		DBInstance:             dbInstances,
+		DBParameterGroup:       dbParameterGroups,
+		DBSubnetGroup:          dbSubnetGroups,
+		S3Bucket:               s3Buckets,
 		//S3BucketObject:      s3_bucket_objects,
 		CloudfrontDistribution:         cloudfrontDistributions,
 		CloudfrontOriginAccessIdentity: cloudfrontOriginAccessIdentities,
@@ -421,6 +430,132 @@ func albs(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]p
 		if err != nil {
 			return nil, err
 		}
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func albListeners(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+
+	ALBArns, err := getLoadBalancersV2Arns(ctx, a, ALB.String(), tags)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, alb := range ALBArns {
+
+		input := &elbv2.DescribeListenersInput{
+			LoadBalancerArn: awsSDK.String(alb),
+		}
+
+		albListeners, err := a.awsr.GetLoadBalancersV2Listeners(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, i := range albListeners.Listeners {
+			r, err := initializeResource(a, *i.ListenerArn, resourceType)
+			if err != nil {
+				return nil, err
+			}
+			resources = append(resources, r)
+		}
+	}
+
+	return resources, nil
+}
+
+func albListenerRules(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+
+	ALBListeners, err := getLoadBalancersV2ListenersArns(ctx, a, ALBListener.String(), tags)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, l := range ALBListeners {
+
+		input := &elbv2.DescribeRulesInput{
+			ListenerArn: awsSDK.String(l),
+		}
+
+		albListenerRules, err := a.awsr.GetLoadBalancersV2Rules(ctx, input)
+
+		if err != nil {
+			return nil, err
+		}
+
+		for _, i := range albListenerRules.Rules {
+
+			r, err := initializeResource(a, *i.RuleArn, resourceType)
+
+			if err != nil {
+				return nil, err
+			}
+
+			resources = append(resources, r)
+		}
+	}
+
+	return resources, nil
+}
+
+func albListenerCertificates(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+
+	ALBListeners, err := getLoadBalancersV2ListenersArns(ctx, a, ALBListener.String(), tags)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, l := range ALBListeners {
+
+		input := &elbv2.DescribeListenerCertificatesInput{
+			ListenerArn: awsSDK.String(l),
+		}
+
+		albListenerCertificates, err := a.awsr.GetListenerCertificates(ctx, input)
+
+		if err != nil {
+			return nil, err
+		}
+
+		for _, i := range albListenerCertificates.Certificates {
+
+			// TODO: if filter include aws_alb_listener, check if *i.IsDefault not append (since it is already written by aws_alb_listener)
+			r, err := initializeResource(a, *i.CertificateArn, resourceType)
+
+			if err != nil {
+				return nil, err
+			}
+
+			resources = append(resources, r)
+		}
+	}
+
+	// TODO: This resource it's not Importable yet (https://www.terraform.io/docs/providers/aws/r/lb_listener_certificate.html)
+	// https://github.com/cycloidio/terracognita/issues/91
+	return nil, nil
+	//return resources, nil
+}
+
+func albTargetGroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	albTargetGroups, err := a.awsr.GetLoadBalancersV2TargetGroups(ctx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range albTargetGroups.TargetGroups {
+
+		r, err := initializeResource(a, *i.TargetGroupArn, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
 		resources = append(resources, r)
 	}
 

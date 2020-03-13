@@ -223,6 +223,45 @@ var (
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
+		Function{
+			FnName:  "GetLoadBalancersV2Listeners",
+			Entity:  "Listeners",
+			Prefix:  "Describe",
+			Service: "elbv2",
+			Documentation: `
+			// GetLoadBalancersV2Listeners returns a list of Listeners based on the input from the different regions.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:  "GetLoadBalancersV2TargetGroups",
+			Entity:  "TargetGroups",
+			Prefix:  "Describe",
+			Service: "elbv2",
+			Documentation: `
+			// GetLoadBalancersV2TargetGroups returns a list of TargetGroups based on the input from the different regions.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "ListenerCertificates",
+			Prefix:  "Describe",
+			Service: "elbv2",
+			Documentation: `
+			// GetListenerCertificates returns a list of ListenerCertificates based on the input from the different regions.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:  "GetLoadBalancersV2Rules",
+			Entity:  "Rules",
+			Prefix:  "Describe",
+			Service: "elbv2",
+			Documentation: `
+			// GetLoadBalancersV2Rules returns a list of Rules based on the input from the different regions.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
 
 		// rds
 		Function{
