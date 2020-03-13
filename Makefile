@@ -4,6 +4,7 @@ BIN_DIR := $(GOPATH)/bin
 
 GOLINT := $(BIN_DIR)/golinter
 GOIMPORTS := $(BIN_DIR)/goimports
+ENUMER := $(BIN_DIR)/enumer
 MOCKGEN := $(BIN_DIR)/mockgen
 
 VERSION= $(shell git describe --tags --always)
@@ -34,6 +35,9 @@ $(MOCKGEN):
 $(GOIMPORTS):
 	@go get -u golang.org/x/tools/cmd/goimports
 
+$(ENUMER):
+	@go get -u github.com/dmarkham/enumer
+
 $(GOLINT):
 	@go get -u golang.org/x/lint/golint
 
@@ -42,7 +46,7 @@ lint: $(GOLINT) $(GOIMPORTS) ## Runs the linter
 	@GO111MODULE=on golint -set_exit_status ./... && test -z "`go list -f {{.Dir}} ./... | xargs goimports -l | tee /dev/stderr`"
 
 .PHONY: generate
-generate: $(MOCKGEN) ## Generates the needed code
+generate: $(MOCKGEN) $(GOIMPORTS) $(ENUMER) ## Generates the needed code
 	@GO111MODULE=on rm -rf ./mock/a && \
 		go generate ./... && \
 		goimports -w ./mock
