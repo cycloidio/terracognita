@@ -75,12 +75,12 @@ var (
 			var hclW, stateW writer.Writer
 
 			if hclOut != nil {
-				logger.Log("msg", "initialzing HCL writer")
+				logger.Log("msg", "initializing HCL writer")
 				hclW = hcl.NewWriter(hclOut)
 			}
 
 			if stateOut != nil {
-				logger.Log("msg", "initialzing TFState writer")
+				logger.Log("msg", "initializing TFState writer")
 				stateW = state.NewWriter(stateOut)
 			}
 
