@@ -3,6 +3,8 @@ package azurerm
 import (
 	"context"
 
+	"github.com/pkg/errors"
+
 	"github.com/cycloidio/terracognita/provider"
 	"github.com/cycloidio/terracognita/tag"
 )
@@ -13,17 +15,26 @@ type ResourceType int
 
 //go:generate enumer -type ResourceType -addprefix azurerm_ -transform snake -linecomment
 const (
-	DummyResource ResourceType = iota
+	VirtualMachine ResourceType = iota
 )
 
 type rtFn func(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error)
 
 var (
 	resources = map[ResourceType]rtFn{
-		DummyResource: dummyResource,
+		VirtualMachine: virtualMachines,
 	}
 )
 
-func dummyResource(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	return nil, nil
+func virtualMachines(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	virtualMachines, err := a.azurer.ListVirtualMachines(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list virtual machines from reader")
+	}
+	resources := make([]provider.Resource, 0, len(virtualMachines))
+	for _, virtualMachine := range virtualMachines {
+		r := provider.NewResource(*virtualMachine.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
 }

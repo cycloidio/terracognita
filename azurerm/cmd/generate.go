@@ -9,9 +9,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-var azureAPIs []AzureAPI
+var azureAPIs = []AzureAPI{
+	AzureAPI{API: "compute", APIVersion: "2019-07-01"},
+}
 
-var functions []Function
+var functions = []Function{
+	Function{Resource: "VirtualMachine", API: "compute", ResourceGroup: true},
+}
 
 func main() {
 	f, err := os.OpenFile("./reader_generated.go", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
