@@ -180,7 +180,7 @@ jobs:
           context: ((ci-context))
           path: pull-request
           status: pending
-          target_url: 'https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME'
+          target_url: 'https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID'
 
       - task: unit-tests
         privileged: true
@@ -206,7 +206,7 @@ jobs:
             context: ((ci-context))
             path: pull-request
             status: failure
-            target_url: 'https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME'
+            target_url: 'https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID'
         on_success:
           put: pull-request
           params:
@@ -214,7 +214,7 @@ jobs:
             context: ((ci-context))
             path: pull-request
             status: success
-            target_url: 'https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME'
+            target_url: 'https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID'
 
   - name: test-((branch))
     build_logs_to_retain: 20
