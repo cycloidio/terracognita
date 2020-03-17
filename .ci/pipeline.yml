@@ -2,7 +2,7 @@ shared:
   - &slack-alert
     author_name: cycloid.io
     author_link: https://www.cycloid.io/
-    title_link: https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID
+    title_link: https://console.cycloid.io/organizations/((customer))/projects/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID
     fields:
       - title: Project
         value: ((project))
@@ -180,7 +180,7 @@ jobs:
           context: ((ci-context))
           path: pull-request
           status: pending
-          target_url: 'https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME'
+          target_url: 'https://console.cycloid.io/organizations/((customer))/projects/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID'
 
       - task: unit-tests
         privileged: true
@@ -206,7 +206,7 @@ jobs:
             context: ((ci-context))
             path: pull-request
             status: failure
-            target_url: 'https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME'
+            target_url: 'https://console.cycloid.io/organizations/((customer))/projects/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID'
         on_success:
           put: pull-request
           params:
@@ -214,7 +214,7 @@ jobs:
             context: ((ci-context))
             path: pull-request
             status: success
-            target_url: 'https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME'
+            target_url: 'https://console.cycloid.io/organizations/((customer))/projects/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID'
 
   - name: test-((branch))
     build_logs_to_retain: 20
@@ -251,7 +251,7 @@ jobs:
               commit: ((branch))
               context: ((ci-context))
               state: success
-              target_url: 'https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID'
+              target_url: 'https://console.cycloid.io/organizations/((customer))/projects/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID'
         on_failure:
           try:
             put: report-status-((branch))
@@ -259,7 +259,7 @@ jobs:
               commit: ((branch))
               context: ((ci-context))
               state: failure
-              target_url: 'https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID'
+              target_url: 'https://console.cycloid.io/organizations/((customer))/projects/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID'
 
   - name: version-((branch))
     build_logs_to_retain: 20
@@ -372,7 +372,7 @@ jobs:
                    A new deployment of ((project)) version $VERSION has failed on ((env)) environment
                    </br>
                    <ul>
-                   <li><em><a href="https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID">Build link</a></em></li>
+                   <li><em><a href="https://console.cycloid.io/organizations/((customer))/projects/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID">Build link</a></em></li>
                    <li><em><a href="https://github.com/cycloidio/((project))/releases/tag/v$VERSION">Changelog</a></em></li>
                    </ul>
           title: Fail deployment of ((project)) version $VERSION on ((env)) environment
@@ -392,7 +392,7 @@ jobs:
                    A new deployment of ((project)) version $VERSION has been done on ((env)) environment
                    </br>
                    <ul>
-                   <li><em><a href="https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID">Build link</a></em></li>
+                   <li><em><a href="https://console.cycloid.io/organizations/((customer))/projects/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID">Build link</a></em></li>
                    <li><em><a href="https://github.com/cycloidio/((project))/releases/tag/v$VERSION">Changelog</a></em></li>
                    </ul>
           title: Success deployment of ((project)) version $VERSION on ((env)) environment
@@ -450,7 +450,7 @@ jobs:
                   A new build image of terracognita has failed on master environment
                   </br>
                   <ul>
-                  <li><em><a href="https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID">Build link</a></em></li>
+                  <li><em><a href="https://console.cycloid.io/organizations/((customer))/projects/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID">Build link</a></em></li>
                   </ul>
                 severity: critical
                 title: Fail build image of terracognita on master environment
@@ -469,7 +469,7 @@ jobs:
                   A new build image of terracognita has been done on master environment
                   </br>
                   <ul>
-                  <li><em><a href="https://console.cycloid.io/projects/((customer))/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID">Build link</a></em></li>
+                  <li><em><a href="https://console.cycloid.io/organizations/((customer))/projects/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID">Build link</a></em></li>
                   </ul>
                 title: Success build image of terracognita on master environment
 
