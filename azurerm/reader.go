@@ -75,6 +75,11 @@ func NewAzureReader(ctx context.Context, clientID, clientSecret, environment, re
 	}, nil
 }
 
+// GetResourceGroup returns the current Resource Group resource
+func (ar *AzureReader) GetResourceGroup() azureResourcesAPI.Group {
+	return ar.resourceGroup
+}
+
 // GetResourceGroupName returns the current Resource Group name
 func (ar *AzureReader) GetResourceGroupName() string {
 	return *ar.resourceGroup.Name
