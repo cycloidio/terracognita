@@ -16,6 +16,7 @@ type ResourceType int
 //go:generate enumer -type ResourceType -addprefix azurerm_ -transform snake -linecomment
 const (
 	VirtualMachine ResourceType = iota
+	VirtualNetwork
 )
 
 type rtFn func(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error)
@@ -23,6 +24,7 @@ type rtFn func(ctx context.Context, a *azurerm, resourceType string, tags []tag.
 var (
 	resources = map[ResourceType]rtFn{
 		VirtualMachine: virtualMachines,
+		VirtualNetwork: virtualNetworks,
 	}
 )
 
@@ -34,6 +36,19 @@ func virtualMachines(ctx context.Context, a *azurerm, resourceType string, tags 
 	resources := make([]provider.Resource, 0, len(virtualMachines))
 	for _, virtualMachine := range virtualMachines {
 		r := provider.NewResource(*virtualMachine.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func virtualNetworks(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	virtualNetworks, err := a.azurer.ListVirtualNetworks(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list virtual networks from reader")
+	}
+	resources := make([]provider.Resource, 0, len(virtualNetworks))
+	for _, virtualNetwork := range virtualNetworks {
+		r := provider.NewResource(*virtualNetwork.ID, resourceType, a)
 		resources = append(resources, r)
 	}
 	return resources, nil

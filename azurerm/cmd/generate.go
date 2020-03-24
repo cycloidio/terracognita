@@ -11,10 +11,12 @@ import (
 
 var azureAPIs = []AzureAPI{
 	AzureAPI{API: "compute", APIVersion: "2019-07-01"},
+	AzureAPI{API: "network", APIVersion: "2019-06-01"},
 }
 
 var functions = []Function{
 	Function{Resource: "VirtualMachine", API: "compute", ResourceGroup: true},
+	Function{Resource: "VirtualNetwork", API: "network", ResourceGroup: true},
 }
 
 func main() {
