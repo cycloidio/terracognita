@@ -20,17 +20,19 @@ const (
 	VirtualNetwork
 	Subnet
 	NetworkInterface
+	NetworkSecurityGroup
 )
 
 type rtFn func(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error)
 
 var (
 	resources = map[ResourceType]rtFn{
-		ResourceGroup:    resourceGroup,
-		VirtualMachine:   virtualMachines,
-		VirtualNetwork:   virtualNetworks,
-		Subnet:           subnets,
-		NetworkInterface: networkInterfaces,
+		ResourceGroup:        resourceGroup,
+		VirtualMachine:       virtualMachines,
+		VirtualNetwork:       virtualNetworks,
+		Subnet:               subnets,
+		NetworkInterface:     networkInterfaces,
+		NetworkSecurityGroup: networkSecurityGroups,
 	}
 )
 
@@ -94,6 +96,19 @@ func networkInterfaces(ctx context.Context, a *azurerm, resourceType string, tag
 	resources := make([]provider.Resource, 0, len(networkInterfaces))
 	for _, networkInterface := range networkInterfaces {
 		r := provider.NewResource(*networkInterface.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func networkSecurityGroups(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	securityGroups, err := a.azurer.ListSecurityGroups(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list network security groups from reader")
+	}
+	resources := make([]provider.Resource, 0, len(securityGroups))
+	for _, securityGroup := range securityGroups {
+		r := provider.NewResource(*securityGroup.ID, resourceType, a)
 		resources = append(resources, r)
 	}
 	return resources, nil
