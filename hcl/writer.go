@@ -151,7 +151,7 @@ func (w *Writer) Interpolate(i map[string]string) {
 }
 
 // walk through a resource block. it's easier since we do not know how the block is made
-// `dest` will be the new "block" with the values inteprolated from `interpolate`
+// `dest` will be the new "block" with the values interpolated from `interpolate`
 func walk(dest, src reflect.Value, interpolate map[string]string, name string, resourceType string) {
 	switch src.Kind() {
 	// it's an interface, so we basically need
