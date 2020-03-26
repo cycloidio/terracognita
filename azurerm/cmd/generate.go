@@ -17,6 +17,7 @@ var azureAPIs = []AzureAPI{
 var functions = []Function{
 	Function{Resource: "VirtualMachine", API: "compute", ResourceGroup: true},
 	Function{Resource: "VirtualNetwork", API: "network", ResourceGroup: true},
+	Function{Resource: "Subnet", API: "network", ResourceGroup: true, ExtraArgs: []string{"virtualNetworkName"}},
 }
 
 func main() {

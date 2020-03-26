@@ -18,6 +18,7 @@ const (
 	ResourceGroup ResourceType = iota
 	VirtualMachine
 	VirtualNetwork
+	Subnet
 )
 
 type rtFn func(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error)
@@ -27,6 +28,7 @@ var (
 		ResourceGroup:  resourceGroup,
 		VirtualMachine: virtualMachines,
 		VirtualNetwork: virtualNetworks,
+		Subnet:         subnets,
 	}
 )
 
@@ -59,6 +61,25 @@ func virtualNetworks(ctx context.Context, a *azurerm, resourceType string, tags 
 	for _, virtualNetwork := range virtualNetworks {
 		r := provider.NewResource(*virtualNetwork.ID, resourceType, a)
 		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func subnets(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	virtualNetworks, err := a.azurer.ListVirtualNetworks(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list virtual networks from reader")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, virtualNetwork := range virtualNetworks {
+		subnets, err := a.azurer.ListSubnets(ctx, *virtualNetwork.Name)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list subnets from reader")
+		}
+		for _, subnet := range subnets {
+			r := provider.NewResource(*subnet.ID, resourceType, a)
+			resources = append(resources, r)
+		}
 	}
 	return resources, nil
 }
