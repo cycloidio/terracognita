@@ -19,16 +19,18 @@ const (
 	VirtualMachine
 	VirtualNetwork
 	Subnet
+	NetworkInterface
 )
 
 type rtFn func(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error)
 
 var (
 	resources = map[ResourceType]rtFn{
-		ResourceGroup:  resourceGroup,
-		VirtualMachine: virtualMachines,
-		VirtualNetwork: virtualNetworks,
-		Subnet:         subnets,
+		ResourceGroup:    resourceGroup,
+		VirtualMachine:   virtualMachines,
+		VirtualNetwork:   virtualNetworks,
+		Subnet:           subnets,
+		NetworkInterface: networkInterfaces,
 	}
 )
 
@@ -80,6 +82,19 @@ func subnets(ctx context.Context, a *azurerm, resourceType string, tags []tag.Ta
 			r := provider.NewResource(*subnet.ID, resourceType, a)
 			resources = append(resources, r)
 		}
+	}
+	return resources, nil
+}
+
+func networkInterfaces(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	networkInterfaces, err := a.azurer.ListInterfaces(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list network interfaces from reader")
+	}
+	resources := make([]provider.Resource, 0, len(networkInterfaces))
+	for _, networkInterface := range networkInterfaces {
+		r := provider.NewResource(*networkInterface.ID, resourceType, a)
+		resources = append(resources, r)
 	}
 	return resources, nil
 }
