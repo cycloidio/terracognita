@@ -35,6 +35,16 @@ var (
 			`,
 		},
 		Function{
+			Entity:  "VpcPeeringConnections",
+			Prefix:  "Describe",
+			Service: "ec2",
+			Documentation: `
+			// GetVpcPeeringConnections returns all VpcPeeringConnections based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		Function{
 			Entity:  "Images",
 			Prefix:  "Describe",
 			Service: "ec2",
@@ -50,6 +60,15 @@ var (
 			FilterByOwner: "Owners",
 			Documentation: `
 			// GetOwnImages returns all EC2 AMI belonging to the Account ID based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "KeyPairs",
+			Prefix:  "Describe",
+			Service: "ec2",
+			Documentation: `
+			// GetKeyPairs returns all KeyPairs based on the input given.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
@@ -204,6 +223,45 @@ var (
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
+		Function{
+			FnName:  "GetLoadBalancersV2Listeners",
+			Entity:  "Listeners",
+			Prefix:  "Describe",
+			Service: "elbv2",
+			Documentation: `
+			// GetLoadBalancersV2Listeners returns a list of Listeners based on the input from the different regions.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:  "GetLoadBalancersV2TargetGroups",
+			Entity:  "TargetGroups",
+			Prefix:  "Describe",
+			Service: "elbv2",
+			Documentation: `
+			// GetLoadBalancersV2TargetGroups returns a list of TargetGroups based on the input from the different regions.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "ListenerCertificates",
+			Prefix:  "Describe",
+			Service: "elbv2",
+			Documentation: `
+			// GetListenerCertificates returns a list of ListenerCertificates based on the input from the different regions.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:  "GetLoadBalancersV2Rules",
+			Entity:  "Rules",
+			Prefix:  "Describe",
+			Service: "elbv2",
+			Documentation: `
+			// GetLoadBalancersV2Rules returns a list of Rules based on the input from the different regions.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
 
 		// rds
 		Function{
@@ -231,6 +289,15 @@ var (
 			Service: "rds",
 			Documentation: `
 			// GetDBParameterGroups returns all DB parameterGroups based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "DBSubnetGroups",
+			Prefix:  "Describe",
+			Service: "rds",
+			Documentation: `
+			// GetDBSubnetGroups returns all DB DBSubnetGroups based on the input given.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},

@@ -9,6 +9,80 @@ import (
 	"github.com/pkg/errors"
 )
 
+func cacheLoadBalancersV2(ctx context.Context, a *aws, rt string, tags []tag.Tag) ([]provider.Resource, error) {
+	rs, err := a.cache.Get(rt)
+	if err != nil {
+		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
+			return nil, errors.WithStack(err)
+		}
+
+		rs, err = albs(ctx, a, rt, tags)
+		if err != nil {
+			return nil, err
+		}
+
+		err = a.cache.Set(rt, rs)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return rs, nil
+}
+
+func getLoadBalancersV2Arns(ctx context.Context, a *aws, rt string, tags []tag.Tag) ([]string, error) {
+	rs, err := cacheLoadBalancersV2(ctx, a, rt, tags)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get the actual needed value
+	// TODO cach this result too
+	names := make([]string, 0, len(rs))
+	for _, i := range rs {
+		names = append(names, i.ID())
+	}
+
+	return names, nil
+}
+
+func cacheLoadBalancersV2Listeners(ctx context.Context, a *aws, rt string, tags []tag.Tag) ([]provider.Resource, error) {
+	rs, err := a.cache.Get(rt)
+	if err != nil {
+		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
+			return nil, errors.WithStack(err)
+		}
+
+		rs, err = albListeners(ctx, a, rt, tags)
+		if err != nil {
+			return nil, err
+		}
+
+		err = a.cache.Set(rt, rs)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return rs, nil
+}
+
+func getLoadBalancersV2ListenersArns(ctx context.Context, a *aws, rt string, tags []tag.Tag) ([]string, error) {
+	rs, err := cacheLoadBalancersV2Listeners(ctx, a, rt, tags)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get the actual needed value
+	// TODO cach this result too
+	names := make([]string, 0, len(rs))
+	for _, i := range rs {
+		names = append(names, i.ID())
+	}
+
+	return names, nil
+}
+
 func cacheIAMGroups(ctx context.Context, a *aws, rt string, tags []tag.Tag) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
 	if err != nil {
