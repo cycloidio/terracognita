@@ -163,7 +163,7 @@ The const is used to generate `aws/resourcetype_enumer.go`.
 3. Add the associated function to generate terraform codes.
 
 ```go
-func dbParameterGroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func dbParameterGroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	dbParameterGroups, err := a.awsr.GetDBParameterGroups(ctx, nil)
 
 	if err != nil {
@@ -302,7 +302,7 @@ You only need to find out if your component belongs to a `project` or a `project
 
 #### Build and test your component
 
-That's it ! You can now generate some code and build your binary: 
+That's it ! You can now generate some code and build your binary:
 
 ```shell
 $ make generate && make build

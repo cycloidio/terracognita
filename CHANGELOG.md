@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Changed
+
+- Provide filters to resource functions instead of tags only
+  ([PR #92](https://github.com/cycloidio/terracognita/pull/92))
+
 ## [0.4.0] _2020-03-31_
 
 ### Added
@@ -14,11 +19,6 @@
   ([Issue #40](https://github.com/cycloidio/terracognita/issues/40))
 - New AzureRM provider
   ([PR #88](https://github.com/cycloidio/terracognita/pull/88))
-
-### Changed
-
-- Provide filters to resource functions instead of tags only
-  ([PR #92](https://github.com/cycloidio/terracognita/pull/92))
 
 ## [0.3.0] _2020-01-02_
 
