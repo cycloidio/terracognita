@@ -21,18 +21,20 @@ const (
 	Subnet
 	NetworkInterface
 	NetworkSecurityGroup
+	VirtualMachineScaleSet
 )
 
 type rtFn func(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error)
 
 var (
 	resources = map[ResourceType]rtFn{
-		ResourceGroup:        resourceGroup,
-		VirtualMachine:       virtualMachines,
-		VirtualNetwork:       virtualNetworks,
-		Subnet:               subnets,
-		NetworkInterface:     networkInterfaces,
-		NetworkSecurityGroup: networkSecurityGroups,
+		ResourceGroup:          resourceGroup,
+		VirtualMachine:         virtualMachines,
+		VirtualNetwork:         virtualNetworks,
+		Subnet:                 subnets,
+		NetworkInterface:       networkInterfaces,
+		NetworkSecurityGroup:   networkSecurityGroups,
+		VirtualMachineScaleSet: virtualMachineScaleSets,
 	}
 )
 
@@ -109,6 +111,19 @@ func networkSecurityGroups(ctx context.Context, a *azurerm, resourceType string,
 	resources := make([]provider.Resource, 0, len(securityGroups))
 	for _, securityGroup := range securityGroups {
 		r := provider.NewResource(*securityGroup.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func virtualMachineScaleSets(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+	virtualMachineScaleSets, err := a.azurer.ListVirtualMachineScaleSets(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list virtual machines scale sets from reader")
+	}
+	resources := make([]provider.Resource, 0, len(virtualMachineScaleSets))
+	for _, virtualMachineScaleSet := range virtualMachineScaleSets {
+		r := provider.NewResource(*virtualMachineScaleSet.ID, resourceType, a)
 		resources = append(resources, r)
 	}
 	return resources, nil
