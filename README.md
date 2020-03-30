@@ -11,11 +11,12 @@ We decided to opensource this tool as we believe that it will help people to ado
 
 ## Cloud providers
 
-Terracognita currently imports AWS and GCP cloud provider as terraform (0.12.7) resource/state.
+Terracognita currently imports AWS, GCP and AzureRM cloud provider as terraform (0.12.8) resource/state.
 Please see the following versions as follow:
 
 Providers:
  * AWS: 2.31.0
+ * AzureRM: 1.35.0
  * GCP: 2.16.0
 
 ## Installation
