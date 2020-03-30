@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 	tfazurerm "github.com/terraform-providers/terraform-provider-azurerm/azurerm"
 
+	"github.com/cycloidio/terracognita/cache"
 	"github.com/cycloidio/terracognita/filter"
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/provider"
@@ -19,6 +20,8 @@ type azurerm struct {
 	tfAzureRMClient interface{}
 	tfProvider      *schema.Provider
 	azurer          *AzureReader
+
+	cache cache.Cache
 }
 
 // NewProvider returns a AzureRM Provider
@@ -52,6 +55,7 @@ func NewProvider(ctx context.Context, clientID, clientSecret, environment, resou
 		tfAzureRMClient: tfp.Meta(),
 		tfProvider:      tfp,
 		azurer:          reader,
+		cache:           cache.New(),
 	}, nil
 }
 

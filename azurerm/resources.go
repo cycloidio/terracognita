@@ -30,7 +30,7 @@ var (
 	resources = map[ResourceType]rtFn{
 		ResourceGroup:          resourceGroup,
 		VirtualMachine:         virtualMachines,
-		VirtualNetwork:         virtualNetworks,
+		VirtualNetwork:         cacheVirtualNetworks,
 		Subnet:                 subnets,
 		NetworkInterface:       networkInterfaces,
 		NetworkSecurityGroup:   networkSecurityGroups,
@@ -66,19 +66,24 @@ func virtualNetworks(ctx context.Context, a *azurerm, resourceType string, tags 
 	resources := make([]provider.Resource, 0, len(virtualNetworks))
 	for _, virtualNetwork := range virtualNetworks {
 		r := provider.NewResource(*virtualNetwork.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
+		if err := r.Data().Set("name", *virtualNetwork.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the virtual network '%s'", *virtualNetwork.Name)
+		}
 		resources = append(resources, r)
 	}
 	return resources, nil
 }
 
 func subnets(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	virtualNetworks, err := a.azurer.ListVirtualNetworks(ctx)
+	virtualNetworkNames, err := getVirtualNetworkNames(ctx, a, resourceType, tags)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to list virtual networks from reader")
+		return nil, errors.Wrap(err, "unable to list virtual networks from cache")
 	}
 	resources := make([]provider.Resource, 0)
-	for _, virtualNetwork := range virtualNetworks {
-		subnets, err := a.azurer.ListSubnets(ctx, *virtualNetwork.Name)
+	for _, virtualNetworkName := range virtualNetworkNames {
+		subnets, err := a.azurer.ListSubnets(ctx, virtualNetworkName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list subnets from reader")
 		}
