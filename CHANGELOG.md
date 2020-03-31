@@ -10,6 +10,8 @@
   ([PR #78](https://github.com/cycloidio/terracognita/pull/78))
 - New flag `--target` to allow specific resource+id import
   ([Issue #40](https://github.com/cycloidio/terracognita/issues/40))
+- New AzureRM provider
+  ([PR #88](https://github.com/cycloidio/terracognita/pull/88))
 
 ## [0.3.0] _2020-01-02_
 

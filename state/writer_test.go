@@ -161,7 +161,7 @@ func TestSync(t *testing.T) {
       }
    ],
    "serial":0,
-   "terraform_version":"0.12.7",
+   "terraform_version":"0.12.8",
    "version":4
 }`
 		)
