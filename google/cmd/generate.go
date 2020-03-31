@@ -10,22 +10,22 @@ import (
 )
 
 var functions = []Function{
-	Function{Resource: "Instance", Zone: true},
-	Function{Resource: "Firewall", Zone: false},
-	Function{Resource: "Network", Zone: false},
-	Function{Resource: "InstanceGroup", Zone: true},
 	Function{Resource: "BackendService", Zone: false},
-	Function{Resource: "HealthCheck", Zone: false},
-	Function{Resource: "UrlMap", Zone: false, Name: "URLMaps"},
-	Function{Resource: "TargetHttpProxy", Zone: false, Name: "TargetHTTPProxies", ServiceName: "TargetHttpProxies"},
-	Function{Resource: "TargetHttpsProxy", Zone: false, Name: "TargetHTTPSProxies", ServiceName: "TargetHttpsProxies"},
-	Function{Resource: "SslCertificate", Zone: false, Name: "SSLCertificates"},
-	Function{Resource: "ForwardingRule", Zone: false, Name: "GlobalForwardingRules", ServiceName: "GlobalForwardingRules"},
-	Function{Resource: "ForwardingRule", Region: true},
-	Function{Resource: "Disk", Zone: true},
 	Function{Resource: "Bucket", NoFilter: true, API: "storage", ResourceList: "Buckets"},
 	Function{Resource: "DatabaseInstance", Name: "StorageInstances", API: "sqladmin", ResourceList: "InstancesListResponse", ServiceName: "Instances"},
+	Function{Resource: "Disk", Zone: true},
+	Function{Resource: "Firewall", Zone: false},
+	Function{Resource: "ForwardingRule", Zone: false, Name: "GlobalForwardingRules", ServiceName: "GlobalForwardingRules"},
+	Function{Resource: "ForwardingRule", Region: true},
+	Function{Resource: "HealthCheck", Zone: false},
+	Function{Resource: "Instance", Zone: true},
+	Function{Resource: "InstanceGroup", Zone: true},
 	Function{Resource: "ManagedZone", API: "dns", ResourceList: "ManagedZonesListResponse", NoFilter: true, ItemName: "ManagedZones"},
+	Function{Resource: "Network", Zone: false},
+	Function{Resource: "SslCertificate", Zone: false, Name: "SSLCertificates"},
+	Function{Resource: "TargetHttpProxy", Zone: false, Name: "TargetHTTPProxies", ServiceName: "TargetHttpProxies"},
+	Function{Resource: "TargetHttpsProxy", Zone: false, Name: "TargetHTTPSProxies", ServiceName: "TargetHttpsProxies"},
+	Function{Resource: "UrlMap", Zone: false, Name: "URLMaps"},
 }
 
 func main() {
