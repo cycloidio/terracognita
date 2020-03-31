@@ -11,6 +11,7 @@ import (
 
 var functions = []Function{
 	Function{Resource: "BackendService", Zone: false},
+	Function{Resource: "BackendBucket"},
 	Function{Resource: "Bucket", NoFilter: true, API: "storage", ResourceList: "Buckets"},
 	Function{Resource: "DatabaseInstance", Name: "StorageInstances", API: "sqladmin", ResourceList: "InstancesListResponse", ServiceName: "Instances"},
 	Function{Resource: "Disk", Zone: true},
