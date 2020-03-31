@@ -34,6 +34,28 @@ func (r *GCPReader) ListBackendServices(ctx context.Context, filter string) ([]c
 
 }
 
+// ListBackendBuckets returns a list of BackendBuckets within a project
+func (r *GCPReader) ListBackendBuckets(ctx context.Context, filter string) ([]compute.BackendBucket, error) {
+	service := compute.NewBackendBucketsService(r.compute)
+
+	resources := make([]compute.BackendBucket, 0)
+
+	if err := service.List(r.project).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.BackendBucketList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		}); err != nil {
+		return nil, errors.Wrap(err, "unable to list compute BackendBucket from google APIs")
+	}
+
+	return resources, nil
+
+}
+
 // ListBuckets returns a list of Buckets within a project
 func (r *GCPReader) ListBuckets(ctx context.Context) ([]storage.Bucket, error) {
 	service := storage.NewBucketsService(r.storage)
