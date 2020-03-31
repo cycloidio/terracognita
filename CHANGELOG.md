@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.4.0] _2020-03-31_
+
 ### Added
 
 - aws resources: `aws_db_subnet_group`, `aws_key_pair`, `aws_vpc_peering_connection`, `aws_alb_target_group`, `aws_alb_listener`, `aws_alb_listener_rule`
