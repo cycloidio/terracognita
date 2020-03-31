@@ -26,6 +26,7 @@ const (
 	// * frontend configuration: target_http(s)_proxy + global_forwarding_rule
 	ComputeHealthCheck
 	ComputeInstanceGroup
+	ComputeBackendBucket
 	ComputeBackendService
 	ComputeSSLCertificate
 	ComputeTargetHTTPProxy
@@ -50,6 +51,7 @@ var (
 		ComputeHealthCheck:          computeHealthCheck,
 		ComputeInstanceGroup:        computeInstanceGroup,
 		ComputeBackendService:       computeBackendService,
+		ComputeBackendBucket:        computeBackendBucket,
 		ComputeSSLCertificate:       computeSSLCertificate,
 		ComputeTargetHTTPProxy:      computeTargetHTTPProxy,
 		ComputeTargetHTTPSProxy:     computeTargetHTTPSProxy,
@@ -320,6 +322,20 @@ func recordSetDNS(ctx context.Context, g *google, resourceType string, filters *
 			r := provider.NewResource(fmt.Sprintf("%s/%s/%s", z, rrset.Name, rrset.Type), resourceType, g)
 			resources = append(resources, r)
 		}
+	}
+	return resources, nil
+}
+
+func computeBackendBucket(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	f := initializeFilter(filters)
+	backends, err := g.gcpr.ListBackendBuckets(ctx, f)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list backend buckets from reader")
+	}
+	resources := make([]provider.Resource, 0, len(backends))
+	for _, backend := range backends {
+		r := provider.NewResource(backend.Name, resourceType, g)
+		resources = append(resources, r)
 	}
 	return resources, nil
 }
