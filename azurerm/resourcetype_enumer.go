@@ -19,36 +19,23 @@ func (i ResourceType) String() string {
 	return _ResourceTypeName[_ResourceTypeIndex[i]:_ResourceTypeIndex[i+1]]
 }
 
-// An "invalid array index" compiler error signifies that the constant values have changed.
-// Re-run the stringer command to generate them again.
-func _ResourceTypeNoOp() {
-	var x [1]struct{}
-	_ = x[ResourceGroup-(0)]
-	_ = x[VirtualMachine-(1)]
-	_ = x[VirtualNetwork-(2)]
-	_ = x[Subnet-(3)]
-	_ = x[NetworkInterface-(4)]
-	_ = x[NetworkSecurityGroup-(5)]
-	_ = x[VirtualMachineScaleSet-(6)]
-}
-
-var _ResourceTypeValues = []ResourceType{ResourceGroup, VirtualMachine, VirtualNetwork, Subnet, NetworkInterface, NetworkSecurityGroup, VirtualMachineScaleSet}
+var _ResourceTypeValues = []ResourceType{0, 1, 2, 3, 4, 5, 6}
 
 var _ResourceTypeNameToValueMap = map[string]ResourceType{
-	_ResourceTypeName[0:22]:         ResourceGroup,
-	_ResourceTypeLowerName[0:22]:    ResourceGroup,
-	_ResourceTypeName[22:45]:        VirtualMachine,
-	_ResourceTypeLowerName[22:45]:   VirtualMachine,
-	_ResourceTypeName[45:68]:        VirtualNetwork,
-	_ResourceTypeLowerName[45:68]:   VirtualNetwork,
-	_ResourceTypeName[68:82]:        Subnet,
-	_ResourceTypeLowerName[68:82]:   Subnet,
-	_ResourceTypeName[82:107]:       NetworkInterface,
-	_ResourceTypeLowerName[82:107]:  NetworkInterface,
-	_ResourceTypeName[107:137]:      NetworkSecurityGroup,
-	_ResourceTypeLowerName[107:137]: NetworkSecurityGroup,
-	_ResourceTypeName[137:170]:      VirtualMachineScaleSet,
-	_ResourceTypeLowerName[137:170]: VirtualMachineScaleSet,
+	_ResourceTypeName[0:22]:         0,
+	_ResourceTypeLowerName[0:22]:    0,
+	_ResourceTypeName[22:45]:        1,
+	_ResourceTypeLowerName[22:45]:   1,
+	_ResourceTypeName[45:68]:        2,
+	_ResourceTypeLowerName[45:68]:   2,
+	_ResourceTypeName[68:82]:        3,
+	_ResourceTypeLowerName[68:82]:   3,
+	_ResourceTypeName[82:107]:       4,
+	_ResourceTypeLowerName[82:107]:  4,
+	_ResourceTypeName[107:137]:      5,
+	_ResourceTypeLowerName[107:137]: 5,
+	_ResourceTypeName[137:170]:      6,
+	_ResourceTypeLowerName[137:170]: 6,
 }
 
 var _ResourceTypeNames = []string{
