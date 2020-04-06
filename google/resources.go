@@ -7,8 +7,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/cycloidio/terracognita/filter"
 	"github.com/cycloidio/terracognita/provider"
-	"github.com/cycloidio/terracognita/tag"
 )
 
 // ResourceType is the type used to define all the Resources
@@ -40,7 +40,7 @@ const (
 	SQLDatabaseInstance
 )
 
-type rtFn func(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error)
+type rtFn func(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error)
 
 var (
 	resources = map[ResourceType]rtFn{
@@ -64,17 +64,17 @@ var (
 	}
 )
 
-func initializeFilter(tags []tag.Tag) string {
+func initializeFilter(filters *filter.Filter) string {
 	var b bytes.Buffer
-	for _, t := range tags {
+	for _, t := range filters.Tags {
 		// if multiple tags, we suppose it's a "AND" operation
 		b.WriteString(fmt.Sprintf("(labels.%s=%s) ", t.Name, t.Value))
 	}
 	return b.String()
 }
 
-func computeInstance(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	f := initializeFilter(tags)
+func computeInstance(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	f := initializeFilter(filters)
 	instancesList, err := g.gcpr.ListInstances(ctx, f)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list instances from reader")
@@ -89,8 +89,8 @@ func computeInstance(ctx context.Context, g *google, resourceType string, tags [
 	return resources, nil
 }
 
-func computeFirewall(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	f := initializeFilter(tags)
+func computeFirewall(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	f := initializeFilter(filters)
 	firewalls, err := g.gcpr.ListFirewalls(ctx, f)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list firewalls from reader")
@@ -103,8 +103,8 @@ func computeFirewall(ctx context.Context, g *google, resourceType string, tags [
 	return resources, nil
 }
 
-func computeNetwork(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	f := initializeFilter(tags)
+func computeNetwork(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	f := initializeFilter(filters)
 	networks, err := g.gcpr.ListNetworks(ctx, f)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list networks from reader")
@@ -117,8 +117,8 @@ func computeNetwork(ctx context.Context, g *google, resourceType string, tags []
 	return resources, nil
 }
 
-func computeHealthCheck(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	f := initializeFilter(tags)
+func computeHealthCheck(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	f := initializeFilter(filters)
 	checks, err := g.gcpr.ListHealthChecks(ctx, f)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list health checks from reader")
@@ -131,8 +131,8 @@ func computeHealthCheck(ctx context.Context, g *google, resourceType string, tag
 	return resources, nil
 }
 
-func computeInstanceGroup(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	f := initializeFilter(tags)
+func computeInstanceGroup(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	f := initializeFilter(filters)
 	instanceGroups, err := g.gcpr.ListInstanceGroups(ctx, f)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list instance groups from reader")
@@ -147,8 +147,8 @@ func computeInstanceGroup(ctx context.Context, g *google, resourceType string, t
 	return resources, nil
 }
 
-func computeBackendService(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	f := initializeFilter(tags)
+func computeBackendService(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	f := initializeFilter(filters)
 	backends, err := g.gcpr.ListBackendServices(ctx, f)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list backend services from reader")
@@ -161,8 +161,8 @@ func computeBackendService(ctx context.Context, g *google, resourceType string, 
 	return resources, nil
 }
 
-func computeURLMap(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	f := initializeFilter(tags)
+func computeURLMap(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	f := initializeFilter(filters)
 	maps, err := g.gcpr.ListURLMaps(ctx, f)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list URL maps from reader")
@@ -175,8 +175,8 @@ func computeURLMap(ctx context.Context, g *google, resourceType string, tags []t
 	return resources, nil
 }
 
-func computeTargetHTTPProxy(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	f := initializeFilter(tags)
+func computeTargetHTTPProxy(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	f := initializeFilter(filters)
 	targets, err := g.gcpr.ListTargetHTTPProxies(ctx, f)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list target http proxies from reader")
@@ -189,8 +189,8 @@ func computeTargetHTTPProxy(ctx context.Context, g *google, resourceType string,
 	return resources, nil
 }
 
-func computeTargetHTTPSProxy(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	f := initializeFilter(tags)
+func computeTargetHTTPSProxy(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	f := initializeFilter(filters)
 	targets, err := g.gcpr.ListTargetHTTPSProxies(ctx, f)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list target https proxies from reader")
@@ -203,8 +203,8 @@ func computeTargetHTTPSProxy(ctx context.Context, g *google, resourceType string
 	return resources, nil
 }
 
-func computeSSLCertificate(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	f := initializeFilter(tags)
+func computeSSLCertificate(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	f := initializeFilter(filters)
 	certs, err := g.gcpr.ListSSLCertificates(ctx, f)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list SSL certificates from reader")
@@ -217,8 +217,8 @@ func computeSSLCertificate(ctx context.Context, g *google, resourceType string, 
 	return resources, nil
 }
 
-func computeGlobalForwardingRule(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	f := initializeFilter(tags)
+func computeGlobalForwardingRule(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	f := initializeFilter(filters)
 	rules, err := g.gcpr.ListGlobalForwardingRules(ctx, f)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list global forwarding rules from reader")
@@ -231,8 +231,8 @@ func computeGlobalForwardingRule(ctx context.Context, g *google, resourceType st
 	return resources, nil
 }
 
-func computeForwardingRule(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	f := initializeFilter(tags)
+func computeForwardingRule(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	f := initializeFilter(filters)
 	rules, err := g.gcpr.ListForwardingRules(ctx, f)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list global forwarding rules from reader")
@@ -245,8 +245,8 @@ func computeForwardingRule(ctx context.Context, g *google, resourceType string, 
 	return resources, nil
 }
 
-func computeDisk(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	f := initializeFilter(tags)
+func computeDisk(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	f := initializeFilter(filters)
 	disksList, err := g.gcpr.ListDisks(ctx, f)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list disks from reader")
@@ -261,7 +261,7 @@ func computeDisk(ctx context.Context, g *google, resourceType string, tags []tag
 	return resources, nil
 }
 
-func storageBucket(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func storageBucket(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	rules, err := g.gcpr.ListBuckets(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list global forwarding rules from reader")
@@ -274,8 +274,8 @@ func storageBucket(ctx context.Context, g *google, resourceType string, tags []t
 	return resources, nil
 }
 
-func sqlDatabaseInstance(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	f := initializeFilter(tags)
+func sqlDatabaseInstance(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	f := initializeFilter(filters)
 	instances, err := g.gcpr.ListStorageInstances(ctx, f)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list sql storage instances rules from reader")
@@ -288,7 +288,7 @@ func sqlDatabaseInstance(ctx context.Context, g *google, resourceType string, ta
 	return resources, nil
 }
 
-func managedZoneDNS(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func managedZoneDNS(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	zones, err := g.gcpr.ListManagedZones(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list DNS managed zone from reader")
@@ -301,8 +301,8 @@ func managedZoneDNS(ctx context.Context, g *google, resourceType string, tags []
 	return resources, nil
 }
 
-func recordSetDNS(ctx context.Context, g *google, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	managedZones, err := managedZoneDNS(ctx, g, resourceType, tags)
+func recordSetDNS(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	managedZones, err := managedZoneDNS(ctx, g, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to previously fetch managed zones")
 	}
