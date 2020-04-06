@@ -5,8 +5,8 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/cycloidio/terracognita/filter"
 	"github.com/cycloidio/terracognita/provider"
-	"github.com/cycloidio/terracognita/tag"
 )
 
 // ResourceType is the type used to define all the Resources
@@ -24,7 +24,7 @@ const (
 	VirtualMachineScaleSet
 )
 
-type rtFn func(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error)
+type rtFn func(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error)
 
 var (
 	resources = map[ResourceType]rtFn{
@@ -38,14 +38,14 @@ var (
 	}
 )
 
-func resourceGroup(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func resourceGroup(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	resourceGroup := a.azurer.GetResourceGroup()
 	r := provider.NewResource(*resourceGroup.ID, resourceType, a)
 	resources := []provider.Resource{r}
 	return resources, nil
 }
 
-func virtualMachines(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func virtualMachines(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	virtualMachines, err := a.azurer.ListVirtualMachines(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual machines from reader")
@@ -58,7 +58,7 @@ func virtualMachines(ctx context.Context, a *azurerm, resourceType string, tags 
 	return resources, nil
 }
 
-func virtualNetworks(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func virtualNetworks(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	virtualNetworks, err := a.azurer.ListVirtualNetworks(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual networks from reader")
@@ -76,8 +76,8 @@ func virtualNetworks(ctx context.Context, a *azurerm, resourceType string, tags 
 	return resources, nil
 }
 
-func subnets(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	virtualNetworkNames, err := getVirtualNetworkNames(ctx, a, resourceType, tags)
+func subnets(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	virtualNetworkNames, err := getVirtualNetworkNames(ctx, a, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual networks from cache")
 	}
@@ -95,7 +95,7 @@ func subnets(ctx context.Context, a *azurerm, resourceType string, tags []tag.Ta
 	return resources, nil
 }
 
-func networkInterfaces(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func networkInterfaces(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	networkInterfaces, err := a.azurer.ListInterfaces(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list network interfaces from reader")
@@ -108,7 +108,7 @@ func networkInterfaces(ctx context.Context, a *azurerm, resourceType string, tag
 	return resources, nil
 }
 
-func networkSecurityGroups(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func networkSecurityGroups(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	securityGroups, err := a.azurer.ListSecurityGroups(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list network security groups from reader")
@@ -121,7 +121,7 @@ func networkSecurityGroups(ctx context.Context, a *azurerm, resourceType string,
 	return resources, nil
 }
 
-func virtualMachineScaleSets(ctx context.Context, a *azurerm, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func virtualMachineScaleSets(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	virtualMachineScaleSets, err := a.azurer.ListVirtualMachineScaleSets(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual machines scale sets from reader")
