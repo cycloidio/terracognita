@@ -1,9 +1,9 @@
 #
 # Default variables that shouldn't be changed except if needed
 #
-project: ($ project $)
-env: ($ environment $)
-customer: ($ organization_canonical $)
+project: terracognita
+env: master
+customer: cycloid-owl
 
 base-context: cycloid-ci
 ci-context: terracognita
