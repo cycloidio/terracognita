@@ -4,19 +4,19 @@ import (
 	"context"
 
 	"github.com/cycloidio/terracognita/errcode"
+	"github.com/cycloidio/terracognita/filter"
 	"github.com/cycloidio/terracognita/provider"
-	"github.com/cycloidio/terracognita/tag"
 	"github.com/pkg/errors"
 )
 
-func cacheVirtualNetworks(ctx context.Context, a *azurerm, rt string, tags []tag.Tag) ([]provider.Resource, error) {
+func cacheVirtualNetworks(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
 	if err != nil {
 		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
 			return nil, errors.WithStack(err)
 		}
 
-		rs, err = virtualNetworks(ctx, a, rt, tags)
+		rs, err = virtualNetworks(ctx, a, rt, filters)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to get virtual networks")
 		}
@@ -30,8 +30,8 @@ func cacheVirtualNetworks(ctx context.Context, a *azurerm, rt string, tags []tag
 	return rs, nil
 }
 
-func getVirtualNetworkNames(ctx context.Context, a *azurerm, rt string, tags []tag.Tag) ([]string, error) {
-	rs, err := cacheVirtualNetworks(ctx, a, rt, tags)
+func getVirtualNetworkNames(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]string, error) {
+	rs, err := cacheVirtualNetworks(ctx, a, rt, filters)
 	if err != nil {
 		return nil, err
 	}

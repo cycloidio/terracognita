@@ -74,7 +74,7 @@ func (g *google) Resources(ctx context.Context, t string, f *filter.Filter) ([]p
 		return nil, errors.Errorf("the resource %q it's not implemented", t)
 	}
 
-	resources, err := rfn(ctx, g, t, f.Tags)
+	resources, err := rfn(ctx, g, t, f)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error while reading from resource %q", t)
 	}

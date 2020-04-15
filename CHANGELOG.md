@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Changed
+
+- Provide filters to resource functions instead of tags only
+  ([PR #92](https://github.com/cycloidio/terracognita/pull/92))
+
 ## [0.4.0] _2020-03-31_
 
 ### Added

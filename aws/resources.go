@@ -11,8 +11,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/route53"
 	"github.com/aws/aws-sdk-go/service/ses"
+	"github.com/cycloidio/terracognita/filter"
 	"github.com/cycloidio/terracognita/provider"
-	"github.com/cycloidio/terracognita/tag"
 )
 
 // ResourceType is the type used to define all the Resources
@@ -105,7 +105,7 @@ const (
 	AutoscalingPolicy
 )
 
-type rtFn func(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error)
+type rtFn func(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error)
 
 var (
 	resources = map[ResourceType]rtFn{
@@ -184,9 +184,9 @@ func initializeResource(a *aws, ID, t string) (provider.Resource, error) {
 	return provider.NewResource(ID, t, a), nil
 }
 
-func instances(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func instances(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	var input = &ec2.DescribeInstancesInput{
-		Filters: toEC2Filters(tags),
+		Filters: toEC2Filters(filters),
 	}
 
 	instances, err := a.awsr.GetInstances(ctx, input)
@@ -208,9 +208,9 @@ func instances(ctx context.Context, a *aws, resourceType string, tags []tag.Tag)
 	return resources, nil
 }
 
-func vpcs(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func vpcs(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	var input = &ec2.DescribeVpcsInput{
-		Filters: toEC2Filters(tags),
+		Filters: toEC2Filters(filters),
 	}
 
 	vpcs, err := a.awsr.GetVpcs(ctx, input)
@@ -230,9 +230,9 @@ func vpcs(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]p
 	return resources, nil
 }
 
-//func amis(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+//func amis(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 //var input = &ec2.DescribeImagesInput{
-//Filters: toEC2Filters(tags),
+//Filters: toEC2Filters(filters),
 //}
 
 //images, err := a.awsr.GetOwnImages(ctx, input)
@@ -252,8 +252,12 @@ func vpcs(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]p
 //return resources, nil
 //}
 
-func vpcPeeringConnections(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	vpcPeeringConnections, err := a.awsr.GetVpcPeeringConnections(ctx, nil)
+func vpcPeeringConnections(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	var input = &ec2.DescribeVpcPeeringConnectionsInput{
+		Filters: toEC2Filters(filters),
+	}
+
+	vpcPeeringConnections, err := a.awsr.GetVpcPeeringConnections(ctx, input)
 
 	if err != nil {
 		return nil, err
@@ -273,8 +277,12 @@ func vpcPeeringConnections(ctx context.Context, a *aws, resourceType string, tag
 	return resources, nil
 }
 
-func keyPairs(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	keyPairs, err := a.awsr.GetKeyPairs(ctx, nil)
+func keyPairs(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	var input = &ec2.DescribeKeyPairsInput{
+		Filters: toEC2Filters(filters),
+	}
+
+	keyPairs, err := a.awsr.GetKeyPairs(ctx, input)
 
 	if err != nil {
 		return nil, err
@@ -294,9 +302,9 @@ func keyPairs(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) 
 	return resources, nil
 }
 
-func securityGroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func securityGroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	var input = &ec2.DescribeSecurityGroupsInput{
-		Filters: toEC2Filters(tags),
+		Filters: toEC2Filters(filters),
 	}
 
 	sgs, err := a.awsr.GetSecurityGroups(ctx, input)
@@ -316,9 +324,9 @@ func securityGroups(ctx context.Context, a *aws, resourceType string, tags []tag
 	return resources, nil
 }
 
-func subnets(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func subnets(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	var input = &ec2.DescribeSubnetsInput{
-		Filters: toEC2Filters(tags),
+		Filters: toEC2Filters(filters),
 	}
 
 	subnets, err := a.awsr.GetSubnets(ctx, input)
@@ -338,9 +346,9 @@ func subnets(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) (
 	return resources, nil
 }
 
-func ebsVolumes(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func ebsVolumes(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	var input = &ec2.DescribeVolumesInput{
-		Filters: toEC2Filters(tags),
+		Filters: toEC2Filters(filters),
 	}
 
 	volumes, err := a.awsr.GetVolumes(ctx, input)
@@ -360,9 +368,9 @@ func ebsVolumes(ctx context.Context, a *aws, resourceType string, tags []tag.Tag
 	return resources, nil
 }
 
-//func ebsSnapshots(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+//func ebsSnapshots(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 //var input = &ec2.DescribeSnapshotsInput{
-//Filters: toEC2Filters(tags),
+//Filters: toEC2Filters(filters),
 //}
 
 //snapshots, err := a.awsr.GetOwnSnapshots(ctx, input)
@@ -382,7 +390,7 @@ func ebsVolumes(ctx context.Context, a *aws, resourceType string, tags []tag.Tag
 //return resources, nil
 //}
 
-func elasticacheClusters(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func elasticacheClusters(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	cacheClusters, err := a.awsr.GetElastiCacheClusters(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -400,7 +408,7 @@ func elasticacheClusters(ctx context.Context, a *aws, resourceType string, tags 
 	return resources, nil
 }
 
-func elbs(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func elbs(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	lbs, err := a.awsr.GetLoadBalancers(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -418,7 +426,7 @@ func elbs(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]p
 	return resources, nil
 }
 
-func albs(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func albs(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	lbs, err := a.awsr.GetLoadBalancersV2(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -436,9 +444,8 @@ func albs(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]p
 	return resources, nil
 }
 
-func albListeners(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-
-	ALBArns, err := getLoadBalancersV2Arns(ctx, a, ALB.String(), tags)
+func albListeners(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	ALBArns, err := getLoadBalancersV2Arns(ctx, a, ALB.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -467,9 +474,8 @@ func albListeners(ctx context.Context, a *aws, resourceType string, tags []tag.T
 	return resources, nil
 }
 
-func albListenerRules(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-
-	ALBListeners, err := getLoadBalancersV2ListenersArns(ctx, a, ALBListener.String(), tags)
+func albListenerRules(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	ALBListeners, err := getLoadBalancersV2ListenersArns(ctx, a, ALBListener.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -502,9 +508,8 @@ func albListenerRules(ctx context.Context, a *aws, resourceType string, tags []t
 	return resources, nil
 }
 
-func albListenerCertificates(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-
-	ALBListeners, err := getLoadBalancersV2ListenersArns(ctx, a, ALBListener.String(), tags)
+func albListenerCertificates(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	ALBListeners, err := getLoadBalancersV2ListenersArns(ctx, a, ALBListener.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -541,7 +546,7 @@ func albListenerCertificates(ctx context.Context, a *aws, resourceType string, t
 	//return resources, nil
 }
 
-func albTargetGroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func albTargetGroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	albTargetGroups, err := a.awsr.GetLoadBalancersV2TargetGroups(ctx, nil)
 
 	if err != nil {
@@ -562,7 +567,7 @@ func albTargetGroups(ctx context.Context, a *aws, resourceType string, tags []ta
 	return resources, nil
 }
 
-func dbInstances(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func dbInstances(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	dbs, err := a.awsr.GetDBInstances(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -580,7 +585,7 @@ func dbInstances(ctx context.Context, a *aws, resourceType string, tags []tag.Ta
 	return resources, nil
 }
 
-func dbParameterGroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func dbParameterGroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	dbParameterGroups, err := a.awsr.GetDBParameterGroups(ctx, nil)
 
 	if err != nil {
@@ -601,7 +606,7 @@ func dbParameterGroups(ctx context.Context, a *aws, resourceType string, tags []
 	return resources, nil
 }
 
-func dbSubnetGroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func dbSubnetGroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	dbSubnetGroups, err := a.awsr.GetDBSubnetGroups(ctx, nil)
 
 	if err != nil {
@@ -622,7 +627,7 @@ func dbSubnetGroups(ctx context.Context, a *aws, resourceType string, tags []tag
 	return resources, nil
 }
 
-func s3Buckets(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func s3Buckets(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	buckets, err := a.awsr.ListBuckets(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -640,7 +645,7 @@ func s3Buckets(ctx context.Context, a *aws, resourceType string, tags []tag.Tag)
 	return resources, nil
 }
 
-func cloudfrontDistributions(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func cloudfrontDistributions(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	distributions, err := a.awsr.GetCloudFrontDistributions(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -658,7 +663,7 @@ func cloudfrontDistributions(ctx context.Context, a *aws, resourceType string, t
 	return resources, nil
 }
 
-func cloudfrontOriginAccessIdentities(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func cloudfrontOriginAccessIdentities(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	identitys, err := a.awsr.GetCloudFrontOriginAccessIdentities(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -676,7 +681,7 @@ func cloudfrontOriginAccessIdentities(ctx context.Context, a *aws, resourceType 
 	return resources, nil
 }
 
-func cloudfrontPublicKeys(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func cloudfrontPublicKeys(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	publicKeys, err := a.awsr.GetCloudFrontPublicKeys(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -694,7 +699,7 @@ func cloudfrontPublicKeys(ctx context.Context, a *aws, resourceType string, tags
 	return resources, nil
 }
 
-func cloudwatchMetricAlarms(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func cloudwatchMetricAlarms(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	alarms, err := a.awsr.GetAlarms(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -713,10 +718,9 @@ func cloudwatchMetricAlarms(ctx context.Context, a *aws, resourceType string, ta
 	return resources, nil
 }
 
-func iamAccessKeys(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-
+func iamAccessKeys(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	// Get the users list
-	userNames, err := getIAMUserNames(ctx, a, IAMUser.String(), tags)
+	userNames, err := getIAMUserNames(ctx, a, IAMUser.String(), filters)
 	if err != nil {
 		return nil, err
 	}
@@ -746,7 +750,7 @@ func iamAccessKeys(ctx context.Context, a *aws, resourceType string, tags []tag.
 	return resources, nil
 }
 
-func iamAccountAliases(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func iamAccountAliases(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	accountAliases, err := a.awsr.GetAccountAliases(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -764,7 +768,7 @@ func iamAccountAliases(ctx context.Context, a *aws, resourceType string, tags []
 	return resources, nil
 }
 
-func iamAccountPasswordPolicy(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func iamAccountPasswordPolicy(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	// As it's for the full account we'll tell TF to fetch it directly with a "" id
 	r, err := initializeResource(a, "iam-account-password-policy", resourceType)
 	if err != nil {
@@ -773,7 +777,7 @@ func iamAccountPasswordPolicy(ctx context.Context, a *aws, resourceType string, 
 	return []provider.Resource{r}, nil
 }
 
-func iamGroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func iamGroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	groups, err := a.awsr.GetGroups(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -791,8 +795,8 @@ func iamGroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag)
 	return resources, nil
 }
 
-func iamGroupMemberships(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	groupNames, err := getIAMGroupNames(ctx, a, IAMGroup.String(), tags)
+func iamGroupMemberships(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	groupNames, err := getIAMGroupNames(ctx, a, IAMGroup.String(), filters)
 	if err != nil {
 		return nil, err
 	}
@@ -813,8 +817,8 @@ func iamGroupMemberships(ctx context.Context, a *aws, resourceType string, tags 
 	return resources, nil
 }
 
-func iamGroupPolicies(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	groupNames, err := getIAMGroupNames(ctx, a, IAMGroup.String(), tags)
+func iamGroupPolicies(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	groupNames, err := getIAMGroupNames(ctx, a, IAMGroup.String(), filters)
 	if err != nil {
 		return nil, err
 	}
@@ -843,8 +847,8 @@ func iamGroupPolicies(ctx context.Context, a *aws, resourceType string, tags []t
 	return resources, nil
 }
 
-func iamGroupPolicyAttachments(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	groupNames, err := getIAMGroupNames(ctx, a, IAMGroup.String(), tags)
+func iamGroupPolicyAttachments(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	groupNames, err := getIAMGroupNames(ctx, a, IAMGroup.String(), filters)
 	if err != nil {
 		return nil, err
 	}
@@ -871,7 +875,7 @@ func iamGroupPolicyAttachments(ctx context.Context, a *aws, resourceType string,
 	return resources, nil
 }
 
-func iamInstanceProfiles(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func iamInstanceProfiles(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	instanceProfiles, err := a.awsr.GetInstanceProfiles(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -889,7 +893,7 @@ func iamInstanceProfiles(ctx context.Context, a *aws, resourceType string, tags 
 	return resources, nil
 }
 
-func iamOpenidConnectProviders(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func iamOpenidConnectProviders(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	openIDConnectProviders, err := a.awsr.GetOpenIDConnectProviders(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -907,7 +911,7 @@ func iamOpenidConnectProviders(ctx context.Context, a *aws, resourceType string,
 	return resources, nil
 }
 
-func iamPolicies(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func iamPolicies(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	input := &iam.ListPoliciesInput{
 		Scope: awsSDK.String("Local"),
 	}
@@ -928,7 +932,7 @@ func iamPolicies(ctx context.Context, a *aws, resourceType string, tags []tag.Ta
 	return resources, nil
 }
 
-func iamRoles(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func iamRoles(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	roles, err := a.awsr.GetRoles(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -946,8 +950,8 @@ func iamRoles(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) 
 	return resources, nil
 }
 
-func iamRolePolicies(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	roleNames, err := getIAMRoleNames(ctx, a, IAMRole.String(), tags)
+func iamRolePolicies(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	roleNames, err := getIAMRoleNames(ctx, a, IAMRole.String(), filters)
 	if err != nil {
 		return nil, err
 	}
@@ -974,8 +978,8 @@ func iamRolePolicies(ctx context.Context, a *aws, resourceType string, tags []ta
 	return resources, nil
 }
 
-func iamRolePolicyAttachments(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	roleNames, err := getIAMRoleNames(ctx, a, IAMRole.String(), tags)
+func iamRolePolicyAttachments(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	roleNames, err := getIAMRoleNames(ctx, a, IAMRole.String(), filters)
 	if err != nil {
 		return nil, err
 	}
@@ -1002,7 +1006,7 @@ func iamRolePolicyAttachments(ctx context.Context, a *aws, resourceType string, 
 	return resources, nil
 }
 
-func iamSAMLProviders(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func iamSAMLProviders(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	samalProviders, err := a.awsr.GetSAMLProviders(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -1020,7 +1024,7 @@ func iamSAMLProviders(ctx context.Context, a *aws, resourceType string, tags []t
 	return resources, nil
 }
 
-func iamServerCertificates(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func iamServerCertificates(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	serverCertificates, err := a.awsr.GetServerCertificates(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -1038,7 +1042,7 @@ func iamServerCertificates(ctx context.Context, a *aws, resourceType string, tag
 	return resources, nil
 }
 
-func iamUsers(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func iamUsers(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	users, err := a.awsr.GetUsers(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -1056,13 +1060,13 @@ func iamUsers(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) 
 	return resources, nil
 }
 
-func iamUserGroupMemberships(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	userNames, err := getIAMUserNames(ctx, a, IAMUser.String(), tags)
+func iamUserGroupMemberships(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	userNames, err := getIAMUserNames(ctx, a, IAMUser.String(), filters)
 	if err != nil {
 		return nil, err
 	}
 
-	groupNames, err := getIAMGroupNames(ctx, a, IAMGroup.String(), tags)
+	groupNames, err := getIAMGroupNames(ctx, a, IAMGroup.String(), filters)
 	if err != nil {
 		return nil, err
 	}
@@ -1080,8 +1084,8 @@ func iamUserGroupMemberships(ctx context.Context, a *aws, resourceType string, t
 	return resources, nil
 }
 
-func iamUserPolicies(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	userNames, err := getIAMUserNames(ctx, a, IAMUser.String(), tags)
+func iamUserPolicies(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	userNames, err := getIAMUserNames(ctx, a, IAMUser.String(), filters)
 	if err != nil {
 		return nil, err
 	}
@@ -1108,8 +1112,8 @@ func iamUserPolicies(ctx context.Context, a *aws, resourceType string, tags []ta
 	return resources, nil
 }
 
-func iamUserPolicyAttachments(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	userNames, err := getIAMUserNames(ctx, a, IAMUser.String(), tags)
+func iamUserPolicyAttachments(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	userNames, err := getIAMUserNames(ctx, a, IAMUser.String(), filters)
 	if err != nil {
 		return nil, err
 	}
@@ -1136,10 +1140,9 @@ func iamUserPolicyAttachments(ctx context.Context, a *aws, resourceType string, 
 	return resources, nil
 }
 
-func iamUserSSHKeys(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-
+func iamUserSSHKeys(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	// Get the users list
-	userNames, err := getIAMUserNames(ctx, a, IAMUser.String(), tags)
+	userNames, err := getIAMUserNames(ctx, a, IAMUser.String(), filters)
 	if err != nil {
 		return nil, err
 	}
@@ -1167,7 +1170,8 @@ func iamUserSSHKeys(ctx context.Context, a *aws, resourceType string, tags []tag
 	return resources, nil
 }
 
-func route53DelegationSets(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func route53DelegationSets(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+
 	r53DelegationSets, err := a.awsr.GetReusableDelegationSets(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -1185,7 +1189,7 @@ func route53DelegationSets(ctx context.Context, a *aws, resourceType string, tag
 	return resources, nil
 }
 
-func route53HealthChecks(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func route53HealthChecks(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	r53HealthChecks, err := a.awsr.GetHealthChecks(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -1203,7 +1207,7 @@ func route53HealthChecks(ctx context.Context, a *aws, resourceType string, tags 
 	return resources, nil
 }
 
-func route53QueryLogs(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func route53QueryLogs(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	r53QueryLogs, err := a.awsr.GetQueryLoggingConfigs(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -1221,7 +1225,7 @@ func route53QueryLogs(ctx context.Context, a *aws, resourceType string, tags []t
 	return resources, nil
 }
 
-func route53Zones(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func route53Zones(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	r53Zones, err := a.awsr.GetHostedZones(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -1239,8 +1243,8 @@ func route53Zones(ctx context.Context, a *aws, resourceType string, tags []tag.T
 	return resources, nil
 }
 
-func route53Records(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	zones, err := getRoute53ZoneIDs(ctx, a, Route53Zone.String(), tags)
+func route53Records(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	zones, err := getRoute53ZoneIDs(ctx, a, Route53Zone.String(), filters)
 	if err != nil {
 		return nil, err
 	}
@@ -1271,8 +1275,8 @@ func route53Records(ctx context.Context, a *aws, resourceType string, tags []tag
 	return resources, nil
 }
 
-func route53ZoneAssociations(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	zones, err := getRoute53ZoneIDs(ctx, a, Route53Zone.String(), tags)
+func route53ZoneAssociations(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	zones, err := getRoute53ZoneIDs(ctx, a, Route53Zone.String(), filters)
 	if err != nil {
 		return nil, err
 	}
@@ -1299,7 +1303,7 @@ func route53ZoneAssociations(ctx context.Context, a *aws, resourceType string, t
 	return resources, nil
 }
 
-func route53ResolverEndpoints(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func route53ResolverEndpoints(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	r53ResolverEndpoints, err := a.awsr.GetResolverEndpoints(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -1317,7 +1321,7 @@ func route53ResolverEndpoints(ctx context.Context, a *aws, resourceType string, 
 	return resources, nil
 }
 
-func route53ResolverRuleAssociation(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func route53ResolverRuleAssociation(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	r53ResolverRuleAssociations, err := a.awsr.GetResolverRuleAssociations(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -1335,7 +1339,7 @@ func route53ResolverRuleAssociation(ctx context.Context, a *aws, resourceType st
 	return resources, nil
 }
 
-func sesActiveReceiptRuleSets(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func sesActiveReceiptRuleSets(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	sesActiveReceiptRuleSets, err := a.awsr.GetActiveReceiptRuleSet(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -1353,7 +1357,7 @@ func sesActiveReceiptRuleSets(ctx context.Context, a *aws, resourceType string, 
 	return []provider.Resource{r}, nil
 }
 
-func sesDomainIdentities(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func sesDomainIdentities(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	sesDomainIdentities, err := a.awsr.GetIdentities(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -1371,8 +1375,8 @@ func sesDomainIdentities(ctx context.Context, a *aws, resourceType string, tags 
 	return resources, nil
 }
 
-func sesDomainGeneral(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	domainNames, err := getSESDomainIdentityDomains(ctx, a, SESDomainIdentity.String(), tags)
+func sesDomainGeneral(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	domainNames, err := getSESDomainIdentityDomains(ctx, a, SESDomainIdentity.String(), filters)
 	if err != nil {
 		return nil, err
 	}
@@ -1389,7 +1393,7 @@ func sesDomainGeneral(ctx context.Context, a *aws, resourceType string, tags []t
 	return resources, nil
 }
 
-func sesReceiptFilters(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func sesReceiptFilters(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	sesReceiptFilters, err := a.awsr.GetReceiptFilters(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -1407,7 +1411,7 @@ func sesReceiptFilters(ctx context.Context, a *aws, resourceType string, tags []
 	return resources, nil
 }
 
-func sesReceiptRules(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func sesReceiptRules(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	sesActiveReceiptRuleSets, err := a.awsr.GetActiveReceiptRuleSet(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -1425,7 +1429,7 @@ func sesReceiptRules(ctx context.Context, a *aws, resourceType string, tags []ta
 	return resources, nil
 }
 
-func sesReceiptRuleSets(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func sesReceiptRuleSets(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	sesActiveReceiptRuleSets, err := a.awsr.GetActiveReceiptRuleSet(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -1443,7 +1447,7 @@ func sesReceiptRuleSets(ctx context.Context, a *aws, resourceType string, tags [
 	return []provider.Resource{r}, nil
 }
 
-func sesConfigurationSets(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func sesConfigurationSets(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	sesConfigurationSets, err := a.awsr.GetConfigurationSets(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -1461,8 +1465,8 @@ func sesConfigurationSets(ctx context.Context, a *aws, resourceType string, tags
 	return resources, nil
 }
 
-func sesIdentityNotificationTopics(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	domainNames, err := getSESDomainIdentityDomains(ctx, a, SESDomainIdentity.String(), tags)
+func sesIdentityNotificationTopics(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	domainNames, err := getSESDomainIdentityDomains(ctx, a, SESDomainIdentity.String(), filters)
 	if err != nil {
 		return nil, err
 	}
@@ -1505,7 +1509,7 @@ func sesIdentityNotificationTopics(ctx context.Context, a *aws, resourceType str
 	return resources, nil
 }
 
-func sesTemplates(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func sesTemplates(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	sesTemplates, err := a.awsr.GetTemplates(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -1523,7 +1527,7 @@ func sesTemplates(ctx context.Context, a *aws, resourceType string, tags []tag.T
 	return resources, nil
 }
 
-func launchConfigurations(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func launchConfigurations(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	launchConfigurations, err := a.awsr.GetLaunchConfigurations(ctx, nil)
 
 	if err != nil {
@@ -1544,8 +1548,12 @@ func launchConfigurations(ctx context.Context, a *aws, resourceType string, tags
 	return resources, nil
 }
 
-func launchTemplates(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
-	launchTemplates, err := a.awsr.GetLaunchTemplates(ctx, nil)
+func launchTemplates(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	var input = &ec2.DescribeLaunchTemplatesInput{
+		Filters: toEC2Filters(filters),
+	}
+
+	launchTemplates, err := a.awsr.GetLaunchTemplates(ctx, input)
 
 	if err != nil {
 		return nil, err
@@ -1565,7 +1573,7 @@ func launchTemplates(ctx context.Context, a *aws, resourceType string, tags []ta
 	return resources, nil
 }
 
-func autoscalingGroups(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func autoscalingGroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	autoscalingGroups, err := a.awsr.GetAutoScalingGroups(ctx, nil)
 
 	if err != nil {
@@ -1586,7 +1594,7 @@ func autoscalingGroups(ctx context.Context, a *aws, resourceType string, tags []
 	return resources, nil
 }
 
-func autoscalingPolicies(ctx context.Context, a *aws, resourceType string, tags []tag.Tag) ([]provider.Resource, error) {
+func autoscalingPolicies(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	autoscalingPolicies, err := a.awsr.GetAutoScalingPolicies(ctx, nil)
 
 	if err != nil {
@@ -1607,15 +1615,16 @@ func autoscalingPolicies(ctx context.Context, a *aws, resourceType string, tags 
 	return resources, nil
 }
 
-func toEC2Filters(tags []tag.Tag) []*ec2.Filter {
+func toEC2Filters(filters *filter.Filter) []*ec2.Filter {
+	tags := filters.Tags
 	if len(tags) == 0 {
 		return nil
 	}
-	filters := make([]*ec2.Filter, 0, len(tags))
+	filtersEc2 := make([]*ec2.Filter, 0, len(tags))
 
 	for _, t := range tags {
-		filters = append(filters, t.ToEC2Filter())
+		filtersEc2 = append(filtersEc2, t.ToEC2Filter())
 	}
 
-	return filters
+	return filtersEc2
 }
