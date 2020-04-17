@@ -1,7 +1,13 @@
 ## [Unreleased]
 
+### Added
+- aws: `aws_lb`, `aws_lb_listener`, `aws_lb_listener_rule`, `aws_lb_target_group`
+  ([PR #96](https://github.com/cycloidio/terracognita/pull/96))
+
 ### Changed
 
+- filter: update IsExcluded and add IsIncluded to verify multiple resources.
+  ([PR #96](https://github.com/cycloidio/terracognita/pull/96))
 - Provide filters to resource functions instead of tags only
   ([PR #92](https://github.com/cycloidio/terracognita/pull/92))
 
