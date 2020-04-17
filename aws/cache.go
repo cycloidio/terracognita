@@ -10,6 +10,11 @@ import (
 )
 
 func cacheLoadBalancersV2(ctx context.Context, a *aws, rt string, filters *filter.Filter) ([]provider.Resource, error) {
+	// if both aws_alb and aws_lb defined, keep only aws_alb
+	if filters.IsIncluded("aws_alb", "aws_lb") && (!filters.IsExcluded("aws_alb") && rt == "aws_lb") {
+		return nil, nil
+	}
+
 	rs, err := a.cache.Get(rt)
 	if err != nil {
 		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
@@ -47,6 +52,11 @@ func getLoadBalancersV2Arns(ctx context.Context, a *aws, rt string, filters *fil
 }
 
 func cacheLoadBalancersV2Listeners(ctx context.Context, a *aws, rt string, filters *filter.Filter) ([]provider.Resource, error) {
+	// if both defined, keep only aws_alb_listener
+	if filters.IsIncluded("aws_alb_listener", "aws_lb_listener") && (!filters.IsExcluded("aws_alb_listener") && rt == "aws_lb_listener") {
+		return nil, nil
+	}
+
 	rs, err := a.cache.Get(rt)
 	if err != nil {
 		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
