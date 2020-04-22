@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Added
+
+- google resources: `google_compute_backend_bucket`, `google_project_iam_custom_role`, `google_storage_bucket_iam_policy`, `google_compute_instance_iam_policy`
+  ([PR #97](https://github.com/cycloidio/terracognita/pull/97))
+
 ### Changed
 
 - Provide filters to resource functions instead of tags only
