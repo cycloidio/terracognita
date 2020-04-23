@@ -2,6 +2,7 @@ package google
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -113,4 +114,28 @@ func (r *GCPReader) ListResourceRecordSets(ctx context.Context, managedZone []st
 	}
 	return list, nil
 
+}
+
+// ListProjectIAMCustomRoles returns a list of ProjectIamCustomRole within a parent
+func (r *GCPReader) ListProjectIAMCustomRoles(ctx context.Context, parent string) ([]iam.Role, error) {
+	service := iam.NewRolesService(r.iam)
+
+	resources := make([]iam.Role, 0)
+
+	if err := service.List().
+		// Parent is the "scope" of the search:
+		// organizations/{organization_id} for an organization level
+		// projects/{project_id} for a project level
+		Parent(parent).
+		PageSize(int64(r.maxResults)).
+		Pages(ctx, func(list *iam.ListRolesResponse) error {
+			for _, res := range list.Roles {
+				resources = append(resources, *res)
+			}
+			return nil
+		}); err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("unable to list roles from %s", parent))
+	}
+
+	return resources, nil
 }
