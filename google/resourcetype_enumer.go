@@ -6,11 +6,11 @@ import (
 	"fmt"
 )
 
-const _ResourceTypeName = "google_compute_instancegoogle_compute_firewallgoogle_compute_networkgoogle_compute_health_checkgoogle_compute_instance_groupgoogle_compute_backend_bucketgoogle_compute_backend_servicegoogle_compute_ssl_certificategoogle_compute_target_http_proxygoogle_compute_target_https_proxygoogle_compute_url_mapgoogle_compute_global_forwarding_rulegoogle_compute_forwarding_rulegoogle_compute_diskgoogle_dns_managed_zonegoogle_dns_record_setgoogle_project_iam_custom_rolegoogle_storage_bucketgoogle_storage_bucket_iam_policygoogle_sql_database_instance"
+const _ResourceTypeName = "google_compute_instancegoogle_compute_firewallgoogle_compute_networkgoogle_compute_health_checkgoogle_compute_instance_groupgoogle_compute_instance_iam_policygoogle_compute_backend_bucketgoogle_compute_backend_servicegoogle_compute_ssl_certificategoogle_compute_target_http_proxygoogle_compute_target_https_proxygoogle_compute_url_mapgoogle_compute_global_forwarding_rulegoogle_compute_forwarding_rulegoogle_compute_diskgoogle_dns_managed_zonegoogle_dns_record_setgoogle_project_iam_custom_rolegoogle_storage_bucketgoogle_storage_bucket_iam_policygoogle_sql_database_instance"
 
-var _ResourceTypeIndex = [...]uint16{0, 23, 46, 68, 95, 124, 153, 183, 213, 245, 278, 300, 337, 367, 386, 409, 430, 460, 481, 513, 541}
+var _ResourceTypeIndex = [...]uint16{0, 23, 46, 68, 95, 124, 158, 187, 217, 247, 279, 312, 334, 371, 401, 420, 443, 464, 494, 515, 547, 575}
 
-const _ResourceTypeLowerName = "google_compute_instancegoogle_compute_firewallgoogle_compute_networkgoogle_compute_health_checkgoogle_compute_instance_groupgoogle_compute_backend_bucketgoogle_compute_backend_servicegoogle_compute_ssl_certificategoogle_compute_target_http_proxygoogle_compute_target_https_proxygoogle_compute_url_mapgoogle_compute_global_forwarding_rulegoogle_compute_forwarding_rulegoogle_compute_diskgoogle_dns_managed_zonegoogle_dns_record_setgoogle_project_iam_custom_rolegoogle_storage_bucketgoogle_storage_bucket_iam_policygoogle_sql_database_instance"
+const _ResourceTypeLowerName = "google_compute_instancegoogle_compute_firewallgoogle_compute_networkgoogle_compute_health_checkgoogle_compute_instance_groupgoogle_compute_instance_iam_policygoogle_compute_backend_bucketgoogle_compute_backend_servicegoogle_compute_ssl_certificategoogle_compute_target_http_proxygoogle_compute_target_https_proxygoogle_compute_url_mapgoogle_compute_global_forwarding_rulegoogle_compute_forwarding_rulegoogle_compute_diskgoogle_dns_managed_zonegoogle_dns_record_setgoogle_project_iam_custom_rolegoogle_storage_bucketgoogle_storage_bucket_iam_policygoogle_sql_database_instance"
 
 func (i ResourceType) String() string {
 	if i < 0 || i >= ResourceType(len(_ResourceTypeIndex)-1) {
@@ -19,7 +19,7 @@ func (i ResourceType) String() string {
 	return _ResourceTypeName[_ResourceTypeIndex[i]:_ResourceTypeIndex[i+1]]
 }
 
-var _ResourceTypeValues = []ResourceType{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}
+var _ResourceTypeValues = []ResourceType{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}
 
 var _ResourceTypeNameToValueMap = map[string]ResourceType{
 	_ResourceTypeName[0:23]:         0,
@@ -32,36 +32,38 @@ var _ResourceTypeNameToValueMap = map[string]ResourceType{
 	_ResourceTypeLowerName[68:95]:   3,
 	_ResourceTypeName[95:124]:       4,
 	_ResourceTypeLowerName[95:124]:  4,
-	_ResourceTypeName[124:153]:      5,
-	_ResourceTypeLowerName[124:153]: 5,
-	_ResourceTypeName[153:183]:      6,
-	_ResourceTypeLowerName[153:183]: 6,
-	_ResourceTypeName[183:213]:      7,
-	_ResourceTypeLowerName[183:213]: 7,
-	_ResourceTypeName[213:245]:      8,
-	_ResourceTypeLowerName[213:245]: 8,
-	_ResourceTypeName[245:278]:      9,
-	_ResourceTypeLowerName[245:278]: 9,
-	_ResourceTypeName[278:300]:      10,
-	_ResourceTypeLowerName[278:300]: 10,
-	_ResourceTypeName[300:337]:      11,
-	_ResourceTypeLowerName[300:337]: 11,
-	_ResourceTypeName[337:367]:      12,
-	_ResourceTypeLowerName[337:367]: 12,
-	_ResourceTypeName[367:386]:      13,
-	_ResourceTypeLowerName[367:386]: 13,
-	_ResourceTypeName[386:409]:      14,
-	_ResourceTypeLowerName[386:409]: 14,
-	_ResourceTypeName[409:430]:      15,
-	_ResourceTypeLowerName[409:430]: 15,
-	_ResourceTypeName[430:460]:      16,
-	_ResourceTypeLowerName[430:460]: 16,
-	_ResourceTypeName[460:481]:      17,
-	_ResourceTypeLowerName[460:481]: 17,
-	_ResourceTypeName[481:513]:      18,
-	_ResourceTypeLowerName[481:513]: 18,
-	_ResourceTypeName[513:541]:      19,
-	_ResourceTypeLowerName[513:541]: 19,
+	_ResourceTypeName[124:158]:      5,
+	_ResourceTypeLowerName[124:158]: 5,
+	_ResourceTypeName[158:187]:      6,
+	_ResourceTypeLowerName[158:187]: 6,
+	_ResourceTypeName[187:217]:      7,
+	_ResourceTypeLowerName[187:217]: 7,
+	_ResourceTypeName[217:247]:      8,
+	_ResourceTypeLowerName[217:247]: 8,
+	_ResourceTypeName[247:279]:      9,
+	_ResourceTypeLowerName[247:279]: 9,
+	_ResourceTypeName[279:312]:      10,
+	_ResourceTypeLowerName[279:312]: 10,
+	_ResourceTypeName[312:334]:      11,
+	_ResourceTypeLowerName[312:334]: 11,
+	_ResourceTypeName[334:371]:      12,
+	_ResourceTypeLowerName[334:371]: 12,
+	_ResourceTypeName[371:401]:      13,
+	_ResourceTypeLowerName[371:401]: 13,
+	_ResourceTypeName[401:420]:      14,
+	_ResourceTypeLowerName[401:420]: 14,
+	_ResourceTypeName[420:443]:      15,
+	_ResourceTypeLowerName[420:443]: 15,
+	_ResourceTypeName[443:464]:      16,
+	_ResourceTypeLowerName[443:464]: 16,
+	_ResourceTypeName[464:494]:      17,
+	_ResourceTypeLowerName[464:494]: 17,
+	_ResourceTypeName[494:515]:      18,
+	_ResourceTypeLowerName[494:515]: 18,
+	_ResourceTypeName[515:547]:      19,
+	_ResourceTypeLowerName[515:547]: 19,
+	_ResourceTypeName[547:575]:      20,
+	_ResourceTypeLowerName[547:575]: 20,
 }
 
 var _ResourceTypeNames = []string{
@@ -70,21 +72,22 @@ var _ResourceTypeNames = []string{
 	_ResourceTypeName[46:68],
 	_ResourceTypeName[68:95],
 	_ResourceTypeName[95:124],
-	_ResourceTypeName[124:153],
-	_ResourceTypeName[153:183],
-	_ResourceTypeName[183:213],
-	_ResourceTypeName[213:245],
-	_ResourceTypeName[245:278],
-	_ResourceTypeName[278:300],
-	_ResourceTypeName[300:337],
-	_ResourceTypeName[337:367],
-	_ResourceTypeName[367:386],
-	_ResourceTypeName[386:409],
-	_ResourceTypeName[409:430],
-	_ResourceTypeName[430:460],
-	_ResourceTypeName[460:481],
-	_ResourceTypeName[481:513],
-	_ResourceTypeName[513:541],
+	_ResourceTypeName[124:158],
+	_ResourceTypeName[158:187],
+	_ResourceTypeName[187:217],
+	_ResourceTypeName[217:247],
+	_ResourceTypeName[247:279],
+	_ResourceTypeName[279:312],
+	_ResourceTypeName[312:334],
+	_ResourceTypeName[334:371],
+	_ResourceTypeName[371:401],
+	_ResourceTypeName[401:420],
+	_ResourceTypeName[420:443],
+	_ResourceTypeName[443:464],
+	_ResourceTypeName[464:494],
+	_ResourceTypeName[494:515],
+	_ResourceTypeName[515:547],
+	_ResourceTypeName[547:575],
 }
 
 // ResourceTypeString retrieves an enum value from the enum constants string name.
