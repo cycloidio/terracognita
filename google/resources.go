@@ -268,13 +268,13 @@ func computeDisk(ctx context.Context, g *google, resourceType string, filters *f
 }
 
 func storageBucket(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	rules, err := g.gcpr.ListBuckets(ctx)
+	buckets, err := g.gcpr.ListBuckets(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list global forwarding rules from reader")
 	}
 	resources := make([]provider.Resource, 0)
-	for _, rule := range rules {
-		r := provider.NewResource(rule.Name, resourceType, g)
+	for _, bucket := range buckets {
+		r := provider.NewResource(bucket.Name, resourceType, g)
 		resources = append(resources, r)
 	}
 	return resources, nil
