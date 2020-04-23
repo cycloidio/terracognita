@@ -37,6 +37,7 @@ const (
 	ComputeDisk
 	DNSManagedZone
 	DNSRecordSet
+	ProjectIAMCustomRole
 	StorageBucket
 	SQLDatabaseInstance
 )
@@ -61,6 +62,7 @@ var (
 		ComputeDisk:                 computeDisk,
 		DNSManagedZone:              managedZoneDNS,
 		DNSRecordSet:                recordSetDNS,
+		ProjectIAMCustomRole:        projectIAMCustomRole,
 		StorageBucket:               storageBucket,
 		SQLDatabaseInstance:         sqlDatabaseInstance,
 	}
@@ -335,6 +337,19 @@ func computeBackendBucket(ctx context.Context, g *google, resourceType string, f
 	resources := make([]provider.Resource, 0, len(backends))
 	for _, backend := range backends {
 		r := provider.NewResource(backend.Name, resourceType, g)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func projectIAMCustomRole(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	roles, err := g.gcpr.ListProjectIAMCustomRoles(ctx, fmt.Sprintf("projects/%s", g.gcpr.project))
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list project IAM custom roles from reader")
+	}
+	resources := make([]provider.Resource, 0, len(roles))
+	for _, role := range roles {
+		r := provider.NewResource(role.Name, resourceType, g)
 		resources = append(resources, r)
 	}
 	return resources, nil

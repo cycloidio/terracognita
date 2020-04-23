@@ -6,11 +6,11 @@ import (
 	"fmt"
 )
 
-const _ResourceTypeName = "google_compute_instancegoogle_compute_firewallgoogle_compute_networkgoogle_compute_health_checkgoogle_compute_instance_groupgoogle_compute_backend_bucketgoogle_compute_backend_servicegoogle_compute_ssl_certificategoogle_compute_target_http_proxygoogle_compute_target_https_proxygoogle_compute_url_mapgoogle_compute_global_forwarding_rulegoogle_compute_forwarding_rulegoogle_compute_diskgoogle_dns_managed_zonegoogle_dns_record_setgoogle_storage_bucketgoogle_sql_database_instance"
+const _ResourceTypeName = "google_compute_instancegoogle_compute_firewallgoogle_compute_networkgoogle_compute_health_checkgoogle_compute_instance_groupgoogle_compute_backend_bucketgoogle_compute_backend_servicegoogle_compute_ssl_certificategoogle_compute_target_http_proxygoogle_compute_target_https_proxygoogle_compute_url_mapgoogle_compute_global_forwarding_rulegoogle_compute_forwarding_rulegoogle_compute_diskgoogle_dns_managed_zonegoogle_dns_record_setgoogle_project_iam_custom_rolegoogle_storage_bucketgoogle_sql_database_instance"
 
-var _ResourceTypeIndex = [...]uint16{0, 23, 46, 68, 95, 124, 153, 183, 213, 245, 278, 300, 337, 367, 386, 409, 430, 451, 479}
+var _ResourceTypeIndex = [...]uint16{0, 23, 46, 68, 95, 124, 153, 183, 213, 245, 278, 300, 337, 367, 386, 409, 430, 460, 481, 509}
 
-const _ResourceTypeLowerName = "google_compute_instancegoogle_compute_firewallgoogle_compute_networkgoogle_compute_health_checkgoogle_compute_instance_groupgoogle_compute_backend_bucketgoogle_compute_backend_servicegoogle_compute_ssl_certificategoogle_compute_target_http_proxygoogle_compute_target_https_proxygoogle_compute_url_mapgoogle_compute_global_forwarding_rulegoogle_compute_forwarding_rulegoogle_compute_diskgoogle_dns_managed_zonegoogle_dns_record_setgoogle_storage_bucketgoogle_sql_database_instance"
+const _ResourceTypeLowerName = "google_compute_instancegoogle_compute_firewallgoogle_compute_networkgoogle_compute_health_checkgoogle_compute_instance_groupgoogle_compute_backend_bucketgoogle_compute_backend_servicegoogle_compute_ssl_certificategoogle_compute_target_http_proxygoogle_compute_target_https_proxygoogle_compute_url_mapgoogle_compute_global_forwarding_rulegoogle_compute_forwarding_rulegoogle_compute_diskgoogle_dns_managed_zonegoogle_dns_record_setgoogle_project_iam_custom_rolegoogle_storage_bucketgoogle_sql_database_instance"
 
 func (i ResourceType) String() string {
 	if i < 0 || i >= ResourceType(len(_ResourceTypeIndex)-1) {
@@ -19,7 +19,7 @@ func (i ResourceType) String() string {
 	return _ResourceTypeName[_ResourceTypeIndex[i]:_ResourceTypeIndex[i+1]]
 }
 
-var _ResourceTypeValues = []ResourceType{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17}
+var _ResourceTypeValues = []ResourceType{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18}
 
 var _ResourceTypeNameToValueMap = map[string]ResourceType{
 	_ResourceTypeName[0:23]:         0,
@@ -54,10 +54,12 @@ var _ResourceTypeNameToValueMap = map[string]ResourceType{
 	_ResourceTypeLowerName[386:409]: 14,
 	_ResourceTypeName[409:430]:      15,
 	_ResourceTypeLowerName[409:430]: 15,
-	_ResourceTypeName[430:451]:      16,
-	_ResourceTypeLowerName[430:451]: 16,
-	_ResourceTypeName[451:479]:      17,
-	_ResourceTypeLowerName[451:479]: 17,
+	_ResourceTypeName[430:460]:      16,
+	_ResourceTypeLowerName[430:460]: 16,
+	_ResourceTypeName[460:481]:      17,
+	_ResourceTypeLowerName[460:481]: 17,
+	_ResourceTypeName[481:509]:      18,
+	_ResourceTypeLowerName[481:509]: 18,
 }
 
 var _ResourceTypeNames = []string{
@@ -77,8 +79,9 @@ var _ResourceTypeNames = []string{
 	_ResourceTypeName[367:386],
 	_ResourceTypeName[386:409],
 	_ResourceTypeName[409:430],
-	_ResourceTypeName[430:451],
-	_ResourceTypeName[451:479],
+	_ResourceTypeName[430:460],
+	_ResourceTypeName[460:481],
+	_ResourceTypeName[481:509],
 }
 
 // ResourceTypeString retrieves an enum value from the enum constants string name.
