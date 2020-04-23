@@ -39,6 +39,7 @@ const (
 	DNSRecordSet
 	ProjectIAMCustomRole
 	StorageBucket
+	StorageBucketIAMPolicy
 	SQLDatabaseInstance
 )
 
@@ -64,6 +65,7 @@ var (
 		DNSRecordSet:                recordSetDNS,
 		ProjectIAMCustomRole:        projectIAMCustomRole,
 		StorageBucket:               storageBucket,
+		StorageBucketIAMPolicy:      storageBucketIAMPolicy,
 		SQLDatabaseInstance:         sqlDatabaseInstance,
 	}
 )
@@ -350,6 +352,21 @@ func projectIAMCustomRole(ctx context.Context, g *google, resourceType string, f
 	resources := make([]provider.Resource, 0, len(roles))
 	for _, role := range roles {
 		r := provider.NewResource(role.Name, resourceType, g)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+// storageBucketIAMPolicy will import the policies binded to a bucket. We need to iterate over the
+// bucket list
+func storageBucketIAMPolicy(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	buckets, err := g.gcpr.ListBuckets(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list bucket policies custom roles from reader")
+	}
+	resources := make([]provider.Resource, 0, len(buckets))
+	for _, bucket := range buckets {
+		r := provider.NewResource(bucket.Name, resourceType, g)
 		resources = append(resources, r)
 	}
 	return resources, nil
