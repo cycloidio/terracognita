@@ -1,6 +1,8 @@
 ## [Unreleased]
 
 ### Added
+- google resources: `google_compute_backend_bucket`, `google_project_iam_custom_role`, `google_storage_bucket_iam_policy`, `google_compute_instance_iam_policy`
+  ([PR #97](https://github.com/cycloidio/terracognita/pull/97))
 - aws: `aws_lb`, `aws_lb_listener`, `aws_lb_listener_rule`, `aws_lb_target_group`
   ([PR #96](https://github.com/cycloidio/terracognita/pull/96))
 

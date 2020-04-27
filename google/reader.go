@@ -2,12 +2,14 @@ package google
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
 
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/dns/v1"
+	"google.golang.org/api/iam/v1"
 	"google.golang.org/api/option"
 	sqladmin "google.golang.org/api/sqladmin/v1beta4"
 	"google.golang.org/api/storage/v1"
@@ -21,6 +23,7 @@ type GCPReader struct {
 	storage    *storage.Service
 	sqladmin   *sqladmin.Service
 	dns        *dns.Service
+	iam        *iam.Service
 	project    string
 	region     string
 	zones      []string
@@ -49,6 +52,10 @@ func NewGcpReader(ctx context.Context, maxResults uint64, project, region, crede
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to create sqladmin service")
 	}
+	i, err := iam.NewService(ctx, option.WithCredentialsFile(credentials))
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to create iam service")
+	}
 	return &GCPReader{
 		compute:    comp,
 		storage:    storage,
@@ -56,6 +63,7 @@ func NewGcpReader(ctx context.Context, maxResults uint64, project, region, crede
 		project:    project,
 		region:     region,
 		dns:        d,
+		iam:        i,
 		zones:      []string{},
 		maxResults: maxResults,
 	}, nil
@@ -106,4 +114,28 @@ func (r *GCPReader) ListResourceRecordSets(ctx context.Context, managedZone []st
 	}
 	return list, nil
 
+}
+
+// ListProjectIAMCustomRoles returns a list of ProjectIamCustomRole within a parent
+func (r *GCPReader) ListProjectIAMCustomRoles(ctx context.Context, parent string) ([]iam.Role, error) {
+	service := iam.NewRolesService(r.iam)
+
+	resources := make([]iam.Role, 0)
+
+	if err := service.List().
+		// Parent is the "scope" of the search:
+		// organizations/{organization_id} for an organization level
+		// projects/{project_id} for a project level
+		Parent(parent).
+		PageSize(int64(r.maxResults)).
+		Pages(ctx, func(list *iam.ListRolesResponse) error {
+			for _, res := range list.Roles {
+				resources = append(resources, *res)
+			}
+			return nil
+		}); err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("unable to list roles from %s", parent))
+	}
+
+	return resources, nil
 }

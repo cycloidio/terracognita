@@ -26,6 +26,8 @@ const (
 	// * frontend configuration: target_http(s)_proxy + global_forwarding_rule
 	ComputeHealthCheck
 	ComputeInstanceGroup
+	ComputeInstanceIAMPolicy
+	ComputeBackendBucket
 	ComputeBackendService
 	ComputeSSLCertificate
 	ComputeTargetHTTPProxy
@@ -36,7 +38,9 @@ const (
 	ComputeDisk
 	DNSManagedZone
 	DNSRecordSet
+	ProjectIAMCustomRole
 	StorageBucket
+	StorageBucketIAMPolicy
 	SQLDatabaseInstance
 )
 
@@ -49,7 +53,9 @@ var (
 		ComputeNetwork:              computeNetwork,
 		ComputeHealthCheck:          computeHealthCheck,
 		ComputeInstanceGroup:        computeInstanceGroup,
+		ComputeInstanceIAMPolicy:    computeInstanceIAMPolicy,
 		ComputeBackendService:       computeBackendService,
+		ComputeBackendBucket:        computeBackendBucket,
 		ComputeSSLCertificate:       computeSSLCertificate,
 		ComputeTargetHTTPProxy:      computeTargetHTTPProxy,
 		ComputeTargetHTTPSProxy:     computeTargetHTTPSProxy,
@@ -59,7 +65,9 @@ var (
 		ComputeDisk:                 computeDisk,
 		DNSManagedZone:              managedZoneDNS,
 		DNSRecordSet:                recordSetDNS,
+		ProjectIAMCustomRole:        projectIAMCustomRole,
 		StorageBucket:               storageBucket,
+		StorageBucketIAMPolicy:      storageBucketIAMPolicy,
 		SQLDatabaseInstance:         sqlDatabaseInstance,
 	}
 )
@@ -262,13 +270,13 @@ func computeDisk(ctx context.Context, g *google, resourceType string, filters *f
 }
 
 func storageBucket(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	rules, err := g.gcpr.ListBuckets(ctx)
+	buckets, err := g.gcpr.ListBuckets(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list global forwarding rules from reader")
 	}
 	resources := make([]provider.Resource, 0)
-	for _, rule := range rules {
-		r := provider.NewResource(rule.Name, resourceType, g)
+	for _, bucket := range buckets {
+		r := provider.NewResource(bucket.Name, resourceType, g)
 		resources = append(resources, r)
 	}
 	return resources, nil
@@ -318,6 +326,66 @@ func recordSetDNS(ctx context.Context, g *google, resourceType string, filters *
 	for z, rrsets := range rrsetsList {
 		for _, rrset := range rrsets {
 			r := provider.NewResource(fmt.Sprintf("%s/%s/%s", z, rrset.Name, rrset.Type), resourceType, g)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func computeBackendBucket(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	f := initializeFilter(filters)
+	backends, err := g.gcpr.ListBackendBuckets(ctx, f)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list backend buckets from reader")
+	}
+	resources := make([]provider.Resource, 0, len(backends))
+	for _, backend := range backends {
+		r := provider.NewResource(backend.Name, resourceType, g)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func projectIAMCustomRole(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	roles, err := g.gcpr.ListProjectIAMCustomRoles(ctx, fmt.Sprintf("projects/%s", g.gcpr.project))
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list project IAM custom roles from reader")
+	}
+	resources := make([]provider.Resource, 0, len(roles))
+	for _, role := range roles {
+		r := provider.NewResource(role.Name, resourceType, g)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+// storageBucketIAMPolicy will import the policies binded to a bucket. We need to iterate over the
+// bucket list
+func storageBucketIAMPolicy(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	buckets, err := g.gcpr.ListBuckets(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list bucket policies custom roles from reader")
+	}
+	resources := make([]provider.Resource, 0, len(buckets))
+	for _, bucket := range buckets {
+		r := provider.NewResource(bucket.Name, resourceType, g)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+// computeInstanceIAMPolicy will import the policies binded to a compute instance. We need to iterate over the
+// compute instance list
+func computeInstanceIAMPolicy(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	f := initializeFilter(filters)
+	list, err := g.gcpr.ListInstances(ctx, f)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list compute instances from reader")
+	}
+	resources := make([]provider.Resource, 0)
+	for zone, instances := range list {
+		for _, instance := range instances {
+			r := provider.NewResource(fmt.Sprintf("projects/%s/zones/%s/instances/%s", g.Project(), zone, instance.Name), resourceType, g)
 			resources = append(resources, r)
 		}
 	}
