@@ -19,20 +19,45 @@ type Filter struct {
 	Targets []string
 
 	exclude map[string]struct{}
+	include map[string]struct{}
 }
 
 // IsExcluded checks if the v is on the Exclude list
-func (f *Filter) IsExcluded(v string) bool {
+func (f *Filter) IsExcluded(v ...string) bool {
 	if len(f.Exclude) == 0 {
 		return false
 	}
 
 	if f.exclude == nil {
-		f.calculateExludeMap()
+		f.calculateExcludeMap()
 	}
 
-	_, ok := f.exclude[v]
-	return ok
+	// check one or more resources type are defined in Exclude
+	for _, res := range v {
+		if _, ok := f.exclude[res]; !ok {
+			return false
+		}
+	}
+	return true
+}
+
+// IsIncluded checks if the v is on the Include list
+func (f *Filter) IsIncluded(v ...string) bool {
+	if len(f.Include) == 0 {
+		return true
+	}
+
+	if f.include == nil {
+		f.calculateIncludeMap()
+	}
+
+	// check one or more resources type are defined in Include
+	for _, res := range v {
+		if _, ok := f.include[res]; !ok {
+			return false
+		}
+	}
+	return true
 }
 
 // Validate validates that the data inside of the filters is right
@@ -86,9 +111,9 @@ func (f *Filter) String() string {
 `, f.Tags, f.Include, f.Exclude, f.Targets)
 }
 
-// calculateExludeMap makes a map of the Exclude so
+// calculateExcludeMap makes a map of the Exclude so
 // it's easy to operate over them
-func (f *Filter) calculateExludeMap() {
+func (f *Filter) calculateExcludeMap() {
 	aux := make(map[string]struct{})
 
 	for _, e := range f.Exclude {
@@ -96,4 +121,16 @@ func (f *Filter) calculateExludeMap() {
 	}
 
 	f.exclude = aux
+}
+
+// calculateIncludeMap makes a map of the Include so
+// it's easy to operate over them
+func (f *Filter) calculateIncludeMap() {
+	aux := make(map[string]struct{})
+
+	for _, e := range f.Include {
+		aux[e] = struct{}{}
+	}
+
+	f.include = aux
 }

@@ -45,6 +45,11 @@ const (
 	ALBListenerRule
 	ALBListenerCertificate
 	ALBTargetGroup
+	LB
+	LBListener
+	LBListenerRule
+	LBListenerCertificate
+	LBTargetGroup
 	DBInstance
 	DBParameterGroup
 	DBSubnetGroup
@@ -125,6 +130,11 @@ var (
 		ALBListenerRule:        albListenerRules,
 		ALBListenerCertificate: albListenerCertificates,
 		ALBTargetGroup:         albTargetGroups,
+		LB:                     cacheLoadBalancersV2,
+		LBListener:             cacheLoadBalancersV2Listeners,
+		LBListenerRule:         albListenerRules,
+		LBListenerCertificate:  albListenerCertificates,
+		LBTargetGroup:          albTargetGroups,
 		DBInstance:             dbInstances,
 		DBParameterGroup:       dbParameterGroups,
 		DBSubnetGroup:          dbSubnetGroups,
@@ -445,7 +455,7 @@ func albs(ctx context.Context, a *aws, resourceType string, filters *filter.Filt
 }
 
 func albListeners(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	ALBArns, err := getLoadBalancersV2Arns(ctx, a, ALB.String(), nil)
+	ALBArns, err := getLoadBalancersV2Arns(ctx, a, ALB.String(), filters)
 	if err != nil {
 		return nil, err
 	}
@@ -475,7 +485,12 @@ func albListeners(ctx context.Context, a *aws, resourceType string, filters *fil
 }
 
 func albListenerRules(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	ALBListeners, err := getLoadBalancersV2ListenersArns(ctx, a, ALBListener.String(), nil)
+	// if both defined, keep only aws_alb_listener_rule
+	if filters.IsIncluded("aws_alb_listener_rule", "aws_lb_listener_rule") && (!filters.IsExcluded("aws_alb_listener_rule") && resourceType == "aws_lb_listener_rule") {
+		return nil, nil
+	}
+
+	ALBListeners, err := getLoadBalancersV2ListenersArns(ctx, a, ALBListener.String(), filters)
 	if err != nil {
 		return nil, err
 	}
@@ -509,7 +524,12 @@ func albListenerRules(ctx context.Context, a *aws, resourceType string, filters 
 }
 
 func albListenerCertificates(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	ALBListeners, err := getLoadBalancersV2ListenersArns(ctx, a, ALBListener.String(), nil)
+	// if both defined, keep only aws_alb_listener_certificate
+	if filters.IsIncluded("aws_alb_listener_certificate", "aws_lb_listener_certificate") && (!filters.IsExcluded("aws_alb_listener_certificate") && resourceType == "aws_lb_listener_certificate") {
+		return nil, nil
+	}
+
+	ALBListeners, err := getLoadBalancersV2ListenersArns(ctx, a, ALBListener.String(), filters)
 	if err != nil {
 		return nil, err
 	}
@@ -547,6 +567,10 @@ func albListenerCertificates(ctx context.Context, a *aws, resourceType string, f
 }
 
 func albTargetGroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	// if both defined, keep only aws_alb_target_group
+	if filters.IsIncluded("aws_alb_target_group", "aws_lb_target_group") && (!filters.IsExcluded("aws_alb_target_group") && resourceType == "aws_lb_target_group") {
+		return nil, nil
+	}
 	albTargetGroups, err := a.awsr.GetLoadBalancersV2TargetGroups(ctx, nil)
 
 	if err != nil {

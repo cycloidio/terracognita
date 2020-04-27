@@ -15,9 +15,36 @@ func TestIsExcluded(t *testing.T) {
 		f := filter.Filter{Exclude: []string{"a", "b"}}
 		assert.True(t, f.IsExcluded("a"))
 	})
+	t.Run("True", func(t *testing.T) {
+		f := filter.Filter{Exclude: []string{"a", "b"}}
+		assert.True(t, f.IsExcluded("a", "b"))
+	})
 	t.Run("False", func(t *testing.T) {
 		f := filter.Filter{Exclude: []string{"a", "b"}}
 		assert.False(t, f.IsExcluded("c"))
+	})
+	t.Run("False", func(t *testing.T) {
+		f := filter.Filter{Exclude: []string{"a", "b"}}
+		assert.False(t, f.IsExcluded("a", "c"))
+	})
+}
+
+func TestIsIncluded(t *testing.T) {
+	t.Run("True", func(t *testing.T) {
+		f := filter.Filter{Include: []string{"a", "b"}}
+		assert.True(t, f.IsIncluded("a"))
+	})
+	t.Run("True", func(t *testing.T) {
+		f := filter.Filter{Include: []string{"a", "b"}}
+		assert.True(t, f.IsIncluded("a", "b"))
+	})
+	t.Run("False", func(t *testing.T) {
+		f := filter.Filter{Include: []string{"a", "b"}}
+		assert.False(t, f.IsIncluded("c"))
+	})
+	t.Run("False", func(t *testing.T) {
+		f := filter.Filter{Include: []string{"a", "b"}}
+		assert.False(t, f.IsIncluded("a", "c"))
 	})
 }
 
