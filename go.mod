@@ -16,6 +16,9 @@ require (
 	github.com/hashicorp/hil v0.0.0-20190212132231-97b3a9cdfa93 // indirect
 	github.com/hashicorp/terraform v0.12.8
 	github.com/hashicorp/vault v1.0.3 // indirect
+	github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d // indirect
+	github.com/jinzhu/inflection v1.0.0
+	github.com/mitchellh/reflectwalk v1.0.1 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.4.0
@@ -29,7 +32,7 @@ require (
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/net v0.0.0-20200301022130-244492dfa37a // indirect
 	golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527 // indirect
-	golang.org/x/tools v0.0.0-20200312194400-c312e98713c2 // indirect
+	golang.org/x/tools v0.0.0-20200515220128-d3bf790afa53 // indirect
 	google.golang.org/api v0.9.0
 	k8s.io/apimachinery v0.0.0-20190213030929-f84a4639d8e8 // indirect
 	k8s.io/klog v0.2.0 // indirect
