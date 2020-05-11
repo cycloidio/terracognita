@@ -57,9 +57,8 @@ func TestTemplateOutput(t *testing.T) {
 			tmp: Function{
 				Service: "Service",
 				Entity:  "Entity",
-				Prefix:  "Prefix",
 			},
-			opt: "Service.PrefixEntityOutput",
+			opt: "[]*Service.Entity",
 		},
 		{
 			name: "FnOutput",
@@ -67,7 +66,7 @@ func TestTemplateOutput(t *testing.T) {
 				Service:  "Service",
 				FnOutput: "FnOutput",
 			},
-			opt: "Service.FnOutput",
+			opt: "[]*FnOutput",
 		},
 	}
 
@@ -112,10 +111,10 @@ func TestTemplateSignature(t *testing.T) {
 			name: "Basic",
 			tmp: Function{
 				Service: "Service",
-				Entity:  "Entity",
+				Entity:  "Entities",
 				Prefix:  "Prefix",
 			},
-			opt: "GetEntity (ctx context.Context, input *Service.PrefixEntityInput) (*Service.PrefixEntityOutput, error)",
+			opt: "GetEntities (ctx context.Context, input *Service.PrefixEntitiesInput) ([]*Service.Entity, error)",
 		},
 		{
 			name: "FnSignature",
@@ -144,7 +143,7 @@ func TestTemplateExecute(t *testing.T) {
 			tmp: Function{
 				FnSignature: "Signature",
 				Service:     "Service",
-				Entity:      "Entity",
+				Entity:      "Entities",
 				Prefix:      "Prefix",
 			},
 			opt: `
@@ -153,9 +152,18 @@ func TestTemplateExecute(t *testing.T) {
 					c.svc.Service = Service.New(c.svc.session)
 				}
 
-				opt, err := c.svc.Service.PrefixEntityWithContext(ctx, input)
-				if err != nil {
-					return nil, err
+				opt := make([]*Service.Entity, 0)
+
+				hasNextToken := true
+				for hasNextToken {
+					o, err := c.svc.Service.PrefixEntitiesWithContext(ctx, input)
+					if err != nil {
+						return nil, err
+					}
+					input.NextToken = o.NextToken
+					hasNextToken = o.NextToken != nil
+
+					opt = append(opt, o.Entities...)
 				}
 
 				return opt, nil
@@ -167,13 +175,13 @@ func TestTemplateExecute(t *testing.T) {
 				FilterByOwner: "OwnerField",
 				FnSignature:   "Signature",
 				Service:       "Service",
-				Entity:        "Entity",
+				Entity:        "Entities",
 				Prefix:        "Prefix",
 			},
 			opt: `
 			func (c *connector) Signature {
 				if input == nil {
-					input = &Service.PrefixEntityInput{}
+					input = &Service.PrefixEntitiesInput{}
 				}
 				input.OwnerField = append(input.OwnerField, c.accountID)
 
@@ -181,9 +189,18 @@ func TestTemplateExecute(t *testing.T) {
 					c.svc.Service = Service.New(c.svc.session)
 				}
 
-				opt, err := c.svc.Service.PrefixEntityWithContext(ctx, input)
-				if err != nil {
-					return nil, err
+				opt := make([]*Service.Entity, 0)
+
+				hasNextToken := true
+				for hasNextToken {
+					o, err := c.svc.Service.PrefixEntitiesWithContext(ctx, input)
+					if err != nil {
+						return nil, err
+					}
+					input.NextToken = o.NextToken
+					hasNextToken = o.NextToken != nil
+
+					opt = append(opt, o.Entities...)
 				}
 
 				return opt, nil

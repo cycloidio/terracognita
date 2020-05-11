@@ -43,14 +43,23 @@ type Reader interface {
 	DownloadObject(ctx context.Context, w io.WriterAt, input *s3.GetObjectInput, options ...func(*s3manager.Downloader)) (int64, error)
 }
 
-func (c *connector) GetInstances(ctx context.Context, input *ec2.DescribeInstancesInput) (*ec2.DescribeInstancesOutput, error) {
+func (c *connector) GetInstances(ctx context.Context, input *ec2.DescribeInstancesInput) ([]*ec2.Instance, error) {
 	if c.svc.ec2 == nil {
 		c.svc.ec2 = ec2.New(c.svc.session)
 	}
 
-	opt, err := c.svc.ec2.DescribeInstancesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*ec2.Instance, 0)
+
+	hasNextToken := true
+	for hasNextToken != nil {
+		o, err := c.svc.ec2.DescribeInstancesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.Instances...)
 	}
 
 	return opt, nil

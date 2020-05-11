@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"strings"
 
+	"github.com/jinzhu/inflection"
 	"github.com/pkg/errors"
 )
 
@@ -63,9 +65,36 @@ const (
 				c.svc.{{.Service}} = {{.Service}}.New(c.svc.session)
 			}
 
-			opt, err := c.svc.{{.Service}}.{{.Prefix}}{{.Entity}}WithContext(ctx, input)
-			if err != nil {
-				return nil, err
+			{{ if .HasNoSlice }}
+				var opt {{ .Output }}
+			{{ else }}
+				opt := make({{ .Output }}, 0)
+			{{ end }}
+
+			hasNextToken := true
+			for hasNextToken {
+				o, err := c.svc.{{.Service}}.{{.ServiceEntityFn}}WithContext(ctx, input)
+				if err != nil {
+					return nil, err
+				}
+				{{ if .HasNotPagination }}
+					hasNextToken = false
+				{{ else }}
+					input.{{.InputPaginationAttributeFn}} = o.{{.PaginationAttributeFn}}
+					hasNextToken = o.{{.PaginationAttributeFn}} != nil
+				{{ end }}
+
+				{{ if .IsAttributeListSlice }}
+					for _,v := range o.{{ index .AttributeList 0 }} {
+						opt = append(opt, v.{{ index .AttributeList 1 }}...)
+					}
+				{{ else if .HasNoSlice }}
+					opt = o.{{ index .AttributeList 0 }}
+				{{ else if .IsMap }}
+					opt = o.{{ index .AttributeList 0 }}
+				{{ else }}
+					opt = append(opt, o.{{ index .AttributeList 0 }}...)
+				{{ end }}
 			}
 
 			return opt, nil
@@ -108,6 +137,13 @@ type Function struct {
 	// CloudFrontOriginAccessIdentities, Instances etc
 	Entity string
 
+	// FnAttributeList defines the attribute inside of the output
+	// that holds all the resources to return
+	// If defined like 'attribute.name' it'll call that directly
+	// If defined like 'attribute#name' it'll iterate over 'attribute'
+	// and 'name' will be used ad the list item to fetch
+	FnAttributeList string
+
 	// Some functions on AWS have the "Describe" prefix
 	// or the "List" prefix, so it has to be specified
 	// which one to use
@@ -116,6 +152,9 @@ type Function struct {
 	// Service is the AWS service that it uses, basically the
 	// pkg name, so "ec2", "cloudfront" etc
 	Service string
+
+	// FnServiceEntity is the name of the Entity function to use on the Service
+	FnServiceEntity string
 
 	// Documentation is the documentation that will be added
 	// to the AWSReader function definition, as it's the
@@ -139,6 +178,25 @@ type Function struct {
 	// FilterByOwner adds the "{{.FilterByOwner}} = AccountID" to the input filter
 	// so this value has to be the correct name on the input
 	FilterByOwner string
+
+	// HasNotPagination flags if the resource has NextToken logic or not
+	HasNotPagination bool
+
+	// HasNoSlice means that it's not an [] to return but a single item
+	HasNoSlice bool
+
+	// FnPaginationAttribute overrides the default name NextToken
+	FnPaginationAttribute string
+
+	// FnInputPaginationAttribute overrides the default reciever of the
+	// pagination name FnPaginationAttribute
+	FnInputPaginationAttribute string
+
+	// SingularEntity represents the singular value of an entity
+	SingularEntity string
+
+	// If the value is a map
+	IsMap bool
 }
 
 // Name builds a name simply using "Get{{.Entity}}"
@@ -157,20 +215,30 @@ func (f Function) Name() string {
 	return fmt.Sprintf("%s%s", prefix, f.Entity)
 }
 
-// Output builds the output by "{{.Service}}.{{.Prefix}}{{.Entity}}"
+// Output builds the output by "{{.Service}}.{{singular(.Entity)}}"
 // except if FnOutput is defined in which case the formula
-// "{{.Service}}{{.FnOutput}}" is used
+// "{{.FnOutput}}" is used
 func (f Function) Output() string {
+	var typePrefix = "[]*"
+	if f.IsMap {
+		typePrefix = "map[string]*"
+	}
+	if f.HasNoSlice {
+		typePrefix = "*"
+	}
 	if f.FnOutput != "" {
-		return fmt.Sprintf("%s.%s", f.Service, f.FnOutput)
+		return fmt.Sprintf("%s%s", typePrefix, f.FnOutput)
 	}
 
-	return fmt.Sprintf("%s.%s%sOutput", f.Service, f.Prefix, f.Entity)
+	if f.SingularEntity != "" {
+		return fmt.Sprintf("%s%s.%s", typePrefix, f.Service, f.SingularEntity)
+	}
+	return fmt.Sprintf("%s%s.%s", typePrefix, f.Service, inflection.Singular(f.Entity))
 }
 
 // Input builds the input by "{{.Service}}.{{.Prefix}}{{.Entity}}"
 func (f Function) Input() string {
-	return fmt.Sprintf("%s.%s%sInput", f.Service, f.Prefix, f.Entity)
+	return fmt.Sprintf("%s.%sInput", f.Service, f.ServiceEntityFn())
 }
 
 // Signature builds the signature except if FnSignature it's defined,
@@ -180,7 +248,60 @@ func (f Function) Signature() string {
 		return f.FnSignature
 	}
 
-	return fmt.Sprintf("%s (ctx context.Context, input *%s) (*%s, error)", f.Name(), f.Input(), f.Output())
+	return fmt.Sprintf("%s (ctx context.Context, input *%s) (%s, error)", f.Name(), f.Input(), f.Output())
+}
+
+// AttributeList returns all the list of attributes to access to get the value
+// that we want, if it has the '#' it means it's inside of an array, if not
+// its used as a simple access.
+func (f Function) AttributeList() []string {
+	if f.FnAttributeList != "" {
+		if f.IsAttributeListSlice() {
+			return strings.Split(f.FnAttributeList, "#")
+		}
+		return []string{f.FnAttributeList}
+	}
+
+	return []string{f.Entity}
+}
+
+// IsAttributeListSlice checks if the logic should be to
+// access an attribute or to iterate over attributes
+func (f Function) IsAttributeListSlice() bool {
+	if strings.Contains(f.FnAttributeList, "#") {
+		return true
+	}
+	return false
+}
+
+// ServiceEntityFn the name of the function to call on the
+// service to get the Entity
+func (f Function) ServiceEntityFn() string {
+	if f.FnServiceEntity != "" {
+		return fmt.Sprintf("%s%s", f.Prefix, f.FnServiceEntity)
+	}
+
+	return fmt.Sprintf("%s%s", f.Prefix, f.Entity)
+
+}
+
+// PaginationAttributeFn is the attribute that defined the Pagination
+func (f Function) PaginationAttributeFn() string {
+	if f.FnPaginationAttribute != "" {
+		return f.FnPaginationAttribute
+	}
+
+	return "NextToken"
+}
+
+// InputPaginationAttributeFn is the attribute that defines the
+// pagination on the input filter
+func (f Function) InputPaginationAttributeFn() string {
+	if f.FnInputPaginationAttribute != "" {
+		return f.FnInputPaginationAttribute
+	}
+
+	return f.PaginationAttributeFn()
 }
 
 // Execute uses the fnTmpl to interpolate f
