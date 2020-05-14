@@ -70,7 +70,7 @@ build:                           Bulids the binary
 clean:                           Removes binary and/or docker image
 ```
 
-[![asciicast](https://asciinema.org/a/252604.svg)](https://asciinema.org/a/252604)
+[![asciicast](https://asciinema.org/a/330055.svg)](https://asciinema.org/a/330055)
 
 ### Docker
 
