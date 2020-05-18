@@ -45,361 +45,421 @@ type Reader interface {
 	// GetRegion returns the currently used region for the Connector
 	GetRegion() string
 
-	// GetAlarms returns all cloudwatch alarms based on the input given.
+	// GetMetricAlarms returns all cloudwatch alarms based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetAlarms(ctx context.Context, input *cloudwatch.DescribeAlarmsInput) (*cloudwatch.DescribeAlarmsOutput, error)
+	GetMetricAlarms(ctx context.Context, input *cloudwatch.DescribeAlarmsInput) ([]*cloudwatch.MetricAlarm, error)
 
 	// GetInstances returns all EC2 instances based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetInstances(ctx context.Context, input *ec2.DescribeInstancesInput) (*ec2.DescribeInstancesOutput, error)
+	GetInstances(ctx context.Context, input *ec2.DescribeInstancesInput) ([]*ec2.Instance, error)
 
 	// GetVpcs returns all EC2 VPCs based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) (*ec2.DescribeVpcsOutput, error)
+	GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) ([]*ec2.Vpc, error)
 
 	// GetVpcPeeringConnections returns all VpcPeeringConnections based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetVpcPeeringConnections(ctx context.Context, input *ec2.DescribeVpcPeeringConnectionsInput) (*ec2.DescribeVpcPeeringConnectionsOutput, error)
+	GetVpcPeeringConnections(ctx context.Context, input *ec2.DescribeVpcPeeringConnectionsInput) ([]*ec2.VpcPeeringConnection, error)
 
 	// GetImages returns all EC2 AMI based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetImages(ctx context.Context, input *ec2.DescribeImagesInput) (*ec2.DescribeImagesOutput, error)
+	GetImages(ctx context.Context, input *ec2.DescribeImagesInput) ([]*ec2.Image, error)
 
 	// GetOwnImages returns all EC2 AMI belonging to the Account ID based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetOwnImages(ctx context.Context, input *ec2.DescribeImagesInput) (*ec2.DescribeImagesOutput, error)
+	GetOwnImages(ctx context.Context, input *ec2.DescribeImagesInput) ([]*ec2.Image, error)
 
 	// GetKeyPairs returns all KeyPairs based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetKeyPairs(ctx context.Context, input *ec2.DescribeKeyPairsInput) (*ec2.DescribeKeyPairsOutput, error)
+	GetKeyPairs(ctx context.Context, input *ec2.DescribeKeyPairsInput) ([]*ec2.KeyPairInfo, error)
 
 	// GetSecurityGroups returns all EC2 security groups based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetSecurityGroups(ctx context.Context, input *ec2.DescribeSecurityGroupsInput) (*ec2.DescribeSecurityGroupsOutput, error)
+	GetSecurityGroups(ctx context.Context, input *ec2.DescribeSecurityGroupsInput) ([]*ec2.SecurityGroup, error)
 
 	// GetSubnets returns all EC2 subnets based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetSubnets(ctx context.Context, input *ec2.DescribeSubnetsInput) (*ec2.DescribeSubnetsOutput, error)
+	GetSubnets(ctx context.Context, input *ec2.DescribeSubnetsInput) ([]*ec2.Subnet, error)
 
 	// GetVolumes returns all EC2 volumes based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetVolumes(ctx context.Context, input *ec2.DescribeVolumesInput) (*ec2.DescribeVolumesOutput, error)
+	GetVolumes(ctx context.Context, input *ec2.DescribeVolumesInput) ([]*ec2.Volume, error)
 
 	// GetSnapshots returns all snapshots based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput) (*ec2.DescribeSnapshotsOutput, error)
+	GetSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput) ([]*ec2.Snapshot, error)
 
 	// GetOwnSnapshots returns all snapshots belonging to the Account ID based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetOwnSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput) (*ec2.DescribeSnapshotsOutput, error)
+	GetOwnSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput) ([]*ec2.Snapshot, error)
 
 	// GetLaunchTemplates returns all LaunchTemplate belonging to the Account ID based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetLaunchTemplates(ctx context.Context, input *ec2.DescribeLaunchTemplatesInput) (*ec2.DescribeLaunchTemplatesOutput, error)
+	GetLaunchTemplates(ctx context.Context, input *ec2.DescribeLaunchTemplatesInput) ([]*ec2.LaunchTemplate, error)
 
 	// GetAutoScalingGroups returns all AutoScalingGroup belonging to the Account ID based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetAutoScalingGroups(ctx context.Context, input *autoscaling.DescribeAutoScalingGroupsInput) (*autoscaling.DescribeAutoScalingGroupsOutput, error)
+	GetAutoScalingGroups(ctx context.Context, input *autoscaling.DescribeAutoScalingGroupsInput) ([]*autoscaling.Group, error)
 
 	// GetLaunchConfigurations returns all LaunchConfiguration belonging to the Account ID based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetLaunchConfigurations(ctx context.Context, input *autoscaling.DescribeLaunchConfigurationsInput) (*autoscaling.DescribeLaunchConfigurationsOutput, error)
+	GetLaunchConfigurations(ctx context.Context, input *autoscaling.DescribeLaunchConfigurationsInput) ([]*autoscaling.LaunchConfiguration, error)
 
 	// GetAutoScalingPolicies returns all AutoScalingPolicies belonging to the Account ID based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetAutoScalingPolicies(ctx context.Context, input *autoscaling.DescribePoliciesInput) (*autoscaling.DescribePoliciesOutput, error)
+	GetAutoScalingPolicies(ctx context.Context, input *autoscaling.DescribePoliciesInput) ([]*autoscaling.ScalingPolicy, error)
 
 	// GetElastiCacheClusters returns all Elasticache clusters based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetElastiCacheClusters(ctx context.Context, input *elasticache.DescribeCacheClustersInput) (*elasticache.DescribeCacheClustersOutput, error)
+	GetElastiCacheClusters(ctx context.Context, input *elasticache.DescribeCacheClustersInput) ([]*elasticache.CacheCluster, error)
 
 	// GetElastiCacheTags returns a list of tags of Elasticache resources based on its ARN.
 	// Returned values are commented in the interface doc comment block.
-	GetElastiCacheTags(ctx context.Context, input *elasticache.ListTagsForResourceInput) (*elasticache.TagListMessage, error)
+	GetElastiCacheTags(ctx context.Context, input *elasticache.ListTagsForResourceInput) ([]*elasticache.Tag, error)
 
 	// GetLoadBalancers returns a list of ELB (v1) based on the input from the different regions.
 	// Returned values are commented in the interface doc comment block.
-	GetLoadBalancers(ctx context.Context, input *elb.DescribeLoadBalancersInput) (*elb.DescribeLoadBalancersOutput, error)
+	GetLoadBalancers(ctx context.Context, input *elb.DescribeLoadBalancersInput) ([]*elb.LoadBalancerDescription, error)
 
 	// GetLoadBalancersTags returns a list of Tags based on the input from the different regions.
 	// Returned values are commented in the interface doc comment block.
-	GetLoadBalancersTags(ctx context.Context, input *elb.DescribeTagsInput) (*elb.DescribeTagsOutput, error)
+	GetLoadBalancersTags(ctx context.Context, input *elb.DescribeTagsInput) ([]*elb.TagDescription, error)
 
 	// GetLoadBalancersV2 returns a list of ELB (v2) - also known as ALB - based on the input from the different regions.
 	// Returned values are commented in the interface doc comment block.
-	GetLoadBalancersV2(ctx context.Context, input *elbv2.DescribeLoadBalancersInput) (*elbv2.DescribeLoadBalancersOutput, error)
+	GetLoadBalancersV2(ctx context.Context, input *elbv2.DescribeLoadBalancersInput) ([]*elbv2.LoadBalancer, error)
 
 	// GetLoadBalancersV2Tags returns a list of Tags based on the input from the different regions.
 	// Returned values are commented in the interface doc comment block.
-	GetLoadBalancersV2Tags(ctx context.Context, input *elbv2.DescribeTagsInput) (*elbv2.DescribeTagsOutput, error)
+	GetLoadBalancersV2Tags(ctx context.Context, input *elbv2.DescribeTagsInput) ([]*elbv2.TagDescription, error)
 
 	// GetLoadBalancersV2Listeners returns a list of Listeners based on the input from the different regions.
 	// Returned values are commented in the interface doc comment block.
-	GetLoadBalancersV2Listeners(ctx context.Context, input *elbv2.DescribeListenersInput) (*elbv2.DescribeListenersOutput, error)
+	GetLoadBalancersV2Listeners(ctx context.Context, input *elbv2.DescribeListenersInput) ([]*elbv2.Listener, error)
 
 	// GetLoadBalancersV2TargetGroups returns a list of TargetGroups based on the input from the different regions.
 	// Returned values are commented in the interface doc comment block.
-	GetLoadBalancersV2TargetGroups(ctx context.Context, input *elbv2.DescribeTargetGroupsInput) (*elbv2.DescribeTargetGroupsOutput, error)
+	GetLoadBalancersV2TargetGroups(ctx context.Context, input *elbv2.DescribeTargetGroupsInput) ([]*elbv2.TargetGroup, error)
 
 	// GetListenerCertificates returns a list of ListenerCertificates based on the input from the different regions.
 	// Returned values are commented in the interface doc comment block.
-	GetListenerCertificates(ctx context.Context, input *elbv2.DescribeListenerCertificatesInput) (*elbv2.DescribeListenerCertificatesOutput, error)
+	GetListenerCertificates(ctx context.Context, input *elbv2.DescribeListenerCertificatesInput) ([]*elbv2.Certificate, error)
 
 	// GetLoadBalancersV2Rules returns a list of Rules based on the input from the different regions.
 	// Returned values are commented in the interface doc comment block.
-	GetLoadBalancersV2Rules(ctx context.Context, input *elbv2.DescribeRulesInput) (*elbv2.DescribeRulesOutput, error)
+	GetLoadBalancersV2Rules(ctx context.Context, input *elbv2.DescribeRulesInput) ([]*elbv2.Rule, error)
 
 	// GetDBInstances returns all DB instances based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetDBInstances(ctx context.Context, input *rds.DescribeDBInstancesInput) (*rds.DescribeDBInstancesOutput, error)
+	GetDBInstances(ctx context.Context, input *rds.DescribeDBInstancesInput) ([]*rds.DBInstance, error)
 
 	// GetDBInstancesTags returns a list of tags from an ARN, extra filters for tags can also be provided.
 	// Returned values are commented in the interface doc comment block.
-	GetDBInstancesTags(ctx context.Context, input *rds.ListTagsForResourceInput) (*rds.ListTagsForResourceOutput, error)
+	GetDBInstancesTags(ctx context.Context, input *rds.ListTagsForResourceInput) ([]*rds.Tag, error)
 
 	// GetDBParameterGroups returns all DB parameterGroups based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetDBParameterGroups(ctx context.Context, input *rds.DescribeDBParameterGroupsInput) (*rds.DescribeDBParameterGroupsOutput, error)
+	GetDBParameterGroups(ctx context.Context, input *rds.DescribeDBParameterGroupsInput) ([]*rds.DBParameterGroup, error)
 
 	// GetDBSubnetGroups returns all DB DBSubnetGroups based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetDBSubnetGroups(ctx context.Context, input *rds.DescribeDBSubnetGroupsInput) (*rds.DescribeDBSubnetGroupsOutput, error)
+	GetDBSubnetGroups(ctx context.Context, input *rds.DescribeDBSubnetGroupsInput) ([]*rds.DBSubnetGroup, error)
 
 	// ListBuckets returns all S3 buckets based on the input given and specifically
 	// filtering by Location as ListBuckets does not do it by itself
 	// Returned values are commented in the interface doc comment block.
-	ListBuckets(ctx context.Context, input *s3.ListBucketsInput) (*s3.ListBucketsOutput, error)
+	ListBuckets(ctx context.Context, input *s3.ListBucketsInput) ([]*s3.Bucket, error)
 
 	// GetBucketTags returns tags associated with S3 buckets based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetBucketTags(ctx context.Context, input *s3.GetBucketTaggingInput) (*s3.GetBucketTaggingOutput, error)
+	GetBucketTags(ctx context.Context, input *s3.GetBucketTaggingInput) ([]*s3.Tag, error)
 
 	// ListObjects returns a list of all S3 objects in a bucket based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	ListObjects(ctx context.Context, input *s3.ListObjectsInput) (*s3.ListObjectsOutput, error)
+	ListObjects(ctx context.Context, input *s3.ListObjectsInput) ([]*s3.Object, error)
 
 	// GetObjectsTags returns tags associated with S3 objects based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetObjectsTags(ctx context.Context, input *s3.GetObjectTaggingInput) (*s3.GetObjectTaggingOutput, error)
+	GetObjectsTags(ctx context.Context, input *s3.GetObjectTaggingInput) ([]*s3.Tag, error)
 
 	// GetRecordedResourceCounts returns counts of the AWS resources which have
 	// been recorded by AWS Config.
 	// See https://docs.aws.amazon.com/config/latest/APIReference/API_GetDiscoveredResourceCounts.html
 	// for more information about what to enable in your AWS account, the list of
 	// supported resources, etc.
-	GetRecordedResourceCounts(ctx context.Context, input *configservice.GetDiscoveredResourceCountsInput) (*configservice.GetDiscoveredResourceCountsOutput, error)
+	GetRecordedResourceCounts(ctx context.Context, input *configservice.GetDiscoveredResourceCountsInput) ([]*configservice.ResourceCount, error)
 
 	// GetCloudFrontDistributions returns all the CloudFront Distributions on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetCloudFrontDistributions(ctx context.Context, input *cloudfront.ListDistributionsInput) (*cloudfront.ListDistributionsOutput, error)
+	GetCloudFrontDistributions(ctx context.Context, input *cloudfront.ListDistributionsInput) ([]*cloudfront.DistributionSummary, error)
 
 	// GetCloudFrontPublicKeys returns all the CloudFront Public Keys on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetCloudFrontPublicKeys(ctx context.Context, input *cloudfront.ListPublicKeysInput) (*cloudfront.ListPublicKeysOutput, error)
+	GetCloudFrontPublicKeys(ctx context.Context, input *cloudfront.ListPublicKeysInput) ([]*cloudfront.PublicKeySummary, error)
 
 	// GetCloudFrontOriginAccessIdentities returns all the CloudFront Origin Access Identities on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetCloudFrontOriginAccessIdentities(ctx context.Context, input *cloudfront.ListCloudFrontOriginAccessIdentitiesInput) (*cloudfront.ListCloudFrontOriginAccessIdentitiesOutput, error)
+	GetCloudFrontOriginAccessIdentities(ctx context.Context, input *cloudfront.ListCloudFrontOriginAccessIdentitiesInput) ([]*cloudfront.OriginAccessIdentitySummary, error)
 
 	// GetAccessKeys returns all the IAM AccessKeys on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetAccessKeys(ctx context.Context, input *iam.ListAccessKeysInput) (*iam.ListAccessKeysOutput, error)
+	GetAccessKeys(ctx context.Context, input *iam.ListAccessKeysInput) ([]*iam.AccessKeyMetadata, error)
 
 	// GetAccountAliases returns all the IAM AccountAliases on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetAccountAliases(ctx context.Context, input *iam.ListAccountAliasesInput) (*iam.ListAccountAliasesOutput, error)
+	GetAccountAliases(ctx context.Context, input *iam.ListAccountAliasesInput) ([]*string, error)
 
 	// GetAccountPasswordPolicy returns the IAM AccountPasswordPolicy on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetAccountPasswordPolicy(ctx context.Context, input *iam.GetAccountPasswordPolicyInput) (*iam.GetAccountPasswordPolicyOutput, error)
+	GetAccountPasswordPolicy(ctx context.Context, input *iam.GetAccountPasswordPolicyInput) (*iam.PasswordPolicy, error)
 
 	// GetGroups returns the IAM Groups on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetGroups(ctx context.Context, input *iam.ListGroupsInput) (*iam.ListGroupsOutput, error)
+	GetGroups(ctx context.Context, input *iam.ListGroupsInput) ([]*iam.Group, error)
 
 	// GetGroupPolicies returns the IAM GroupPolicies on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetGroupPolicies(ctx context.Context, input *iam.ListGroupPoliciesInput) (*iam.ListGroupPoliciesOutput, error)
+	GetGroupPolicies(ctx context.Context, input *iam.ListGroupPoliciesInput) ([]*string, error)
 
 	// GetAttachedGroupPolicies returns the IAM AttachedGroupPolicies on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetAttachedGroupPolicies(ctx context.Context, input *iam.ListAttachedGroupPoliciesInput) (*iam.ListAttachedGroupPoliciesOutput, error)
+	GetAttachedGroupPolicies(ctx context.Context, input *iam.ListAttachedGroupPoliciesInput) ([]*iam.AttachedPolicy, error)
 
 	// GetIstanceProfiles returns the IAM InstanceProfiles on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetInstanceProfiles(ctx context.Context, input *iam.ListInstanceProfilesInput) (*iam.ListInstanceProfilesOutput, error)
+	GetInstanceProfiles(ctx context.Context, input *iam.ListInstanceProfilesInput) ([]*iam.InstanceProfile, error)
 
 	// GetOpenIDConnectProviders returns the IAM OpenIDConnectProviders on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetOpenIDConnectProviders(ctx context.Context, input *iam.ListOpenIDConnectProvidersInput) (*iam.ListOpenIDConnectProvidersOutput, error)
+	GetOpenIDConnectProviders(ctx context.Context, input *iam.ListOpenIDConnectProvidersInput) ([]*iam.OpenIDConnectProviderListEntry, error)
 
 	// GetPolicies returns the IAM Policies on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetPolicies(ctx context.Context, input *iam.ListPoliciesInput) (*iam.ListPoliciesOutput, error)
+	GetPolicies(ctx context.Context, input *iam.ListPoliciesInput) ([]*iam.Policy, error)
 
 	// GetRoles returns the IAM Roles on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetRoles(ctx context.Context, input *iam.ListRolesInput) (*iam.ListRolesOutput, error)
+	GetRoles(ctx context.Context, input *iam.ListRolesInput) ([]*iam.Role, error)
 
 	// GetRolePolicies returns the IAM RolePolicies on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetRolePolicies(ctx context.Context, input *iam.ListRolePoliciesInput) (*iam.ListRolePoliciesOutput, error)
+	GetRolePolicies(ctx context.Context, input *iam.ListRolePoliciesInput) ([]*string, error)
 
 	// GetAttachedRolePolicies returns the IAM AttachedRolePolicies on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetAttachedRolePolicies(ctx context.Context, input *iam.ListAttachedRolePoliciesInput) (*iam.ListAttachedRolePoliciesOutput, error)
+	GetAttachedRolePolicies(ctx context.Context, input *iam.ListAttachedRolePoliciesInput) ([]*iam.AttachedPolicy, error)
 
 	// GetSAMLProviders returns the IAM SAMLProviders on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetSAMLProviders(ctx context.Context, input *iam.ListSAMLProvidersInput) (*iam.ListSAMLProvidersOutput, error)
+	GetSAMLProviders(ctx context.Context, input *iam.ListSAMLProvidersInput) ([]*iam.SAMLProviderListEntry, error)
 
 	// GetServerCertificates returns the IAM ServerCertificates on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetServerCertificates(ctx context.Context, input *iam.ListServerCertificatesInput) (*iam.ListServerCertificatesOutput, error)
+	GetServerCertificates(ctx context.Context, input *iam.ListServerCertificatesInput) ([]*iam.ServerCertificateMetadata, error)
 
 	// GetUsers returns the IAM Users on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetUsers(ctx context.Context, input *iam.ListUsersInput) (*iam.ListUsersOutput, error)
+	GetUsers(ctx context.Context, input *iam.ListUsersInput) ([]*iam.User, error)
 
 	// GetUserPolicies returns the IAM UserPolicies on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetUserPolicies(ctx context.Context, input *iam.ListUserPoliciesInput) (*iam.ListUserPoliciesOutput, error)
+	GetUserPolicies(ctx context.Context, input *iam.ListUserPoliciesInput) ([]*string, error)
 
 	// GetAttachedUserPolicies returns the IAM AttachedUserPolicies on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetAttachedUserPolicies(ctx context.Context, input *iam.ListAttachedUserPoliciesInput) (*iam.ListAttachedUserPoliciesOutput, error)
+	GetAttachedUserPolicies(ctx context.Context, input *iam.ListAttachedUserPoliciesInput) ([]*iam.AttachedPolicy, error)
 
 	// GetSSHPublicKeys returns the IAM SSHPublicKeys on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetSSHPublicKeys(ctx context.Context, input *iam.ListSSHPublicKeysInput) (*iam.ListSSHPublicKeysOutput, error)
+	GetSSHPublicKeys(ctx context.Context, input *iam.ListSSHPublicKeysInput) ([]*iam.SSHPublicKeyMetadata, error)
 
 	// GetActiveReceiptRuleSet returns the SES ActiveReceiptRuleSet on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetActiveReceiptRuleSet(ctx context.Context, input *ses.DescribeActiveReceiptRuleSetInput) (*ses.DescribeActiveReceiptRuleSetOutput, error)
+	GetActiveReceiptRuleSet(ctx context.Context, input *ses.DescribeActiveReceiptRuleSetInput) (*string, error)
+
+	// GetActiveReceiptRulesSet returns the SES ActiveReceiptRuleSet on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetActiveReceiptRulesSet(ctx context.Context, input *ses.DescribeActiveReceiptRuleSetInput) ([]*ses.ReceiptRule, error)
 
 	// GetIdentities returns the SES Identities on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetIdentities(ctx context.Context, input *ses.ListIdentitiesInput) (*ses.ListIdentitiesOutput, error)
+	GetIdentities(ctx context.Context, input *ses.ListIdentitiesInput) ([]*string, error)
 
 	// GetReceiptFilters returns the SES ReceiptFilters on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetReceiptFilters(ctx context.Context, input *ses.ListReceiptFiltersInput) (*ses.ListReceiptFiltersOutput, error)
+	GetReceiptFilters(ctx context.Context, input *ses.ListReceiptFiltersInput) ([]*ses.ReceiptFilter, error)
 
 	// GetConfigurationSets returns the SES ConfigurationSets on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetConfigurationSets(ctx context.Context, input *ses.ListConfigurationSetsInput) (*ses.ListConfigurationSetsOutput, error)
+	GetConfigurationSets(ctx context.Context, input *ses.ListConfigurationSetsInput) ([]*ses.ConfigurationSet, error)
 
 	// GetIdentityNotificationAttributes returns the SES IdentityNotificationAttributes on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetIdentityNotificationAttributes(ctx context.Context, input *ses.GetIdentityNotificationAttributesInput) (*ses.GetIdentityNotificationAttributesOutput, error)
+	GetIdentityNotificationAttributes(ctx context.Context, input *ses.GetIdentityNotificationAttributesInput) (map[string]*ses.IdentityNotificationAttributes, error)
 
 	// GetTemplates returns the SES Templates on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetTemplates(ctx context.Context, input *ses.ListTemplatesInput) (*ses.ListTemplatesOutput, error)
+	GetTemplates(ctx context.Context, input *ses.ListTemplatesInput) ([]*ses.TemplateMetadata, error)
 
 	// GetReusableDelegationSets returns the Route53 ReusableDelegationSets on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetReusableDelegationSets(ctx context.Context, input *route53.ListReusableDelegationSetsInput) (*route53.ListReusableDelegationSetsOutput, error)
+	GetReusableDelegationSets(ctx context.Context, input *route53.ListReusableDelegationSetsInput) ([]*route53.DelegationSet, error)
 
 	// GetHealthChecks returns the Route53 HealthChecks on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetHealthChecks(ctx context.Context, input *route53.ListHealthChecksInput) (*route53.ListHealthChecksOutput, error)
+	GetHealthChecks(ctx context.Context, input *route53.ListHealthChecksInput) ([]*route53.HealthCheck, error)
 
 	// GetQueryLoggingConfigs returns the Route53 QueryLoggingConfigs on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetQueryLoggingConfigs(ctx context.Context, input *route53.ListQueryLoggingConfigsInput) (*route53.ListQueryLoggingConfigsOutput, error)
+	GetQueryLoggingConfigs(ctx context.Context, input *route53.ListQueryLoggingConfigsInput) ([]*route53.QueryLoggingConfig, error)
 
 	// GetResourceRecordSets returns the Route53 ResourceRecordSets on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetResourceRecordSets(ctx context.Context, input *route53.ListResourceRecordSetsInput) (*route53.ListResourceRecordSetsOutput, error)
+	GetResourceRecordSets(ctx context.Context, input *route53.ListResourceRecordSetsInput) ([]*route53.ResourceRecordSet, error)
 
 	// GetHostedZones returns the Route53 HostedZones on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetHostedZones(ctx context.Context, input *route53.ListHostedZonesInput) (*route53.ListHostedZonesOutput, error)
+	GetHostedZones(ctx context.Context, input *route53.ListHostedZonesInput) ([]*route53.HostedZone, error)
 
 	// GetVPCAssociationAuthorizations returns the Route53 VPCAssociationAuthorizations on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetVPCAssociationAuthorizations(ctx context.Context, input *route53.ListVPCAssociationAuthorizationsInput) (*route53.ListVPCAssociationAuthorizationsOutput, error)
+	GetVPCAssociationAuthorizations(ctx context.Context, input *route53.ListVPCAssociationAuthorizationsInput) ([]*route53.VPC, error)
 
 	// GetResolverEndpoints returns the Route53Resolver ResolverEndpoints on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetResolverEndpoints(ctx context.Context, input *route53resolver.ListResolverEndpointsInput) (*route53resolver.ListResolverEndpointsOutput, error)
+	GetResolverEndpoints(ctx context.Context, input *route53resolver.ListResolverEndpointsInput) ([]*route53resolver.ResolverEndpoint, error)
 
 	// GetResolverRules returns the Route53Resolver ResolverRules on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetResolverRules(ctx context.Context, input *route53resolver.ListResolverRulesInput) (*route53resolver.ListResolverRulesOutput, error)
+	GetResolverRules(ctx context.Context, input *route53resolver.ListResolverRulesInput) ([]*route53resolver.ResolverRule, error)
 
 	// GetResolverRuleAssociations returns the Route53Resolver ResolverRuleAssociations on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetResolverRuleAssociations(ctx context.Context, input *route53resolver.ListResolverRuleAssociationsInput) (*route53resolver.ListResolverRuleAssociationsOutput, error)
+	GetResolverRuleAssociations(ctx context.Context, input *route53resolver.ListResolverRuleAssociationsInput) ([]*route53resolver.ResolverRuleAssociation, error)
 }
 
-func (c *connector) GetAlarms(ctx context.Context, input *cloudwatch.DescribeAlarmsInput) (*cloudwatch.DescribeAlarmsOutput, error) {
+func (c *connector) GetMetricAlarms(ctx context.Context, input *cloudwatch.DescribeAlarmsInput) ([]*cloudwatch.MetricAlarm, error) {
 	if c.svc.cloudwatch == nil {
 		c.svc.cloudwatch = cloudwatch.New(c.svc.session)
 	}
 
-	opt, err := c.svc.cloudwatch.DescribeAlarmsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*cloudwatch.MetricAlarm, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.cloudwatch.DescribeAlarmsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.MetricAlarms...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetInstances(ctx context.Context, input *ec2.DescribeInstancesInput) (*ec2.DescribeInstancesOutput, error) {
+func (c *connector) GetInstances(ctx context.Context, input *ec2.DescribeInstancesInput) ([]*ec2.Instance, error) {
 	if c.svc.ec2 == nil {
 		c.svc.ec2 = ec2.New(c.svc.session)
 	}
 
-	opt, err := c.svc.ec2.DescribeInstancesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*ec2.Instance, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeInstancesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		for _, v := range o.Reservations {
+			opt = append(opt, v.Instances...)
+		}
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) (*ec2.DescribeVpcsOutput, error) {
+func (c *connector) GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) ([]*ec2.Vpc, error) {
 	if c.svc.ec2 == nil {
 		c.svc.ec2 = ec2.New(c.svc.session)
 	}
 
-	opt, err := c.svc.ec2.DescribeVpcsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*ec2.Vpc, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeVpcsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.Vpcs...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetVpcPeeringConnections(ctx context.Context, input *ec2.DescribeVpcPeeringConnectionsInput) (*ec2.DescribeVpcPeeringConnectionsOutput, error) {
+func (c *connector) GetVpcPeeringConnections(ctx context.Context, input *ec2.DescribeVpcPeeringConnectionsInput) ([]*ec2.VpcPeeringConnection, error) {
 	if c.svc.ec2 == nil {
 		c.svc.ec2 = ec2.New(c.svc.session)
 	}
 
-	opt, err := c.svc.ec2.DescribeVpcPeeringConnectionsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*ec2.VpcPeeringConnection, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeVpcPeeringConnectionsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.VpcPeeringConnections...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetImages(ctx context.Context, input *ec2.DescribeImagesInput) (*ec2.DescribeImagesOutput, error) {
+func (c *connector) GetImages(ctx context.Context, input *ec2.DescribeImagesInput) ([]*ec2.Image, error) {
 	if c.svc.ec2 == nil {
 		c.svc.ec2 = ec2.New(c.svc.session)
 	}
 
-	opt, err := c.svc.ec2.DescribeImagesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*ec2.Image, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeImagesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.Images...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetOwnImages(ctx context.Context, input *ec2.DescribeImagesInput) (*ec2.DescribeImagesOutput, error) {
+func (c *connector) GetOwnImages(ctx context.Context, input *ec2.DescribeImagesInput) ([]*ec2.Image, error) {
 
 	if input == nil {
 		input = &ec2.DescribeImagesInput{}
@@ -409,80 +469,144 @@ func (c *connector) GetOwnImages(ctx context.Context, input *ec2.DescribeImagesI
 		c.svc.ec2 = ec2.New(c.svc.session)
 	}
 
-	opt, err := c.svc.ec2.DescribeImagesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*ec2.Image, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeImagesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.Images...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetKeyPairs(ctx context.Context, input *ec2.DescribeKeyPairsInput) (*ec2.DescribeKeyPairsOutput, error) {
+func (c *connector) GetKeyPairs(ctx context.Context, input *ec2.DescribeKeyPairsInput) ([]*ec2.KeyPairInfo, error) {
 	if c.svc.ec2 == nil {
 		c.svc.ec2 = ec2.New(c.svc.session)
 	}
 
-	opt, err := c.svc.ec2.DescribeKeyPairsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*ec2.KeyPairInfo, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeKeyPairsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.KeyPairs...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetSecurityGroups(ctx context.Context, input *ec2.DescribeSecurityGroupsInput) (*ec2.DescribeSecurityGroupsOutput, error) {
+func (c *connector) GetSecurityGroups(ctx context.Context, input *ec2.DescribeSecurityGroupsInput) ([]*ec2.SecurityGroup, error) {
 	if c.svc.ec2 == nil {
 		c.svc.ec2 = ec2.New(c.svc.session)
 	}
 
-	opt, err := c.svc.ec2.DescribeSecurityGroupsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*ec2.SecurityGroup, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeSecurityGroupsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.SecurityGroups...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetSubnets(ctx context.Context, input *ec2.DescribeSubnetsInput) (*ec2.DescribeSubnetsOutput, error) {
+func (c *connector) GetSubnets(ctx context.Context, input *ec2.DescribeSubnetsInput) ([]*ec2.Subnet, error) {
 	if c.svc.ec2 == nil {
 		c.svc.ec2 = ec2.New(c.svc.session)
 	}
 
-	opt, err := c.svc.ec2.DescribeSubnetsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*ec2.Subnet, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeSubnetsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.Subnets...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetVolumes(ctx context.Context, input *ec2.DescribeVolumesInput) (*ec2.DescribeVolumesOutput, error) {
+func (c *connector) GetVolumes(ctx context.Context, input *ec2.DescribeVolumesInput) ([]*ec2.Volume, error) {
 	if c.svc.ec2 == nil {
 		c.svc.ec2 = ec2.New(c.svc.session)
 	}
 
-	opt, err := c.svc.ec2.DescribeVolumesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*ec2.Volume, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeVolumesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.Volumes...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput) (*ec2.DescribeSnapshotsOutput, error) {
+func (c *connector) GetSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput) ([]*ec2.Snapshot, error) {
 	if c.svc.ec2 == nil {
 		c.svc.ec2 = ec2.New(c.svc.session)
 	}
 
-	opt, err := c.svc.ec2.DescribeSnapshotsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*ec2.Snapshot, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeSnapshotsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.Snapshots...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetOwnSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput) (*ec2.DescribeSnapshotsOutput, error) {
+func (c *connector) GetOwnSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput) ([]*ec2.Snapshot, error) {
 
 	if input == nil {
 		input = &ec2.DescribeSnapshotsInput{}
@@ -492,763 +616,1423 @@ func (c *connector) GetOwnSnapshots(ctx context.Context, input *ec2.DescribeSnap
 		c.svc.ec2 = ec2.New(c.svc.session)
 	}
 
-	opt, err := c.svc.ec2.DescribeSnapshotsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*ec2.Snapshot, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeSnapshotsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.Snapshots...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetLaunchTemplates(ctx context.Context, input *ec2.DescribeLaunchTemplatesInput) (*ec2.DescribeLaunchTemplatesOutput, error) {
+func (c *connector) GetLaunchTemplates(ctx context.Context, input *ec2.DescribeLaunchTemplatesInput) ([]*ec2.LaunchTemplate, error) {
 	if c.svc.ec2 == nil {
 		c.svc.ec2 = ec2.New(c.svc.session)
 	}
 
-	opt, err := c.svc.ec2.DescribeLaunchTemplatesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*ec2.LaunchTemplate, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeLaunchTemplatesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.LaunchTemplates...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetAutoScalingGroups(ctx context.Context, input *autoscaling.DescribeAutoScalingGroupsInput) (*autoscaling.DescribeAutoScalingGroupsOutput, error) {
+func (c *connector) GetAutoScalingGroups(ctx context.Context, input *autoscaling.DescribeAutoScalingGroupsInput) ([]*autoscaling.Group, error) {
 	if c.svc.autoscaling == nil {
 		c.svc.autoscaling = autoscaling.New(c.svc.session)
 	}
 
-	opt, err := c.svc.autoscaling.DescribeAutoScalingGroupsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*autoscaling.Group, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.autoscaling.DescribeAutoScalingGroupsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.AutoScalingGroups...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetLaunchConfigurations(ctx context.Context, input *autoscaling.DescribeLaunchConfigurationsInput) (*autoscaling.DescribeLaunchConfigurationsOutput, error) {
+func (c *connector) GetLaunchConfigurations(ctx context.Context, input *autoscaling.DescribeLaunchConfigurationsInput) ([]*autoscaling.LaunchConfiguration, error) {
 	if c.svc.autoscaling == nil {
 		c.svc.autoscaling = autoscaling.New(c.svc.session)
 	}
 
-	opt, err := c.svc.autoscaling.DescribeLaunchConfigurationsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*autoscaling.LaunchConfiguration, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.autoscaling.DescribeLaunchConfigurationsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.LaunchConfigurations...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetAutoScalingPolicies(ctx context.Context, input *autoscaling.DescribePoliciesInput) (*autoscaling.DescribePoliciesOutput, error) {
+func (c *connector) GetAutoScalingPolicies(ctx context.Context, input *autoscaling.DescribePoliciesInput) ([]*autoscaling.ScalingPolicy, error) {
 	if c.svc.autoscaling == nil {
 		c.svc.autoscaling = autoscaling.New(c.svc.session)
 	}
 
-	opt, err := c.svc.autoscaling.DescribePoliciesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*autoscaling.ScalingPolicy, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.autoscaling.DescribePoliciesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.ScalingPolicies...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetElastiCacheClusters(ctx context.Context, input *elasticache.DescribeCacheClustersInput) (*elasticache.DescribeCacheClustersOutput, error) {
+func (c *connector) GetElastiCacheClusters(ctx context.Context, input *elasticache.DescribeCacheClustersInput) ([]*elasticache.CacheCluster, error) {
 	if c.svc.elasticache == nil {
 		c.svc.elasticache = elasticache.New(c.svc.session)
 	}
 
-	opt, err := c.svc.elasticache.DescribeCacheClustersWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*elasticache.CacheCluster, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.elasticache.DescribeCacheClustersWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.CacheClusters...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetElastiCacheTags(ctx context.Context, input *elasticache.ListTagsForResourceInput) (*elasticache.TagListMessage, error) {
+func (c *connector) GetElastiCacheTags(ctx context.Context, input *elasticache.ListTagsForResourceInput) ([]*elasticache.Tag, error) {
 	if c.svc.elasticache == nil {
 		c.svc.elasticache = elasticache.New(c.svc.session)
 	}
 
-	opt, err := c.svc.elasticache.ListTagsForResourceWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*elasticache.Tag, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.elasticache.ListTagsForResourceWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.TagList...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetLoadBalancers(ctx context.Context, input *elb.DescribeLoadBalancersInput) (*elb.DescribeLoadBalancersOutput, error) {
+func (c *connector) GetLoadBalancers(ctx context.Context, input *elb.DescribeLoadBalancersInput) ([]*elb.LoadBalancerDescription, error) {
 	if c.svc.elb == nil {
 		c.svc.elb = elb.New(c.svc.session)
 	}
 
-	opt, err := c.svc.elb.DescribeLoadBalancersWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*elb.LoadBalancerDescription, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.elb.DescribeLoadBalancersWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.NextMarker
+		hasNextToken = o.NextMarker != nil
+
+		opt = append(opt, o.LoadBalancerDescriptions...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetLoadBalancersTags(ctx context.Context, input *elb.DescribeTagsInput) (*elb.DescribeTagsOutput, error) {
+func (c *connector) GetLoadBalancersTags(ctx context.Context, input *elb.DescribeTagsInput) ([]*elb.TagDescription, error) {
 	if c.svc.elb == nil {
 		c.svc.elb = elb.New(c.svc.session)
 	}
 
-	opt, err := c.svc.elb.DescribeTagsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*elb.TagDescription, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.elb.DescribeTagsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.TagDescriptions...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetLoadBalancersV2(ctx context.Context, input *elbv2.DescribeLoadBalancersInput) (*elbv2.DescribeLoadBalancersOutput, error) {
+func (c *connector) GetLoadBalancersV2(ctx context.Context, input *elbv2.DescribeLoadBalancersInput) ([]*elbv2.LoadBalancer, error) {
 	if c.svc.elbv2 == nil {
 		c.svc.elbv2 = elbv2.New(c.svc.session)
 	}
 
-	opt, err := c.svc.elbv2.DescribeLoadBalancersWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*elbv2.LoadBalancer, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.elbv2.DescribeLoadBalancersWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.NextMarker
+		hasNextToken = o.NextMarker != nil
+
+		opt = append(opt, o.LoadBalancers...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetLoadBalancersV2Tags(ctx context.Context, input *elbv2.DescribeTagsInput) (*elbv2.DescribeTagsOutput, error) {
+func (c *connector) GetLoadBalancersV2Tags(ctx context.Context, input *elbv2.DescribeTagsInput) ([]*elbv2.TagDescription, error) {
 	if c.svc.elbv2 == nil {
 		c.svc.elbv2 = elbv2.New(c.svc.session)
 	}
 
-	opt, err := c.svc.elbv2.DescribeTagsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*elbv2.TagDescription, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.elbv2.DescribeTagsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.TagDescriptions...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetLoadBalancersV2Listeners(ctx context.Context, input *elbv2.DescribeListenersInput) (*elbv2.DescribeListenersOutput, error) {
+func (c *connector) GetLoadBalancersV2Listeners(ctx context.Context, input *elbv2.DescribeListenersInput) ([]*elbv2.Listener, error) {
 	if c.svc.elbv2 == nil {
 		c.svc.elbv2 = elbv2.New(c.svc.session)
 	}
 
-	opt, err := c.svc.elbv2.DescribeListenersWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*elbv2.Listener, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.elbv2.DescribeListenersWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.NextMarker
+		hasNextToken = o.NextMarker != nil
+
+		opt = append(opt, o.Listeners...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetLoadBalancersV2TargetGroups(ctx context.Context, input *elbv2.DescribeTargetGroupsInput) (*elbv2.DescribeTargetGroupsOutput, error) {
+func (c *connector) GetLoadBalancersV2TargetGroups(ctx context.Context, input *elbv2.DescribeTargetGroupsInput) ([]*elbv2.TargetGroup, error) {
 	if c.svc.elbv2 == nil {
 		c.svc.elbv2 = elbv2.New(c.svc.session)
 	}
 
-	opt, err := c.svc.elbv2.DescribeTargetGroupsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*elbv2.TargetGroup, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.elbv2.DescribeTargetGroupsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.NextMarker
+		hasNextToken = o.NextMarker != nil
+
+		opt = append(opt, o.TargetGroups...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetListenerCertificates(ctx context.Context, input *elbv2.DescribeListenerCertificatesInput) (*elbv2.DescribeListenerCertificatesOutput, error) {
+func (c *connector) GetListenerCertificates(ctx context.Context, input *elbv2.DescribeListenerCertificatesInput) ([]*elbv2.Certificate, error) {
 	if c.svc.elbv2 == nil {
 		c.svc.elbv2 = elbv2.New(c.svc.session)
 	}
 
-	opt, err := c.svc.elbv2.DescribeListenerCertificatesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*elbv2.Certificate, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.elbv2.DescribeListenerCertificatesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.NextMarker
+		hasNextToken = o.NextMarker != nil
+
+		opt = append(opt, o.Certificates...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetLoadBalancersV2Rules(ctx context.Context, input *elbv2.DescribeRulesInput) (*elbv2.DescribeRulesOutput, error) {
+func (c *connector) GetLoadBalancersV2Rules(ctx context.Context, input *elbv2.DescribeRulesInput) ([]*elbv2.Rule, error) {
 	if c.svc.elbv2 == nil {
 		c.svc.elbv2 = elbv2.New(c.svc.session)
 	}
 
-	opt, err := c.svc.elbv2.DescribeRulesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*elbv2.Rule, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.elbv2.DescribeRulesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.NextMarker
+		hasNextToken = o.NextMarker != nil
+
+		opt = append(opt, o.Rules...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetDBInstances(ctx context.Context, input *rds.DescribeDBInstancesInput) (*rds.DescribeDBInstancesOutput, error) {
+func (c *connector) GetDBInstances(ctx context.Context, input *rds.DescribeDBInstancesInput) ([]*rds.DBInstance, error) {
 	if c.svc.rds == nil {
 		c.svc.rds = rds.New(c.svc.session)
 	}
 
-	opt, err := c.svc.rds.DescribeDBInstancesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*rds.DBInstance, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.rds.DescribeDBInstancesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.DBInstances...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetDBInstancesTags(ctx context.Context, input *rds.ListTagsForResourceInput) (*rds.ListTagsForResourceOutput, error) {
+func (c *connector) GetDBInstancesTags(ctx context.Context, input *rds.ListTagsForResourceInput) ([]*rds.Tag, error) {
 	if c.svc.rds == nil {
 		c.svc.rds = rds.New(c.svc.session)
 	}
 
-	opt, err := c.svc.rds.ListTagsForResourceWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*rds.Tag, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.rds.ListTagsForResourceWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.TagList...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetDBParameterGroups(ctx context.Context, input *rds.DescribeDBParameterGroupsInput) (*rds.DescribeDBParameterGroupsOutput, error) {
+func (c *connector) GetDBParameterGroups(ctx context.Context, input *rds.DescribeDBParameterGroupsInput) ([]*rds.DBParameterGroup, error) {
 	if c.svc.rds == nil {
 		c.svc.rds = rds.New(c.svc.session)
 	}
 
-	opt, err := c.svc.rds.DescribeDBParameterGroupsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*rds.DBParameterGroup, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.rds.DescribeDBParameterGroupsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.DBParameterGroups...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetDBSubnetGroups(ctx context.Context, input *rds.DescribeDBSubnetGroupsInput) (*rds.DescribeDBSubnetGroupsOutput, error) {
+func (c *connector) GetDBSubnetGroups(ctx context.Context, input *rds.DescribeDBSubnetGroupsInput) ([]*rds.DBSubnetGroup, error) {
 	if c.svc.rds == nil {
 		c.svc.rds = rds.New(c.svc.session)
 	}
 
-	opt, err := c.svc.rds.DescribeDBSubnetGroupsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*rds.DBSubnetGroup, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.rds.DescribeDBSubnetGroupsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.DBSubnetGroups...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetBucketTags(ctx context.Context, input *s3.GetBucketTaggingInput) (*s3.GetBucketTaggingOutput, error) {
+func (c *connector) GetBucketTags(ctx context.Context, input *s3.GetBucketTaggingInput) ([]*s3.Tag, error) {
 	if c.svc.s3 == nil {
 		c.svc.s3 = s3.New(c.svc.session)
 	}
 
-	opt, err := c.svc.s3.GetBucketTaggingWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*s3.Tag, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.s3.GetBucketTaggingWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.TagSet...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) ListObjects(ctx context.Context, input *s3.ListObjectsInput) (*s3.ListObjectsOutput, error) {
+func (c *connector) ListObjects(ctx context.Context, input *s3.ListObjectsInput) ([]*s3.Object, error) {
 	if c.svc.s3 == nil {
 		c.svc.s3 = s3.New(c.svc.session)
 	}
 
-	opt, err := c.svc.s3.ListObjectsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*s3.Object, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.s3.ListObjectsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.Contents...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetObjectsTags(ctx context.Context, input *s3.GetObjectTaggingInput) (*s3.GetObjectTaggingOutput, error) {
+func (c *connector) GetObjectsTags(ctx context.Context, input *s3.GetObjectTaggingInput) ([]*s3.Tag, error) {
 	if c.svc.s3 == nil {
 		c.svc.s3 = s3.New(c.svc.session)
 	}
 
-	opt, err := c.svc.s3.GetObjectTaggingWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*s3.Tag, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.s3.GetObjectTaggingWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.TagSet...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetRecordedResourceCounts(ctx context.Context, input *configservice.GetDiscoveredResourceCountsInput) (*configservice.GetDiscoveredResourceCountsOutput, error) {
+func (c *connector) GetRecordedResourceCounts(ctx context.Context, input *configservice.GetDiscoveredResourceCountsInput) ([]*configservice.ResourceCount, error) {
 	if c.svc.configservice == nil {
 		c.svc.configservice = configservice.New(c.svc.session)
 	}
 
-	opt, err := c.svc.configservice.GetDiscoveredResourceCountsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*configservice.ResourceCount, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.configservice.GetDiscoveredResourceCountsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.ResourceCounts...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetCloudFrontDistributions(ctx context.Context, input *cloudfront.ListDistributionsInput) (*cloudfront.ListDistributionsOutput, error) {
+func (c *connector) GetCloudFrontDistributions(ctx context.Context, input *cloudfront.ListDistributionsInput) ([]*cloudfront.DistributionSummary, error) {
 	if c.svc.cloudfront == nil {
 		c.svc.cloudfront = cloudfront.New(c.svc.session)
 	}
 
-	opt, err := c.svc.cloudfront.ListDistributionsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*cloudfront.DistributionSummary, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.cloudfront.ListDistributionsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.DistributionList.NextMarker
+		hasNextToken = o.DistributionList.NextMarker != nil
+
+		opt = append(opt, o.DistributionList.Items...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetCloudFrontPublicKeys(ctx context.Context, input *cloudfront.ListPublicKeysInput) (*cloudfront.ListPublicKeysOutput, error) {
+func (c *connector) GetCloudFrontPublicKeys(ctx context.Context, input *cloudfront.ListPublicKeysInput) ([]*cloudfront.PublicKeySummary, error) {
 	if c.svc.cloudfront == nil {
 		c.svc.cloudfront = cloudfront.New(c.svc.session)
 	}
 
-	opt, err := c.svc.cloudfront.ListPublicKeysWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*cloudfront.PublicKeySummary, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.cloudfront.ListPublicKeysWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.PublicKeyList.NextMarker
+		hasNextToken = o.PublicKeyList.NextMarker != nil
+
+		opt = append(opt, o.PublicKeyList.Items...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetCloudFrontOriginAccessIdentities(ctx context.Context, input *cloudfront.ListCloudFrontOriginAccessIdentitiesInput) (*cloudfront.ListCloudFrontOriginAccessIdentitiesOutput, error) {
+func (c *connector) GetCloudFrontOriginAccessIdentities(ctx context.Context, input *cloudfront.ListCloudFrontOriginAccessIdentitiesInput) ([]*cloudfront.OriginAccessIdentitySummary, error) {
 	if c.svc.cloudfront == nil {
 		c.svc.cloudfront = cloudfront.New(c.svc.session)
 	}
 
-	opt, err := c.svc.cloudfront.ListCloudFrontOriginAccessIdentitiesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*cloudfront.OriginAccessIdentitySummary, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.cloudfront.ListCloudFrontOriginAccessIdentitiesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.CloudFrontOriginAccessIdentityList.Marker
+		hasNextToken = o.CloudFrontOriginAccessIdentityList.Marker != nil
+
+		opt = append(opt, o.CloudFrontOriginAccessIdentityList.Items...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetAccessKeys(ctx context.Context, input *iam.ListAccessKeysInput) (*iam.ListAccessKeysOutput, error) {
+func (c *connector) GetAccessKeys(ctx context.Context, input *iam.ListAccessKeysInput) ([]*iam.AccessKeyMetadata, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt, err := c.svc.iam.ListAccessKeysWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*iam.AccessKeyMetadata, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.ListAccessKeysWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.AccessKeyMetadata...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetAccountAliases(ctx context.Context, input *iam.ListAccountAliasesInput) (*iam.ListAccountAliasesOutput, error) {
+func (c *connector) GetAccountAliases(ctx context.Context, input *iam.ListAccountAliasesInput) ([]*string, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt, err := c.svc.iam.ListAccountAliasesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*string, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.ListAccountAliasesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.AccountAliases...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetAccountPasswordPolicy(ctx context.Context, input *iam.GetAccountPasswordPolicyInput) (*iam.GetAccountPasswordPolicyOutput, error) {
+func (c *connector) GetAccountPasswordPolicy(ctx context.Context, input *iam.GetAccountPasswordPolicyInput) (*iam.PasswordPolicy, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt, err := c.svc.iam.GetAccountPasswordPolicyWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	var opt *iam.PasswordPolicy
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.GetAccountPasswordPolicyWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		hasNextToken = false
+
+		opt = o.PasswordPolicy
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetGroups(ctx context.Context, input *iam.ListGroupsInput) (*iam.ListGroupsOutput, error) {
+func (c *connector) GetGroups(ctx context.Context, input *iam.ListGroupsInput) ([]*iam.Group, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt, err := c.svc.iam.ListGroupsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*iam.Group, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.ListGroupsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.Groups...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetGroupPolicies(ctx context.Context, input *iam.ListGroupPoliciesInput) (*iam.ListGroupPoliciesOutput, error) {
+func (c *connector) GetGroupPolicies(ctx context.Context, input *iam.ListGroupPoliciesInput) ([]*string, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt, err := c.svc.iam.ListGroupPoliciesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*string, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.ListGroupPoliciesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.PolicyNames...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetAttachedGroupPolicies(ctx context.Context, input *iam.ListAttachedGroupPoliciesInput) (*iam.ListAttachedGroupPoliciesOutput, error) {
+func (c *connector) GetAttachedGroupPolicies(ctx context.Context, input *iam.ListAttachedGroupPoliciesInput) ([]*iam.AttachedPolicy, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt, err := c.svc.iam.ListAttachedGroupPoliciesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*iam.AttachedPolicy, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.ListAttachedGroupPoliciesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.AttachedPolicies...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetInstanceProfiles(ctx context.Context, input *iam.ListInstanceProfilesInput) (*iam.ListInstanceProfilesOutput, error) {
+func (c *connector) GetInstanceProfiles(ctx context.Context, input *iam.ListInstanceProfilesInput) ([]*iam.InstanceProfile, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt, err := c.svc.iam.ListInstanceProfilesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*iam.InstanceProfile, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.ListInstanceProfilesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.InstanceProfiles...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetOpenIDConnectProviders(ctx context.Context, input *iam.ListOpenIDConnectProvidersInput) (*iam.ListOpenIDConnectProvidersOutput, error) {
+func (c *connector) GetOpenIDConnectProviders(ctx context.Context, input *iam.ListOpenIDConnectProvidersInput) ([]*iam.OpenIDConnectProviderListEntry, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt, err := c.svc.iam.ListOpenIDConnectProvidersWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*iam.OpenIDConnectProviderListEntry, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.ListOpenIDConnectProvidersWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.OpenIDConnectProviderList...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetPolicies(ctx context.Context, input *iam.ListPoliciesInput) (*iam.ListPoliciesOutput, error) {
+func (c *connector) GetPolicies(ctx context.Context, input *iam.ListPoliciesInput) ([]*iam.Policy, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt, err := c.svc.iam.ListPoliciesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*iam.Policy, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.ListPoliciesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.Policies...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetRoles(ctx context.Context, input *iam.ListRolesInput) (*iam.ListRolesOutput, error) {
+func (c *connector) GetRoles(ctx context.Context, input *iam.ListRolesInput) ([]*iam.Role, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt, err := c.svc.iam.ListRolesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*iam.Role, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.ListRolesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.Roles...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetRolePolicies(ctx context.Context, input *iam.ListRolePoliciesInput) (*iam.ListRolePoliciesOutput, error) {
+func (c *connector) GetRolePolicies(ctx context.Context, input *iam.ListRolePoliciesInput) ([]*string, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt, err := c.svc.iam.ListRolePoliciesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*string, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.ListRolePoliciesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.PolicyNames...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetAttachedRolePolicies(ctx context.Context, input *iam.ListAttachedRolePoliciesInput) (*iam.ListAttachedRolePoliciesOutput, error) {
+func (c *connector) GetAttachedRolePolicies(ctx context.Context, input *iam.ListAttachedRolePoliciesInput) ([]*iam.AttachedPolicy, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt, err := c.svc.iam.ListAttachedRolePoliciesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*iam.AttachedPolicy, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.ListAttachedRolePoliciesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.AttachedPolicies...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetSAMLProviders(ctx context.Context, input *iam.ListSAMLProvidersInput) (*iam.ListSAMLProvidersOutput, error) {
+func (c *connector) GetSAMLProviders(ctx context.Context, input *iam.ListSAMLProvidersInput) ([]*iam.SAMLProviderListEntry, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt, err := c.svc.iam.ListSAMLProvidersWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*iam.SAMLProviderListEntry, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.ListSAMLProvidersWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.SAMLProviderList...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetServerCertificates(ctx context.Context, input *iam.ListServerCertificatesInput) (*iam.ListServerCertificatesOutput, error) {
+func (c *connector) GetServerCertificates(ctx context.Context, input *iam.ListServerCertificatesInput) ([]*iam.ServerCertificateMetadata, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt, err := c.svc.iam.ListServerCertificatesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*iam.ServerCertificateMetadata, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.ListServerCertificatesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.ServerCertificateMetadataList...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetUsers(ctx context.Context, input *iam.ListUsersInput) (*iam.ListUsersOutput, error) {
+func (c *connector) GetUsers(ctx context.Context, input *iam.ListUsersInput) ([]*iam.User, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt, err := c.svc.iam.ListUsersWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*iam.User, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.ListUsersWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.Users...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetUserPolicies(ctx context.Context, input *iam.ListUserPoliciesInput) (*iam.ListUserPoliciesOutput, error) {
+func (c *connector) GetUserPolicies(ctx context.Context, input *iam.ListUserPoliciesInput) ([]*string, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt, err := c.svc.iam.ListUserPoliciesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*string, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.ListUserPoliciesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.PolicyNames...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetAttachedUserPolicies(ctx context.Context, input *iam.ListAttachedUserPoliciesInput) (*iam.ListAttachedUserPoliciesOutput, error) {
+func (c *connector) GetAttachedUserPolicies(ctx context.Context, input *iam.ListAttachedUserPoliciesInput) ([]*iam.AttachedPolicy, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt, err := c.svc.iam.ListAttachedUserPoliciesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*iam.AttachedPolicy, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.ListAttachedUserPoliciesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.AttachedPolicies...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetSSHPublicKeys(ctx context.Context, input *iam.ListSSHPublicKeysInput) (*iam.ListSSHPublicKeysOutput, error) {
+func (c *connector) GetSSHPublicKeys(ctx context.Context, input *iam.ListSSHPublicKeysInput) ([]*iam.SSHPublicKeyMetadata, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt, err := c.svc.iam.ListSSHPublicKeysWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*iam.SSHPublicKeyMetadata, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.ListSSHPublicKeysWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.SSHPublicKeys...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetActiveReceiptRuleSet(ctx context.Context, input *ses.DescribeActiveReceiptRuleSetInput) (*ses.DescribeActiveReceiptRuleSetOutput, error) {
+func (c *connector) GetActiveReceiptRuleSet(ctx context.Context, input *ses.DescribeActiveReceiptRuleSetInput) (*string, error) {
 	if c.svc.ses == nil {
 		c.svc.ses = ses.New(c.svc.session)
 	}
 
-	opt, err := c.svc.ses.DescribeActiveReceiptRuleSetWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	var opt *string
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ses.DescribeActiveReceiptRuleSetWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		hasNextToken = false
+
+		opt = o.Metadata.Name
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetIdentities(ctx context.Context, input *ses.ListIdentitiesInput) (*ses.ListIdentitiesOutput, error) {
+func (c *connector) GetActiveReceiptRulesSet(ctx context.Context, input *ses.DescribeActiveReceiptRuleSetInput) ([]*ses.ReceiptRule, error) {
 	if c.svc.ses == nil {
 		c.svc.ses = ses.New(c.svc.session)
 	}
 
-	opt, err := c.svc.ses.ListIdentitiesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*ses.ReceiptRule, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ses.DescribeActiveReceiptRuleSetWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.Rules...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetReceiptFilters(ctx context.Context, input *ses.ListReceiptFiltersInput) (*ses.ListReceiptFiltersOutput, error) {
+func (c *connector) GetIdentities(ctx context.Context, input *ses.ListIdentitiesInput) ([]*string, error) {
 	if c.svc.ses == nil {
 		c.svc.ses = ses.New(c.svc.session)
 	}
 
-	opt, err := c.svc.ses.ListReceiptFiltersWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*string, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ses.ListIdentitiesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.Identities...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetConfigurationSets(ctx context.Context, input *ses.ListConfigurationSetsInput) (*ses.ListConfigurationSetsOutput, error) {
+func (c *connector) GetReceiptFilters(ctx context.Context, input *ses.ListReceiptFiltersInput) ([]*ses.ReceiptFilter, error) {
 	if c.svc.ses == nil {
 		c.svc.ses = ses.New(c.svc.session)
 	}
 
-	opt, err := c.svc.ses.ListConfigurationSetsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*ses.ReceiptFilter, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ses.ListReceiptFiltersWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.Filters...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetIdentityNotificationAttributes(ctx context.Context, input *ses.GetIdentityNotificationAttributesInput) (*ses.GetIdentityNotificationAttributesOutput, error) {
+func (c *connector) GetConfigurationSets(ctx context.Context, input *ses.ListConfigurationSetsInput) ([]*ses.ConfigurationSet, error) {
 	if c.svc.ses == nil {
 		c.svc.ses = ses.New(c.svc.session)
 	}
 
-	opt, err := c.svc.ses.GetIdentityNotificationAttributesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*ses.ConfigurationSet, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ses.ListConfigurationSetsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.ConfigurationSets...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetTemplates(ctx context.Context, input *ses.ListTemplatesInput) (*ses.ListTemplatesOutput, error) {
+func (c *connector) GetIdentityNotificationAttributes(ctx context.Context, input *ses.GetIdentityNotificationAttributesInput) (map[string]*ses.IdentityNotificationAttributes, error) {
 	if c.svc.ses == nil {
 		c.svc.ses = ses.New(c.svc.session)
 	}
 
-	opt, err := c.svc.ses.ListTemplatesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make(map[string]*ses.IdentityNotificationAttributes, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ses.GetIdentityNotificationAttributesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		hasNextToken = false
+
+		opt = o.NotificationAttributes
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetReusableDelegationSets(ctx context.Context, input *route53.ListReusableDelegationSetsInput) (*route53.ListReusableDelegationSetsOutput, error) {
+func (c *connector) GetTemplates(ctx context.Context, input *ses.ListTemplatesInput) ([]*ses.TemplateMetadata, error) {
+	if c.svc.ses == nil {
+		c.svc.ses = ses.New(c.svc.session)
+	}
+
+	opt := make([]*ses.TemplateMetadata, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ses.ListTemplatesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.TemplatesMetadata...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetReusableDelegationSets(ctx context.Context, input *route53.ListReusableDelegationSetsInput) ([]*route53.DelegationSet, error) {
 	if c.svc.route53 == nil {
 		c.svc.route53 = route53.New(c.svc.session)
 	}
 
-	opt, err := c.svc.route53.ListReusableDelegationSetsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*route53.DelegationSet, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.route53.ListReusableDelegationSetsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.DelegationSets...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetHealthChecks(ctx context.Context, input *route53.ListHealthChecksInput) (*route53.ListHealthChecksOutput, error) {
+func (c *connector) GetHealthChecks(ctx context.Context, input *route53.ListHealthChecksInput) ([]*route53.HealthCheck, error) {
 	if c.svc.route53 == nil {
 		c.svc.route53 = route53.New(c.svc.session)
 	}
 
-	opt, err := c.svc.route53.ListHealthChecksWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*route53.HealthCheck, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.route53.ListHealthChecksWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.HealthChecks...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetQueryLoggingConfigs(ctx context.Context, input *route53.ListQueryLoggingConfigsInput) (*route53.ListQueryLoggingConfigsOutput, error) {
+func (c *connector) GetQueryLoggingConfigs(ctx context.Context, input *route53.ListQueryLoggingConfigsInput) ([]*route53.QueryLoggingConfig, error) {
 	if c.svc.route53 == nil {
 		c.svc.route53 = route53.New(c.svc.session)
 	}
 
-	opt, err := c.svc.route53.ListQueryLoggingConfigsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*route53.QueryLoggingConfig, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.route53.ListQueryLoggingConfigsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.QueryLoggingConfigs...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetResourceRecordSets(ctx context.Context, input *route53.ListResourceRecordSetsInput) (*route53.ListResourceRecordSetsOutput, error) {
+func (c *connector) GetResourceRecordSets(ctx context.Context, input *route53.ListResourceRecordSetsInput) ([]*route53.ResourceRecordSet, error) {
 	if c.svc.route53 == nil {
 		c.svc.route53 = route53.New(c.svc.session)
 	}
 
-	opt, err := c.svc.route53.ListResourceRecordSetsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*route53.ResourceRecordSet, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.route53.ListResourceRecordSetsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.StartRecordName = o.NextRecordName
+		hasNextToken = o.NextRecordName != nil
+
+		opt = append(opt, o.ResourceRecordSets...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetHostedZones(ctx context.Context, input *route53.ListHostedZonesInput) (*route53.ListHostedZonesOutput, error) {
+func (c *connector) GetHostedZones(ctx context.Context, input *route53.ListHostedZonesInput) ([]*route53.HostedZone, error) {
 	if c.svc.route53 == nil {
 		c.svc.route53 = route53.New(c.svc.session)
 	}
 
-	opt, err := c.svc.route53.ListHostedZonesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*route53.HostedZone, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.route53.ListHostedZonesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.HostedZones...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetVPCAssociationAuthorizations(ctx context.Context, input *route53.ListVPCAssociationAuthorizationsInput) (*route53.ListVPCAssociationAuthorizationsOutput, error) {
+func (c *connector) GetVPCAssociationAuthorizations(ctx context.Context, input *route53.ListVPCAssociationAuthorizationsInput) ([]*route53.VPC, error) {
 	if c.svc.route53 == nil {
 		c.svc.route53 = route53.New(c.svc.session)
 	}
 
-	opt, err := c.svc.route53.ListVPCAssociationAuthorizationsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*route53.VPC, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.route53.ListVPCAssociationAuthorizationsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.VPCs...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetResolverEndpoints(ctx context.Context, input *route53resolver.ListResolverEndpointsInput) (*route53resolver.ListResolverEndpointsOutput, error) {
+func (c *connector) GetResolverEndpoints(ctx context.Context, input *route53resolver.ListResolverEndpointsInput) ([]*route53resolver.ResolverEndpoint, error) {
 	if c.svc.route53resolver == nil {
 		c.svc.route53resolver = route53resolver.New(c.svc.session)
 	}
 
-	opt, err := c.svc.route53resolver.ListResolverEndpointsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*route53resolver.ResolverEndpoint, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.route53resolver.ListResolverEndpointsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.ResolverEndpoints...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetResolverRules(ctx context.Context, input *route53resolver.ListResolverRulesInput) (*route53resolver.ListResolverRulesOutput, error) {
+func (c *connector) GetResolverRules(ctx context.Context, input *route53resolver.ListResolverRulesInput) ([]*route53resolver.ResolverRule, error) {
 	if c.svc.route53resolver == nil {
 		c.svc.route53resolver = route53resolver.New(c.svc.session)
 	}
 
-	opt, err := c.svc.route53resolver.ListResolverRulesWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*route53resolver.ResolverRule, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.route53resolver.ListResolverRulesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.ResolverRules...)
+
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetResolverRuleAssociations(ctx context.Context, input *route53resolver.ListResolverRuleAssociationsInput) (*route53resolver.ListResolverRuleAssociationsOutput, error) {
+func (c *connector) GetResolverRuleAssociations(ctx context.Context, input *route53resolver.ListResolverRuleAssociationsInput) ([]*route53resolver.ResolverRuleAssociation, error) {
 	if c.svc.route53resolver == nil {
 		c.svc.route53resolver = route53resolver.New(c.svc.session)
 	}
 
-	opt, err := c.svc.route53resolver.ListResolverRuleAssociationsWithContext(ctx, input)
-	if err != nil {
-		return nil, err
+	opt := make([]*route53resolver.ResolverRuleAssociation, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.route53resolver.ListResolverRuleAssociationsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.ResolverRuleAssociations...)
+
 	}
 
 	return opt, nil

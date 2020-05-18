@@ -9,7 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
-func (c *connector) ListBuckets(ctx context.Context, input *s3.ListBucketsInput) (*s3.ListBucketsOutput, error) {
+func (c *connector) ListBuckets(ctx context.Context, input *s3.ListBucketsInput) ([]*s3.Bucket, error) {
 	var errs []error
 	var ropt = &s3.ListBucketsOutput{}
 
@@ -48,5 +48,5 @@ func (c *connector) ListBuckets(ctx context.Context, input *s3.ListBucketsInput)
 		return nil, errors.New(strings.Join(serrs, ","))
 	}
 
-	return ropt, nil
+	return ropt.Buckets, nil
 }

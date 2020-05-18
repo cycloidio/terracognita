@@ -5,6 +5,8 @@
   ([PR #97](https://github.com/cycloidio/terracognita/pull/97))
 - aws: `aws_lb`, `aws_lb_listener`, `aws_lb_listener_rule`, `aws_lb_target_group`
   ([PR #96](https://github.com/cycloidio/terracognita/pull/96))
+- aws: Pagination of all the functions on the reader
+  ([Issue #13](https://github.com/cycloidio/terracognita/issue/13))
 
 ### Changed
 

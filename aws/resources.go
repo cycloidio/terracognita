@@ -205,14 +205,12 @@ func instances(ctx context.Context, a *aws, resourceType string, filters *filter
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, v := range instances.Reservations {
-		for _, vv := range v.Instances {
-			r, err := initializeResource(a, *vv.InstanceId, resourceType)
-			if err != nil {
-				return nil, err
-			}
-			resources = append(resources, r)
+	for _, i := range instances {
+		r, err := initializeResource(a, *i.InstanceId, resourceType)
+		if err != nil {
+			return nil, err
 		}
+		resources = append(resources, r)
 	}
 
 	return resources, nil
@@ -229,7 +227,7 @@ func vpcs(ctx context.Context, a *aws, resourceType string, filters *filter.Filt
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, v := range vpcs.Vpcs {
+	for _, v := range vpcs {
 		r, err := initializeResource(a, *v.VpcId, resourceType)
 		if err != nil {
 			return nil, err
@@ -274,7 +272,7 @@ func vpcPeeringConnections(ctx context.Context, a *aws, resourceType string, fil
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range vpcPeeringConnections.VpcPeeringConnections {
+	for _, i := range vpcPeeringConnections {
 
 		r, err := initializeResource(a, *i.VpcPeeringConnectionId, resourceType)
 		if err != nil {
@@ -299,7 +297,7 @@ func keyPairs(ctx context.Context, a *aws, resourceType string, filters *filter.
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range keyPairs.KeyPairs {
+	for _, i := range keyPairs {
 
 		r, err := initializeResource(a, *i.KeyName, resourceType)
 		if err != nil {
@@ -323,7 +321,7 @@ func securityGroups(ctx context.Context, a *aws, resourceType string, filters *f
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, v := range sgs.SecurityGroups {
+	for _, v := range sgs {
 		r, err := initializeResource(a, *v.GroupId, resourceType)
 		if err != nil {
 			return nil, err
@@ -345,7 +343,7 @@ func subnets(ctx context.Context, a *aws, resourceType string, filters *filter.F
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, v := range subnets.Subnets {
+	for _, v := range subnets {
 		r, err := initializeResource(a, *v.SubnetId, resourceType)
 		if err != nil {
 			return nil, err
@@ -367,7 +365,7 @@ func ebsVolumes(ctx context.Context, a *aws, resourceType string, filters *filte
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, v := range volumes.Volumes {
+	for _, v := range volumes {
 		r, err := initializeResource(a, *v.VolumeId, resourceType)
 		if err != nil {
 			return nil, err
@@ -407,7 +405,7 @@ func elasticacheClusters(ctx context.Context, a *aws, resourceType string, filte
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, v := range cacheClusters.CacheClusters {
+	for _, v := range cacheClusters {
 		r, err := initializeResource(a, *v.CacheClusterId, resourceType)
 		if err != nil {
 			return nil, err
@@ -425,7 +423,7 @@ func elbs(ctx context.Context, a *aws, resourceType string, filters *filter.Filt
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, v := range lbs.LoadBalancerDescriptions {
+	for _, v := range lbs {
 		r, err := initializeResource(a, *v.LoadBalancerName, resourceType)
 		if err != nil {
 			return nil, err
@@ -443,7 +441,7 @@ func albs(ctx context.Context, a *aws, resourceType string, filters *filter.Filt
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, v := range lbs.LoadBalancers {
+	for _, v := range lbs {
 		r, err := initializeResource(a, *v.LoadBalancerArn, resourceType)
 		if err != nil {
 			return nil, err
@@ -472,7 +470,7 @@ func albListeners(ctx context.Context, a *aws, resourceType string, filters *fil
 			return nil, err
 		}
 
-		for _, i := range albListeners.Listeners {
+		for _, i := range albListeners {
 			r, err := initializeResource(a, *i.ListenerArn, resourceType)
 			if err != nil {
 				return nil, err
@@ -508,7 +506,7 @@ func albListenerRules(ctx context.Context, a *aws, resourceType string, filters 
 			return nil, err
 		}
 
-		for _, i := range albListenerRules.Rules {
+		for _, i := range albListenerRules {
 
 			r, err := initializeResource(a, *i.RuleArn, resourceType)
 
@@ -547,7 +545,7 @@ func albListenerCertificates(ctx context.Context, a *aws, resourceType string, f
 			return nil, err
 		}
 
-		for _, i := range albListenerCertificates.Certificates {
+		for _, i := range albListenerCertificates {
 
 			// TODO: if filter include aws_alb_listener, check if *i.IsDefault not append (since it is already written by aws_alb_listener)
 			r, err := initializeResource(a, *i.CertificateArn, resourceType)
@@ -578,7 +576,7 @@ func albTargetGroups(ctx context.Context, a *aws, resourceType string, filters *
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range albTargetGroups.TargetGroups {
+	for _, i := range albTargetGroups {
 
 		r, err := initializeResource(a, *i.TargetGroupArn, resourceType)
 		if err != nil {
@@ -598,7 +596,7 @@ func dbInstances(ctx context.Context, a *aws, resourceType string, filters *filt
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, v := range dbs.DBInstances {
+	for _, v := range dbs {
 		r, err := initializeResource(a, *v.DBInstanceIdentifier, resourceType)
 		if err != nil {
 			return nil, err
@@ -617,7 +615,7 @@ func dbParameterGroups(ctx context.Context, a *aws, resourceType string, filters
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range dbParameterGroups.DBParameterGroups {
+	for _, i := range dbParameterGroups {
 
 		r, err := initializeResource(a, *i.DBParameterGroupName, resourceType)
 		if err != nil {
@@ -638,7 +636,7 @@ func dbSubnetGroups(ctx context.Context, a *aws, resourceType string, filters *f
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range dbSubnetGroups.DBSubnetGroups {
+	for _, i := range dbSubnetGroups {
 
 		r, err := initializeResource(a, *i.DBSubnetGroupName, resourceType)
 		if err != nil {
@@ -658,7 +656,7 @@ func s3Buckets(ctx context.Context, a *aws, resourceType string, filters *filter
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, v := range buckets.Buckets {
+	for _, v := range buckets {
 		r, err := initializeResource(a, *v.Name, resourceType)
 		if err != nil {
 			return nil, err
@@ -676,7 +674,7 @@ func cloudfrontDistributions(ctx context.Context, a *aws, resourceType string, f
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range distributions.DistributionList.Items {
+	for _, i := range distributions {
 		r, err := initializeResource(a, *i.Id, resourceType)
 		if err != nil {
 			return nil, err
@@ -694,7 +692,7 @@ func cloudfrontOriginAccessIdentities(ctx context.Context, a *aws, resourceType 
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range identitys.CloudFrontOriginAccessIdentityList.Items {
+	for _, i := range identitys {
 		r, err := initializeResource(a, *i.Id, resourceType)
 		if err != nil {
 			return nil, err
@@ -712,7 +710,7 @@ func cloudfrontPublicKeys(ctx context.Context, a *aws, resourceType string, filt
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range publicKeys.PublicKeyList.Items {
+	for _, i := range publicKeys {
 		r, err := initializeResource(a, *i.Id, resourceType)
 		if err != nil {
 			return nil, err
@@ -724,13 +722,13 @@ func cloudfrontPublicKeys(ctx context.Context, a *aws, resourceType string, filt
 }
 
 func cloudwatchMetricAlarms(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	alarms, err := a.awsr.GetAlarms(ctx, nil)
+	alarms, err := a.awsr.GetMetricAlarms(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range alarms.MetricAlarms {
+	for _, i := range alarms {
 		r, err := initializeResource(a, *i.AlarmName, resourceType)
 		if err != nil {
 			return nil, err
@@ -758,7 +756,7 @@ func iamAccessKeys(ctx context.Context, a *aws, resourceType string, filters *fi
 			return nil, err
 		}
 
-		for _, i := range iamAccessKeys.AccessKeyMetadata {
+		for _, i := range iamAccessKeys {
 			r, err := initializeResource(a, *i.AccessKeyId, resourceType)
 			if err != nil {
 				return nil, err
@@ -781,7 +779,7 @@ func iamAccountAliases(ctx context.Context, a *aws, resourceType string, filters
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range accountAliases.AccountAliases {
+	for _, i := range accountAliases {
 		r, err := initializeResource(a, *i, resourceType)
 		if err != nil {
 			return nil, err
@@ -808,7 +806,7 @@ func iamGroups(ctx context.Context, a *aws, resourceType string, filters *filter
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range groups.Groups {
+	for _, i := range groups {
 		r, err := initializeResource(a, *i.GroupName, resourceType)
 		if err != nil {
 			return nil, err
@@ -857,7 +855,7 @@ func iamGroupPolicies(ctx context.Context, a *aws, resourceType string, filters 
 			return nil, err
 		}
 
-		for _, i := range groupPolicies.PolicyNames {
+		for _, i := range groupPolicies {
 			// It needs the ID to be "GN:PN"
 			// https://github.com/terraform-providers/terraform-provider-aws/blob/master/aws/resource_aws_iam_group_policy.go#L134:6
 			r, err := initializeResource(a, fmt.Sprintf("%s:%s", gn, *i), resourceType)
@@ -887,7 +885,7 @@ func iamGroupPolicyAttachments(ctx context.Context, a *aws, resourceType string,
 			return nil, err
 		}
 
-		for _, i := range groupPolicies.AttachedPolicies {
+		for _, i := range groupPolicies {
 			r, err := initializeResource(a, fmt.Sprintf("%s/%s", gn, *i.PolicyArn), resourceType)
 			if err != nil {
 				return nil, err
@@ -906,7 +904,7 @@ func iamInstanceProfiles(ctx context.Context, a *aws, resourceType string, filte
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range instanceProfiles.InstanceProfiles {
+	for _, i := range instanceProfiles {
 		r, err := initializeResource(a, *i.InstanceProfileName, resourceType)
 		if err != nil {
 			return nil, err
@@ -924,7 +922,7 @@ func iamOpenidConnectProviders(ctx context.Context, a *aws, resourceType string,
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range openIDConnectProviders.OpenIDConnectProviderList {
+	for _, i := range openIDConnectProviders {
 		r, err := initializeResource(a, *i.Arn, resourceType)
 		if err != nil {
 			return nil, err
@@ -945,7 +943,7 @@ func iamPolicies(ctx context.Context, a *aws, resourceType string, filters *filt
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range policies.Policies {
+	for _, i := range policies {
 		r, err := initializeResource(a, *i.Arn, resourceType)
 		if err != nil {
 			return nil, err
@@ -963,7 +961,7 @@ func iamRoles(ctx context.Context, a *aws, resourceType string, filters *filter.
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range roles.Roles {
+	for _, i := range roles {
 		r, err := initializeResource(a, *i.RoleName, resourceType)
 		if err != nil {
 			return nil, err
@@ -990,7 +988,7 @@ func iamRolePolicies(ctx context.Context, a *aws, resourceType string, filters *
 			return nil, err
 		}
 
-		for _, i := range rolePolicies.PolicyNames {
+		for _, i := range rolePolicies {
 			r, err := initializeResource(a, fmt.Sprintf("%s:%s", rn, *i), resourceType)
 			if err != nil {
 				return nil, err
@@ -1018,7 +1016,7 @@ func iamRolePolicyAttachments(ctx context.Context, a *aws, resourceType string, 
 			return nil, err
 		}
 
-		for _, i := range rolePolicies.AttachedPolicies {
+		for _, i := range rolePolicies {
 			r, err := initializeResource(a, fmt.Sprintf("%s/%s", rn, *i.PolicyArn), resourceType)
 			if err != nil {
 				return nil, err
@@ -1037,7 +1035,7 @@ func iamSAMLProviders(ctx context.Context, a *aws, resourceType string, filters 
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range samalProviders.SAMLProviderList {
+	for _, i := range samalProviders {
 		r, err := initializeResource(a, *i.Arn, resourceType)
 		if err != nil {
 			return nil, err
@@ -1055,7 +1053,7 @@ func iamServerCertificates(ctx context.Context, a *aws, resourceType string, fil
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range serverCertificates.ServerCertificateMetadataList {
+	for _, i := range serverCertificates {
 		r, err := initializeResource(a, *i.ServerCertificateName, resourceType)
 		if err != nil {
 			return nil, err
@@ -1073,7 +1071,7 @@ func iamUsers(ctx context.Context, a *aws, resourceType string, filters *filter.
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range users.Users {
+	for _, i := range users {
 		r, err := initializeResource(a, *i.UserName, resourceType)
 		if err != nil {
 			return nil, err
@@ -1124,7 +1122,7 @@ func iamUserPolicies(ctx context.Context, a *aws, resourceType string, filters *
 			return nil, err
 		}
 
-		for _, i := range userPolicies.PolicyNames {
+		for _, i := range userPolicies {
 			r, err := initializeResource(a, fmt.Sprintf("%s:%s", un, *i), resourceType)
 			if err != nil {
 				return nil, err
@@ -1152,7 +1150,7 @@ func iamUserPolicyAttachments(ctx context.Context, a *aws, resourceType string, 
 			return nil, err
 		}
 
-		for _, i := range userPolicies.AttachedPolicies {
+		for _, i := range userPolicies {
 			r, err := initializeResource(a, fmt.Sprintf("%s/%s", un, *i.PolicyArn), resourceType)
 			if err != nil {
 				return nil, err
@@ -1180,7 +1178,7 @@ func iamUserSSHKeys(ctx context.Context, a *aws, resourceType string, filters *f
 			return nil, err
 		}
 
-		for _, i := range sshPublicKeys.SSHPublicKeys {
+		for _, i := range sshPublicKeys {
 
 			r, err := initializeResource(a, fmt.Sprintf("%s:%s:%s", *i.UserName, *i.SSHPublicKeyId, "SSH"), resourceType)
 			if err != nil {
@@ -1202,7 +1200,7 @@ func route53DelegationSets(ctx context.Context, a *aws, resourceType string, fil
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range r53DelegationSets.DelegationSets {
+	for _, i := range r53DelegationSets {
 		r, err := initializeResource(a, *i.Id, resourceType)
 		if err != nil {
 			return nil, err
@@ -1220,7 +1218,7 @@ func route53HealthChecks(ctx context.Context, a *aws, resourceType string, filte
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range r53HealthChecks.HealthChecks {
+	for _, i := range r53HealthChecks {
 		r, err := initializeResource(a, *i.Id, resourceType)
 		if err != nil {
 			return nil, err
@@ -1238,7 +1236,7 @@ func route53QueryLogs(ctx context.Context, a *aws, resourceType string, filters 
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range r53QueryLogs.QueryLoggingConfigs {
+	for _, i := range r53QueryLogs {
 		r, err := initializeResource(a, *i.Id, resourceType)
 		if err != nil {
 			return nil, err
@@ -1256,7 +1254,7 @@ func route53Zones(ctx context.Context, a *aws, resourceType string, filters *fil
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range r53Zones.HostedZones {
+	for _, i := range r53Zones {
 		r, err := initializeResource(a, *i.Id, resourceType)
 		if err != nil {
 			return nil, err
@@ -1283,7 +1281,7 @@ func route53Records(ctx context.Context, a *aws, resourceType string, filters *f
 			return nil, err
 		}
 
-		for _, i := range r53Records.ResourceRecordSets {
+		for _, i := range r53Records {
 			id := []string{z, strings.ToLower(*i.Name), *i.Type}
 			if i.SetIdentifier != nil {
 				id = append(id, *i.SetIdentifier)
@@ -1315,7 +1313,7 @@ func route53ZoneAssociations(ctx context.Context, a *aws, resourceType string, f
 			return nil, err
 		}
 
-		for _, i := range r53ZoneAssociations.VPCs {
+		for _, i := range r53ZoneAssociations {
 			r, err := initializeResource(a, fmt.Sprintf("%s:%s", z, *i.VPCId), resourceType)
 			if err != nil {
 				return nil, err
@@ -1334,7 +1332,7 @@ func route53ResolverEndpoints(ctx context.Context, a *aws, resourceType string, 
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range r53ResolverEndpoints.ResolverEndpoints {
+	for _, i := range r53ResolverEndpoints {
 		r, err := initializeResource(a, *i.Id, resourceType)
 		if err != nil {
 			return nil, err
@@ -1352,7 +1350,7 @@ func route53ResolverRuleAssociation(ctx context.Context, a *aws, resourceType st
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range r53ResolverRuleAssociations.ResolverRuleAssociations {
+	for _, i := range r53ResolverRuleAssociations {
 		r, err := initializeResource(a, *i.Id, resourceType)
 		if err != nil {
 			return nil, err
@@ -1369,11 +1367,7 @@ func sesActiveReceiptRuleSets(ctx context.Context, a *aws, resourceType string, 
 		return nil, err
 	}
 
-	if sesActiveReceiptRuleSets.Metadata == nil {
-		return nil, nil
-	}
-
-	r, err := initializeResource(a, *sesActiveReceiptRuleSets.Metadata.Name, resourceType)
+	r, err := initializeResource(a, *sesActiveReceiptRuleSets, resourceType)
 	if err != nil {
 		return nil, err
 	}
@@ -1388,7 +1382,7 @@ func sesDomainIdentities(ctx context.Context, a *aws, resourceType string, filte
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range sesDomainIdentities.Identities {
+	for _, i := range sesDomainIdentities {
 		r, err := initializeResource(a, *i, resourceType)
 		if err != nil {
 			return nil, err
@@ -1424,7 +1418,7 @@ func sesReceiptFilters(ctx context.Context, a *aws, resourceType string, filters
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range sesReceiptFilters.Filters {
+	for _, i := range sesReceiptFilters {
 		r, err := initializeResource(a, *i.Name, resourceType)
 		if err != nil {
 			return nil, err
@@ -1436,14 +1430,19 @@ func sesReceiptFilters(ctx context.Context, a *aws, resourceType string, filters
 }
 
 func sesReceiptRules(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	sesActiveReceiptRuleSets, err := a.awsr.GetActiveReceiptRuleSet(ctx, nil)
+	arrmetadata, err := a.awsr.GetActiveReceiptRuleSet(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	sesActiveReceiptRuleSets, err := a.awsr.GetActiveReceiptRulesSet(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range sesActiveReceiptRuleSets.Rules {
-		r, err := initializeResource(a, fmt.Sprintf("%s:%s", *sesActiveReceiptRuleSets.Metadata.Name, *i.Name), resourceType)
+	for _, i := range sesActiveReceiptRuleSets {
+		r, err := initializeResource(a, fmt.Sprintf("%s:%s", *arrmetadata, *i.Name), resourceType)
 		if err != nil {
 			return nil, err
 		}
@@ -1459,11 +1458,7 @@ func sesReceiptRuleSets(ctx context.Context, a *aws, resourceType string, filter
 		return nil, err
 	}
 
-	if sesActiveReceiptRuleSets.Metadata == nil {
-		return nil, nil
-	}
-
-	r, err := initializeResource(a, *sesActiveReceiptRuleSets.Metadata.Name, resourceType)
+	r, err := initializeResource(a, *sesActiveReceiptRuleSets, resourceType)
 	if err != nil {
 		return nil, err
 	}
@@ -1478,7 +1473,7 @@ func sesConfigurationSets(ctx context.Context, a *aws, resourceType string, filt
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range sesConfigurationSets.ConfigurationSets {
+	for _, i := range sesConfigurationSets {
 		r, err := initializeResource(a, *i.Name, resourceType)
 		if err != nil {
 			return nil, err
@@ -1509,7 +1504,7 @@ func sesIdentityNotificationTopics(ctx context.Context, a *aws, resourceType str
 			return nil, err
 		}
 
-		for _, i := range sesIdentityNotificationTopics.NotificationAttributes {
+		for _, i := range sesIdentityNotificationTopics {
 			var notType string
 			if i.BounceTopic != nil {
 				notType = ses.NotificationTypeBounce
@@ -1540,7 +1535,7 @@ func sesTemplates(ctx context.Context, a *aws, resourceType string, filters *fil
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range sesTemplates.TemplatesMetadata {
+	for _, i := range sesTemplates {
 		r, err := initializeResource(a, *i.Name, resourceType)
 		if err != nil {
 			return nil, err
@@ -1559,7 +1554,7 @@ func launchConfigurations(ctx context.Context, a *aws, resourceType string, filt
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range launchConfigurations.LaunchConfigurations {
+	for _, i := range launchConfigurations {
 
 		r, err := initializeResource(a, *i.LaunchConfigurationName, resourceType)
 		if err != nil {
@@ -1584,7 +1579,7 @@ func launchTemplates(ctx context.Context, a *aws, resourceType string, filters *
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range launchTemplates.LaunchTemplates {
+	for _, i := range launchTemplates {
 
 		r, err := initializeResource(a, *i.LaunchTemplateId, resourceType)
 		if err != nil {
@@ -1605,7 +1600,7 @@ func autoscalingGroups(ctx context.Context, a *aws, resourceType string, filters
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range autoscalingGroups.AutoScalingGroups {
+	for _, i := range autoscalingGroups {
 
 		r, err := initializeResource(a, *i.AutoScalingGroupName, resourceType)
 		if err != nil {
@@ -1626,7 +1621,7 @@ func autoscalingPolicies(ctx context.Context, a *aws, resourceType string, filte
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range autoscalingPolicies.ScalingPolicies {
+	for _, i := range autoscalingPolicies {
 
 		r, err := initializeResource(a, *i.AutoScalingGroupName+"/"+*i.PolicyName, resourceType)
 		if err != nil {

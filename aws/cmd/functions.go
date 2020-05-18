@@ -6,20 +6,22 @@ var (
 	functions = []Function{
 		// cloudwatch
 		Function{
-			Entity:  "Alarms",
-			Prefix:  "Describe",
-			Service: "cloudwatch",
+			Entity:          "MetricAlarms",
+			FnServiceEntity: "Alarms",
+			Prefix:          "Describe",
+			Service:         "cloudwatch",
 			Documentation: `
-			// GetAlarms returns all cloudwatch alarms based on the input given.
+			// GetMetricAlarms returns all cloudwatch alarms based on the input given.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 
 		// ec2
 		Function{
-			Entity:  "Instances",
-			Prefix:  "Describe",
-			Service: "ec2",
+			FnAttributeList: "Reservations#Instances",
+			Entity:          "Instances",
+			Prefix:          "Describe",
+			Service:         "ec2",
 			Documentation: `
 			// GetInstances returns all EC2 instances based on the input given.
 			// Returned values are commented in the interface doc comment block.
@@ -45,28 +47,32 @@ var (
 		},
 
 		Function{
-			Entity:  "Images",
-			Prefix:  "Describe",
-			Service: "ec2",
+			HasNotPagination: true,
+			Entity:           "Images",
+			Prefix:           "Describe",
+			Service:          "ec2",
 			Documentation: `
 			// GetImages returns all EC2 AMI based on the input given.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:        "Images",
-			Prefix:        "Describe",
-			Service:       "ec2",
-			FilterByOwner: "Owners",
+			HasNotPagination: true,
+			Entity:           "Images",
+			Prefix:           "Describe",
+			Service:          "ec2",
+			FilterByOwner:    "Owners",
 			Documentation: `
 			// GetOwnImages returns all EC2 AMI belonging to the Account ID based on the input given.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "KeyPairs",
-			Prefix:  "Describe",
-			Service: "ec2",
+			SingularEntity:   "KeyPairInfo",
+			HasNotPagination: true,
+			Entity:           "KeyPairs",
+			Prefix:           "Describe",
+			Service:          "ec2",
 			Documentation: `
 			// GetKeyPairs returns all KeyPairs based on the input given.
 			// Returned values are commented in the interface doc comment block.
@@ -130,9 +136,10 @@ var (
 
 		// autoscaling
 		Function{
-			Entity:  "AutoScalingGroups",
-			Prefix:  "Describe",
-			Service: "autoscaling",
+			Entity:         "AutoScalingGroups",
+			SingularEntity: "Group",
+			Prefix:         "Describe",
+			Service:        "autoscaling",
 			Documentation: `
 			// GetAutoScalingGroups returns all AutoScalingGroup belonging to the Account ID based on the input given.
 			// Returned values are commented in the interface doc comment block.
@@ -148,10 +155,11 @@ var (
 			`,
 		},
 		Function{
-			FnName:  "GetAutoScalingPolicies",
-			Entity:  "Policies",
-			Prefix:  "Describe",
-			Service: "autoscaling",
+			FnName:          "GetAutoScalingPolicies",
+			Entity:          "ScalingPolicies",
+			FnServiceEntity: "Policies",
+			Prefix:          "Describe",
+			Service:         "autoscaling",
 			Documentation: `
 		  // GetAutoScalingPolicies returns all AutoScalingPolicies belonging to the Account ID based on the input given.
 		  // Returned values are commented in the interface doc comment block.
@@ -160,21 +168,24 @@ var (
 
 		// elasticache
 		Function{
-			FnName:  "GetElastiCacheClusters",
-			Entity:  "CacheClusters",
-			Prefix:  "Describe",
-			Service: "elasticache",
+			FnName:                "GetElastiCacheClusters",
+			Entity:                "CacheClusters",
+			Prefix:                "Describe",
+			Service:               "elasticache",
+			FnPaginationAttribute: "Marker",
 			Documentation: `
 			// GetElastiCacheClusters returns all Elasticache clusters based on the input given.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			FnName:   "GetElastiCacheTags",
-			Entity:   "TagsForResource",
-			Prefix:   "List",
-			Service:  "elasticache",
-			FnOutput: "TagListMessage",
+			HasNotPagination: true,
+			FnName:           "GetElastiCacheTags",
+			Entity:           "TagsForResource",
+			SingularEntity:   "Tag",
+			FnAttributeList:  "TagList",
+			Prefix:           "List",
+			Service:          "elasticache",
 			Documentation: `
 			// GetElastiCacheTags returns a list of tags of Elasticache resources based on its ARN.
 			// Returned values are commented in the interface doc comment block.
@@ -183,19 +194,26 @@ var (
 
 		// elb
 		Function{
-			Entity:  "LoadBalancers",
-			Prefix:  "Describe",
-			Service: "elb",
+			Entity:                     "LoadBalancers",
+			SingularEntity:             "LoadBalancerDescription",
+			FnAttributeList:            "LoadBalancerDescriptions",
+			Prefix:                     "Describe",
+			Service:                    "elb",
+			FnPaginationAttribute:      "NextMarker",
+			FnInputPaginationAttribute: "Marker",
 			Documentation: `
 			// GetLoadBalancers returns a list of ELB (v1) based on the input from the different regions.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			FnName:  "GetLoadBalancersTags",
-			Entity:  "Tags",
-			Prefix:  "Describe",
-			Service: "elb",
+			FnName:           "GetLoadBalancersTags",
+			Entity:           "Tags",
+			SingularEntity:   "TagDescription",
+			FnAttributeList:  "TagDescriptions",
+			Prefix:           "Describe",
+			HasNotPagination: true,
+			Service:          "elb",
 			Documentation: `
 			// GetLoadBalancersTags returns a list of Tags based on the input from the different regions.
 			// Returned values are commented in the interface doc comment block.
@@ -204,59 +222,74 @@ var (
 
 		// elbv2
 		Function{
-			FnName:  "GetLoadBalancersV2",
-			Entity:  "LoadBalancers",
-			Prefix:  "Describe",
-			Service: "elbv2",
+			FnName:                     "GetLoadBalancersV2",
+			Entity:                     "LoadBalancers",
+			Prefix:                     "Describe",
+			Service:                    "elbv2",
+			FnPaginationAttribute:      "NextMarker",
+			FnInputPaginationAttribute: "Marker",
 			Documentation: `
 			// GetLoadBalancersV2 returns a list of ELB (v2) - also known as ALB - based on the input from the different regions.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			FnName:  "GetLoadBalancersV2Tags",
-			Entity:  "Tags",
-			Prefix:  "Describe",
-			Service: "elbv2",
+			FnName:           "GetLoadBalancersV2Tags",
+			Entity:           "Tags",
+			SingularEntity:   "TagDescription",
+			FnAttributeList:  "TagDescriptions",
+			Prefix:           "Describe",
+			Service:          "elbv2",
+			HasNotPagination: true,
 			Documentation: `
 			// GetLoadBalancersV2Tags returns a list of Tags based on the input from the different regions.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			FnName:  "GetLoadBalancersV2Listeners",
-			Entity:  "Listeners",
-			Prefix:  "Describe",
-			Service: "elbv2",
+			FnName:                     "GetLoadBalancersV2Listeners",
+			Entity:                     "Listeners",
+			Prefix:                     "Describe",
+			Service:                    "elbv2",
+			FnPaginationAttribute:      "NextMarker",
+			FnInputPaginationAttribute: "Marker",
 			Documentation: `
 			// GetLoadBalancersV2Listeners returns a list of Listeners based on the input from the different regions.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			FnName:  "GetLoadBalancersV2TargetGroups",
-			Entity:  "TargetGroups",
-			Prefix:  "Describe",
-			Service: "elbv2",
+			FnName:                     "GetLoadBalancersV2TargetGroups",
+			Entity:                     "TargetGroups",
+			Prefix:                     "Describe",
+			Service:                    "elbv2",
+			FnPaginationAttribute:      "NextMarker",
+			FnInputPaginationAttribute: "Marker",
 			Documentation: `
 			// GetLoadBalancersV2TargetGroups returns a list of TargetGroups based on the input from the different regions.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "ListenerCertificates",
-			Prefix:  "Describe",
-			Service: "elbv2",
+			Entity:                     "ListenerCertificates",
+			SingularEntity:             "Certificate",
+			FnAttributeList:            "Certificates",
+			FnPaginationAttribute:      "NextMarker",
+			FnInputPaginationAttribute: "Marker",
+			Prefix:                     "Describe",
+			Service:                    "elbv2",
 			Documentation: `
 			// GetListenerCertificates returns a list of ListenerCertificates based on the input from the different regions.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			FnName:  "GetLoadBalancersV2Rules",
-			Entity:  "Rules",
-			Prefix:  "Describe",
-			Service: "elbv2",
+			FnName:                     "GetLoadBalancersV2Rules",
+			Entity:                     "Rules",
+			FnInputPaginationAttribute: "Marker",
+			FnPaginationAttribute:      "NextMarker",
+			Prefix:                     "Describe",
+			Service:                    "elbv2",
 			Documentation: `
 			// GetLoadBalancersV2Rules returns a list of Rules based on the input from the different regions.
 			// Returned values are commented in the interface doc comment block.
@@ -265,37 +298,43 @@ var (
 
 		// rds
 		Function{
-			Entity:  "DBInstances",
-			Prefix:  "Describe",
-			Service: "rds",
+			Entity:                "DBInstances",
+			FnPaginationAttribute: "Marker",
+			Prefix:                "Describe",
+			Service:               "rds",
 			Documentation: `
 			// GetDBInstances returns all DB instances based on the input given.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			FnName:  "GetDBInstancesTags",
-			Entity:  "TagsForResource",
-			Prefix:  "List",
-			Service: "rds",
+			FnName:           "GetDBInstancesTags",
+			Entity:           "TagsForResource",
+			SingularEntity:   "Tag",
+			FnAttributeList:  "TagList",
+			HasNotPagination: true,
+			Prefix:           "List",
+			Service:          "rds",
 			Documentation: `
 			// GetDBInstancesTags returns a list of tags from an ARN, extra filters for tags can also be provided.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "DBParameterGroups",
-			Prefix:  "Describe",
-			Service: "rds",
+			Entity:                "DBParameterGroups",
+			FnPaginationAttribute: "Marker",
+			Prefix:                "Describe",
+			Service:               "rds",
 			Documentation: `
 			// GetDBParameterGroups returns all DB parameterGroups based on the input given.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "DBSubnetGroups",
-			Prefix:  "Describe",
-			Service: "rds",
+			Entity:                "DBSubnetGroups",
+			FnPaginationAttribute: "Marker",
+			Prefix:                "Describe",
+			Service:               "rds",
 			Documentation: `
 			// GetDBSubnetGroups returns all DB DBSubnetGroups based on the input given.
 			// Returned values are commented in the interface doc comment block.
@@ -317,10 +356,13 @@ var (
 			`,
 		},
 		Function{
-			FnName:  "GetBucketTags",
-			Entity:  "BucketTagging",
-			Prefix:  "Get",
-			Service: "s3",
+			FnName:           "GetBucketTags",
+			Entity:           "BucketTagging",
+			SingularEntity:   "Tag",
+			FnAttributeList:  "TagSet",
+			HasNotPagination: true,
+			Prefix:           "Get",
+			Service:          "s3",
 			Documentation: `
 			// GetBucketTags returns tags associated with S3 buckets based on the input given.
 			// Returned values are commented in the interface doc comment block.
@@ -328,30 +370,37 @@ var (
 		},
 		Function{
 			// TODO: https://github.com/cycloidio/terracognita/issues/76
-			FnName:  "ListObjects",
-			Entity:  "Objects",
-			Prefix:  "List",
-			Service: "s3",
+			FnName:                "ListObjects",
+			Entity:                "Objects",
+			FnAttributeList:       "Contents",
+			FnPaginationAttribute: "Marker",
+			Prefix:                "List",
+			Service:               "s3",
 			Documentation: `
 			// ListObjects returns a list of all S3 objects in a bucket based on the input given.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			FnName:  "GetObjectsTags",
-			Entity:  "ObjectTagging",
-			Prefix:  "Get",
-			Service: "s3",
+			FnName:           "GetObjectsTags",
+			Entity:           "ObjectTagging",
+			SingularEntity:   "Tag",
+			FnAttributeList:  "TagSet",
+			HasNotPagination: true,
+			Prefix:           "Get",
+			Service:          "s3",
 			Documentation: `
 			// GetObjectsTags returns tags associated with S3 objects based on the input given.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			FnName:  "GetRecordedResourceCounts",
-			Entity:  "DiscoveredResourceCounts",
-			Prefix:  "Get",
-			Service: "configservice",
+			FnName:          "GetRecordedResourceCounts",
+			Entity:          "DiscoveredResourceCounts",
+			SingularEntity:  "ResourceCount",
+			FnAttributeList: "ResourceCounts",
+			Prefix:          "Get",
+			Service:         "configservice",
 			Documentation: `
 			// GetRecordedResourceCounts returns counts of the AWS resources which have
 			// been recorded by AWS Config.
@@ -363,29 +412,41 @@ var (
 
 		// cloudfront
 		Function{
-			FnName:  "GetCloudFrontDistributions",
-			Entity:  "Distributions",
-			Prefix:  "List",
-			Service: "cloudfront",
+			FnName:                     "GetCloudFrontDistributions",
+			Entity:                     "Distributions",
+			Prefix:                     "List",
+			Service:                    "cloudfront",
+			SingularEntity:             "DistributionSummary",
+			FnPaginationAttribute:      "DistributionList.NextMarker",
+			FnInputPaginationAttribute: "Marker",
+			FnAttributeList:            "DistributionList.Items",
 			Documentation: `
 			// GetCloudFrontDistributions returns all the CloudFront Distributions on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			FnName:  "GetCloudFrontPublicKeys",
-			Entity:  "PublicKeys",
-			Prefix:  "List",
-			Service: "cloudfront",
+			FnName:                     "GetCloudFrontPublicKeys",
+			Entity:                     "PublicKeys",
+			SingularEntity:             "PublicKeySummary",
+			FnAttributeList:            "PublicKeyList.Items",
+			FnPaginationAttribute:      "PublicKeyList.NextMarker",
+			FnInputPaginationAttribute: "Marker",
+			Prefix:                     "List",
+			Service:                    "cloudfront",
 			Documentation: `
 			// GetCloudFrontPublicKeys returns all the CloudFront Public Keys on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "CloudFrontOriginAccessIdentities",
-			Prefix:  "List",
-			Service: "cloudfront",
+			Entity:                     "CloudFrontOriginAccessIdentities",
+			Prefix:                     "List",
+			Service:                    "cloudfront",
+			SingularEntity:             "OriginAccessIdentitySummary",
+			FnAttributeList:            "CloudFrontOriginAccessIdentityList.Items",
+			FnPaginationAttribute:      "CloudFrontOriginAccessIdentityList.Marker",
+			FnInputPaginationAttribute: "Marker",
 			Documentation: `
 			// GetCloudFrontOriginAccessIdentities returns all the CloudFront Origin Access Identities on the given input
 			// Returned values are commented in the interface doc comment block.
@@ -394,18 +455,23 @@ var (
 
 		// iam
 		Function{
-			Entity:  "AccessKeys",
-			Prefix:  "List",
-			Service: "iam",
+			Entity:                "AccessKeys",
+			Prefix:                "List",
+			Service:               "iam",
+			FnAttributeList:       "AccessKeyMetadata",
+			SingularEntity:        "AccessKeyMetadata",
+			FnPaginationAttribute: "Marker",
 			Documentation: `
 			// GetAccessKeys returns all the IAM AccessKeys on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "AccountAliases",
-			Prefix:  "List",
-			Service: "iam",
+			Entity:                "AccountAliases",
+			Prefix:                "List",
+			Service:               "iam",
+			FnPaginationAttribute: "Marker",
+			FnOutput:              "string",
 			Documentation: `
 			// GetAccountAliases returns all the IAM AccountAliases on the given input
 			// Returned values are commented in the interface doc comment block.
@@ -413,144 +479,182 @@ var (
 		},
 		// Check
 		Function{
-			Entity:  "AccountPasswordPolicy",
-			Prefix:  "Get",
-			Service: "iam",
+			Entity:           "AccountPasswordPolicy",
+			Prefix:           "Get",
+			FnAttributeList:  "PasswordPolicy",
+			SingularEntity:   "PasswordPolicy",
+			HasNotPagination: true,
+			HasNoSlice:       true,
+			Service:          "iam",
 			Documentation: `
 			// GetAccountPasswordPolicy returns the IAM AccountPasswordPolicy on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "Groups",
-			Prefix:  "List",
-			Service: "iam",
+			Entity:                "Groups",
+			Prefix:                "List",
+			FnPaginationAttribute: "Marker",
+			Service:               "iam",
 			Documentation: `
 			// GetGroups returns the IAM Groups on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "GroupPolicies",
-			Prefix:  "List",
-			Service: "iam",
+			Entity:                "GroupPolicies",
+			Prefix:                "List",
+			Service:               "iam",
+			FnOutput:              "string",
+			FnAttributeList:       "PolicyNames",
+			FnPaginationAttribute: "Marker",
 			Documentation: `
 			// GetGroupPolicies returns the IAM GroupPolicies on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "AttachedGroupPolicies",
-			Prefix:  "List",
-			Service: "iam",
+			Entity:                "AttachedGroupPolicies",
+			FnAttributeList:       "AttachedPolicies",
+			SingularEntity:        "AttachedPolicy",
+			FnPaginationAttribute: "Marker",
+			Prefix:                "List",
+			Service:               "iam",
 			Documentation: `
 			// GetAttachedGroupPolicies returns the IAM AttachedGroupPolicies on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "InstanceProfiles",
-			Prefix:  "List",
-			Service: "iam",
+			Entity:                "InstanceProfiles",
+			Prefix:                "List",
+			Service:               "iam",
+			FnPaginationAttribute: "Marker",
 			Documentation: `
 			// GetIstanceProfiles returns the IAM InstanceProfiles on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "OpenIDConnectProviders",
-			Prefix:  "List",
-			Service: "iam",
+			Entity:           "OpenIDConnectProviders",
+			Prefix:           "List",
+			Service:          "iam",
+			HasNotPagination: true,
+			FnAttributeList:  "OpenIDConnectProviderList",
+			SingularEntity:   "OpenIDConnectProviderListEntry",
 			Documentation: `
 			// GetOpenIDConnectProviders returns the IAM OpenIDConnectProviders on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "Policies",
-			Prefix:  "List",
-			Service: "iam",
+			Entity:                "Policies",
+			Prefix:                "List",
+			Service:               "iam",
+			FnPaginationAttribute: "Marker",
 			Documentation: `
 			// GetPolicies returns the IAM Policies on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "Roles",
-			Prefix:  "List",
-			Service: "iam",
+			Entity:                "Roles",
+			Prefix:                "List",
+			FnPaginationAttribute: "Marker",
+			Service:               "iam",
 			Documentation: `
 			// GetRoles returns the IAM Roles on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "RolePolicies",
-			Prefix:  "List",
-			Service: "iam",
+			FnOutput:              "string",
+			FnAttributeList:       "PolicyNames",
+			Entity:                "RolePolicies",
+			FnPaginationAttribute: "Marker",
+			Prefix:                "List",
+			Service:               "iam",
 			Documentation: `
 			// GetRolePolicies returns the IAM RolePolicies on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "AttachedRolePolicies",
-			Prefix:  "List",
-			Service: "iam",
+			Entity:                "AttachedRolePolicies",
+			Prefix:                "List",
+			FnPaginationAttribute: "Marker",
+			FnAttributeList:       "AttachedPolicies",
+			SingularEntity:        "AttachedPolicy",
+			Service:               "iam",
 			Documentation: `
 			// GetAttachedRolePolicies returns the IAM AttachedRolePolicies on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "SAMLProviders",
-			Prefix:  "List",
-			Service: "iam",
+			Entity:           "SAMLProviders",
+			HasNotPagination: true,
+			FnAttributeList:  "SAMLProviderList",
+			SingularEntity:   "SAMLProviderListEntry",
+			Prefix:           "List",
+			Service:          "iam",
 			Documentation: `
 			// GetSAMLProviders returns the IAM SAMLProviders on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "ServerCertificates",
-			Prefix:  "List",
-			Service: "iam",
+			Entity:                "ServerCertificates",
+			FnAttributeList:       "ServerCertificateMetadataList",
+			SingularEntity:        "ServerCertificateMetadata",
+			Prefix:                "List",
+			FnPaginationAttribute: "Marker",
+			Service:               "iam",
 			Documentation: `
 			// GetServerCertificates returns the IAM ServerCertificates on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "Users",
-			Prefix:  "List",
-			Service: "iam",
+			Entity:                "Users",
+			Prefix:                "List",
+			FnPaginationAttribute: "Marker",
+			Service:               "iam",
 			Documentation: `
 			// GetUsers returns the IAM Users on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "UserPolicies",
-			Prefix:  "List",
-			Service: "iam",
+			Entity:                "UserPolicies",
+			Prefix:                "List",
+			Service:               "iam",
+			FnPaginationAttribute: "Marker",
+			FnOutput:              "string",
+			FnAttributeList:       "PolicyNames",
 			Documentation: `
 			// GetUserPolicies returns the IAM UserPolicies on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "AttachedUserPolicies",
-			Prefix:  "List",
-			Service: "iam",
+			Entity:                "AttachedUserPolicies",
+			FnPaginationAttribute: "Marker",
+			FnAttributeList:       "AttachedPolicies",
+			SingularEntity:        "AttachedPolicy",
+			Prefix:                "List",
+			Service:               "iam",
 			Documentation: `
 			// GetAttachedUserPolicies returns the IAM AttachedUserPolicies on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "SSHPublicKeys",
-			Prefix:  "List",
-			Service: "iam",
+			Entity:                "SSHPublicKeys",
+			SingularEntity:        "SSHPublicKeyMetadata",
+			FnPaginationAttribute: "Marker",
+			Prefix:                "List",
+			Service:               "iam",
 			Documentation: `
 			// GetSSHPublicKeys returns the IAM SSHPublicKeys on the given input
 			// Returned values are commented in the interface doc comment block.
@@ -559,27 +663,47 @@ var (
 
 		// ses
 		Function{
-			Entity:  "ActiveReceiptRuleSet",
-			Prefix:  "Describe",
-			Service: "ses",
+			Entity:           "ActiveReceiptRuleSet",
+			Prefix:           "Describe",
+			HasNoSlice:       true,
+			HasNotPagination: true,
+			FnAttributeList:  "Metadata.Name",
+			FnOutput:         "string",
+			Service:          "ses",
 			Documentation: `
 			// GetActiveReceiptRuleSet returns the SES ActiveReceiptRuleSet on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "Identities",
-			Prefix:  "List",
-			Service: "ses",
+			Entity:           "ActiveReceiptRuleSet",
+			FnName:           "GetActiveReceiptRulesSet",
+			Prefix:           "Describe",
+			HasNotPagination: true,
+			FnAttributeList:  "Rules",
+			SingularEntity:   "ReceiptRule",
+			Service:          "ses",
+			Documentation: `
+			// GetActiveReceiptRulesSet returns the SES ActiveReceiptRuleSet on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:   "Identities",
+			FnOutput: "string",
+			Prefix:   "List",
+			Service:  "ses",
 			Documentation: `
 			// GetIdentities returns the SES Identities on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "ReceiptFilters",
-			Prefix:  "List",
-			Service: "ses",
+			FnAttributeList:  "Filters",
+			Entity:           "ReceiptFilters",
+			HasNotPagination: true,
+			Prefix:           "List",
+			Service:          "ses",
 			Documentation: `
 			// GetReceiptFilters returns the SES ReceiptFilters on the given input
 			// Returned values are commented in the interface doc comment block.
@@ -595,18 +719,24 @@ var (
 			`,
 		},
 		Function{
-			Entity:  "IdentityNotificationAttributes",
-			Prefix:  "Get",
-			Service: "ses",
+			Entity:           "IdentityNotificationAttributes",
+			Prefix:           "Get",
+			Service:          "ses",
+			FnAttributeList:  "NotificationAttributes",
+			SingularEntity:   "IdentityNotificationAttributes",
+			IsMap:            true,
+			HasNotPagination: true,
 			Documentation: `
 			// GetIdentityNotificationAttributes returns the SES IdentityNotificationAttributes on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "Templates",
-			Prefix:  "List",
-			Service: "ses",
+			Entity:          "Templates",
+			Prefix:          "List",
+			FnAttributeList: "TemplatesMetadata",
+			SingularEntity:  "TemplateMetadata",
+			Service:         "ses",
 			Documentation: `
 			// GetTemplates returns the SES Templates on the given input
 			// Returned values are commented in the interface doc comment block.
@@ -615,18 +745,22 @@ var (
 
 		// route53
 		Function{
-			Entity:  "ReusableDelegationSets",
-			Prefix:  "List",
-			Service: "route53",
+			Entity:                "ReusableDelegationSets",
+			FnAttributeList:       "DelegationSets",
+			SingularEntity:        "DelegationSet",
+			Prefix:                "List",
+			Service:               "route53",
+			FnPaginationAttribute: "Marker",
 			Documentation: `
 			// GetReusableDelegationSets returns the Route53 ReusableDelegationSets on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "HealthChecks",
-			Prefix:  "List",
-			Service: "route53",
+			Entity:                "HealthChecks",
+			Prefix:                "List",
+			Service:               "route53",
+			FnPaginationAttribute: "Marker",
 			Documentation: `
 			// GetHealthChecks returns the Route53 HealthChecks on the given input
 			// Returned values are commented in the interface doc comment block.
@@ -642,27 +776,32 @@ var (
 			`,
 		},
 		Function{
-			Entity:  "ResourceRecordSets",
-			Prefix:  "List",
-			Service: "route53",
+			Entity:                     "ResourceRecordSets",
+			Prefix:                     "List",
+			Service:                    "route53",
+			FnInputPaginationAttribute: "StartRecordName",
+			FnPaginationAttribute:      "NextRecordName",
 			Documentation: `
 			// GetResourceRecordSets returns the Route53 ResourceRecordSets on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "HostedZones",
-			Prefix:  "List",
-			Service: "route53",
+			Entity:                "HostedZones",
+			Prefix:                "List",
+			Service:               "route53",
+			FnPaginationAttribute: "Marker",
 			Documentation: `
 			// GetHostedZones returns the Route53 HostedZones on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "VPCAssociationAuthorizations",
-			Prefix:  "List",
-			Service: "route53",
+			Entity:          "VPCAssociationAuthorizations",
+			Prefix:          "List",
+			Service:         "route53",
+			FnAttributeList: "VPCs",
+			SingularEntity:  "VPC",
 			Documentation: `
 			// GetVPCAssociationAuthorizations returns the Route53 VPCAssociationAuthorizations on the given input
 			// Returned values are commented in the interface doc comment block.
