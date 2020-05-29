@@ -195,8 +195,13 @@ func initializeResource(a *aws, ID, t string) (provider.Resource, error) {
 }
 
 func instances(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	fl := toEC2Filters(filters)
+	fl = append(fl, &ec2.Filter{
+		Name:   awsSDK.String("instance-state-name"),
+		Values: []*string{awsSDK.String("running"), awsSDK.String("stopped")},
+	})
 	var input = &ec2.DescribeInstancesInput{
-		Filters: toEC2Filters(filters),
+		Filters: fl,
 	}
 
 	instances, err := a.awsr.GetInstances(ctx, input)
