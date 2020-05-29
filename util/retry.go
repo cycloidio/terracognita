@@ -30,11 +30,14 @@ func Retry(rfn RetryFn, times int, interval time.Duration) error {
 		// This is a fix because 'request.IsErrorRetryable(err)' will always
 		// retry normal errors "just in case" and we do not want to retry errors
 		// that we return
-		if fmt.Sprintf("%T", err) == "*errors.errorString" {
+		// *errors.errorString is the standar lib
+		// *errors.fundamental is the github.com/pkg/errors
+		// This way if it's an std error or one from us we skip the Retry
+		if fmt.Sprintf("%T", err) == "*errors.errorString" || fmt.Sprintf("%T", err) == "*errors.fundamental" {
 			return err
 		}
 		if request.IsErrorRetryable(err) || request.IsErrorThrottle(err) || request.IsErrorExpiredCreds(err) {
-			log.Get().Log("func", "utils.Retry", "msg", "waiting for Throttling error", "times-left", times)
+			log.Get().Log("func", "utils.Retry", "msg", "waiting for Throttling error", "err", fmt.Sprintf("%+v", err), "times-left", times)
 			time.Sleep(interval)
 			return Retry(rfn, times, interval)
 		}

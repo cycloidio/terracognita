@@ -6,7 +6,7 @@
 - aws: `aws_lb`, `aws_lb_listener`, `aws_lb_listener_rule`, `aws_lb_target_group`
   ([PR #96](https://github.com/cycloidio/terracognita/pull/96))
 - aws: Pagination of all the functions on the reader
-  ([Issue #13](https://github.com/cycloidio/terracognita/issue/13))
+  ([Issue #13](https://github.com/cycloidio/terracognita/issues/13))
 
 ### Changed
 
@@ -19,6 +19,8 @@
 
 - Error when importing `aws_iam_user_group_membership` without groups
   ([Issue #104](https://github.com/cycloidio/terracognita/issues/104))
+- util/retry now ignores the internal errors format
+  ([Issue #106](https://github.com/cycloidio/terracognita/issues/106))
 
 ## [0.4.0] _2020-03-31_
 
