@@ -1092,8 +1092,14 @@ func iamUserGroupMemberships(ctx context.Context, a *aws, resourceType string, f
 	if err != nil {
 		return nil, err
 	}
-
 	resources := make([]provider.Resource, 0)
+
+	// If the user has no Groups then we do not need to proceed
+	// or TF will return an error of malformed ID
+	if len(groupNames) == 0 {
+		return resources, nil
+	}
+
 	for _, un := range userNames {
 		// The format expected by TF is <user-name>/<group-name1>/...
 		r, err := initializeResource(a, strings.Join(append([]string{un}, groupNames...), "/"), resourceType)
