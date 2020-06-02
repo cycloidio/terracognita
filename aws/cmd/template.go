@@ -80,6 +80,9 @@ const (
 				{{ if .HasNotPagination }}
 					hasNextToken = false
 				{{ else }}
+					if input == nil {
+						input = &{{.Input}}{}
+					}
 					input.{{.InputPaginationAttributeFn}} = o.{{.PaginationAttributeFn}}
 					hasNextToken = o.{{.PaginationAttributeFn}} != nil
 				{{ end }}

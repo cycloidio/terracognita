@@ -352,6 +352,9 @@ func (c *connector) GetMetricAlarms(ctx context.Context, input *cloudwatch.Descr
 			return nil, err
 		}
 
+		if input == nil {
+			input = &cloudwatch.DescribeAlarmsInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
@@ -376,6 +379,9 @@ func (c *connector) GetInstances(ctx context.Context, input *ec2.DescribeInstanc
 			return nil, err
 		}
 
+		if input == nil {
+			input = &ec2.DescribeInstancesInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
@@ -402,6 +408,9 @@ func (c *connector) GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) (
 			return nil, err
 		}
 
+		if input == nil {
+			input = &ec2.DescribeVpcsInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
@@ -426,6 +435,9 @@ func (c *connector) GetVpcPeeringConnections(ctx context.Context, input *ec2.Des
 			return nil, err
 		}
 
+		if input == nil {
+			input = &ec2.DescribeVpcPeeringConnectionsInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
@@ -524,6 +536,9 @@ func (c *connector) GetSecurityGroups(ctx context.Context, input *ec2.DescribeSe
 			return nil, err
 		}
 
+		if input == nil {
+			input = &ec2.DescribeSecurityGroupsInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
@@ -548,6 +563,9 @@ func (c *connector) GetSubnets(ctx context.Context, input *ec2.DescribeSubnetsIn
 			return nil, err
 		}
 
+		if input == nil {
+			input = &ec2.DescribeSubnetsInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
@@ -572,6 +590,9 @@ func (c *connector) GetVolumes(ctx context.Context, input *ec2.DescribeVolumesIn
 			return nil, err
 		}
 
+		if input == nil {
+			input = &ec2.DescribeVolumesInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
@@ -596,6 +617,9 @@ func (c *connector) GetSnapshots(ctx context.Context, input *ec2.DescribeSnapsho
 			return nil, err
 		}
 
+		if input == nil {
+			input = &ec2.DescribeSnapshotsInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
@@ -625,6 +649,9 @@ func (c *connector) GetOwnSnapshots(ctx context.Context, input *ec2.DescribeSnap
 			return nil, err
 		}
 
+		if input == nil {
+			input = &ec2.DescribeSnapshotsInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
@@ -649,6 +676,9 @@ func (c *connector) GetLaunchTemplates(ctx context.Context, input *ec2.DescribeL
 			return nil, err
 		}
 
+		if input == nil {
+			input = &ec2.DescribeLaunchTemplatesInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
@@ -673,6 +703,9 @@ func (c *connector) GetAutoScalingGroups(ctx context.Context, input *autoscaling
 			return nil, err
 		}
 
+		if input == nil {
+			input = &autoscaling.DescribeAutoScalingGroupsInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
@@ -697,6 +730,9 @@ func (c *connector) GetLaunchConfigurations(ctx context.Context, input *autoscal
 			return nil, err
 		}
 
+		if input == nil {
+			input = &autoscaling.DescribeLaunchConfigurationsInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
@@ -721,6 +757,9 @@ func (c *connector) GetAutoScalingPolicies(ctx context.Context, input *autoscali
 			return nil, err
 		}
 
+		if input == nil {
+			input = &autoscaling.DescribePoliciesInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
@@ -745,6 +784,9 @@ func (c *connector) GetElastiCacheClusters(ctx context.Context, input *elasticac
 			return nil, err
 		}
 
+		if input == nil {
+			input = &elasticache.DescribeCacheClustersInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -792,6 +834,9 @@ func (c *connector) GetLoadBalancers(ctx context.Context, input *elb.DescribeLoa
 			return nil, err
 		}
 
+		if input == nil {
+			input = &elb.DescribeLoadBalancersInput{}
+		}
 		input.Marker = o.NextMarker
 		hasNextToken = o.NextMarker != nil
 
@@ -839,6 +884,9 @@ func (c *connector) GetLoadBalancersV2(ctx context.Context, input *elbv2.Describ
 			return nil, err
 		}
 
+		if input == nil {
+			input = &elbv2.DescribeLoadBalancersInput{}
+		}
 		input.Marker = o.NextMarker
 		hasNextToken = o.NextMarker != nil
 
@@ -886,6 +934,9 @@ func (c *connector) GetLoadBalancersV2Listeners(ctx context.Context, input *elbv
 			return nil, err
 		}
 
+		if input == nil {
+			input = &elbv2.DescribeListenersInput{}
+		}
 		input.Marker = o.NextMarker
 		hasNextToken = o.NextMarker != nil
 
@@ -910,6 +961,9 @@ func (c *connector) GetLoadBalancersV2TargetGroups(ctx context.Context, input *e
 			return nil, err
 		}
 
+		if input == nil {
+			input = &elbv2.DescribeTargetGroupsInput{}
+		}
 		input.Marker = o.NextMarker
 		hasNextToken = o.NextMarker != nil
 
@@ -934,6 +988,9 @@ func (c *connector) GetListenerCertificates(ctx context.Context, input *elbv2.De
 			return nil, err
 		}
 
+		if input == nil {
+			input = &elbv2.DescribeListenerCertificatesInput{}
+		}
 		input.Marker = o.NextMarker
 		hasNextToken = o.NextMarker != nil
 
@@ -958,6 +1015,9 @@ func (c *connector) GetLoadBalancersV2Rules(ctx context.Context, input *elbv2.De
 			return nil, err
 		}
 
+		if input == nil {
+			input = &elbv2.DescribeRulesInput{}
+		}
 		input.Marker = o.NextMarker
 		hasNextToken = o.NextMarker != nil
 
@@ -982,6 +1042,9 @@ func (c *connector) GetDBInstances(ctx context.Context, input *rds.DescribeDBIns
 			return nil, err
 		}
 
+		if input == nil {
+			input = &rds.DescribeDBInstancesInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1029,6 +1092,9 @@ func (c *connector) GetDBParameterGroups(ctx context.Context, input *rds.Describ
 			return nil, err
 		}
 
+		if input == nil {
+			input = &rds.DescribeDBParameterGroupsInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1053,6 +1119,9 @@ func (c *connector) GetDBSubnetGroups(ctx context.Context, input *rds.DescribeDB
 			return nil, err
 		}
 
+		if input == nil {
+			input = &rds.DescribeDBSubnetGroupsInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1100,6 +1169,9 @@ func (c *connector) ListObjects(ctx context.Context, input *s3.ListObjectsInput)
 			return nil, err
 		}
 
+		if input == nil {
+			input = &s3.ListObjectsInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1147,6 +1219,9 @@ func (c *connector) GetRecordedResourceCounts(ctx context.Context, input *config
 			return nil, err
 		}
 
+		if input == nil {
+			input = &configservice.GetDiscoveredResourceCountsInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
@@ -1171,6 +1246,9 @@ func (c *connector) GetCloudFrontDistributions(ctx context.Context, input *cloud
 			return nil, err
 		}
 
+		if input == nil {
+			input = &cloudfront.ListDistributionsInput{}
+		}
 		input.Marker = o.DistributionList.NextMarker
 		hasNextToken = o.DistributionList.NextMarker != nil
 
@@ -1195,6 +1273,9 @@ func (c *connector) GetCloudFrontPublicKeys(ctx context.Context, input *cloudfro
 			return nil, err
 		}
 
+		if input == nil {
+			input = &cloudfront.ListPublicKeysInput{}
+		}
 		input.Marker = o.PublicKeyList.NextMarker
 		hasNextToken = o.PublicKeyList.NextMarker != nil
 
@@ -1219,6 +1300,9 @@ func (c *connector) GetCloudFrontOriginAccessIdentities(ctx context.Context, inp
 			return nil, err
 		}
 
+		if input == nil {
+			input = &cloudfront.ListCloudFrontOriginAccessIdentitiesInput{}
+		}
 		input.Marker = o.CloudFrontOriginAccessIdentityList.Marker
 		hasNextToken = o.CloudFrontOriginAccessIdentityList.Marker != nil
 
@@ -1243,6 +1327,9 @@ func (c *connector) GetAccessKeys(ctx context.Context, input *iam.ListAccessKeys
 			return nil, err
 		}
 
+		if input == nil {
+			input = &iam.ListAccessKeysInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1267,6 +1354,9 @@ func (c *connector) GetAccountAliases(ctx context.Context, input *iam.ListAccoun
 			return nil, err
 		}
 
+		if input == nil {
+			input = &iam.ListAccountAliasesInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1314,6 +1404,9 @@ func (c *connector) GetGroups(ctx context.Context, input *iam.ListGroupsInput) (
 			return nil, err
 		}
 
+		if input == nil {
+			input = &iam.ListGroupsInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1338,6 +1431,9 @@ func (c *connector) GetGroupPolicies(ctx context.Context, input *iam.ListGroupPo
 			return nil, err
 		}
 
+		if input == nil {
+			input = &iam.ListGroupPoliciesInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1362,6 +1458,9 @@ func (c *connector) GetAttachedGroupPolicies(ctx context.Context, input *iam.Lis
 			return nil, err
 		}
 
+		if input == nil {
+			input = &iam.ListAttachedGroupPoliciesInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1386,6 +1485,9 @@ func (c *connector) GetInstanceProfiles(ctx context.Context, input *iam.ListInst
 			return nil, err
 		}
 
+		if input == nil {
+			input = &iam.ListInstanceProfilesInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1433,6 +1535,9 @@ func (c *connector) GetPolicies(ctx context.Context, input *iam.ListPoliciesInpu
 			return nil, err
 		}
 
+		if input == nil {
+			input = &iam.ListPoliciesInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1457,6 +1562,9 @@ func (c *connector) GetRoles(ctx context.Context, input *iam.ListRolesInput) ([]
 			return nil, err
 		}
 
+		if input == nil {
+			input = &iam.ListRolesInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1481,6 +1589,9 @@ func (c *connector) GetRolePolicies(ctx context.Context, input *iam.ListRolePoli
 			return nil, err
 		}
 
+		if input == nil {
+			input = &iam.ListRolePoliciesInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1505,6 +1616,9 @@ func (c *connector) GetAttachedRolePolicies(ctx context.Context, input *iam.List
 			return nil, err
 		}
 
+		if input == nil {
+			input = &iam.ListAttachedRolePoliciesInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1552,6 +1666,9 @@ func (c *connector) GetServerCertificates(ctx context.Context, input *iam.ListSe
 			return nil, err
 		}
 
+		if input == nil {
+			input = &iam.ListServerCertificatesInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1576,6 +1693,9 @@ func (c *connector) GetUsers(ctx context.Context, input *iam.ListUsersInput) ([]
 			return nil, err
 		}
 
+		if input == nil {
+			input = &iam.ListUsersInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1600,6 +1720,9 @@ func (c *connector) GetUserPolicies(ctx context.Context, input *iam.ListUserPoli
 			return nil, err
 		}
 
+		if input == nil {
+			input = &iam.ListUserPoliciesInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1624,6 +1747,9 @@ func (c *connector) GetAttachedUserPolicies(ctx context.Context, input *iam.List
 			return nil, err
 		}
 
+		if input == nil {
+			input = &iam.ListAttachedUserPoliciesInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1648,6 +1774,9 @@ func (c *connector) GetSSHPublicKeys(ctx context.Context, input *iam.ListSSHPubl
 			return nil, err
 		}
 
+		if input == nil {
+			input = &iam.ListSSHPublicKeysInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1718,6 +1847,9 @@ func (c *connector) GetIdentities(ctx context.Context, input *ses.ListIdentities
 			return nil, err
 		}
 
+		if input == nil {
+			input = &ses.ListIdentitiesInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
@@ -1765,6 +1897,9 @@ func (c *connector) GetConfigurationSets(ctx context.Context, input *ses.ListCon
 			return nil, err
 		}
 
+		if input == nil {
+			input = &ses.ListConfigurationSetsInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
@@ -1812,6 +1947,9 @@ func (c *connector) GetTemplates(ctx context.Context, input *ses.ListTemplatesIn
 			return nil, err
 		}
 
+		if input == nil {
+			input = &ses.ListTemplatesInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
@@ -1836,6 +1974,9 @@ func (c *connector) GetReusableDelegationSets(ctx context.Context, input *route5
 			return nil, err
 		}
 
+		if input == nil {
+			input = &route53.ListReusableDelegationSetsInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1860,6 +2001,9 @@ func (c *connector) GetHealthChecks(ctx context.Context, input *route53.ListHeal
 			return nil, err
 		}
 
+		if input == nil {
+			input = &route53.ListHealthChecksInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1884,6 +2028,9 @@ func (c *connector) GetQueryLoggingConfigs(ctx context.Context, input *route53.L
 			return nil, err
 		}
 
+		if input == nil {
+			input = &route53.ListQueryLoggingConfigsInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
@@ -1908,6 +2055,9 @@ func (c *connector) GetResourceRecordSets(ctx context.Context, input *route53.Li
 			return nil, err
 		}
 
+		if input == nil {
+			input = &route53.ListResourceRecordSetsInput{}
+		}
 		input.StartRecordName = o.NextRecordName
 		hasNextToken = o.NextRecordName != nil
 
@@ -1932,6 +2082,9 @@ func (c *connector) GetHostedZones(ctx context.Context, input *route53.ListHoste
 			return nil, err
 		}
 
+		if input == nil {
+			input = &route53.ListHostedZonesInput{}
+		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
@@ -1956,6 +2109,9 @@ func (c *connector) GetVPCAssociationAuthorizations(ctx context.Context, input *
 			return nil, err
 		}
 
+		if input == nil {
+			input = &route53.ListVPCAssociationAuthorizationsInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
@@ -1980,6 +2136,9 @@ func (c *connector) GetResolverEndpoints(ctx context.Context, input *route53reso
 			return nil, err
 		}
 
+		if input == nil {
+			input = &route53resolver.ListResolverEndpointsInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
@@ -2004,6 +2163,9 @@ func (c *connector) GetResolverRules(ctx context.Context, input *route53resolver
 			return nil, err
 		}
 
+		if input == nil {
+			input = &route53resolver.ListResolverRulesInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
@@ -2028,6 +2190,9 @@ func (c *connector) GetResolverRuleAssociations(ctx context.Context, input *rout
 			return nil, err
 		}
 
+		if input == nil {
+			input = &route53resolver.ListResolverRuleAssociationsInput{}
+		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
