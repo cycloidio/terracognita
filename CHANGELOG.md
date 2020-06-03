@@ -15,6 +15,11 @@
 - Provide filters to resource functions instead of tags only
   ([PR #92](https://github.com/cycloidio/terracognita/pull/92))
 
+## Fixed
+
+- Error when importing `aws_iam_user_group_membership` without groups
+  ([Issue #104](https://github.com/cycloidio/terracognita/issues/104))
+
 ## [0.4.0] _2020-03-31_
 
 ### Added
