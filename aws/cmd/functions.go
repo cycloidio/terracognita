@@ -536,6 +536,18 @@ var (
 			`,
 		},
 		Function{
+			Entity:                "GroupsForUser",
+			Prefix:                "List",
+			Service:               "iam",
+			FnAttributeList:       "Groups",
+			SingularEntity:        "Group",
+			FnPaginationAttribute: "Marker",
+			Documentation: `
+			// GetGroupsForUser returns the IAM GroupsForUser on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
 			Entity:           "OpenIDConnectProviders",
 			Prefix:           "List",
 			Service:          "iam",

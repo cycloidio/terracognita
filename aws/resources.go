@@ -1083,24 +1083,33 @@ func iamUsers(ctx context.Context, a *aws, resourceType string, filters *filter.
 }
 
 func iamUserGroupMemberships(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	userNames, err := getIAMUserNames(ctx, a, IAMUser.String(), filters)
-	if err != nil {
-		return nil, err
-	}
 
-	groupNames, err := getIAMGroupNames(ctx, a, IAMGroup.String(), filters)
+	userNames, err := getIAMUserNames(ctx, a, IAMUser.String(), filters)
 	if err != nil {
 		return nil, err
 	}
 	resources := make([]provider.Resource, 0)
 
-	// If the user has no Groups then we do not need to proceed
-	// or TF will return an error of malformed ID
-	if len(groupNames) == 0 {
-		return resources, nil
-	}
-
 	for _, un := range userNames {
+		var input = &iam.ListGroupsForUserInput{
+			UserName: awsSDK.String(un),
+		}
+
+		groups, err := a.awsr.GetGroupsForUser(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		// If the user has no Groups then we do not need to write membership
+		if len(groups) == 0 {
+			continue
+		}
+
+		groupNames := make([]string, 0, len(groups))
+		for _, g := range groups {
+			groupNames = append(groupNames, *g.GroupName)
+		}
+
 		// The format expected by TF is <user-name>/<group-name1>/...
 		r, err := initializeResource(a, strings.Join(append([]string{un}, groupNames...), "/"), resourceType)
 		if err != nil {
