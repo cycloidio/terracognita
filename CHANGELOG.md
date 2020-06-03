@@ -10,6 +10,8 @@
 
 ### Changed
 
+- aws resources: do not write group_membership if the user has no groups.
+  ([issue #111](https://github.com/cycloidio/terracognita/issue/111))
 - filter: update IsExcluded and add IsIncluded to verify multiple resources.
   ([PR #96](https://github.com/cycloidio/terracognita/pull/96))
 - Provide filters to resource functions instead of tags only
