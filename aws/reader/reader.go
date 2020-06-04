@@ -229,6 +229,10 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetInstanceProfiles(ctx context.Context, input *iam.ListInstanceProfilesInput) ([]*iam.InstanceProfile, error)
 
+	// GetGroupsForUser returns the IAM GroupsForUser on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetGroupsForUser(ctx context.Context, input *iam.ListGroupsForUserInput) ([]*iam.Group, error)
+
 	// GetOpenIDConnectProviders returns the IAM OpenIDConnectProviders on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetOpenIDConnectProviders(ctx context.Context, input *iam.ListOpenIDConnectProvidersInput) ([]*iam.OpenIDConnectProviderListEntry, error)
@@ -1492,6 +1496,33 @@ func (c *connector) GetInstanceProfiles(ctx context.Context, input *iam.ListInst
 		hasNextToken = o.Marker != nil
 
 		opt = append(opt, o.InstanceProfiles...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetGroupsForUser(ctx context.Context, input *iam.ListGroupsForUserInput) ([]*iam.Group, error) {
+	if c.svc.iam == nil {
+		c.svc.iam = iam.New(c.svc.session)
+	}
+
+	opt := make([]*iam.Group, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.ListGroupsForUserWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		if input == nil {
+			input = &iam.ListGroupsForUserInput{}
+		}
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.Groups...)
 
 	}
 
