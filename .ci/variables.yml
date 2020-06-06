@@ -17,7 +17,7 @@ github-private-key: ((git_github.ssh_key))
 
 # Docker image version
 docker-image: golang
-docker-image-tag: 1.12
+docker-image-tag: 1.14.4
 docker-hub-username: ((docker_hub.username))
 docker-hub-password: ((docker_hub.password))
 

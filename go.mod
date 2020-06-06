@@ -42,4 +42,14 @@ replace git.apache.org/thrift.git => github.com/apache/thrift v0.0.0-20180902110
 
 replace github.com/terraform-providers/terraform-provider-tls v2.1.0+incompatible => github.com/terraform-providers/terraform-provider-tls v1.2.1-0.20190816230231-0790c4b40281
 
-go 1.11
+// This are directly from the https://github.com/terraform-providers/terraform-provider-azurerm/blob/master/go.mod
+replace github.com/Azure/go-autorest => github.com/tombuildsstuff/go-autorest v14.0.1-0.20200416184303-d4e299a3c04a+incompatible
+
+replace github.com/Azure/go-autorest/autorest => github.com/tombuildsstuff/go-autorest/autorest v0.10.1-0.20200416184303-d4e299a3c04a
+
+replace github.com/Azure/go-autorest/autorest/azure/auth => github.com/tombuildsstuff/go-autorest/autorest/azure/auth v0.4.3-0.20200416184303-d4e299a3c04a
+
+// To remove the panic issue of using TF
+replace github.com/hashicorp/terraform => github.com/cycloidio/terraform v0.12.26-cy
+
+go 1.14
