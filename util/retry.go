@@ -33,7 +33,8 @@ func Retry(rfn RetryFn, times int, interval time.Duration) error {
 		// *errors.errorString is the standar lib
 		// *errors.fundamental is the github.com/pkg/errors
 		// This way if it's an std error or one from us we skip the Retry
-		if fmt.Sprintf("%T", err) == "*errors.errorString" || fmt.Sprintf("%T", err) == "*errors.fundamental" {
+		errtype := fmt.Sprintf("%T", err)
+		if errtype == "*errors.errorString" || errtype == "*errors.fundamental" || errtype == "*errors.withStack" || errtype == "*errors.withMessage" {
 			return err
 		}
 		if request.IsErrorRetryable(err) || request.IsErrorThrottle(err) || request.IsErrorExpiredCreds(err) {
