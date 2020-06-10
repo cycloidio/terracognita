@@ -86,7 +86,7 @@ resources:
     type: docker-image
     source:
       repository: golang
-      tag: 1.12
+      tag: ((docker-image-tag))
 
   - name: cycloid-events
     type: cycloid-events

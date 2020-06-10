@@ -18,12 +18,11 @@ import (
 	azuredocs "github.com/cycloidio/tfdocs/providers/azurerm"
 	googledocs "github.com/cycloidio/tfdocs/providers/google"
 	tfdocs "github.com/cycloidio/tfdocs/resource"
-	"github.com/hashicorp/terraform/configs/configschema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/hashicorp/terraform/configs/hcl2shim"
-	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/providers"
 	"github.com/hashicorp/terraform/states"
-	"github.com/hashicorp/terraform/terraform"
 	"github.com/pkg/errors"
 	"github.com/zclconf/go-cty/cty"
 )
@@ -77,9 +76,9 @@ type Resource interface {
 	// InstanceInfo returns the InstanceInfo of this Resource
 	InstanceInfo() *terraform.InstanceInfo
 
-	// CoreConfigSchema returns the configschema.Block of the
+	// ImpliedType returns the cty.Type of the
 	// Resource
-	CoreConfigSchema() *configschema.Block
+	ImpliedType() cty.Type
 
 	// ResourceInstanceObject is the calculated states.ResourceInstanceObject
 	// after 'Read' has been called
@@ -262,7 +261,7 @@ func (r *resource) Read(f *filter.Filter) error {
 	// helper/schema should always copy the ID over, but do it again just to be safe
 	newInstanceState.Attributes["id"] = newInstanceState.ID
 
-	newStateVal, err := hcl2shim.HCL2ValueFromFlatmap(newInstanceState.Attributes, r.CoreConfigSchema().ImpliedType())
+	newStateVal, err := hcl2shim.HCL2ValueFromFlatmap(newInstanceState.Attributes, r.ImpliedType())
 	if err != nil {
 		return err
 	}
@@ -272,7 +271,7 @@ func (r *resource) Read(f *filter.Filter) error {
 		r.state = &terraform.InstanceState{}
 	}
 
-	oldStateVal, err := hcl2shim.HCL2ValueFromFlatmap(r.state.Attributes, r.CoreConfigSchema().ImpliedType())
+	oldStateVal, err := hcl2shim.HCL2ValueFromFlatmap(r.state.Attributes, r.ImpliedType())
 	if err != nil {
 		return err
 	}
@@ -451,8 +450,8 @@ func (r *resource) InstanceInfo() *terraform.InstanceInfo {
 	}
 }
 
-func (r *resource) CoreConfigSchema() *configschema.Block {
-	return r.tfResource.CoreConfigSchema()
+func (r *resource) ImpliedType() cty.Type {
+	return r.tfResource.CoreConfigSchema().ImpliedType()
 }
 
 func (r *resource) ResourceInstanceObject() *states.ResourceInstanceObject {

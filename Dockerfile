@@ -1,7 +1,5 @@
 # build stage
-FROM golang:1.12 as builder
-
-ENV GO111MODULE=on
+FROM golang:1.14.4 as builder
 
 WORKDIR /app
 

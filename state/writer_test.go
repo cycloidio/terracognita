@@ -10,8 +10,8 @@ import (
 	"github.com/cycloidio/terracognita/provider"
 	"github.com/cycloidio/terracognita/state"
 	"github.com/golang/mock/gomock"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform/configs/hcl2shim"
-	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/providers"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -45,7 +45,7 @@ func TestWrite(t *testing.T) {
 		res.EXPECT().Type().Return(tp)
 		res.EXPECT().Provider().Return(prv)
 		res.EXPECT().TFResource().Return(aws.Provider().(*schema.Provider).ResourcesMap[tp])
-		res.EXPECT().CoreConfigSchema().Return(aws.Provider().(*schema.Provider).ResourcesMap[tp].CoreConfigSchema())
+		res.EXPECT().ImpliedType().Return(aws.Provider().(*schema.Provider).ResourcesMap[tp].CoreConfigSchema().ImpliedType())
 		res.EXPECT().ResourceInstanceObject().Return(providers.ImportedResource{
 			TypeName: tp,
 			State:    s,
@@ -89,7 +89,7 @@ func TestWrite(t *testing.T) {
 		res.EXPECT().Type().Return(tp)
 		res.EXPECT().Provider().Return(prv)
 		res.EXPECT().TFResource().Return(aws.Provider().(*schema.Provider).ResourcesMap[tp])
-		res.EXPECT().CoreConfigSchema().Return(aws.Provider().(*schema.Provider).ResourcesMap[tp].CoreConfigSchema())
+		res.EXPECT().ImpliedType().Return(aws.Provider().(*schema.Provider).ResourcesMap[tp].CoreConfigSchema().ImpliedType())
 		res.EXPECT().ResourceInstanceObject().Return(providers.ImportedResource{
 			TypeName: tp,
 			State:    s,
@@ -161,7 +161,7 @@ func TestSync(t *testing.T) {
       }
    ],
    "serial":0,
-   "terraform_version":"0.12.8",
+   "terraform_version":"0.12.26",
    "version":4
 }`
 		)
@@ -174,7 +174,7 @@ func TestSync(t *testing.T) {
 		res.EXPECT().Type().Return(tp)
 		res.EXPECT().Provider().Return(prv)
 		res.EXPECT().TFResource().Return(aws.Provider().(*schema.Provider).ResourcesMap[tp])
-		res.EXPECT().CoreConfigSchema().Return(aws.Provider().(*schema.Provider).ResourcesMap[tp].CoreConfigSchema())
+		res.EXPECT().ImpliedType().Return(aws.Provider().(*schema.Provider).ResourcesMap[tp].CoreConfigSchema().ImpliedType())
 		res.EXPECT().ResourceInstanceObject().Return(providers.ImportedResource{
 			TypeName: tp,
 			State:    s,

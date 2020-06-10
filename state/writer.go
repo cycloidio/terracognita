@@ -70,11 +70,11 @@ func (w *Writer) Write(key string, value interface{}) error {
 	absProviderConf := addrs.AbsProviderConfig{
 		Module: nil,
 		ProviderConfig: addrs.ProviderConfig{
-			Type: r.Provider().String(),
+			Type: addrs.NewLegacyProvider(r.Provider().String()),
 		},
 	}
 
-	src, err := r.ResourceInstanceObject().Encode(r.CoreConfigSchema().ImpliedType(), uint64(r.TFResource().SchemaVersion))
+	src, err := r.ResourceInstanceObject().Encode(r.ImpliedType(), uint64(r.TFResource().SchemaVersion))
 	if err != nil {
 		return err
 	}

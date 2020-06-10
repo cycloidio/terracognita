@@ -8,7 +8,7 @@ import (
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/provider"
 
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/pkg/errors"
 	tfgoogle "github.com/terraform-providers/terraform-provider-google/google"
 )
@@ -29,7 +29,7 @@ func NewProvider(ctx context.Context, maxResults uint64, project, region, creden
 
 	tfgoogle.ConfigureBasePaths(&cfg)
 	log.Get().Log("func", "google.NewProvider", "msg", "loading TF client")
-	if err := cfg.LoadAndValidate(); err != nil {
+	if err := cfg.LoadAndValidate(ctx); err != nil {
 		return nil, fmt.Errorf("could not initialize 'terraform/google.Config.LoadAndValidate()' because: %s", err)
 	}
 
