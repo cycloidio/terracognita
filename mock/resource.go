@@ -11,10 +11,10 @@ import (
 	provider "github.com/cycloidio/terracognita/provider"
 	writer "github.com/cycloidio/terracognita/writer"
 	gomock "github.com/golang/mock/gomock"
-	configschema "github.com/hashicorp/terraform/configs/configschema"
-	schema "github.com/hashicorp/terraform/helper/schema"
+	schema "github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	terraform "github.com/hashicorp/terraform-plugin-sdk/terraform"
 	states "github.com/hashicorp/terraform/states"
-	terraform "github.com/hashicorp/terraform/terraform"
+	cty "github.com/zclconf/go-cty/cty"
 )
 
 // Resource is a mock of Resource interface
@@ -53,20 +53,6 @@ func (m *Resource) AttributesReference() ([]string, error) {
 func (mr *ResourceMockRecorder) AttributesReference() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AttributesReference", reflect.TypeOf((*Resource)(nil).AttributesReference))
-}
-
-// CoreConfigSchema mocks base method
-func (m *Resource) CoreConfigSchema() *configschema.Block {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CoreConfigSchema")
-	ret0, _ := ret[0].(*configschema.Block)
-	return ret0
-}
-
-// CoreConfigSchema indicates an expected call of CoreConfigSchema
-func (mr *ResourceMockRecorder) CoreConfigSchema() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CoreConfigSchema", reflect.TypeOf((*Resource)(nil).CoreConfigSchema))
 }
 
 // Data mocks base method
@@ -109,6 +95,20 @@ func (m *Resource) ID() string {
 func (mr *ResourceMockRecorder) ID() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ID", reflect.TypeOf((*Resource)(nil).ID))
+}
+
+// ImpliedType mocks base method
+func (m *Resource) ImpliedType() cty.Type {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ImpliedType")
+	ret0, _ := ret[0].(cty.Type)
+	return ret0
+}
+
+// ImpliedType indicates an expected call of ImpliedType
+func (mr *ResourceMockRecorder) ImpliedType() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ImpliedType", reflect.TypeOf((*Resource)(nil).ImpliedType))
 }
 
 // ImportState mocks base method

@@ -11,7 +11,7 @@ import (
 	filter "github.com/cycloidio/terracognita/filter"
 	provider "github.com/cycloidio/terracognita/provider"
 	gomock "github.com/golang/mock/gomock"
-	schema "github.com/hashicorp/terraform/helper/schema"
+	schema "github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 // Provider is a mock of Provider interface
