@@ -8,17 +8,17 @@ Imports your current Cloud infrastructure to an Infrastructure As Code [Terrafor
 
 At [Cycloid](https://www.cycloid.io/), Infrastructure As Code is in the company DNA since the beginning. To help our new customers adopting this best practice, we decided to build Terracognita to convert an existing infrastructure on Cloud Infrastructure into Terraform code in an automated way, relying on Terraform providers built by the community. We focused on AWS, GCP and Azure but Alibaba, Vmware and Openstack will be the next to be integrated.
 
-We decided to opensource this tool as we believe that it will help people to adopt IaC in an easy way. Cycloid provides this tool to let people import their infrastructure into [Cycloid's pipelines](https://www.cycloid.io/devops-framework), allow them to generate infrastructure diagram and manage all infra/application lifecycle from a single interface.
+We decided to Open Source this tool as we believe that it will help people to adopt IaC in an easy way. Cycloid provides this tool to let people import their infrastructure into [Cycloid's pipelines](https://www.cycloid.io/devops-framework), allow them to generate infrastructure diagram and manage all infra/application life cycle from a single interface.
 
 ## Cloud providers
 
-Terracognita currently imports AWS, GCP and AzureRM cloud provider as terraform (0.12.8) resource/state.
+Terracognita currently imports AWS, GCP and AzureRM cloud provider as Terraform (0.12.26) resource/state.
 Please see the following versions as follow:
 
 Providers:
- * AWS: 2.31.0
- * AzureRM: 1.35.0
- * GCP: 2.16.0
+ * AWS: 2.65.0
+ * AzureRM: 2.13.0
+ * GCP: 3.25.0
 
 ## Installation
 
@@ -35,7 +35,7 @@ $ sudo mv terracognita-linux-amd64 /usr/local/bin/terracognita
 
 ### Development
 
-You can build and install with the latest sources, you will enjoy the new features and bugfixes. It uses Go Modules, so GO 1.11+ is required.
+You can build and install with the latest sources, you will enjoy the new features and bug fixes. It uses Go Modules, so GO 1.14+ is required.
 
 ```shell
 $ git clone https://github.com/cycloidio/terracognita
@@ -156,7 +156,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 We built [Cycloid, your DevOps framework](https://www.cycloid.io/devops-framework) to encourage Developers and Ops to work together with the respect of best practices. We want to provide a tool that eliminates the silo effect in a company and allows to share the same level of informations within all professions.
 
-[Cycloid](https://www.cycloid.io/devops-framework) supports you to factorize your application in a reproducable way, to deploy a new environment in one click. This is what we call a stack.
+[Cycloid](https://www.cycloid.io/devops-framework) supports you to factorize your application in a reproducible way, to deploy a new environment in one click. This is what we call a stack.
 
 A stack is composed of 3 pillars:
 
@@ -166,11 +166,11 @@ A stack is composed of 3 pillars:
 
 Thanks to the flexible pipeline, all the steps and technologies are configurable.
 
-To make it easier to create a stack, we build an Infrastructure designer named **StackCraft** that allows you to drag & drop Terraform ressources and generate your Terraform files for you.
+To make it easier to create a stack, we build an Infrastructure designer named **StackCraft** that allows you to drag & drop Terraform resources and generate your Terraform files for you.
 
 Terracognita is a brick that will help us to import an existing infrastructure into a stack to easily adopt Cycloid product.
 
 The product comes also with an Open Source service catalog ([all our public stacks are on Github](https://github.com/cycloid-community-catalog)) to deploy applications seamlessly.
-To manage the whole lifecycle of an application, it also integrates the diagram of the infrastructure and the application, a cost management control to centralize Cloud billing, the monitoring, logs and events centralized with Prometheus, Grafana, ELK.
+To manage the whole life cycle of an application, it also integrates the diagram of the infrastructure and the application, a cost management control to centralize Cloud billing, the monitoring, logs and events centralized with Prometheus, Grafana, ELK.
 
 [Don't hesitate to contact us, we'll be happy to meet you !](https://www.cycloid.io/contact-us)
