@@ -16,6 +16,8 @@
   ([PR #96](https://github.com/cycloidio/terracognita/pull/96))
 - Provide filters to resource functions instead of tags only
   ([PR #92](https://github.com/cycloidio/terracognita/pull/92))
+- Upgraded all the Provider and Terraform versions
+  ([PR #114](https://github.com/cycloidio/terracognita/pull/114))
 
 ## Fixed
 
