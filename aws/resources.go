@@ -13,6 +13,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/ses"
 	"github.com/cycloidio/terracognita/filter"
 	"github.com/cycloidio/terracognita/provider"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 // ResourceType is the type used to define all the Resources
@@ -824,15 +826,43 @@ func iamGroupMemberships(ctx context.Context, a *aws, resourceType string, filte
 	}
 
 	resources := make([]provider.Resource, 0)
+
 	for _, i := range groupNames {
-		r, err := initializeResource(a, NoID, resourceType)
+		input := &iam.GetGroupInput{
+			GroupName: awsSDK.String(i),
+		}
+
+		// Check if group have users. If not do not keep it
+		users, err := a.awsr.GetGroupUsers(ctx, input)
 		if err != nil {
 			return nil, err
 		}
-		err = r.Data().Set("group", i)
+
+		if len(users) == 0 {
+			continue
+		}
+
+		r, err := initializeResource(a, i, resourceType)
 		if err != nil {
 			return nil, err
 		}
+
+		// TODO this resource is not importable. Define our own ResourceImporter
+		// Should be removed when terraform will support it https://github.com/terraform-providers/terraform-provider-aws/pull/13795
+		// more detail: https://github.com/cycloidio/terracognita/issues/120
+		importer := &schema.ResourceImporter{
+			State: func(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+				groupName := d.Id()
+
+				d.Set("group", groupName)
+				d.SetId(resource.UniqueId())
+
+				return []*schema.ResourceData{d}, nil
+			},
+		}
+
+		r.SetImporter(importer)
+
 		resources = append(resources, r)
 	}
 
@@ -1083,6 +1113,10 @@ func iamUsers(ctx context.Context, a *aws, resourceType string, filters *filter.
 }
 
 func iamUserGroupMemberships(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	// if both aws_iam_group_membership and aws_iam_user_group_membership defined, keep only aws_iam_group_membership
+	if filters.IsIncluded("aws_iam_group_membership") && (!filters.IsExcluded("aws_iam_group_membership")) {
+		return nil, nil
+	}
 
 	userNames, err := getIAMUserNames(ctx, a, IAMUser.String(), filters)
 	if err != nil {

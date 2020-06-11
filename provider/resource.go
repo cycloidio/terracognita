@@ -48,6 +48,10 @@ type Resource interface {
 	// TFResource is the definition of that resource
 	TFResource() *schema.Resource
 
+	// SetImporter set schema.Resource.Importer
+	// It defines the ResourceImporter implementation for this resource
+	SetImporter(*schema.ResourceImporter)
+
 	// Data is the actual data of the Resource
 	Data() *schema.ResourceData
 
@@ -170,6 +174,10 @@ func (r *resource) TFResource() *schema.Resource {
 	}
 	r.tfResource = tfr
 	return r.tfResource
+}
+
+func (r *resource) SetImporter(i *schema.ResourceImporter) {
+	r.TFResource().Importer = i
 }
 
 func (r *resource) Data() *schema.ResourceData {
