@@ -217,6 +217,10 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetGroups(ctx context.Context, input *iam.ListGroupsInput) ([]*iam.Group, error)
 
+	// GetGroupUsers returns a list of IAM users that are in the specified IAM group
+	// Returned values are commented in the interface doc comment block.
+	GetGroupUsers(ctx context.Context, input *iam.GetGroupInput) ([]*iam.User, error)
+
 	// GetGroupPolicies returns the IAM GroupPolicies on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetGroupPolicies(ctx context.Context, input *iam.ListGroupPoliciesInput) ([]*string, error)
@@ -1415,6 +1419,33 @@ func (c *connector) GetGroups(ctx context.Context, input *iam.ListGroupsInput) (
 		hasNextToken = o.Marker != nil
 
 		opt = append(opt, o.Groups...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetGroupUsers(ctx context.Context, input *iam.GetGroupInput) ([]*iam.User, error) {
+	if c.svc.iam == nil {
+		c.svc.iam = iam.New(c.svc.session)
+	}
+
+	opt := make([]*iam.User, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.GetGroupWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		if input == nil {
+			input = &iam.GetGroupInput{}
+		}
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.Users...)
 
 	}
 
