@@ -10,6 +10,8 @@ At [Cycloid](https://www.cycloid.io/), Infrastructure As Code is in the company 
 
 We decided to Open Source this tool as we believe that it will help people to adopt IaC in an easy way. Cycloid provides this tool to let people import their infrastructure into [Cycloid's pipelines](https://www.cycloid.io/devops-framework), allow them to generate infrastructure diagram and manage all infra/application life cycle from a single interface.
 
+If you are interested in contributing to Terracognita or simply curious about what's next, take a look at the public [roadmap](https://github.com/cycloidio/terracognita/issues/118).
+
 ## Cloud providers
 
 Terracognita currently imports AWS, GCP and AzureRM cloud provider as Terraform (0.12.26) resource/state.
