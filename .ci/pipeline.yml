@@ -74,6 +74,12 @@ resource_types:
       tag: latest
     privileged: false
 
+  - name: git
+    type: docker-image
+    source:
+      repository: concourse/git-resource
+      tag: latest
+
 resources:
   - name: report-status-((branch))
     type: report-github-status
@@ -291,6 +297,8 @@ jobs:
           resource: repo-((branch))
           passed: [ version-((branch)) ]
           trigger: true
+          params:
+            fetch_tags: true
         - get: final-version
           passed: [ version-((branch)) ]
         - get: repo-version
@@ -407,6 +415,8 @@ jobs:
             resource: repo-((branch))
             passed: [ version-((branch)) ]
             trigger: true
+            params:
+              fetch_tags: true
           - get: repo-version
             trigger: false
           - get: final-version
