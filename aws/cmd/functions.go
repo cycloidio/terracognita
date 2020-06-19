@@ -502,6 +502,19 @@ var (
 			`,
 		},
 		Function{
+			Entity:                "Group",
+			Prefix:                "Get",
+			FnName:                "GetGroupUsers",
+			FnAttributeList:       "Users",
+			SingularEntity:        "User",
+			FnPaginationAttribute: "Marker",
+			Service:               "iam",
+			Documentation: `
+			// GetGroupUsers returns a list of IAM users that are in the specified IAM group
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
 			Entity:                "GroupPolicies",
 			Prefix:                "List",
 			Service:               "iam",

@@ -210,6 +210,18 @@ func (mr *ResourceMockRecorder) ResourceInstanceObject() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResourceInstanceObject", reflect.TypeOf((*Resource)(nil).ResourceInstanceObject))
 }
 
+// SetImporter mocks base method
+func (m *Resource) SetImporter(arg0 *schema.ResourceImporter) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetImporter", arg0)
+}
+
+// SetImporter indicates an expected call of SetImporter
+func (mr *ResourceMockRecorder) SetImporter(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetImporter", reflect.TypeOf((*Resource)(nil).SetImporter), arg0)
+}
+
 // State mocks base method
 func (m *Resource) State(arg0 writer.Writer) error {
 	m.ctrl.T.Helper()

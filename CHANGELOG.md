@@ -1,6 +1,10 @@
 ## [Unreleased]
 
 ### Added
+- provider resource: implement SetImporter to set schema.Resource.Importer when resource is not importable.
+  ([PR #116](https://github.com/cycloidio/terracognita/pull/116))
+- aws resource: `aws_iam_group_membership`
+  ([PR #116](https://github.com/cycloidio/terracognita/pull/116))
 - google resources: `google_compute_backend_bucket`, `google_project_iam_custom_role`, `google_storage_bucket_iam_policy`, `google_compute_instance_iam_policy`
   ([PR #97](https://github.com/cycloidio/terracognita/pull/97))
 - aws: `aws_lb`, `aws_lb_listener`, `aws_lb_listener_rule`, `aws_lb_target_group`
