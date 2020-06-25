@@ -72,7 +72,7 @@ func Import(ctx context.Context, p Provider, hcl, tfstate writer.Writer, f *filt
 	interpolation := make(map[string]string)
 
 	for _, t := range types {
-		logger = kitlog.With(logger, "resource", t)
+		logger := kitlog.With(logger, "resource", t)
 
 		if f.IsExcluded(t) {
 			logger.Log("msg", "excluded")
