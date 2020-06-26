@@ -77,6 +77,11 @@ const (
 				if err != nil {
 					return nil, err
 				}
+				if o.{{ .RootAttribute }} == nil {
+					hasNextToken = false
+					continue
+				}
+
 				{{ if .HasNotPagination }}
 					hasNextToken = false
 				{{ else }}
@@ -266,6 +271,20 @@ func (f Function) AttributeList() []string {
 	}
 
 	return []string{f.Entity}
+}
+
+// RootAttribute returns the first attribute of the
+// FnAttributeList even if it is a List (#) or a
+// method call (.)
+func (f Function) RootAttribute() string {
+	if f.FnAttributeList != "" {
+		if f.IsAttributeListSlice() {
+			return strings.Split(f.FnAttributeList, "#")[0]
+		}
+		return strings.Split(f.FnAttributeList, ".")[0]
+	}
+
+	return f.Entity
 }
 
 // IsAttributeListSlice checks if the logic should be to
