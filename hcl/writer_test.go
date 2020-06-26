@@ -2,6 +2,7 @@ package hcl_test
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/cycloidio/terracognita/errcode"
@@ -185,5 +186,30 @@ resource "type" "name" {
 		hw.Sync()
 
 		assert.Equal(t, hcl, b.String())
+	})
+	t.Run("SuccessMutualInterpolation", func(t *testing.T) {
+		var (
+			b        = &bytes.Buffer{}
+			hw       = hcl.NewWriter(b)
+			instance = map[string]interface{}{
+				"subnet_id": "1234",
+			}
+			subnet = map[string]interface{}{
+				"id":                "subnet-1",
+				"availability_zone": "a-zone",
+			}
+			i = make(map[string]string)
+		)
+		i["a-zone"] = "${aws_instance.instance.availability_zone}"
+		i["1234"] = "${aws_subnet.subnet.id}"
+		hw.Write("aws_subnet.subnet", subnet)
+		hw.Write("aws_instance.instance", instance)
+
+		hw.Interpolate(i)
+		hw.Sync()
+		// the config relies on map, since the order is pseudo random
+		// we just assert that we only have one "$" which means: there is
+		// only one interpolation
+		assert.Equal(t, 1, strings.Count(b.String(), "$"))
 	})
 }
