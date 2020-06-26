@@ -571,8 +571,8 @@ func albTargetGroups(ctx context.Context, a *aws, resourceType string, filters *
 	if filters.IsIncluded("aws_alb_target_group", "aws_lb_target_group") && (!filters.IsExcluded("aws_alb_target_group") && resourceType == "aws_lb_target_group") {
 		return nil, nil
 	}
-	albTargetGroups, err := a.awsr.GetLoadBalancersV2TargetGroups(ctx, nil)
 
+	albTargetGroups, err := a.awsr.GetLoadBalancersV2TargetGroups(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -611,7 +611,6 @@ func dbInstances(ctx context.Context, a *aws, resourceType string, filters *filt
 
 func dbParameterGroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	dbParameterGroups, err := a.awsr.GetDBParameterGroups(ctx, nil)
-
 	if err != nil {
 		return nil, err
 	}
@@ -632,7 +631,6 @@ func dbParameterGroups(ctx context.Context, a *aws, resourceType string, filters
 
 func dbSubnetGroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	dbSubnetGroups, err := a.awsr.GetDBSubnetGroups(ctx, nil)
-
 	if err != nil {
 		return nil, err
 	}
@@ -1416,12 +1414,18 @@ func sesActiveReceiptRuleSets(ctx context.Context, a *aws, resourceType string, 
 		return nil, err
 	}
 
+	resources := make([]provider.Resource, 0, 1)
+	if sesActiveReceiptRuleSets == nil {
+		return resources, nil
+	}
+
 	r, err := initializeResource(a, *sesActiveReceiptRuleSets, resourceType)
 	if err != nil {
 		return nil, err
 	}
+	resources = append(resources, r)
 
-	return []provider.Resource{r}, nil
+	return resources, nil
 }
 
 func sesDomainIdentities(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
@@ -1507,12 +1511,18 @@ func sesReceiptRuleSets(ctx context.Context, a *aws, resourceType string, filter
 		return nil, err
 	}
 
+	resources := make([]provider.Resource, 0, 1)
+	if sesActiveReceiptRuleSets == nil {
+		return resources, nil
+	}
+
 	r, err := initializeResource(a, *sesActiveReceiptRuleSets, resourceType)
 	if err != nil {
 		return nil, err
 	}
 
-	return []provider.Resource{r}, nil
+	resources = append(resources, r)
+	return resources, nil
 }
 
 func sesConfigurationSets(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
