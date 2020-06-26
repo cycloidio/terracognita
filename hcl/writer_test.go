@@ -29,9 +29,10 @@ func TestHCLWriter_Write(t *testing.T) {
 			value = map[string]interface{}{
 				"key": "value",
 			}
+			key = "type.name"
 		)
 
-		err := hw.Write("type.name", value)
+		err := hw.Write(key, value)
 		require.NoError(t, err)
 
 		assert.Equal(t, map[string]interface{}{
@@ -43,6 +44,15 @@ func TestHCLWriter_Write(t *testing.T) {
 				},
 			},
 		}, hw.Config)
+		t.Run("Has", func(t *testing.T) {
+			ok, err := hw.Has(key)
+			require.NoError(t, err)
+			assert.True(t, ok)
+
+			ok, err = hw.Has("type.new")
+			require.NoError(t, err)
+			assert.False(t, ok)
+		})
 	})
 	t.Run("ErrRequiredKey", func(t *testing.T) {
 		var (
