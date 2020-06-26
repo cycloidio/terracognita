@@ -359,6 +359,10 @@ func (c *connector) GetMetricAlarms(ctx context.Context, input *cloudwatch.Descr
 		if err != nil {
 			return nil, err
 		}
+		if o.MetricAlarms == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &cloudwatch.DescribeAlarmsInput{}
@@ -385,6 +389,10 @@ func (c *connector) GetInstances(ctx context.Context, input *ec2.DescribeInstanc
 		o, err := c.svc.ec2.DescribeInstancesWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.Reservations == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -415,6 +423,10 @@ func (c *connector) GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) (
 		if err != nil {
 			return nil, err
 		}
+		if o.Vpcs == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &ec2.DescribeVpcsInput{}
@@ -442,6 +454,10 @@ func (c *connector) GetVpcPeeringConnections(ctx context.Context, input *ec2.Des
 		if err != nil {
 			return nil, err
 		}
+		if o.VpcPeeringConnections == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &ec2.DescribeVpcPeeringConnectionsInput{}
@@ -468,6 +484,10 @@ func (c *connector) GetImages(ctx context.Context, input *ec2.DescribeImagesInpu
 		o, err := c.svc.ec2.DescribeImagesWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.Images == nil {
+			hasNextToken = false
+			continue
 		}
 
 		hasNextToken = false
@@ -497,6 +517,10 @@ func (c *connector) GetOwnImages(ctx context.Context, input *ec2.DescribeImagesI
 		if err != nil {
 			return nil, err
 		}
+		if o.Images == nil {
+			hasNextToken = false
+			continue
+		}
 
 		hasNextToken = false
 
@@ -520,6 +544,10 @@ func (c *connector) GetKeyPairs(ctx context.Context, input *ec2.DescribeKeyPairs
 		if err != nil {
 			return nil, err
 		}
+		if o.KeyPairs == nil {
+			hasNextToken = false
+			continue
+		}
 
 		hasNextToken = false
 
@@ -542,6 +570,10 @@ func (c *connector) GetSecurityGroups(ctx context.Context, input *ec2.DescribeSe
 		o, err := c.svc.ec2.DescribeSecurityGroupsWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.SecurityGroups == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -570,6 +602,10 @@ func (c *connector) GetSubnets(ctx context.Context, input *ec2.DescribeSubnetsIn
 		if err != nil {
 			return nil, err
 		}
+		if o.Subnets == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &ec2.DescribeSubnetsInput{}
@@ -597,6 +633,10 @@ func (c *connector) GetVolumes(ctx context.Context, input *ec2.DescribeVolumesIn
 		if err != nil {
 			return nil, err
 		}
+		if o.Volumes == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &ec2.DescribeVolumesInput{}
@@ -623,6 +663,10 @@ func (c *connector) GetSnapshots(ctx context.Context, input *ec2.DescribeSnapsho
 		o, err := c.svc.ec2.DescribeSnapshotsWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.Snapshots == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -656,6 +700,10 @@ func (c *connector) GetOwnSnapshots(ctx context.Context, input *ec2.DescribeSnap
 		if err != nil {
 			return nil, err
 		}
+		if o.Snapshots == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &ec2.DescribeSnapshotsInput{}
@@ -682,6 +730,10 @@ func (c *connector) GetLaunchTemplates(ctx context.Context, input *ec2.DescribeL
 		o, err := c.svc.ec2.DescribeLaunchTemplatesWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.LaunchTemplates == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -710,6 +762,10 @@ func (c *connector) GetAutoScalingGroups(ctx context.Context, input *autoscaling
 		if err != nil {
 			return nil, err
 		}
+		if o.AutoScalingGroups == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &autoscaling.DescribeAutoScalingGroupsInput{}
@@ -736,6 +792,10 @@ func (c *connector) GetLaunchConfigurations(ctx context.Context, input *autoscal
 		o, err := c.svc.autoscaling.DescribeLaunchConfigurationsWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.LaunchConfigurations == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -764,6 +824,10 @@ func (c *connector) GetAutoScalingPolicies(ctx context.Context, input *autoscali
 		if err != nil {
 			return nil, err
 		}
+		if o.ScalingPolicies == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &autoscaling.DescribePoliciesInput{}
@@ -790,6 +854,10 @@ func (c *connector) GetElastiCacheClusters(ctx context.Context, input *elasticac
 		o, err := c.svc.elasticache.DescribeCacheClustersWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.CacheClusters == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -818,6 +886,10 @@ func (c *connector) GetElastiCacheTags(ctx context.Context, input *elasticache.L
 		if err != nil {
 			return nil, err
 		}
+		if o.TagList == nil {
+			hasNextToken = false
+			continue
+		}
 
 		hasNextToken = false
 
@@ -840,6 +912,10 @@ func (c *connector) GetLoadBalancers(ctx context.Context, input *elb.DescribeLoa
 		o, err := c.svc.elb.DescribeLoadBalancersWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.LoadBalancerDescriptions == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -868,6 +944,10 @@ func (c *connector) GetLoadBalancersTags(ctx context.Context, input *elb.Describ
 		if err != nil {
 			return nil, err
 		}
+		if o.TagDescriptions == nil {
+			hasNextToken = false
+			continue
+		}
 
 		hasNextToken = false
 
@@ -890,6 +970,10 @@ func (c *connector) GetLoadBalancersV2(ctx context.Context, input *elbv2.Describ
 		o, err := c.svc.elbv2.DescribeLoadBalancersWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.LoadBalancers == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -918,6 +1002,10 @@ func (c *connector) GetLoadBalancersV2Tags(ctx context.Context, input *elbv2.Des
 		if err != nil {
 			return nil, err
 		}
+		if o.TagDescriptions == nil {
+			hasNextToken = false
+			continue
+		}
 
 		hasNextToken = false
 
@@ -940,6 +1028,10 @@ func (c *connector) GetLoadBalancersV2Listeners(ctx context.Context, input *elbv
 		o, err := c.svc.elbv2.DescribeListenersWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.Listeners == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -968,6 +1060,10 @@ func (c *connector) GetLoadBalancersV2TargetGroups(ctx context.Context, input *e
 		if err != nil {
 			return nil, err
 		}
+		if o.TargetGroups == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &elbv2.DescribeTargetGroupsInput{}
@@ -994,6 +1090,10 @@ func (c *connector) GetListenerCertificates(ctx context.Context, input *elbv2.De
 		o, err := c.svc.elbv2.DescribeListenerCertificatesWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.Certificates == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -1022,6 +1122,10 @@ func (c *connector) GetLoadBalancersV2Rules(ctx context.Context, input *elbv2.De
 		if err != nil {
 			return nil, err
 		}
+		if o.Rules == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &elbv2.DescribeRulesInput{}
@@ -1048,6 +1152,10 @@ func (c *connector) GetDBInstances(ctx context.Context, input *rds.DescribeDBIns
 		o, err := c.svc.rds.DescribeDBInstancesWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.DBInstances == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -1076,6 +1184,10 @@ func (c *connector) GetDBInstancesTags(ctx context.Context, input *rds.ListTagsF
 		if err != nil {
 			return nil, err
 		}
+		if o.TagList == nil {
+			hasNextToken = false
+			continue
+		}
 
 		hasNextToken = false
 
@@ -1098,6 +1210,10 @@ func (c *connector) GetDBParameterGroups(ctx context.Context, input *rds.Describ
 		o, err := c.svc.rds.DescribeDBParameterGroupsWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.DBParameterGroups == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -1126,6 +1242,10 @@ func (c *connector) GetDBSubnetGroups(ctx context.Context, input *rds.DescribeDB
 		if err != nil {
 			return nil, err
 		}
+		if o.DBSubnetGroups == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &rds.DescribeDBSubnetGroupsInput{}
@@ -1153,6 +1273,10 @@ func (c *connector) GetBucketTags(ctx context.Context, input *s3.GetBucketTaggin
 		if err != nil {
 			return nil, err
 		}
+		if o.TagSet == nil {
+			hasNextToken = false
+			continue
+		}
 
 		hasNextToken = false
 
@@ -1176,12 +1300,16 @@ func (c *connector) ListObjects(ctx context.Context, input *s3.ListObjectsInput)
 		if err != nil {
 			return nil, err
 		}
+		if o.Contents == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &s3.ListObjectsInput{}
 		}
-		input.Marker = o.Marker
-		hasNextToken = o.Marker != nil
+		input.Marker = o.NextMarker
+		hasNextToken = o.NextMarker != nil
 
 		opt = append(opt, o.Contents...)
 
@@ -1202,6 +1330,10 @@ func (c *connector) GetObjectsTags(ctx context.Context, input *s3.GetObjectTaggi
 		o, err := c.svc.s3.GetObjectTaggingWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.TagSet == nil {
+			hasNextToken = false
+			continue
 		}
 
 		hasNextToken = false
@@ -1225,6 +1357,10 @@ func (c *connector) GetRecordedResourceCounts(ctx context.Context, input *config
 		o, err := c.svc.configservice.GetDiscoveredResourceCountsWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.ResourceCounts == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -1253,6 +1389,10 @@ func (c *connector) GetCloudFrontDistributions(ctx context.Context, input *cloud
 		if err != nil {
 			return nil, err
 		}
+		if o.DistributionList == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &cloudfront.ListDistributionsInput{}
@@ -1279,6 +1419,10 @@ func (c *connector) GetCloudFrontPublicKeys(ctx context.Context, input *cloudfro
 		o, err := c.svc.cloudfront.ListPublicKeysWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.PublicKeyList == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -1307,12 +1451,16 @@ func (c *connector) GetCloudFrontOriginAccessIdentities(ctx context.Context, inp
 		if err != nil {
 			return nil, err
 		}
+		if o.CloudFrontOriginAccessIdentityList == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &cloudfront.ListCloudFrontOriginAccessIdentitiesInput{}
 		}
-		input.Marker = o.CloudFrontOriginAccessIdentityList.Marker
-		hasNextToken = o.CloudFrontOriginAccessIdentityList.Marker != nil
+		input.Marker = o.CloudFrontOriginAccessIdentityList.NextMarker
+		hasNextToken = o.CloudFrontOriginAccessIdentityList.NextMarker != nil
 
 		opt = append(opt, o.CloudFrontOriginAccessIdentityList.Items...)
 
@@ -1333,6 +1481,10 @@ func (c *connector) GetAccessKeys(ctx context.Context, input *iam.ListAccessKeys
 		o, err := c.svc.iam.ListAccessKeysWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.AccessKeyMetadata == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -1361,6 +1513,10 @@ func (c *connector) GetAccountAliases(ctx context.Context, input *iam.ListAccoun
 		if err != nil {
 			return nil, err
 		}
+		if o.AccountAliases == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &iam.ListAccountAliasesInput{}
@@ -1388,6 +1544,10 @@ func (c *connector) GetAccountPasswordPolicy(ctx context.Context, input *iam.Get
 		if err != nil {
 			return nil, err
 		}
+		if o.PasswordPolicy == nil {
+			hasNextToken = false
+			continue
+		}
 
 		hasNextToken = false
 
@@ -1410,6 +1570,10 @@ func (c *connector) GetGroups(ctx context.Context, input *iam.ListGroupsInput) (
 		o, err := c.svc.iam.ListGroupsWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.Groups == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -1438,6 +1602,10 @@ func (c *connector) GetGroupUsers(ctx context.Context, input *iam.GetGroupInput)
 		if err != nil {
 			return nil, err
 		}
+		if o.Users == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &iam.GetGroupInput{}
@@ -1464,6 +1632,10 @@ func (c *connector) GetGroupPolicies(ctx context.Context, input *iam.ListGroupPo
 		o, err := c.svc.iam.ListGroupPoliciesWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.PolicyNames == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -1492,6 +1664,10 @@ func (c *connector) GetAttachedGroupPolicies(ctx context.Context, input *iam.Lis
 		if err != nil {
 			return nil, err
 		}
+		if o.AttachedPolicies == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &iam.ListAttachedGroupPoliciesInput{}
@@ -1518,6 +1694,10 @@ func (c *connector) GetInstanceProfiles(ctx context.Context, input *iam.ListInst
 		o, err := c.svc.iam.ListInstanceProfilesWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.InstanceProfiles == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -1546,6 +1726,10 @@ func (c *connector) GetGroupsForUser(ctx context.Context, input *iam.ListGroupsF
 		if err != nil {
 			return nil, err
 		}
+		if o.Groups == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &iam.ListGroupsForUserInput{}
@@ -1573,6 +1757,10 @@ func (c *connector) GetOpenIDConnectProviders(ctx context.Context, input *iam.Li
 		if err != nil {
 			return nil, err
 		}
+		if o.OpenIDConnectProviderList == nil {
+			hasNextToken = false
+			continue
+		}
 
 		hasNextToken = false
 
@@ -1595,6 +1783,10 @@ func (c *connector) GetPolicies(ctx context.Context, input *iam.ListPoliciesInpu
 		o, err := c.svc.iam.ListPoliciesWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.Policies == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -1623,6 +1815,10 @@ func (c *connector) GetRoles(ctx context.Context, input *iam.ListRolesInput) ([]
 		if err != nil {
 			return nil, err
 		}
+		if o.Roles == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &iam.ListRolesInput{}
@@ -1649,6 +1845,10 @@ func (c *connector) GetRolePolicies(ctx context.Context, input *iam.ListRolePoli
 		o, err := c.svc.iam.ListRolePoliciesWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.PolicyNames == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -1677,6 +1877,10 @@ func (c *connector) GetAttachedRolePolicies(ctx context.Context, input *iam.List
 		if err != nil {
 			return nil, err
 		}
+		if o.AttachedPolicies == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &iam.ListAttachedRolePoliciesInput{}
@@ -1704,6 +1908,10 @@ func (c *connector) GetSAMLProviders(ctx context.Context, input *iam.ListSAMLPro
 		if err != nil {
 			return nil, err
 		}
+		if o.SAMLProviderList == nil {
+			hasNextToken = false
+			continue
+		}
 
 		hasNextToken = false
 
@@ -1726,6 +1934,10 @@ func (c *connector) GetServerCertificates(ctx context.Context, input *iam.ListSe
 		o, err := c.svc.iam.ListServerCertificatesWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.ServerCertificateMetadataList == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -1754,6 +1966,10 @@ func (c *connector) GetUsers(ctx context.Context, input *iam.ListUsersInput) ([]
 		if err != nil {
 			return nil, err
 		}
+		if o.Users == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &iam.ListUsersInput{}
@@ -1780,6 +1996,10 @@ func (c *connector) GetUserPolicies(ctx context.Context, input *iam.ListUserPoli
 		o, err := c.svc.iam.ListUserPoliciesWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.PolicyNames == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -1808,6 +2028,10 @@ func (c *connector) GetAttachedUserPolicies(ctx context.Context, input *iam.List
 		if err != nil {
 			return nil, err
 		}
+		if o.AttachedPolicies == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &iam.ListAttachedUserPoliciesInput{}
@@ -1834,6 +2058,10 @@ func (c *connector) GetSSHPublicKeys(ctx context.Context, input *iam.ListSSHPubl
 		o, err := c.svc.iam.ListSSHPublicKeysWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.SSHPublicKeys == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -1862,6 +2090,10 @@ func (c *connector) GetActiveReceiptRuleSet(ctx context.Context, input *ses.Desc
 		if err != nil {
 			return nil, err
 		}
+		if o.Metadata == nil {
+			hasNextToken = false
+			continue
+		}
 
 		hasNextToken = false
 
@@ -1885,6 +2117,10 @@ func (c *connector) GetActiveReceiptRulesSet(ctx context.Context, input *ses.Des
 		if err != nil {
 			return nil, err
 		}
+		if o.Rules == nil {
+			hasNextToken = false
+			continue
+		}
 
 		hasNextToken = false
 
@@ -1907,6 +2143,10 @@ func (c *connector) GetIdentities(ctx context.Context, input *ses.ListIdentities
 		o, err := c.svc.ses.ListIdentitiesWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.Identities == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -1935,6 +2175,10 @@ func (c *connector) GetReceiptFilters(ctx context.Context, input *ses.ListReceip
 		if err != nil {
 			return nil, err
 		}
+		if o.Filters == nil {
+			hasNextToken = false
+			continue
+		}
 
 		hasNextToken = false
 
@@ -1957,6 +2201,10 @@ func (c *connector) GetConfigurationSets(ctx context.Context, input *ses.ListCon
 		o, err := c.svc.ses.ListConfigurationSetsWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.ConfigurationSets == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -1985,6 +2233,10 @@ func (c *connector) GetIdentityNotificationAttributes(ctx context.Context, input
 		if err != nil {
 			return nil, err
 		}
+		if o.NotificationAttributes == nil {
+			hasNextToken = false
+			continue
+		}
 
 		hasNextToken = false
 
@@ -2007,6 +2259,10 @@ func (c *connector) GetTemplates(ctx context.Context, input *ses.ListTemplatesIn
 		o, err := c.svc.ses.ListTemplatesWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.TemplatesMetadata == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -2035,12 +2291,16 @@ func (c *connector) GetReusableDelegationSets(ctx context.Context, input *route5
 		if err != nil {
 			return nil, err
 		}
+		if o.DelegationSets == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &route53.ListReusableDelegationSetsInput{}
 		}
-		input.Marker = o.Marker
-		hasNextToken = o.Marker != nil
+		input.Marker = o.NextMarker
+		hasNextToken = o.NextMarker != nil
 
 		opt = append(opt, o.DelegationSets...)
 
@@ -2062,12 +2322,16 @@ func (c *connector) GetHealthChecks(ctx context.Context, input *route53.ListHeal
 		if err != nil {
 			return nil, err
 		}
+		if o.HealthChecks == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &route53.ListHealthChecksInput{}
 		}
-		input.Marker = o.Marker
-		hasNextToken = o.Marker != nil
+		input.Marker = o.NextMarker
+		hasNextToken = o.NextMarker != nil
 
 		opt = append(opt, o.HealthChecks...)
 
@@ -2088,6 +2352,10 @@ func (c *connector) GetQueryLoggingConfigs(ctx context.Context, input *route53.L
 		o, err := c.svc.route53.ListQueryLoggingConfigsWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.QueryLoggingConfigs == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -2116,6 +2384,10 @@ func (c *connector) GetResourceRecordSets(ctx context.Context, input *route53.Li
 		if err != nil {
 			return nil, err
 		}
+		if o.ResourceRecordSets == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &route53.ListResourceRecordSetsInput{}
@@ -2143,12 +2415,16 @@ func (c *connector) GetHostedZones(ctx context.Context, input *route53.ListHoste
 		if err != nil {
 			return nil, err
 		}
+		if o.HostedZones == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &route53.ListHostedZonesInput{}
 		}
-		input.Marker = o.Marker
-		hasNextToken = o.Marker != nil
+		input.Marker = o.NextMarker
+		hasNextToken = o.NextMarker != nil
 
 		opt = append(opt, o.HostedZones...)
 
@@ -2169,6 +2445,10 @@ func (c *connector) GetVPCAssociationAuthorizations(ctx context.Context, input *
 		o, err := c.svc.route53.ListVPCAssociationAuthorizationsWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.VPCs == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
@@ -2197,6 +2477,10 @@ func (c *connector) GetResolverEndpoints(ctx context.Context, input *route53reso
 		if err != nil {
 			return nil, err
 		}
+		if o.ResolverEndpoints == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &route53resolver.ListResolverEndpointsInput{}
@@ -2224,6 +2508,10 @@ func (c *connector) GetResolverRules(ctx context.Context, input *route53resolver
 		if err != nil {
 			return nil, err
 		}
+		if o.ResolverRules == nil {
+			hasNextToken = false
+			continue
+		}
 
 		if input == nil {
 			input = &route53resolver.ListResolverRulesInput{}
@@ -2250,6 +2538,10 @@ func (c *connector) GetResolverRuleAssociations(ctx context.Context, input *rout
 		o, err := c.svc.route53resolver.ListResolverRuleAssociationsWithContext(ctx, input)
 		if err != nil {
 			return nil, err
+		}
+		if o.ResolverRuleAssociations == nil {
+			hasNextToken = false
+			continue
 		}
 
 		if input == nil {
