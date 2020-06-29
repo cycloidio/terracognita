@@ -36,6 +36,7 @@ func TestWrite(t *testing.T) {
 			b    = &bytes.Buffer{}
 			sw   = state.NewWriter(b)
 			tp   = "aws_iam_user"
+			key  = "aws.name"
 		)
 		defer ctrl.Finish()
 
@@ -53,12 +54,21 @@ func TestWrite(t *testing.T) {
 
 		prv.EXPECT().String().Return("aws").AnyTimes()
 
-		err = sw.Write("aws.name", res)
+		err = sw.Write(key, res)
 		require.NoError(t, err)
 
 		assert.Equal(t, map[string]provider.Resource{
-			"aws.name": res,
+			key: res,
 		}, sw.Config)
+		t.Run("Has", func(t *testing.T) {
+			ok, err := sw.Has(key)
+			require.NoError(t, err)
+			assert.True(t, ok)
+
+			ok, err = sw.Has("aws.new")
+			require.NoError(t, err)
+			assert.False(t, ok)
+		})
 	})
 	t.Run("ErrRequiredKey", func(t *testing.T) {
 		sw := state.NewWriter(nil)

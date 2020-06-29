@@ -396,7 +396,7 @@ func (r *resource) State(w writer.Writer) error {
 		// and store it, so net time it'll use that one on any config
 		if r.configName == "" {
 			configName := tag.GetNameFromTag(r.provider.TagKey(), r.data, r.id)
-			if ok, err := w.Has(configName); err != nil {
+			if ok, err := w.Has(fmt.Sprintf("%s.%s", r.resourceType, configName)); err != nil {
 				return err
 			} else if ok {
 				configName = pwgen.Alpha(5)
@@ -428,8 +428,8 @@ func (r *resource) HCL(w writer.Writer) error {
 	// If it does not have any configName we will generate one
 	// and store it, so net time it'll use that one on any config
 	if r.configName == "" {
-		configName := fmt.Sprintf("%s.%s", r.resourceType, tag.GetNameFromTag(r.provider.TagKey(), r.data, r.id))
-		if ok, err := w.Has(configName); err != nil {
+		configName := tag.GetNameFromTag(r.provider.TagKey(), r.data, r.id)
+		if ok, err := w.Has(fmt.Sprintf("%s.%s", r.resourceType, configName)); err != nil {
 			return err
 		} else if ok {
 			configName = pwgen.Alpha(5)

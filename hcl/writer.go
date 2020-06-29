@@ -83,10 +83,10 @@ func (w *Writer) Has(key string) (bool, error) {
 	name := strings.Join(keys[1:], "")
 
 	if _, ok := w.Config["resource"].(map[string]map[string]interface{})[keys[0]][name]; ok {
-		return false, errors.Wrapf(errcode.ErrWriterAlreadyExistsKey, "with key %q", key)
+		return true, nil
 	}
 
-	return true, nil
+	return false, nil
 }
 
 // Sync writes the content of the Config to the

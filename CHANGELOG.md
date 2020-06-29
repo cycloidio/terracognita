@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Fixed
+
+- Error with the Resource name always being the alphanumeric instead of the Tag Name
+  ([PR #124](https://github.com/cycloidio/terracognita/issues/124))
+
 ## [0.5.0] _2020-06-19_
 
 ### Added
@@ -25,7 +30,7 @@
 - Upgraded all the Provider and Terraform versions
   ([PR #114](https://github.com/cycloidio/terracognita/pull/114))
 
-## Fixed
+### Fixed
 
 - Error when importing `aws_iam_user_group_membership` without groups
   ([Issue #104](https://github.com/cycloidio/terracognita/issues/104))
@@ -73,7 +78,7 @@
 - 'raws' lib to be an internal library instead of a dependency
   ([Issue #69](https://github.com/cycloidio/terracognita/issues/69))
 
-## Fixed
+### Fixed
 
 - '--region' flag working for different subcommands
   ([PR #63](https://github.com/cycloidio/terracognita/pull/63))
