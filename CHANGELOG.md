@@ -3,11 +3,14 @@
 ### Fixed
 
 - Error with the Resource name always being the alphanumeric instead of the Tag Name
-  ([PR #124](https://github.com/cycloidio/terracognita/issues/124))
+  ([PR #124](https://github.com/cycloidio/terracognita/pull/124))
+- Pagination and nil pointer errors
+  ([PR #123](https://github.com/cycloidio/terracognita/pull/123))
 
 ## [0.5.0] _2020-06-19_
 
 ### Added
+
 - provider resource: implement SetImporter to set schema.Resource.Importer when resource is not importable.
   ([PR #116](https://github.com/cycloidio/terracognita/pull/116))
 - aws resource: `aws_iam_group_membership`

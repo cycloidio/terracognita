@@ -160,6 +160,10 @@ func TestTemplateExecute(t *testing.T) {
 					if err != nil {
 						return nil, err
 					}
+					if o.Entities == nil {
+						hasNextToken = false
+						continue
+					}
 					if input == nil {
 						input = &Service.PrefixEntitiesInput{}
 					}
@@ -199,6 +203,10 @@ func TestTemplateExecute(t *testing.T) {
 					o, err := c.svc.Service.PrefixEntitiesWithContext(ctx, input)
 					if err != nil {
 						return nil, err
+					}
+					if o.Entities == nil {
+						hasNextToken = false
+						continue
 					}
 					if input == nil {
 						input = &Service.PrefixEntitiesInput{}

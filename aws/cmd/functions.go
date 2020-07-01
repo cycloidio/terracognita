@@ -370,12 +370,13 @@ var (
 		},
 		Function{
 			// TODO: https://github.com/cycloidio/terracognita/issues/76
-			FnName:                "ListObjects",
-			Entity:                "Objects",
-			FnAttributeList:       "Contents",
-			FnPaginationAttribute: "Marker",
-			Prefix:                "List",
-			Service:               "s3",
+			FnName:                     "ListObjects",
+			Entity:                     "Objects",
+			FnAttributeList:            "Contents",
+			FnPaginationAttribute:      "NextMarker",
+			FnInputPaginationAttribute: "Marker",
+			Prefix:                     "List",
+			Service:                    "s3",
 			Documentation: `
 			// ListObjects returns a list of all S3 objects in a bucket based on the input given.
 			// Returned values are commented in the interface doc comment block.
@@ -445,7 +446,7 @@ var (
 			Service:                    "cloudfront",
 			SingularEntity:             "OriginAccessIdentitySummary",
 			FnAttributeList:            "CloudFrontOriginAccessIdentityList.Items",
-			FnPaginationAttribute:      "CloudFrontOriginAccessIdentityList.Marker",
+			FnPaginationAttribute:      "CloudFrontOriginAccessIdentityList.NextMarker",
 			FnInputPaginationAttribute: "Marker",
 			Documentation: `
 			// GetCloudFrontOriginAccessIdentities returns all the CloudFront Origin Access Identities on the given input
@@ -770,22 +771,24 @@ var (
 
 		// route53
 		Function{
-			Entity:                "ReusableDelegationSets",
-			FnAttributeList:       "DelegationSets",
-			SingularEntity:        "DelegationSet",
-			Prefix:                "List",
-			Service:               "route53",
-			FnPaginationAttribute: "Marker",
+			Entity:                     "ReusableDelegationSets",
+			FnAttributeList:            "DelegationSets",
+			SingularEntity:             "DelegationSet",
+			Prefix:                     "List",
+			Service:                    "route53",
+			FnPaginationAttribute:      "NextMarker",
+			FnInputPaginationAttribute: "Marker",
 			Documentation: `
 			// GetReusableDelegationSets returns the Route53 ReusableDelegationSets on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:                "HealthChecks",
-			Prefix:                "List",
-			Service:               "route53",
-			FnPaginationAttribute: "Marker",
+			Entity:                     "HealthChecks",
+			Prefix:                     "List",
+			Service:                    "route53",
+			FnPaginationAttribute:      "NextMarker",
+			FnInputPaginationAttribute: "Marker",
 			Documentation: `
 			// GetHealthChecks returns the Route53 HealthChecks on the given input
 			// Returned values are commented in the interface doc comment block.
@@ -812,10 +815,11 @@ var (
 			`,
 		},
 		Function{
-			Entity:                "HostedZones",
-			Prefix:                "List",
-			Service:               "route53",
-			FnPaginationAttribute: "Marker",
+			Entity:                     "HostedZones",
+			Prefix:                     "List",
+			Service:                    "route53",
+			FnPaginationAttribute:      "NextMarker",
+			FnInputPaginationAttribute: "Marker",
 			Documentation: `
 			// GetHostedZones returns the Route53 HostedZones on the given input
 			// Returned values are commented in the interface doc comment block.
