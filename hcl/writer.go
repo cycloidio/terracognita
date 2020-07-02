@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"reflect"
+	"regexp"
 	"strings"
 
 	kitlog "github.com/go-kit/kit/log"
@@ -129,6 +130,8 @@ func (w *Writer) Sync() error {
 // with TF interpolation
 func (w *Writer) Interpolate(i map[string]string) {
 	resources := w.Config["resource"]
+	// who's interpolated with who
+	relations := make(map[string]struct{}, 0)
 	// we need to isolate each resource
 	// getting each resource is easier to avoid cycle
 	// or interpolaception.
@@ -142,7 +145,7 @@ func (w *Writer) Interpolate(i map[string]string) {
 			dest := reflect.New(src.Type()).Elem()
 
 			// walk through the resources to interpolate the good values
-			walk(dest, src, i, name, rt)
+			walk(dest, src, i, name, rt, &relations)
 
 			// remove reflect.Value wrapper from dest
 			resources.(map[string]map[string]interface{})[rt][name] = dest.Interface()
@@ -152,7 +155,7 @@ func (w *Writer) Interpolate(i map[string]string) {
 
 // walk through a resource block. it's easier since we do not know how the block is made
 // `dest` will be the new "block" with the values interpolated from `interpolate`
-func walk(dest, src reflect.Value, interpolate map[string]string, name string, resourceType string) {
+func walk(dest, src reflect.Value, interpolate map[string]string, name string, resourceType string, relations *map[string]struct{}) {
 	switch src.Kind() {
 	// it's an interface, so we basically need
 	// to extract the elem and walk through it
@@ -160,7 +163,7 @@ func walk(dest, src reflect.Value, interpolate map[string]string, name string, r
 	case reflect.Interface:
 		srcValue := src.Elem()
 		destValue := reflect.New(srcValue.Type()).Elem()
-		walk(destValue, srcValue, interpolate, name, resourceType)
+		walk(destValue, srcValue, interpolate, name, resourceType, relations)
 		dest.Set(destValue)
 
 	// if the current `src` is a slice
@@ -168,7 +171,7 @@ func walk(dest, src reflect.Value, interpolate map[string]string, name string, r
 	case reflect.Array, reflect.Slice:
 		dest.Set(reflect.MakeSlice(src.Type(), src.Len(), src.Cap()))
 		for i := 0; i < src.Len(); i++ {
-			walk(dest.Index(i), src.Index(i), interpolate, name, resourceType)
+			walk(dest.Index(i), src.Index(i), interpolate, name, resourceType, relations)
 		}
 
 	// it's a map
@@ -178,7 +181,7 @@ func walk(dest, src reflect.Value, interpolate map[string]string, name string, r
 		for iter.Next() {
 			// New gives us a pointer, but again we want the value
 			destValue := reflect.New(iter.Value().Type()).Elem()
-			walk(destValue, iter.Value(), interpolate, name, resourceType)
+			walk(destValue, iter.Value(), interpolate, name, resourceType, relations)
 			dest.SetMapIndex(iter.Key(), destValue)
 		}
 
@@ -189,10 +192,16 @@ func walk(dest, src reflect.Value, interpolate map[string]string, name string, r
 	case reflect.String:
 		// we check if there is a value to interpolate
 		if interpolatedValue, ok := interpolate[src.Interface().(string)]; ok {
+			irt, in := extractResourceTypeAndName(interpolatedValue)
+			target := fmt.Sprintf("%s.%s", irt, in)
+			source := fmt.Sprintf("%s.%s", resourceType, name)
 			// avoid to interpolate a resource by "itself" (interpolaception) and avoid to interpolate a resource type with resource
 			// of the same type (cyclic interpolation)
-			if !(strings.Contains(interpolatedValue, name) || strings.Contains(interpolatedValue, resourceType)) {
+			// we also check for mutual interpolation
+			if !(strings.Contains(interpolatedValue, name) || strings.Contains(interpolatedValue, resourceType) || isMutualInterpolation(target, source, relations)) {
 				dest.SetString(interpolatedValue)
+				// we store this new relationship
+				(*relations)[fmt.Sprintf("%s+%s", source, target)] = struct{}{}
 			} else {
 				dest.SetString(src.Interface().(string))
 			}
@@ -202,4 +211,25 @@ func walk(dest, src reflect.Value, interpolate map[string]string, name string, r
 	default:
 		dest.Set(src)
 	}
+}
+
+// isMutualInterpolation will simply go through the list of relations to find out
+// if a relation is already present between the two resources in one direction
+// or the other
+func isMutualInterpolation(target, source string, relations *map[string]struct{}) bool {
+	if _, ok := (*relations)[fmt.Sprintf("%s+%s", source, target)]; ok {
+		return true
+	}
+	if _, ok := (*relations)[fmt.Sprintf("%s+%s", target, source)]; ok {
+		return true
+	}
+	return false
+}
+
+// extractResourceTypeAndName will parse a TF variable to return
+// the resource type and the name of the resource
+func extractResourceTypeAndName(value string) (string, string) {
+	res := regexp.MustCompile(`\${(.+)\.(.+)\.(.+)}`)
+	match := res.FindStringSubmatch(value)
+	return match[1], match[2]
 }

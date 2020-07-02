@@ -6,6 +6,8 @@
   ([PR #124](https://github.com/cycloidio/terracognita/pull/124))
 - Pagination and nil pointer errors
   ([PR #123](https://github.com/cycloidio/terracognita/pull/123))
+- Error with mutual interpolation between resources
+  ([PR #125](https://github.com/cycloidio/terracognita/pull/125))
 
 ## [0.5.0] _2020-06-19_
 
