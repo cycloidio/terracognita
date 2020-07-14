@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Added
+
+- aws resource: `aws_alb_listener_certificate`, `aws_lb_cookie_stickiness_policy`, `aws_lb_target_group_attachment`, `aws_volume_attachment`, `aws_elasticsearch_domain`, `aws_elasticsearch_domain_policy`, `aws_lambda_function`, `aws_api_gateway_rest_api`, `aws_api_gateway_deployment`, `aws_api_gateway_stage`, `aws_api_gateway_resource`.
+  ([PR #128](https://github.com/cycloidio/terracognita/pull/128))
+
 ## [0.5.1] _2020-07-17_
 
 ### Fixed
