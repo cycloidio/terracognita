@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/apigateway/apigatewayiface"
 	"github.com/aws/aws-sdk-go/service/autoscaling/autoscalingiface"
 	"github.com/aws/aws-sdk-go/service/cloudfront/cloudfrontiface"
 	"github.com/aws/aws-sdk-go/service/cloudwatch/cloudwatchiface"
@@ -15,9 +16,11 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 	"github.com/aws/aws-sdk-go/service/elasticache/elasticacheiface"
+	"github.com/aws/aws-sdk-go/service/elasticsearchservice/elasticsearchserviceiface"
 	"github.com/aws/aws-sdk-go/service/elb/elbiface"
 	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
 	"github.com/aws/aws-sdk-go/service/iam/iamiface"
+	"github.com/aws/aws-sdk-go/service/lambda/lambdaiface"
 	"github.com/aws/aws-sdk-go/service/rds/rdsiface"
 	"github.com/aws/aws-sdk-go/service/route53/route53iface"
 	"github.com/aws/aws-sdk-go/service/route53resolver/route53resolveriface"
@@ -85,23 +88,26 @@ func (c *connector) GetRegion() string {
 }
 
 type serviceConnector struct {
-	region          string
-	session         *session.Session
-	ec2             ec2iface.EC2API
-	elb             elbiface.ELBAPI
-	elbv2           elbv2iface.ELBV2API
-	rds             rdsiface.RDSAPI
-	s3              s3iface.S3API
-	s3downloader    s3manageriface.DownloaderAPI
-	elasticache     elasticacheiface.ElastiCacheAPI
-	configservice   configserviceiface.ConfigServiceAPI
-	cloudfront      cloudfrontiface.CloudFrontAPI
-	cloudwatch      cloudwatchiface.CloudWatchAPI
-	iam             iamiface.IAMAPI
-	ses             sesiface.SESAPI
-	route53         route53iface.Route53API
-	route53resolver route53resolveriface.Route53ResolverAPI
-	autoscaling     autoscalingiface.AutoScalingAPI
+	apigateway           apigatewayiface.APIGatewayAPI
+	autoscaling          autoscalingiface.AutoScalingAPI
+	cloudfront           cloudfrontiface.CloudFrontAPI
+	cloudwatch           cloudwatchiface.CloudWatchAPI
+	configservice        configserviceiface.ConfigServiceAPI
+	ec2                  ec2iface.EC2API
+	elasticache          elasticacheiface.ElastiCacheAPI
+	elasticsearchservice elasticsearchserviceiface.ElasticsearchServiceAPI
+	elb                  elbiface.ELBAPI
+	elbv2                elbv2iface.ELBV2API
+	iam                  iamiface.IAMAPI
+	lambda               lambdaiface.LambdaAPI
+	rds                  rdsiface.RDSAPI
+	region               string
+	route53resolver      route53resolveriface.Route53ResolverAPI
+	route53              route53iface.Route53API
+	s3downloader         s3manageriface.DownloaderAPI
+	s3                   s3iface.S3API
+	ses                  sesiface.SESAPI
+	session              *session.Session
 }
 
 // configureAWS creates a new static credential with the passed accessKey and

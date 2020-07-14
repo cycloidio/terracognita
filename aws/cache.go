@@ -9,6 +9,44 @@ import (
 	"github.com/pkg/errors"
 )
 
+func cacheAPIGatewayRestApis(ctx context.Context, a *aws, rt string, filters *filter.Filter) ([]provider.Resource, error) {
+
+	rs, err := a.cache.Get(rt)
+	if err != nil {
+		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
+			return nil, errors.WithStack(err)
+		}
+
+		rs, err = apiGatewayRestApis(ctx, a, rt, filters)
+		if err != nil {
+			return nil, err
+		}
+
+		err = a.cache.Set(rt, rs)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return rs, nil
+}
+
+func getAPIGatewayRestApis(ctx context.Context, a *aws, rt string, filters *filter.Filter) ([]string, error) {
+	rs, err := cacheAPIGatewayRestApis(ctx, a, rt, filters)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get the actual needed value
+	// TODO cach this result too
+	ids := make([]string, 0, len(rs))
+	for _, i := range rs {
+		ids = append(ids, i.ID())
+	}
+
+	return ids, nil
+}
+
 func cacheLoadBalancersV2(ctx context.Context, a *aws, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	// if both aws_alb and aws_lb defined, keep only aws_alb
 	if filters.IsIncluded("aws_alb", "aws_lb") && (!filters.IsExcluded("aws_alb") && rt == "aws_lb") {
