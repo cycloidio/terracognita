@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.5.1] _2020-07-17_
+
 ### Fixed
 
 - Error with the Resource name always being the alphanumeric instead of the Tag Name
