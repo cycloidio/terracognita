@@ -3,10 +3,14 @@ package aws
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 
 	awsSDK "github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/aws/aws-sdk-go/service/elasticsearchservice"
+	"github.com/aws/aws-sdk-go/service/elb"
 	"github.com/aws/aws-sdk-go/service/elbv2"
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/route53"
@@ -28,39 +32,39 @@ const (
 
 	// List of all the Resources
 	Instance ResourceType = iota
-	VPC
-	VPCPeeringConnection
-	KeyPair
+
 	// Do not have them for now as it's not needed
 	// but works
 	//AMI
-	SecurityGroup
-	Subnet
-	EBSVolume
+
 	// Do not have them for now as it's not needed
 	// but works
 	//EBSSnapshot
-	ElasticacheCluster
-	ELB
+
 	ALB
 	ALBListener
-	ALBListenerRule
 	ALBListenerCertificate
+	ALBListenerRule
 	ALBTargetGroup
-	LB
-	LBListener
-	LBListenerRule
-	LBListenerCertificate
-	LBTargetGroup
-	DBInstance
-	DBParameterGroup
-	DBSubnetGroup
-	S3Bucket
-	//S3BucketObject
+	ALBTargetGroupAttachment
+	APIGatewayDeployment
+	APIGatewayStage
+	APIGatewayResource
+	APIGatewayRestAPI
+	AutoscalingGroup
+	AutoscalingPolicy
 	CloudfrontDistribution
 	CloudfrontOriginAccessIdentity
 	CloudfrontPublicKey
 	CloudwatchMetricAlarm
+	DBInstance
+	DBParameterGroup
+	DBSubnetGroup
+	EBSVolume
+	ElasticacheCluster
+	ElasticsearchDomain
+	ElasticsearchDomainPolicy
+	ELB
 	IAMAccessKey
 	IAMAccountAlias
 	IAMAccountPasswordPolicy
@@ -85,110 +89,135 @@ const (
 	IAMUserPolicy
 	IAMUserPolicyAttachment
 	IAMUserSSHKey
+	KeyPair
+	LambdaFunction
+	LaunchConfiguration
+	LaunchTemplate
+	LB
+	LBCookieStickinessPolicy
+	LBListener
+	LBListenerCertificate
+	LBListenerRule
+	LBTargetGroup
+	LBTargetGroupAttachment
 	Route53DelegationSet
 	Route53HealthCheck
 	Route53QueryLog
 	Route53Record
-	Route53Zone
-	Route53ZoneAssociation
 	Route53ResolverEndpoint
 	Route53ResolverRuleAssociation
+	Route53Zone
+	Route53ZoneAssociation
+	S3Bucket
+	//S3BucketObject
+	SecurityGroup
 	SESActiveReceiptRuleSet
+	SESConfigurationSet
+	SESDomainDKIM
 	SESDomainIdentity
 	SESDomainIdentityVerification
-	SESDomainDKIM
 	SESDomainMailFrom
-	SESReceiptFilter
-	SESReceiptRule
-	SESReceiptRuleSet
-	SESConfigurationSet
 	// Read on TF is nil so ...
 	// SESEventDestination
 	SESIdentityNotificationTopic
+	SESReceiptFilter
+	SESReceiptRule
+	SESReceiptRuleSet
 	SESTemplate
-	LaunchConfiguration
-	LaunchTemplate
-	AutoscalingGroup
-	AutoscalingPolicy
+	Subnet
+	VolumeAttachment
+	VPC
+	VPCPeeringConnection
 )
 
 type rtFn func(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error)
 
 var (
 	resources = map[ResourceType]rtFn{
-		Instance:             instances,
-		VPC:                  vpcs,
-		VPCPeeringConnection: vpcPeeringConnections,
-		KeyPair:              keyPairs,
+		ALB:                      cacheLoadBalancersV2,
+		ALBListener:              cacheLoadBalancersV2Listeners,
+		ALBListenerCertificate:   albListenerCertificates,
+		ALBListenerRule:          albListenerRules,
+		ALBTargetGroup:           albTargetGroups,
+		ALBTargetGroupAttachment: albTargetGroupAttachments,
 		//AMI:      ami,
-		SecurityGroup: securityGroups,
-		Subnet:        subnets,
-		EBSVolume:     ebsVolumes,
-		//EBSSnapshot:         ebsSnapshots,
-		ElasticacheCluster:     elasticacheClusters,
-		ELB:                    elbs,
-		ALB:                    cacheLoadBalancersV2,
-		ALBListener:            cacheLoadBalancersV2Listeners,
-		ALBListenerRule:        albListenerRules,
-		ALBListenerCertificate: albListenerCertificates,
-		ALBTargetGroup:         albTargetGroups,
-		LB:                     cacheLoadBalancersV2,
-		LBListener:             cacheLoadBalancersV2Listeners,
-		LBListenerRule:         albListenerRules,
-		LBListenerCertificate:  albListenerCertificates,
-		LBTargetGroup:          albTargetGroups,
-		DBInstance:             dbInstances,
-		DBParameterGroup:       dbParameterGroups,
-		DBSubnetGroup:          dbSubnetGroups,
-		S3Bucket:               s3Buckets,
-		//S3BucketObject:      s3_bucket_objects,
+		APIGatewayDeployment:           apiGatewayDeployments,
+		APIGatewayStage:                apiGatewayStages,
+		APIGatewayResource:             apiGatewayResources,
+		APIGatewayRestAPI:              apiGatewayRestApis,
+		AutoscalingGroup:               autoscalingGroups,
+		AutoscalingPolicy:              autoscalingPolicies,
 		CloudfrontDistribution:         cloudfrontDistributions,
 		CloudfrontOriginAccessIdentity: cloudfrontOriginAccessIdentities,
 		CloudfrontPublicKey:            cloudfrontPublicKeys,
 		CloudwatchMetricAlarm:          cloudwatchMetricAlarms,
+		DBInstance:                     dbInstances,
+		DBParameterGroup:               dbParameterGroups,
+		DBSubnetGroup:                  dbSubnetGroups,
+		//EBSSnapshot:         ebsSnapshots,
+		EBSVolume:                      ebsVolumes,
+		ElasticacheCluster:             elasticacheClusters,
+		ElasticsearchDomain:            elasticsearchDomains,
+		ElasticsearchDomainPolicy:      elasticsearchDomains,
+		ELB:                            elbs,
 		IAMAccessKey:                   iamAccessKeys,
 		IAMAccountAlias:                iamAccountAliases,
 		IAMAccountPasswordPolicy:       iamAccountPasswordPolicy,
 		IAMGroup:                       cacheIAMGroups,
 		IAMGroupMembership:             iamGroupMemberships,
-		IAMGroupPolicy:                 iamGroupPolicies,
 		IAMGroupPolicyAttachment:       iamGroupPolicyAttachments,
+		IAMGroupPolicy:                 iamGroupPolicies,
 		IAMInstanceProfile:             iamInstanceProfiles,
 		IAMOpenidConnectProvider:       iamOpenidConnectProviders,
 		IAMPolicy:                      iamPolicies,
 		IAMRole:                        cacheIAMRoles,
-		IAMRolePolicy:                  iamRolePolicies,
 		IAMRolePolicyAttachment:        iamRolePolicyAttachments,
+		IAMRolePolicy:                  iamRolePolicies,
 		IAMSAMLProvider:                iamSAMLProviders,
 		IAMServerCertificate:           iamServerCertificates,
 		IAMUser:                        cacheIAMUsers,
 		IAMUserGroupMembership:         iamUserGroupMemberships,
-		IAMUserPolicy:                  iamUserPolicies,
 		IAMUserPolicyAttachment:        iamUserPolicyAttachments,
+		IAMUserPolicy:                  iamUserPolicies,
 		IAMUserSSHKey:                  iamUserSSHKeys,
+		Instance:                       instances,
+		KeyPair:                        keyPairs,
+		LambdaFunction:                 lambdaFunctions,
+		LaunchConfiguration:            launchConfigurations,
+		LaunchTemplate:                 launchTemplates,
+		LB:                             cacheLoadBalancersV2,
+		LBCookieStickinessPolicy:       lbCookieStickinessPolicies,
+		LBListener:                     cacheLoadBalancersV2Listeners,
+		LBListenerCertificate:          albListenerCertificates,
+		LBListenerRule:                 albListenerRules,
+		LBTargetGroup:                  albTargetGroups,
+		LBTargetGroupAttachment:        albTargetGroupAttachments,
 		Route53DelegationSet:           route53DelegationSets,
 		Route53HealthCheck:             route53HealthChecks,
 		Route53QueryLog:                route53QueryLogs,
 		Route53Record:                  route53Records,
-		Route53Zone:                    cacheRoute53Zones,
-		Route53ZoneAssociation:         route53ZoneAssociations,
 		Route53ResolverEndpoint:        route53ResolverEndpoints,
 		Route53ResolverRuleAssociation: route53ResolverRuleAssociation,
-		SESActiveReceiptRuleSet:        sesActiveReceiptRuleSets,
-		SESDomainIdentity:              cacheSESDomainIdentities,
-		SESDomainIdentityVerification:  sesDomainGeneral,
-		SESDomainDKIM:                  sesDomainGeneral,
-		SESDomainMailFrom:              sesDomainGeneral,
-		SESReceiptFilter:               sesReceiptFilters,
-		SESReceiptRule:                 sesReceiptRules,
-		SESReceiptRuleSet:              sesReceiptRuleSets,
-		SESConfigurationSet:            sesConfigurationSets,
-		SESIdentityNotificationTopic:   sesIdentityNotificationTopics,
-		SESTemplate:                    sesTemplates,
-		LaunchConfiguration:            launchConfigurations,
-		LaunchTemplate:                 launchTemplates,
-		AutoscalingGroup:               autoscalingGroups,
-		AutoscalingPolicy:              autoscalingPolicies,
+		Route53ZoneAssociation:         route53ZoneAssociations,
+		Route53Zone:                    cacheRoute53Zones,
+		//S3BucketObject:      s3_bucket_objects,
+		S3Bucket:                      s3Buckets,
+		SecurityGroup:                 securityGroups,
+		SESActiveReceiptRuleSet:       sesActiveReceiptRuleSets,
+		SESConfigurationSet:           sesConfigurationSets,
+		SESDomainDKIM:                 sesDomainGeneral,
+		SESDomainIdentity:             cacheSESDomainIdentities,
+		SESDomainIdentityVerification: sesDomainGeneral,
+		SESDomainMailFrom:             sesDomainGeneral,
+		SESIdentityNotificationTopic:  sesIdentityNotificationTopics,
+		SESReceiptFilter:              sesReceiptFilters,
+		SESReceiptRule:                sesReceiptRules,
+		SESReceiptRuleSet:             sesReceiptRuleSets,
+		SESTemplate:                   sesTemplates,
+		Subnet:                        subnets,
+		VolumeAttachment:              volumeAttachments,
+		VPCPeeringConnection:          vpcPeeringConnections,
+		VPC:                           vpcs,
 	}
 )
 
@@ -368,11 +397,47 @@ func ebsVolumes(ctx context.Context, a *aws, resourceType string, filters *filte
 
 	resources := make([]provider.Resource, 0)
 	for _, v := range volumes {
+
+		// if aws_instance defined, attached volume are done by ebs_block_device block.
+		if (len(v.Attachments) != 0) && (filters.IsIncluded("aws_instance") && !filters.IsExcluded("aws_instance")) {
+			continue
+		}
+
 		r, err := initializeResource(a, *v.VolumeId, resourceType)
 		if err != nil {
 			return nil, err
 		}
 		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func volumeAttachments(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	// if aws_instance defined, attachment are done by ebs_block_device block.
+	if filters.IsIncluded("aws_instance") && !filters.IsExcluded("aws_instance") {
+		return nil, nil
+	}
+
+	var input = &ec2.DescribeVolumesInput{
+		Filters: toEC2Filters(filters),
+	}
+
+	volumes, err := a.awsr.GetVolumes(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+
+	for _, v := range volumes {
+		for _, attach := range v.Attachments {
+			r, err := initializeResource(a, fmt.Sprintf("%s:%s:%s", *attach.Device, *v.VolumeId, *attach.InstanceId), resourceType)
+			if err != nil {
+				return nil, err
+			}
+			resources = append(resources, r)
+		}
 	}
 
 	return resources, nil
@@ -418,6 +483,73 @@ func elasticacheClusters(ctx context.Context, a *aws, resourceType string, filte
 	return resources, nil
 }
 
+func elasticsearchDomains(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	// this function is use for both aws_elasticsearch_domain and aws_elasticsearch_domain_policy
+	// if both defined, execute only aws_elasticsearch_domain
+	if filters.IsIncluded("aws_elasticsearch_domain", "aws_elasticsearch_domain_policy") && (!filters.IsExcluded("aws_elasticsearch_domain") && resourceType == "aws_elasticsearch_domain_policy") {
+		return nil, nil
+	}
+
+	dnames, err := a.awsr.GetElasticsearchDomainNames(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var names []*string
+	for _, dn := range dnames {
+		names = append(names, dn.DomainName)
+	}
+
+	input := &elasticsearchservice.DescribeElasticsearchDomainsInput{
+		DomainNames: names,
+	}
+
+	domains, err := a.awsr.GetElasticsearchDomains(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, d := range domains {
+
+		if resourceType == "aws_elasticsearch_domain" {
+			// Generate aws_elasticsearch_domain
+			r, err := initializeResource(a, *d.DomainName, resourceType)
+			if err != nil {
+				return nil, err
+			}
+
+			resources = append(resources, r)
+		}
+
+		// if aws_elasticsearch_domain_policy, create resource
+		if resourceType == "aws_elasticsearch_domain_policy" {
+			// Generate aws_elasticsearch_domain_policy
+			r2, err := initializeResource(a, *d.DomainName, resourceType)
+			if err != nil {
+				return nil, err
+			}
+			// TODO this resource is not importable. Define our own ResourceImporter
+			// Should be removed when terraform will support it
+			// more detail: https://github.com/cycloidio/terracognita/issues/120
+			importer := &schema.ResourceImporter{
+				State: func(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+					d.Set("domain_name", d.Id())
+					d.SetId("esd-policy-" + d.Id())
+
+					return []*schema.ResourceData{d}, nil
+				},
+			}
+
+			r2.SetImporter(importer)
+			resources = append(resources, r2)
+		}
+
+	}
+
+	return resources, nil
+}
+
 func elbs(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	lbs, err := a.awsr.GetLoadBalancers(ctx, nil)
 	if err != nil {
@@ -431,6 +563,69 @@ func elbs(ctx context.Context, a *aws, resourceType string, filters *filter.Filt
 			return nil, err
 		}
 		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func lbCookieStickinessPolicies(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	lbs, err := a.awsr.GetLoadBalancers(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+
+	for _, l := range lbs {
+		for _, listener := range l.ListenerDescriptions {
+			input := &elb.DescribeLoadBalancerPoliciesInput{
+				LoadBalancerName: l.LoadBalancerName,
+				PolicyNames:      listener.PolicyNames,
+			}
+
+			policies, err := a.awsr.GetLoadBalancerPolicies(ctx, input)
+			if err != nil {
+				return nil, err
+			}
+			for _, i := range policies {
+				if *i.PolicyTypeName == "LBCookieStickinessPolicyType" {
+					//lbName, lbPort, policyName
+					r, err := initializeResource(a, fmt.Sprintf("%s:%d:%s", *l.LoadBalancerName, *listener.Listener.LoadBalancerPort, *i.PolicyName), resourceType)
+					if err != nil {
+						return nil, err
+					}
+
+					// TODO this resource is not importable. Define our own ResourceImporter
+					// Should be removed when terraform will support it
+					// more detail: https://github.com/cycloidio/terracognita/issues/120
+					importer := &schema.ResourceImporter{
+						State: func(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+							parts := strings.SplitN(d.Id(), ":", 3)
+
+							if len(parts) != 3 || parts[0] == "" || parts[1] == "" || parts[2] == "" {
+								return nil, fmt.Errorf("unexpected format of ID (%s), expected lbName:lbPort:policyName", d.Id())
+							}
+
+							lbPort, err := strconv.Atoi(parts[1])
+							if err != nil {
+								return nil, fmt.Errorf("unexpected loadbalancer port (%s)", parts[1])
+							}
+
+							d.Set("load_balancer", parts[0])
+							d.Set("lb_port", lbPort)
+							d.Set("name", fmt.Sprintf("%s-%s-stickiness", parts[0], parts[1]))
+							d.SetId(fmt.Sprintf("%s:%s:%s", parts[0], parts[1], parts[2]))
+
+							return []*schema.ResourceData{d}, nil
+						},
+					}
+
+					r.SetImporter(importer)
+
+					resources = append(resources, r)
+				}
+			}
+		}
 	}
 
 	return resources, nil
@@ -529,6 +724,11 @@ func albListenerCertificates(ctx context.Context, a *aws, resourceType string, f
 		return nil, nil
 	}
 
+	albListernerIncluded := false
+	if (filters.IsIncluded("aws_alb_listener") && !filters.IsExcluded("aws_alb_listener")) || (filters.IsIncluded("aws_lb_listener") && !filters.IsExcluded("aws_lb_listener")) {
+		albListernerIncluded = true
+	}
+
 	ALBListeners, err := getLoadBalancersV2ListenersArns(ctx, a, ALBListener.String(), filters)
 	if err != nil {
 		return nil, err
@@ -548,22 +748,41 @@ func albListenerCertificates(ctx context.Context, a *aws, resourceType string, f
 		}
 
 		for _, i := range albListenerCertificates {
+			// if filter include aws_alb_listener, check if *i.IsDefault not defined (since default it is already written by aws_alb_listener)
+			if albListernerIncluded && *i.IsDefault {
+				continue
+			}
 
-			// TODO: if filter include aws_alb_listener, check if *i.IsDefault not append (since it is already written by aws_alb_listener)
-			r, err := initializeResource(a, *i.CertificateArn, resourceType)
-
+			r, err := initializeResource(a, fmt.Sprintf("%s_%s", l, *i.CertificateArn), resourceType)
 			if err != nil {
 				return nil, err
 			}
+
+			// TODO this resource is not importable. Define our own ResourceImporter
+			// Should be removed when terraform will support it
+			// more detail: https://github.com/cycloidio/terracognita/issues/120
+			importer := &schema.ResourceImporter{
+				State: func(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+					parts := strings.SplitN(d.Id(), "_", 2)
+
+					if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+						return nil, fmt.Errorf("unexpected format of ID (%s), expected listenerArn_certificateArn", d.Id())
+					}
+					d.Set("listener_arn", parts[0])
+					d.Set("certificate_arn", parts[1])
+					d.SetId(fmt.Sprintf("%s_%s", parts[0], parts[1]))
+
+					return []*schema.ResourceData{d}, nil
+				},
+			}
+
+			r.SetImporter(importer)
 
 			resources = append(resources, r)
 		}
 	}
 
-	// TODO: This resource it's not Importable yet (https://www.terraform.io/docs/providers/aws/r/lb_listener_certificate.html)
-	// https://github.com/cycloidio/terracognita/issues/91
-	return nil, nil
-	//return resources, nil
+	return resources, nil
 }
 
 func albTargetGroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
@@ -586,6 +805,70 @@ func albTargetGroups(ctx context.Context, a *aws, resourceType string, filters *
 		}
 
 		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func albTargetGroupAttachments(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	// if both defined, keep only aws_alb_target_group_attachment
+	if filters.IsIncluded("aws_alb_target_group_attachment", "aws_lb_target_group_attachment") && (!filters.IsExcluded("aws_alb_target_group_attachment") && resourceType == "aws_lb_target_group_attachment") {
+		return nil, nil
+	}
+
+	albTargetGroups, err := a.awsr.GetLoadBalancersV2TargetGroups(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range albTargetGroups {
+
+		input := &elbv2.DescribeTargetHealthInput{
+			TargetGroupArn: i.TargetGroupArn,
+		}
+
+		targetHealths, err := a.awsr.GetLoadBalancersV2TargetHealth(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, t := range targetHealths {
+			r, err := initializeResource(a, fmt.Sprintf("%s_%d_%s", *t.Target.Id, *t.Target.Port, *i.TargetGroupArn), resourceType)
+			if err != nil {
+				return nil, err
+			}
+
+			// TODO this resource is not importable. Define our own ResourceImporter
+			// Should be removed when terraform will support it
+			// more detail: https://github.com/cycloidio/terracognita/issues/120
+			importer := &schema.ResourceImporter{
+				State: func(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+					parts := strings.SplitN(d.Id(), "_", 3)
+
+					if len(parts) != 3 || parts[0] == "" || parts[1] == "" || parts[2] == "" {
+						return nil, fmt.Errorf("unexpected format of ID (%s), expected targetId_port_TargetGroupArn", d.Id())
+					}
+
+					tPort, err := strconv.Atoi(parts[1])
+					if err != nil {
+						return nil, fmt.Errorf("unexpected target port (%s)", parts[1])
+					}
+
+					d.Set("target_id", parts[0])
+					d.Set("port", tPort)
+					d.Set("target_group_arn", parts[2])
+
+					d.SetId(resource.PrefixedUniqueId(fmt.Sprintf("%s-", parts[2])))
+
+					return []*schema.ResourceData{d}, nil
+				},
+			}
+
+			r.SetImporter(importer)
+
+			resources = append(resources, r)
+		}
 	}
 
 	return resources, nil
@@ -1605,6 +1888,27 @@ func sesTemplates(ctx context.Context, a *aws, resourceType string, filters *fil
 	return resources, nil
 }
 
+func lambdaFunctions(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	lambdaFunctions, err := a.awsr.GetLambdaFunctions(ctx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range lambdaFunctions {
+
+		r, err := initializeResource(a, *i.FunctionName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
 func launchConfigurations(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	launchConfigurations, err := a.awsr.GetLaunchConfigurations(ctx, nil)
 
@@ -1641,6 +1945,141 @@ func launchTemplates(ctx context.Context, a *aws, resourceType string, filters *
 	for _, i := range launchTemplates {
 
 		r, err := initializeResource(a, *i.LaunchTemplateId, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func apiGatewayDeployments(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+
+	apiGatewayRestApis, err := getAPIGatewayRestApis(ctx, a, APIGatewayRestAPI.String(), filters)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, rapi := range apiGatewayRestApis {
+
+		var input = &apigateway.GetDeploymentsInput{
+			RestApiId: awsSDK.String(rapi),
+		}
+
+		apiGatewayDeployments, err := a.awsr.GetAPIGatewayDeployments(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, i := range apiGatewayDeployments {
+
+			r, err := initializeResource(a, fmt.Sprintf("%s:%s", *i.Id, rapi), resourceType)
+			if err != nil {
+				return nil, err
+			}
+
+			// TODO this resource is not importable. Define our own ResourceImporter
+			// Should be removed when terraform will support it
+			// more detail: https://github.com/cycloidio/terracognita/issues/120
+			importer := &schema.ResourceImporter{
+				State: func(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+					parts := strings.SplitN(d.Id(), ":", 2)
+
+					if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+						return nil, fmt.Errorf("unexpected format of ID (%s), expected targetId_port_TargetGroupArn", d.Id())
+					}
+
+					d.Set("rest_api_id", parts[1])
+					d.SetId(parts[0])
+
+					return []*schema.ResourceData{d}, nil
+				},
+			}
+
+			r.SetImporter(importer)
+
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func apiGatewayStages(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+
+	apiGatewayRestApis, err := getAPIGatewayRestApis(ctx, a, APIGatewayRestAPI.String(), filters)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, rapi := range apiGatewayRestApis {
+
+		var input = &apigateway.GetStagesInput{
+			RestApiId: awsSDK.String(rapi),
+		}
+
+		apiGatewayStages, err := a.awsr.GetAPIGatewayStages(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, i := range apiGatewayStages {
+			r, err := initializeResource(a, fmt.Sprintf("%s/%s", rapi, *i.StageName), resourceType)
+			if err != nil {
+				return nil, err
+			}
+
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func apiGatewayResources(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+
+	apiGatewayRestApis, err := getAPIGatewayRestApis(ctx, a, APIGatewayRestAPI.String(), filters)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, rapi := range apiGatewayRestApis {
+
+		var input = &apigateway.GetResourcesInput{
+			RestApiId: awsSDK.String(rapi),
+		}
+
+		apiGatewayResources, err := a.awsr.GetAPIGatewayResources(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, i := range apiGatewayResources {
+			r, err := initializeResource(a, fmt.Sprintf("%s/%s", rapi, *i.Id), resourceType)
+			if err != nil {
+				return nil, err
+			}
+
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func apiGatewayRestApis(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	apiGatewayRestApis, err := a.awsr.GetAPIGatewayRestAPIs(ctx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range apiGatewayRestApis {
+
+		r, err := initializeResource(a, *i.Id, resourceType)
 		if err != nil {
 			return nil, err
 		}

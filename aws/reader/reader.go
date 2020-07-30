@@ -3,15 +3,18 @@ package reader
 import (
 	"context"
 
+	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/autoscaling"
 	"github.com/aws/aws-sdk-go/service/cloudfront"
 	"github.com/aws/aws-sdk-go/service/cloudwatch"
 	"github.com/aws/aws-sdk-go/service/configservice"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/elasticache"
+	"github.com/aws/aws-sdk-go/service/elasticsearchservice"
 	"github.com/aws/aws-sdk-go/service/elb"
 	"github.com/aws/aws-sdk-go/service/elbv2"
 	"github.com/aws/aws-sdk-go/service/iam"
+	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/rds"
 	"github.com/aws/aws-sdk-go/service/route53"
 	"github.com/aws/aws-sdk-go/service/route53resolver"
@@ -44,6 +47,22 @@ type Reader interface {
 
 	// GetRegion returns the currently used region for the Connector
 	GetRegion() string
+
+	// GetAPIGatewayDeployments returns the Deployment Functions on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetAPIGatewayDeployments(ctx context.Context, input *apigateway.GetDeploymentsInput) ([]*apigateway.Deployment, error)
+
+	// GetAPIGatewayRestAPIs returns the RestApi Functions on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetAPIGatewayRestAPIs(ctx context.Context, input *apigateway.GetRestApisInput) ([]*apigateway.RestApi, error)
+
+	// GetAPIGatewayStages returns the Stage Functions on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetAPIGatewayStages(ctx context.Context, input *apigateway.GetStagesInput) ([]*apigateway.Stage, error)
+
+	// GetAPIGatewayResources returns the Resource Functions on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetAPIGatewayResources(ctx context.Context, input *apigateway.GetResourcesInput) ([]*apigateway.Resource, error)
 
 	// GetMetricAlarms returns all cloudwatch alarms based on the input given.
 	// Returned values are commented in the interface doc comment block.
@@ -117,6 +136,14 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetElastiCacheTags(ctx context.Context, input *elasticache.ListTagsForResourceInput) ([]*elasticache.Tag, error)
 
+	// GetElasticsearchDomains returns a list of domains of Elasticsearch resources.
+	// Returned values are commented in the interface doc comment block.
+	GetElasticsearchDomains(ctx context.Context, input *elasticsearchservice.DescribeElasticsearchDomainsInput) ([]*elasticsearchservice.ElasticsearchDomainStatus, error)
+
+	// GetElasticsearchDomainNames returns a list of domainNames of Elasticsearch resources.
+	// Returned values are commented in the interface doc comment block.
+	GetElasticsearchDomainNames(ctx context.Context, input *elasticsearchservice.ListDomainNamesInput) ([]*elasticsearchservice.DomainInfo, error)
+
 	// GetLoadBalancers returns a list of ELB (v1) based on the input from the different regions.
 	// Returned values are commented in the interface doc comment block.
 	GetLoadBalancers(ctx context.Context, input *elb.DescribeLoadBalancersInput) ([]*elb.LoadBalancerDescription, error)
@@ -124,6 +151,14 @@ type Reader interface {
 	// GetLoadBalancersTags returns a list of Tags based on the input from the different regions.
 	// Returned values are commented in the interface doc comment block.
 	GetLoadBalancersTags(ctx context.Context, input *elb.DescribeTagsInput) ([]*elb.TagDescription, error)
+
+	// GetLoadBalancerAttributes returns a list of Attributes based on the input from the different regions.
+	// Returned values are commented in the interface doc comment block.
+	GetLoadBalancerAttributes(ctx context.Context, input *elb.DescribeLoadBalancerAttributesInput) ([]*elb.AdditionalAttribute, error)
+
+	// GetLoadBalancerPolicies returns a list of Policies based on the input from the different regions.
+	// Returned values are commented in the interface doc comment block.
+	GetLoadBalancerPolicies(ctx context.Context, input *elb.DescribeLoadBalancerPoliciesInput) ([]*elb.PolicyDescription, error)
 
 	// GetLoadBalancersV2 returns a list of ELB (v2) - also known as ALB - based on the input from the different regions.
 	// Returned values are commented in the interface doc comment block.
@@ -141,6 +176,10 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetLoadBalancersV2TargetGroups(ctx context.Context, input *elbv2.DescribeTargetGroupsInput) ([]*elbv2.TargetGroup, error)
 
+	// GetLoadBalancersV2TargetHealth returns a list of TargetHealth based on the input from the different regions.
+	// Returned values are commented in the interface doc comment block.
+	GetLoadBalancersV2TargetHealth(ctx context.Context, input *elbv2.DescribeTargetHealthInput) ([]*elbv2.TargetHealthDescription, error)
+
 	// GetListenerCertificates returns a list of ListenerCertificates based on the input from the different regions.
 	// Returned values are commented in the interface doc comment block.
 	GetListenerCertificates(ctx context.Context, input *elbv2.DescribeListenerCertificatesInput) ([]*elbv2.Certificate, error)
@@ -148,6 +187,10 @@ type Reader interface {
 	// GetLoadBalancersV2Rules returns a list of Rules based on the input from the different regions.
 	// Returned values are commented in the interface doc comment block.
 	GetLoadBalancersV2Rules(ctx context.Context, input *elbv2.DescribeRulesInput) ([]*elbv2.Rule, error)
+
+	// GetLoadBalancersV2TargetGroupAttributes returns a list of TargetGroupAttributes based on the input from the different regions.
+	// Returned values are commented in the interface doc comment block.
+	GetLoadBalancersV2TargetGroupAttributes(ctx context.Context, input *elbv2.DescribeTargetGroupAttributesInput) ([]*elbv2.TargetGroupAttribute, error)
 
 	// GetDBInstances returns all DB instances based on the input given.
 	// Returned values are commented in the interface doc comment block.
@@ -344,6 +387,130 @@ type Reader interface {
 	// GetResolverRuleAssociations returns the Route53Resolver ResolverRuleAssociations on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetResolverRuleAssociations(ctx context.Context, input *route53resolver.ListResolverRuleAssociationsInput) ([]*route53resolver.ResolverRuleAssociation, error)
+
+	// GetLambdaFunctions returns the lambda Functions on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetLambdaFunctions(ctx context.Context, input *lambda.ListFunctionsInput) ([]*lambda.FunctionConfiguration, error)
+}
+
+func (c *connector) GetAPIGatewayDeployments(ctx context.Context, input *apigateway.GetDeploymentsInput) ([]*apigateway.Deployment, error) {
+	if c.svc.apigateway == nil {
+		c.svc.apigateway = apigateway.New(c.svc.session)
+	}
+
+	opt := make([]*apigateway.Deployment, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.apigateway.GetDeploymentsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.Items == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &apigateway.GetDeploymentsInput{}
+		}
+		input.Position = o.Position
+		hasNextToken = o.Position != nil
+
+		opt = append(opt, o.Items...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetAPIGatewayRestAPIs(ctx context.Context, input *apigateway.GetRestApisInput) ([]*apigateway.RestApi, error) {
+	if c.svc.apigateway == nil {
+		c.svc.apigateway = apigateway.New(c.svc.session)
+	}
+
+	opt := make([]*apigateway.RestApi, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.apigateway.GetRestApisWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.Items == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &apigateway.GetRestApisInput{}
+		}
+		input.Position = o.Position
+		hasNextToken = o.Position != nil
+
+		opt = append(opt, o.Items...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetAPIGatewayStages(ctx context.Context, input *apigateway.GetStagesInput) ([]*apigateway.Stage, error) {
+	if c.svc.apigateway == nil {
+		c.svc.apigateway = apigateway.New(c.svc.session)
+	}
+
+	opt := make([]*apigateway.Stage, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.apigateway.GetStagesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.Item == nil {
+			hasNextToken = false
+			continue
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.Item...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetAPIGatewayResources(ctx context.Context, input *apigateway.GetResourcesInput) ([]*apigateway.Resource, error) {
+	if c.svc.apigateway == nil {
+		c.svc.apigateway = apigateway.New(c.svc.session)
+	}
+
+	opt := make([]*apigateway.Resource, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.apigateway.GetResourcesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.Items == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &apigateway.GetResourcesInput{}
+		}
+		input.Position = o.Position
+		hasNextToken = o.Position != nil
+
+		opt = append(opt, o.Items...)
+
+	}
+
+	return opt, nil
 }
 
 func (c *connector) GetMetricAlarms(ctx context.Context, input *cloudwatch.DescribeAlarmsInput) ([]*cloudwatch.MetricAlarm, error) {
@@ -900,6 +1067,60 @@ func (c *connector) GetElastiCacheTags(ctx context.Context, input *elasticache.L
 	return opt, nil
 }
 
+func (c *connector) GetElasticsearchDomains(ctx context.Context, input *elasticsearchservice.DescribeElasticsearchDomainsInput) ([]*elasticsearchservice.ElasticsearchDomainStatus, error) {
+	if c.svc.elasticsearchservice == nil {
+		c.svc.elasticsearchservice = elasticsearchservice.New(c.svc.session)
+	}
+
+	opt := make([]*elasticsearchservice.ElasticsearchDomainStatus, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.elasticsearchservice.DescribeElasticsearchDomainsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.DomainStatusList == nil {
+			hasNextToken = false
+			continue
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.DomainStatusList...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetElasticsearchDomainNames(ctx context.Context, input *elasticsearchservice.ListDomainNamesInput) ([]*elasticsearchservice.DomainInfo, error) {
+	if c.svc.elasticsearchservice == nil {
+		c.svc.elasticsearchservice = elasticsearchservice.New(c.svc.session)
+	}
+
+	opt := make([]*elasticsearchservice.DomainInfo, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.elasticsearchservice.ListDomainNamesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.DomainNames == nil {
+			hasNextToken = false
+			continue
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.DomainNames...)
+
+	}
+
+	return opt, nil
+}
+
 func (c *connector) GetLoadBalancers(ctx context.Context, input *elb.DescribeLoadBalancersInput) ([]*elb.LoadBalancerDescription, error) {
 	if c.svc.elb == nil {
 		c.svc.elb = elb.New(c.svc.session)
@@ -952,6 +1173,60 @@ func (c *connector) GetLoadBalancersTags(ctx context.Context, input *elb.Describ
 		hasNextToken = false
 
 		opt = append(opt, o.TagDescriptions...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetLoadBalancerAttributes(ctx context.Context, input *elb.DescribeLoadBalancerAttributesInput) ([]*elb.AdditionalAttribute, error) {
+	if c.svc.elb == nil {
+		c.svc.elb = elb.New(c.svc.session)
+	}
+
+	opt := make([]*elb.AdditionalAttribute, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.elb.DescribeLoadBalancerAttributesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.LoadBalancerAttributes == nil {
+			hasNextToken = false
+			continue
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.LoadBalancerAttributes.AdditionalAttributes...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetLoadBalancerPolicies(ctx context.Context, input *elb.DescribeLoadBalancerPoliciesInput) ([]*elb.PolicyDescription, error) {
+	if c.svc.elb == nil {
+		c.svc.elb = elb.New(c.svc.session)
+	}
+
+	opt := make([]*elb.PolicyDescription, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.elb.DescribeLoadBalancerPoliciesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.PolicyDescriptions == nil {
+			hasNextToken = false
+			continue
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.PolicyDescriptions...)
 
 	}
 
@@ -1078,6 +1353,33 @@ func (c *connector) GetLoadBalancersV2TargetGroups(ctx context.Context, input *e
 	return opt, nil
 }
 
+func (c *connector) GetLoadBalancersV2TargetHealth(ctx context.Context, input *elbv2.DescribeTargetHealthInput) ([]*elbv2.TargetHealthDescription, error) {
+	if c.svc.elbv2 == nil {
+		c.svc.elbv2 = elbv2.New(c.svc.session)
+	}
+
+	opt := make([]*elbv2.TargetHealthDescription, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.elbv2.DescribeTargetHealthWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.TargetHealthDescriptions == nil {
+			hasNextToken = false
+			continue
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.TargetHealthDescriptions...)
+
+	}
+
+	return opt, nil
+}
+
 func (c *connector) GetListenerCertificates(ctx context.Context, input *elbv2.DescribeListenerCertificatesInput) ([]*elbv2.Certificate, error) {
 	if c.svc.elbv2 == nil {
 		c.svc.elbv2 = elbv2.New(c.svc.session)
@@ -1134,6 +1436,33 @@ func (c *connector) GetLoadBalancersV2Rules(ctx context.Context, input *elbv2.De
 		hasNextToken = o.NextMarker != nil
 
 		opt = append(opt, o.Rules...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetLoadBalancersV2TargetGroupAttributes(ctx context.Context, input *elbv2.DescribeTargetGroupAttributesInput) ([]*elbv2.TargetGroupAttribute, error) {
+	if c.svc.elbv2 == nil {
+		c.svc.elbv2 = elbv2.New(c.svc.session)
+	}
+
+	opt := make([]*elbv2.TargetGroupAttribute, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.elbv2.DescribeTargetGroupAttributesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.Attributes == nil {
+			hasNextToken = false
+			continue
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.Attributes...)
 
 	}
 
@@ -2551,6 +2880,37 @@ func (c *connector) GetResolverRuleAssociations(ctx context.Context, input *rout
 		hasNextToken = o.NextToken != nil
 
 		opt = append(opt, o.ResolverRuleAssociations...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetLambdaFunctions(ctx context.Context, input *lambda.ListFunctionsInput) ([]*lambda.FunctionConfiguration, error) {
+	if c.svc.lambda == nil {
+		c.svc.lambda = lambda.New(c.svc.session)
+	}
+
+	opt := make([]*lambda.FunctionConfiguration, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.lambda.ListFunctionsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.Functions == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &lambda.ListFunctionsInput{}
+		}
+		input.Marker = o.NextMarker
+		hasNextToken = o.NextMarker != nil
+
+		opt = append(opt, o.Functions...)
 
 	}
 

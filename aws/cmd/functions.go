@@ -4,6 +4,63 @@ var (
 	// functions is the list of fuctions that will be added
 	// to the AWSReader with the corresponding implementation
 	functions = []Function{
+		// apigateway
+		Function{
+			FnName:                     "GetAPIGatewayDeployments",
+			Entity:                     "Deployments",
+			FnAttributeList:            "Items",
+			SingularEntity:             "Deployment",
+			Prefix:                     "Get",
+			Service:                    "apigateway",
+			FnPaginationAttribute:      "Position",
+			FnInputPaginationAttribute: "Position",
+			Documentation: `
+			// GetAPIGatewayDeployments returns the Deployment Functions on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:                     "GetAPIGatewayRestAPIs",
+			Entity:                     "RestApis",
+			FnAttributeList:            "Items",
+			SingularEntity:             "RestApi",
+			Prefix:                     "Get",
+			Service:                    "apigateway",
+			FnPaginationAttribute:      "Position",
+			FnInputPaginationAttribute: "Position",
+			Documentation: `
+			// GetAPIGatewayRestAPIs returns the RestApi Functions on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:           "GetAPIGatewayStages",
+			Entity:           "Stages",
+			FnAttributeList:  "Item",
+			SingularEntity:   "Stage",
+			Prefix:           "Get",
+			Service:          "apigateway",
+			HasNotPagination: true,
+			Documentation: `
+			// GetAPIGatewayStages returns the Stage Functions on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:                     "GetAPIGatewayResources",
+			Entity:                     "Resources",
+			FnAttributeList:            "Items",
+			SingularEntity:             "Resource",
+			Prefix:                     "Get",
+			Service:                    "apigateway",
+			FnPaginationAttribute:      "Position",
+			FnInputPaginationAttribute: "Position",
+			Documentation: `
+			// GetAPIGatewayResources returns the Resource Functions on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
 		// cloudwatch
 		Function{
 			Entity:          "MetricAlarms",
@@ -192,6 +249,34 @@ var (
 			`,
 		},
 
+		// elasticsearch
+		Function{
+			HasNotPagination: true,
+			Entity:           "ElasticsearchDomains",
+			SingularEntity:   "ElasticsearchDomainStatus",
+			FnAttributeList:  "DomainStatusList",
+			Prefix:           "Describe",
+			Service:          "elasticsearchservice",
+			Documentation: `
+			// GetElasticsearchDomains returns a list of domains of Elasticsearch resources.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		Function{
+			HasNotPagination: true,
+			FnName:           "GetElasticsearchDomainNames",
+			Entity:           "DomainNames",
+			SingularEntity:   "DomainInfo",
+			FnAttributeList:  "DomainNames",
+			Prefix:           "List",
+			Service:          "elasticsearchservice",
+			Documentation: `
+			// GetElasticsearchDomainNames returns a list of domainNames of Elasticsearch resources.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
 		// elb
 		Function{
 			Entity:                     "LoadBalancers",
@@ -216,6 +301,30 @@ var (
 			Service:          "elb",
 			Documentation: `
 			// GetLoadBalancersTags returns a list of Tags based on the input from the different regions.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:           "LoadBalancerAttributes",
+			SingularEntity:   "AdditionalAttribute",
+			FnAttributeList:  "LoadBalancerAttributes.AdditionalAttributes",
+			Prefix:           "Describe",
+			HasNotPagination: true,
+			Service:          "elb",
+			Documentation: `
+			// GetLoadBalancerAttributes returns a list of Attributes based on the input from the different regions.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:           "LoadBalancerPolicies",
+			SingularEntity:   "PolicyDescription",
+			FnAttributeList:  "PolicyDescriptions",
+			Prefix:           "Describe",
+			HasNotPagination: true,
+			Service:          "elb",
+			Documentation: `
+			// GetLoadBalancerPolicies returns a list of Policies based on the input from the different regions.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
@@ -271,6 +380,19 @@ var (
 			`,
 		},
 		Function{
+			FnName:           "GetLoadBalancersV2TargetHealth",
+			Entity:           "TargetHealth",
+			SingularEntity:   "TargetHealthDescription",
+			FnAttributeList:  "TargetHealthDescriptions",
+			Prefix:           "Describe",
+			Service:          "elbv2",
+			HasNotPagination: true,
+			Documentation: `
+			// GetLoadBalancersV2TargetHealth returns a list of TargetHealth based on the input from the different regions.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
 			Entity:                     "ListenerCertificates",
 			SingularEntity:             "Certificate",
 			FnAttributeList:            "Certificates",
@@ -292,6 +414,20 @@ var (
 			Service:                    "elbv2",
 			Documentation: `
 			// GetLoadBalancersV2Rules returns a list of Rules based on the input from the different regions.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		Function{
+			FnName:           "GetLoadBalancersV2TargetGroupAttributes",
+			SingularEntity:   "TargetGroupAttribute",
+			FnAttributeList:  "Attributes",
+			HasNotPagination: true,
+			Entity:           "TargetGroupAttributes",
+			Prefix:           "Describe",
+			Service:          "elbv2",
+			Documentation: `
+			// GetLoadBalancersV2TargetGroupAttributes returns a list of TargetGroupAttributes based on the input from the different regions.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
@@ -862,6 +998,22 @@ var (
 			Service: "route53resolver",
 			Documentation: `
 			// GetResolverRuleAssociations returns the Route53Resolver ResolverRuleAssociations on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		// Lambda
+		Function{
+			FnName:                     "GetLambdaFunctions",
+			Entity:                     "Functions",
+			FnAttributeList:            "Functions",
+			SingularEntity:             "FunctionConfiguration",
+			Prefix:                     "List",
+			Service:                    "lambda",
+			FnPaginationAttribute:      "NextMarker",
+			FnInputPaginationAttribute: "Marker",
+			Documentation: `
+			// GetLambdaFunctions returns the lambda Functions on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
