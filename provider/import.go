@@ -177,6 +177,7 @@ func Import(ctx context.Context, p Provider, hcl, tfstate writer.Writer, f *filt
 	}
 
 	if tfstate != nil {
+		tfstate.Interpolate(interpolation)
 		fmt.Fprintf(out, "\rWriting TFState ...")
 		logger.Log("msg", "writing the TFState")
 
