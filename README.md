@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/terracognita-icon_color.png" width="150">
+</p>
+
 # TerraCognita
 
 [![GoDoc](https://godoc.org/github.com/cycloidio/terracognita?status.svg)](https://godoc.org/github.com/cycloidio/terracognita)
