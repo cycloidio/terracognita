@@ -13,6 +13,7 @@ import (
 
 	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/log"
+	"github.com/cycloidio/terracognita/writer"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/fmtcmd"
 	"github.com/hashicorp/hcl/hcl/printer"
@@ -25,15 +26,17 @@ type Writer struct {
 	// TODO: Change it to "map[string]map[string]schema.ResourceData"
 	Config map[string]interface{}
 	writer io.Writer
+	opts   *writer.Options
 }
 
 // NewWriter rerturns an Writer initialization
-func NewWriter(w io.Writer) *Writer {
+func NewWriter(w io.Writer, opts *writer.Options) *Writer {
 	cfg := make(map[string]interface{})
 	cfg["resource"] = make(map[string]map[string]interface{})
 	return &Writer{
 		Config: cfg,
 		writer: w,
+		opts:   opts,
 	}
 }
 
@@ -129,6 +132,9 @@ func (w *Writer) Sync() error {
 // Interpolate replaces the hardcoded resources link
 // with TF interpolation
 func (w *Writer) Interpolate(i map[string]string) {
+	if !w.opts.Interpolate {
+		return
+	}
 	resources := w.Config["resource"]
 	// who's interpolated with who
 	relations := make(map[string]struct{}, 0)
