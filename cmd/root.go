@@ -114,6 +114,9 @@ func init() {
 
 	RootCmd.PersistentFlags().BoolP("debug", "d", false, "Activate the debug mode wich includes TF logs via TF_LOG=TRACE|DEBUG|INFO|WARN|ERROR configuration https://www.terraform.io/docs/internals/debugging.html")
 	_ = viper.BindPFlag("debug", RootCmd.PersistentFlags().Lookup("debug"))
+
+	RootCmd.PersistentFlags().BoolP("interpolate", "", true, "Activate the interpolation for the HCL and the dependencies building for the State file")
+	_ = viper.BindPFlag("interpolate", RootCmd.PersistentFlags().Lookup("interpolate"))
 }
 
 func initViper() {
