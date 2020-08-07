@@ -7,6 +7,7 @@ import (
 
 	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/hcl"
+	"github.com/cycloidio/terracognita/writer"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -14,7 +15,7 @@ import (
 
 func TestNewHCLWriter(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		hw := hcl.NewWriter(nil)
+		hw := hcl.NewWriter(nil, &writer.Options{Interpolate: true})
 
 		assert.Equal(t, map[string]interface{}{
 			"resource": make(map[string]map[string]interface{}),
@@ -26,7 +27,7 @@ func TestHCLWriter_Write(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		var (
 			b     = &bytes.Buffer{}
-			hw    = hcl.NewWriter(b)
+			hw    = hcl.NewWriter(b, &writer.Options{Interpolate: true})
 			value = map[string]interface{}{
 				"key": "value",
 			}
@@ -58,7 +59,7 @@ func TestHCLWriter_Write(t *testing.T) {
 	t.Run("ErrRequiredKey", func(t *testing.T) {
 		var (
 			b  = &bytes.Buffer{}
-			hw = hcl.NewWriter(b)
+			hw = hcl.NewWriter(b, &writer.Options{Interpolate: true})
 		)
 
 		err := hw.Write("", nil)
@@ -67,7 +68,7 @@ func TestHCLWriter_Write(t *testing.T) {
 	t.Run("ErrRequiredValue", func(t *testing.T) {
 		var (
 			b  = &bytes.Buffer{}
-			hw = hcl.NewWriter(b)
+			hw = hcl.NewWriter(b, &writer.Options{Interpolate: true})
 		)
 
 		err := hw.Write("type.name", nil)
@@ -76,7 +77,7 @@ func TestHCLWriter_Write(t *testing.T) {
 	t.Run("ErrInvalidKey", func(t *testing.T) {
 		var (
 			b  = &bytes.Buffer{}
-			hw = hcl.NewWriter(b)
+			hw = hcl.NewWriter(b, &writer.Options{Interpolate: true})
 		)
 
 		err := hw.Write("type.name.name", "")
@@ -91,7 +92,7 @@ func TestHCLWriter_Write(t *testing.T) {
 	t.Run("ErrAlreadyExistsKey", func(t *testing.T) {
 		var (
 			b  = &bytes.Buffer{}
-			hw = hcl.NewWriter(b)
+			hw = hcl.NewWriter(b, &writer.Options{Interpolate: true})
 		)
 
 		err := hw.Write("type.name", "")
@@ -106,7 +107,7 @@ func TestHCLWriter_Sync(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		var (
 			b     = &bytes.Buffer{}
-			hw    = hcl.NewWriter(b)
+			hw    = hcl.NewWriter(b, &writer.Options{Interpolate: true})
 			value = map[string]interface{}{
 				"key": "value",
 			}
@@ -130,7 +131,7 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		var (
 			b     = &bytes.Buffer{}
-			hw    = hcl.NewWriter(b)
+			hw    = hcl.NewWriter(b, &writer.Options{Interpolate: true})
 			value = map[string]interface{}{
 				"network": "to-be-interpolated",
 			}
@@ -159,7 +160,7 @@ resource "type" "name" {
 	t.Run("SuccessAvoidInterpolaception", func(t *testing.T) {
 		var (
 			b     = &bytes.Buffer{}
-			hw    = hcl.NewWriter(b)
+			hw    = hcl.NewWriter(b, &writer.Options{Interpolate: true})
 			value = map[string]interface{}{
 				"network": "to-be-interpolated",
 			}
@@ -190,7 +191,7 @@ resource "type" "name" {
 	t.Run("SuccessMutualInterpolation", func(t *testing.T) {
 		var (
 			b        = &bytes.Buffer{}
-			hw       = hcl.NewWriter(b)
+			hw       = hcl.NewWriter(b, &writer.Options{Interpolate: true})
 			instance = map[string]interface{}{
 				"subnet_id": "1234",
 			}
