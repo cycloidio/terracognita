@@ -9,6 +9,7 @@ import (
 	"github.com/cycloidio/terracognita/mock"
 	"github.com/cycloidio/terracognita/provider"
 	"github.com/cycloidio/terracognita/state"
+	"github.com/cycloidio/terracognita/writer"
 	"github.com/golang/mock/gomock"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform/configs/hcl2shim"
@@ -21,7 +22,7 @@ import (
 
 func TestNewWriter(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		sw := state.NewWriter(nil)
+		sw := state.NewWriter(nil, nil)
 
 		assert.Equal(t, make(map[string]provider.Resource), sw.Config)
 	})
@@ -34,7 +35,7 @@ func TestWrite(t *testing.T) {
 			prv  = mock.NewProvider(ctrl)
 			res  = mock.NewResource(ctrl)
 			b    = &bytes.Buffer{}
-			sw   = state.NewWriter(b)
+			sw   = state.NewWriter(b, &writer.Options{Interpolate: true})
 			tp   = "aws_iam_user"
 			key  = "aws.name"
 		)
@@ -71,13 +72,13 @@ func TestWrite(t *testing.T) {
 		})
 	})
 	t.Run("ErrRequiredKey", func(t *testing.T) {
-		sw := state.NewWriter(nil)
+		sw := state.NewWriter(nil, &writer.Options{Interpolate: true})
 
 		err := sw.Write("", nil)
 		assert.Equal(t, errcode.ErrWriterRequiredKey, errors.Cause(err))
 	})
 	t.Run("ErrRequiredValue", func(t *testing.T) {
-		sw := state.NewWriter(nil)
+		sw := state.NewWriter(nil, &writer.Options{Interpolate: true})
 
 		err := sw.Write("aws.key", nil)
 		assert.Equal(t, errcode.ErrWriterRequiredValue, errors.Cause(err))
@@ -88,7 +89,7 @@ func TestWrite(t *testing.T) {
 			prv  = mock.NewProvider(ctrl)
 			res  = mock.NewResource(ctrl)
 			b    = &bytes.Buffer{}
-			sw   = state.NewWriter(b)
+			sw   = state.NewWriter(b, &writer.Options{Interpolate: true})
 			tp   = "aws_iam_user"
 		)
 		defer ctrl.Finish()
@@ -114,7 +115,7 @@ func TestWrite(t *testing.T) {
 		assert.Equal(t, errcode.ErrWriterAlreadyExistsKey, errors.Cause(err))
 	})
 	t.Run("ErrInvalidTypeValue", func(t *testing.T) {
-		sw := state.NewWriter(nil)
+		sw := state.NewWriter(nil, &writer.Options{Interpolate: true})
 
 		err := sw.Write("aws.key", 0)
 		assert.Equal(t, errcode.ErrWriterInvalidTypeValue, errors.Cause(err))
@@ -125,7 +126,7 @@ func TestWrite(t *testing.T) {
 			res  = mock.NewResource(ctrl)
 		)
 		defer ctrl.Finish()
-		sw := state.NewWriter(nil)
+		sw := state.NewWriter(nil, &writer.Options{Interpolate: true})
 
 		err := sw.Write("key", res)
 		assert.Equal(t, errcode.ErrWriterInvalidKey, errors.Cause(err))
@@ -140,7 +141,7 @@ func TestSync(t *testing.T) {
 		var (
 			ctrl  = gomock.NewController(t)
 			b     = &bytes.Buffer{}
-			sw    = state.NewWriter(b)
+			sw    = state.NewWriter(b, &writer.Options{Interpolate: true})
 			prv   = mock.NewProvider(ctrl)
 			res   = mock.NewResource(ctrl)
 			tp    = "aws_iam_user"

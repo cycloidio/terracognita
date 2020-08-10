@@ -7,6 +7,7 @@ package mock
 import (
 	reflect "reflect"
 
+	writer "github.com/cycloidio/terracognita/writer"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -31,6 +32,20 @@ func NewWriter(ctrl *gomock.Controller) *Writer {
 // EXPECT returns an object that allows the caller to indicate expected use
 func (m *Writer) EXPECT() *WriterMockRecorder {
 	return m.recorder
+}
+
+// GetOptions mocks base method
+func (m *Writer) GetOptions() *writer.Options {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetOptions")
+	ret0, _ := ret[0].(*writer.Options)
+	return ret0
+}
+
+// GetOptions indicates an expected call of GetOptions
+func (mr *WriterMockRecorder) GetOptions() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOptions", reflect.TypeOf((*Writer)(nil).GetOptions))
 }
 
 // Has mocks base method

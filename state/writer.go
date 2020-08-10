@@ -7,6 +7,7 @@ import (
 	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/provider"
+	"github.com/cycloidio/terracognita/writer"
 	"github.com/hashicorp/terraform/addrs"
 	"github.com/hashicorp/terraform/states"
 	"github.com/hashicorp/terraform/states/statefile"
@@ -20,14 +21,16 @@ type Writer struct {
 	Config map[string]provider.Resource
 	writer io.Writer
 	state  *states.SyncState
+	opts   *writer.Options
 }
 
 // NewWriter returns a TFStateWriter initialization
-func NewWriter(w io.Writer) *Writer {
+func NewWriter(w io.Writer, opts *writer.Options) *Writer {
 	return &Writer{
 		Config: make(map[string]provider.Resource),
 		writer: w,
 		state:  states.NewState().SyncWrapper(),
+		opts:   opts,
 	}
 }
 
@@ -113,4 +116,8 @@ func (w *Writer) Sync() error {
 }
 
 // Interpolate does nothing in `state` context
-func (w *Writer) Interpolate(i map[string]string) {}
+func (w *Writer) Interpolate(i map[string]string) {
+	if !w.opts.Interpolate {
+		return
+	}
+}

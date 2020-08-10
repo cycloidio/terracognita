@@ -73,15 +73,16 @@ var (
 			}
 
 			var hclW, stateW writer.Writer
+			options := &writer.Options{Interpolate: viper.GetBool("interpolate")}
 
 			if hclOut != nil {
 				logger.Log("msg", "initializing HCL writer")
-				hclW = hcl.NewWriter(hclOut)
+				hclW = hcl.NewWriter(hclOut, options)
 			}
 
 			if stateOut != nil {
 				logger.Log("msg", "initializing TFState writer")
-				stateW = state.NewWriter(stateOut)
+				stateW = state.NewWriter(stateOut, options)
 			}
 
 			logger.Log("msg", "importing")
