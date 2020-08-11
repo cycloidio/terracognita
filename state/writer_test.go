@@ -12,6 +12,7 @@ import (
 	"github.com/cycloidio/terracognita/writer"
 	"github.com/golang/mock/gomock"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/hashicorp/terraform/configs/hcl2shim"
 	"github.com/hashicorp/terraform/providers"
 	"github.com/pkg/errors"
@@ -195,6 +196,271 @@ func TestSync(t *testing.T) {
 
 		err = sw.Write("aws_iam_user.name", res)
 		require.NoError(t, err)
+
+		err = sw.Sync()
+		require.NoError(t, err)
+
+		var st map[string]interface{}
+		err = json.Unmarshal(b.Bytes(), &st)
+		require.NoError(t, err)
+
+		st["lineage"] = "lineage"
+
+		var est map[string]interface{}
+		err = json.Unmarshal([]byte(state), &est)
+		require.NoError(t, err)
+
+		assert.Equal(t, est, st)
+	})
+}
+
+func TestDependencies(t *testing.T) {
+	t.Run("Success", func(t *testing.T) {
+		var (
+			i      = make(map[string]string)
+			ctrl   = gomock.NewController(t)
+			b      = &bytes.Buffer{}
+			sw     = state.NewWriter(b, &writer.Options{Interpolate: true})
+			prv    = mock.NewProvider(ctrl)
+			resSG  = mock.NewResource(ctrl)
+			resSGR = mock.NewResource(ctrl)
+			sg     = "aws_security_group"
+			sgr    = "aws_security_group_rule"
+			state  = `{
+  "version": 4,
+  "terraform_version": "0.12.26",
+  "serial": 0,
+  "lineage": "lineage",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "sg",
+      "provider": "provider.aws",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "id": "sg-1234",
+            "name": "sg",
+            "description": null,
+            "egress": null,
+            "ingress": null,
+            "name_prefix": null,
+	    "arn": null,
+            "owner_id": null,
+            "revoke_rules_on_delete": null,
+            "timeouts": {
+              "create": null,
+              "delete": null
+            },
+	    "tags": null,
+            "vpc_id": null
+          }
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_security_group_rule",
+      "name": "sgrule",
+      "provider": "provider.aws",
+      "instances": [
+        {
+          "schema_version": 2,
+          "attributes": {
+            "id": "sgrule-1234",
+            "security_group_id": "sg-1234",
+            "cidr_blocks": null,
+            "description": null,
+            "from_port": null,
+            "ipv6_cidr_blocks": null,
+            "prefix_list_ids": null,
+            "protocol": null,
+            "self": null,
+            "source_security_group_id": null,
+            "to_port": null,
+            "type": null
+          },
+          "dependencies": [
+            "aws_security_group.sg"
+          ]
+        }
+      ]
+    }
+  ]
+}`
+		)
+
+		defer ctrl.Finish()
+
+		stateSG, err := hcl2shim.HCL2ValueFromFlatmap(map[string]string{"id": "sg-1234", "name": "sg"}, aws.Provider().(*schema.Provider).ResourcesMap[sg].CoreConfigSchema().ImpliedType())
+		stateSGR, err := hcl2shim.HCL2ValueFromFlatmap(map[string]string{"security_group_id": "sg-1234", "id": "sgrule-1234"}, aws.Provider().(*schema.Provider).ResourcesMap[sgr].CoreConfigSchema().ImpliedType())
+
+		require.NoError(t, err)
+
+		resSG.EXPECT().Type().Return(sg)
+		resSG.EXPECT().Provider().Return(prv)
+		resSG.EXPECT().TFResource().Return(aws.Provider().(*schema.Provider).ResourcesMap[sg])
+		resSG.EXPECT().ImpliedType().Return(aws.Provider().(*schema.Provider).ResourcesMap[sg].CoreConfigSchema().ImpliedType())
+		resSG.EXPECT().ResourceInstanceObject().Return(providers.ImportedResource{
+			TypeName: sg,
+			State:    stateSG,
+		}.AsInstanceObject())
+		attrsSG := make(map[string]string)
+		resSG.EXPECT().InstanceState().Return(&terraform.InstanceState{
+			Attributes: attrsSG,
+		})
+
+		prv.EXPECT().String().Return("aws").AnyTimes()
+
+		resSGR.EXPECT().Type().Return(sgr).AnyTimes()
+		resSGR.EXPECT().Provider().Return(prv)
+		resSGR.EXPECT().TFResource().Return(aws.Provider().(*schema.Provider).ResourcesMap[sgr])
+		resSGR.EXPECT().ImpliedType().Return(aws.Provider().(*schema.Provider).ResourcesMap[sgr].CoreConfigSchema().ImpliedType())
+		resSGR.EXPECT().ResourceInstanceObject().Return(providers.ImportedResource{
+			TypeName: sgr,
+			State:    stateSGR,
+		}.AsInstanceObject())
+		attrsSGR := make(map[string]string)
+		attrsSGR["security-group-id"] = "sg-1234"
+		resSGR.EXPECT().InstanceState().Return(&terraform.InstanceState{
+			Attributes: attrsSGR,
+		})
+
+		err = sw.Write("aws_security_group.sg", resSG)
+		require.NoError(t, err)
+		err = sw.Write("aws_security_group_rule.sgrule", resSGR)
+		require.NoError(t, err)
+
+		i["sg-1234"] = "${aws_security_group.sg.id}"
+		sw.Interpolate(i)
+
+		err = sw.Sync()
+		require.NoError(t, err)
+
+		var st map[string]interface{}
+		err = json.Unmarshal(b.Bytes(), &st)
+		require.NoError(t, err)
+
+		st["lineage"] = "lineage"
+
+		var est map[string]interface{}
+		err = json.Unmarshal([]byte(state), &est)
+		require.NoError(t, err)
+
+		assert.Equal(t, est, st)
+	})
+	t.Run("SuccessNoInterpolation", func(t *testing.T) {
+		var (
+			i      = make(map[string]string)
+			ctrl   = gomock.NewController(t)
+			b      = &bytes.Buffer{}
+			sw     = state.NewWriter(b, &writer.Options{Interpolate: false})
+			prv    = mock.NewProvider(ctrl)
+			resSG  = mock.NewResource(ctrl)
+			resSGR = mock.NewResource(ctrl)
+			sg     = "aws_security_group"
+			sgr    = "aws_security_group_rule"
+			state  = `{
+  "version": 4,
+  "terraform_version": "0.12.26",
+  "serial": 0,
+  "lineage": "lineage",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "sg",
+      "provider": "provider.aws",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "id": "sg-1234",
+            "name": "sg",
+            "description": null,
+            "egress": null,
+            "ingress": null,
+            "name_prefix": null,
+	    "arn": null,
+            "owner_id": null,
+            "revoke_rules_on_delete": null,
+            "timeouts": {
+              "create": null,
+              "delete": null
+            },
+	    "tags": null,
+            "vpc_id": null
+          }
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_security_group_rule",
+      "name": "sgrule",
+      "provider": "provider.aws",
+      "instances": [
+        {
+          "schema_version": 2,
+          "attributes": {
+            "id": "sgrule-1234",
+            "security_group_id": "sg-1234",
+            "cidr_blocks": null,
+            "description": null,
+            "from_port": null,
+            "ipv6_cidr_blocks": null,
+            "prefix_list_ids": null,
+            "protocol": null,
+            "self": null,
+            "source_security_group_id": null,
+            "to_port": null,
+            "type": null
+          }
+        }
+      ]
+    }
+  ]
+}`
+		)
+
+		defer ctrl.Finish()
+
+		stateSG, err := hcl2shim.HCL2ValueFromFlatmap(map[string]string{"id": "sg-1234", "name": "sg"}, aws.Provider().(*schema.Provider).ResourcesMap[sg].CoreConfigSchema().ImpliedType())
+		stateSGR, err := hcl2shim.HCL2ValueFromFlatmap(map[string]string{"security_group_id": "sg-1234", "id": "sgrule-1234"}, aws.Provider().(*schema.Provider).ResourcesMap[sgr].CoreConfigSchema().ImpliedType())
+
+		require.NoError(t, err)
+
+		resSG.EXPECT().Type().Return(sg)
+		resSG.EXPECT().Provider().Return(prv)
+		resSG.EXPECT().TFResource().Return(aws.Provider().(*schema.Provider).ResourcesMap[sg])
+		resSG.EXPECT().ImpliedType().Return(aws.Provider().(*schema.Provider).ResourcesMap[sg].CoreConfigSchema().ImpliedType())
+		resSG.EXPECT().ResourceInstanceObject().Return(providers.ImportedResource{
+			TypeName: sg,
+			State:    stateSG,
+		}.AsInstanceObject())
+
+		prv.EXPECT().String().Return("aws").AnyTimes()
+
+		resSGR.EXPECT().Type().Return(sgr)
+		resSGR.EXPECT().Provider().Return(prv)
+		resSGR.EXPECT().TFResource().Return(aws.Provider().(*schema.Provider).ResourcesMap[sgr])
+		resSGR.EXPECT().ImpliedType().Return(aws.Provider().(*schema.Provider).ResourcesMap[sgr].CoreConfigSchema().ImpliedType())
+		resSGR.EXPECT().ResourceInstanceObject().Return(providers.ImportedResource{
+			TypeName: sgr,
+			State:    stateSGR,
+		}.AsInstanceObject())
+
+		err = sw.Write("aws_security_group.sg", resSG)
+		require.NoError(t, err)
+		err = sw.Write("aws_security_group_rule.sgrule", resSGR)
+		require.NoError(t, err)
+
+		i["sg-1234"] = "${aws_security_group.sg.id}"
+		sw.Interpolate(i)
 
 		err = sw.Sync()
 		require.NoError(t, err)
