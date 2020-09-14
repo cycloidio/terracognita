@@ -7,6 +7,11 @@
 - cli option to deactivate interpolation
   ([PR #133](https://github.com/cycloidio/terracognita/pull/133))
 
+### Changed
+
+- HCL lib version from V1 to V2 and all the implications
+  ([PR #135](https://github.com/cycloidio/terracognita/pull/135))
+
 ## [0.5.1] _2020-07-17_
 
 ### Fixed
