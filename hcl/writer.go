@@ -1,7 +1,6 @@
 package hcl
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -14,10 +13,9 @@ import (
 	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/writer"
-	"github.com/hashicorp/hcl"
-	"github.com/hashicorp/hcl/hcl/fmtcmd"
-	"github.com/hashicorp/hcl/hcl/printer"
+	"github.com/hashicorp/hcl2/hclwrite"
 	"github.com/pkg/errors"
+	cjson "github.com/zclconf/go-cty/cty/json"
 )
 
 // Writer is a Writer implementation that writes to
@@ -27,16 +25,20 @@ type Writer struct {
 	Config map[string]interface{}
 	writer io.Writer
 	opts   *writer.Options
+	// File is used to build the HCL file
+	File *hclwrite.File
 }
 
 // NewWriter rerturns an Writer initialization
 func NewWriter(w io.Writer, opts *writer.Options) *Writer {
 	cfg := make(map[string]interface{})
 	cfg["resource"] = make(map[string]map[string]interface{})
+	f := hclwrite.NewEmptyFile()
 	return &Writer{
 		Config: cfg,
 		writer: w,
 		opts:   opts,
+		File:   f,
 	}
 }
 
@@ -98,34 +100,68 @@ func (w *Writer) Has(key string) (bool, error) {
 func (w *Writer) Sync() error {
 	logger := log.Get()
 	logger = kitlog.With(logger, "func", "writer.Write(HCL)")
-	b, err := json.Marshal(w.Config)
+
+	body := w.File.Body()
+
+	src, err := json.Marshal(w.Config)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "unable to marshal JSON config")
 	}
 
-	logger.Log("msg", "parsing internal config to HCL", "json", string(b))
-	f, err := hcl.ParseBytes(b)
+	t, err := cjson.ImpliedType(src)
 	if err != nil {
-		return fmt.Errorf("error while 'hcl.ParseBytes': %s", err)
+		return errors.Wrap(err, "unable to get cty.Type from config")
+	}
+	v, err := cjson.Unmarshal(src, t)
+	if err != nil {
+		return errors.Wrap(err, "unable to get cty.Value from cty.Type and JSON config")
 	}
 
-	buff := &bytes.Buffer{}
-	err = printer.Fprint(buff, f.Node)
-	if err != nil {
-		return fmt.Errorf("error while pretty printing HCL: %s", err)
+	// blockType can be "resource", "variable" or "output"
+	for blockType, blockValue := range v.AsValueMap() {
+		// resourceType is the type of the resource (e.g: `aws_security_groups`)
+		for resourceType, resources := range blockValue.AsValueMap() {
+			for name, resource := range resources.AsValueMap() {
+				block := hclwrite.NewBlock(blockType, []string{resourceType, name})
+				bbody := block.Body()
+				for attr, value := range resource.AsValueMap() {
+					// in JSON representation, we can have a list of object
+					// e.g with ingress:[{ingress1}, {ingress2}, ... {ingressN}]
+					// we need to add a dedicated block for each object instead of having
+					// one block for the whole list
+					if value.Type().IsTupleType() {
+						iter := value.ElementIterator()
+						for iter.Next() {
+							_, val := iter.Element()
+							if val.Type().IsPrimitiveType() {
+								// the value is not an unconsistent object
+								bbody.SetAttributeValue(attr, value)
+								continue
+							}
+							obj := bbody.AppendNewBlock(attr, nil)
+							bobj := obj.Body()
+							ei := val.ElementIterator()
+							for ei.Next() {
+								kei, vei := ei.Element()
+								bobj.SetAttributeValue(kei.AsString(), vei)
+							}
+						}
+					} else {
+						bbody.SetAttributeValue(attr, value)
+					}
+				}
+				body.AppendBlock(block)
+				body.AppendNewline()
+			}
+		}
 	}
 
-	logger.Log("msg", "formatting HCL", "hcl", buff.String())
+	// we don't use the file.WriteTo method because we need to use
+	// our own Format method before writing to the writer
+	formattedBytes := Format(w.File.Bytes())
+	formattedBytes = hclwrite.Format(formattedBytes)
+	w.writer.Write(formattedBytes)
 
-	formattedHCL := Format(buff.Bytes())
-	logger.Log("msg", "formatted HCL", "hcl", formattedHCL)
-
-	buff = bytes.NewBuffer(formattedHCL)
-
-	err = fmtcmd.Run(nil, nil, buff, w.writer, fmtcmd.Options{})
-	if err != nil {
-		return fmt.Errorf("error while fmt HCL: %s", err)
-	}
 	return nil
 }
 
@@ -238,4 +274,5 @@ func extractResourceTypeAndName(value string) (string, string) {
 	res := regexp.MustCompile(`\${(.+)\.(.+)\.(.+)}`)
 	match := res.FindStringSubmatch(value)
 	return match[1], match[2]
+
 }

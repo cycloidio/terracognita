@@ -16,6 +16,15 @@ var (
 		replaceFn func([]byte) []byte
 	}{
 		{
+			// Replace all the `"key" = "$${a.b.c}` for `"key" = a.b.c`
+			// the double `$` is setted by the hclwriter
+			// `$${a.b.c}` is the representation of HCL V1 interpolation passed
+			// trough hcl2/hclwrite. We need to change it to `a.b.c` to be HCL2
+			// compliant interpolation side.
+			match:   regexp.MustCompile(`"\$\${(.+)\.(.+)\.(.+)}"`),
+			replace: []byte(`$1.$2.$3`),
+		},
+		{
 			// Replace all the `"key" = "value"` for `key = "value"` except
 			// if it has a `.` on the key
 			match:   regexp.MustCompile(`"([^\d][\w\-_=]+)"\s=`),

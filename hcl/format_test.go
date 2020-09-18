@@ -128,6 +128,19 @@ func TestFormat(t *testing.T) {
 				role = value
 			}`),
 		},
+		{
+			name: "ReplaceInterpolation11To12Format",
+			in: []byte(`
+			"resource" "aws_instance" "name" {
+				"env" = "value and ${this.must.stay}"
+				"role" = "$${this.is.a-role}"
+			}`),
+			out: []byte(`
+			resource "aws_instance" "name" {
+				env = "value and ${this.must.stay}"
+				role = this.is.a-role
+			}`),
+		},
 	}
 
 	for _, tt := range tests {

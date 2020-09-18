@@ -3,13 +3,15 @@ module github.com/cycloidio/terracognita
 require (
 	github.com/Azure/azure-sdk-for-go v42.1.0+incompatible
 	github.com/Azure/go-autorest/autorest v0.10.0
+	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/aws/aws-sdk-go v1.31.9
 	github.com/chr4/pwgen v1.1.0
 	github.com/cycloidio/tfdocs v0.0.0-20200111145532-e6a80a93d7cc
 	github.com/go-kit/kit v0.9.0
 	github.com/golang/mock v1.4.3
 	github.com/hashicorp/go-azure-helpers v0.10.0
-	github.com/hashicorp/hcl v1.0.0
+	github.com/hashicorp/hcl/v2 v2.6.0 // indirect
+	github.com/hashicorp/hcl2 v0.0.0-20190821123243-0c888d1241f6
 	github.com/hashicorp/hil v0.0.0-20190212132231-97b3a9cdfa93 // indirect
 	github.com/hashicorp/terraform v0.12.26
 	github.com/hashicorp/terraform-plugin-sdk v1.13.1
@@ -24,7 +26,8 @@ require (
 	github.com/terraform-providers/terraform-provider-azurerm v1.44.1-0.20200605204846-1b0da11661ac
 	github.com/terraform-providers/terraform-provider-google v1.20.1-0.20200605200304-d3a169b0353a
 	github.com/terraform-providers/terraform-provider-random v2.0.0+incompatible // indirect
-	github.com/zclconf/go-cty v1.4.2
+	github.com/zclconf/go-cty v1.5.1
+	golang.org/x/text v0.3.3 // indirect
 	golang.org/x/tools v0.0.0-20200515220128-d3bf790afa53 // indirect
 	google.golang.org/api v0.25.0
 )

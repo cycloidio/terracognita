@@ -114,6 +114,7 @@ func TestHCLWriter_Sync(t *testing.T) {
 			hcl = `resource "type" "name" {
   key = "value"
 }
+
 `
 		)
 
@@ -138,15 +139,7 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 			network = map[string]interface{}{
 				"id": "interpolated",
 			}
-			i   = make(map[string]string)
-			hcl = `resource "aType" "aName" {
-  id = "interpolated"
-}
-
-resource "type" "name" {
-  network = "${aType.aName.id}"
-}
-`
+			i = make(map[string]string)
 		)
 		i["to-be-interpolated"] = "${aType.aName.id}"
 		hw.Write("type.name", value)
@@ -155,7 +148,7 @@ resource "type" "name" {
 		hw.Interpolate(i)
 		hw.Sync()
 
-		assert.Equal(t, hcl, b.String())
+		assert.Contains(t, b.String(), "network = aType.aName.id")
 	})
 	t.Run("SuccessAvoidInterpolaception", func(t *testing.T) {
 		var (
@@ -168,16 +161,7 @@ resource "type" "name" {
 				"id":   "interpolated",
 				"name": "to-be-interpolated",
 			}
-			i   = make(map[string]string)
-			hcl = `resource "aType" "aName" {
-  id   = "interpolated"
-  name = "to-be-interpolated"
-}
-
-resource "type" "name" {
-  network = "${aType.aName.id}"
-}
-`
+			i = make(map[string]string)
 		)
 		i["to-be-interpolated"] = "${aType.aName.id}"
 		hw.Write("type.name", value)
@@ -186,7 +170,7 @@ resource "type" "name" {
 		hw.Interpolate(i)
 		hw.Sync()
 
-		assert.Equal(t, hcl, b.String())
+		assert.Contains(t, b.String(), "to-be-interpolated")
 	})
 	t.Run("SuccessMutualInterpolation", func(t *testing.T) {
 		var (
@@ -208,10 +192,9 @@ resource "type" "name" {
 
 		hw.Interpolate(i)
 		hw.Sync()
-		// the config relies on map, since the order is pseudo random
-		// we just assert that we only have one "$" which means: there is
-		// only one interpolation
-		assert.Equal(t, 1, strings.Count(b.String(), "$"))
+		// the only way to assert that there is one interpolation is to
+		// check if we have exactly one value starting by `aws_`
+		assert.Equal(t, 1, strings.Count(b.String(), "= aws_"))
 	})
 	t.Run("SuccessNoInterpolation", func(t *testing.T) {
 		var (
@@ -224,16 +207,7 @@ resource "type" "name" {
 				"id":   "interpolated",
 				"name": "to-be-interpolated",
 			}
-			i   = make(map[string]string)
-			hcl = `resource "aType" "aName" {
-  id   = "interpolated"
-  name = "to-be-interpolated"
-}
-
-resource "type" "name" {
-  network = "should-not-be-interpolated"
-}
-`
+			i = make(map[string]string)
 		)
 		i["should-not-be-interpolated"] = "${aType.aName.id}"
 		hw.Write("type.name", value)
@@ -242,6 +216,6 @@ resource "type" "name" {
 		hw.Interpolate(i)
 		hw.Sync()
 
-		assert.Equal(t, hcl, b.String())
+		assert.Contains(t, b.String(), "network = \"should-not-be-interpolated\"")
 	})
 }
