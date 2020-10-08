@@ -2,6 +2,7 @@ package provider_test
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"testing"
 
@@ -434,5 +435,76 @@ func TestImport(t *testing.T) {
 
 		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
 		assert.Equal(t, errcode.ErrProviderResourceNotSupported.Error(), errors.Cause(err).Error())
+	})
+	t.Run("ErrorWithNotErrProviderAPI", func(t *testing.T) {
+		var (
+			ctrl = gomock.NewController(t)
+			ctx  = context.Background()
+
+			p  = mock.NewProvider(ctrl)
+			hw = mock.NewWriter(ctrl)
+			sw = mock.NewWriter(ctrl)
+
+			f = &filter.Filter{
+				Exclude: []string{"aws_instance"},
+			}
+		)
+
+		defer ctrl.Finish()
+
+		p.EXPECT().HasResourceType("aws_instance").Return(true)
+		p.EXPECT().ResourceTypes().Return([]string{"aws_instance", "aws_iam_user"})
+
+		p.EXPECT().Resources(ctx, "aws_iam_user", f).Return(nil, errors.New("should stop the import"))
+
+		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
+		assert.Contains(t, err.Error(), "stop the import")
+	})
+	t.Run("ErrorWithErrProviderAPI", func(t *testing.T) {
+		var (
+			ctrl = gomock.NewController(t)
+			ctx  = context.Background()
+
+			p                 = mock.NewProvider(ctrl)
+			hw                = mock.NewWriter(ctrl)
+			sw                = mock.NewWriter(ctrl)
+			i                 = make(map[string]string)
+			instanceResource1 = mock.NewResource(ctrl)
+			instanceResource2 = mock.NewResource(ctrl)
+
+			f = &filter.Filter{}
+		)
+
+		defer ctrl.Finish()
+
+		p.EXPECT().ResourceTypes().Return([]string{"aws_instance", "aws_iam_user"})
+
+		p.EXPECT().Resources(ctx, "aws_instance", f).Return([]provider.Resource{instanceResource1, instanceResource2}, nil)
+		p.EXPECT().Resources(ctx, "aws_iam_user", f).Return(nil, fmt.Errorf("%w: should not stop the import", errcode.ErrProviderAPI))
+
+		instanceResource1.EXPECT().ID().Return("1")
+		instanceResource2.EXPECT().ID().Return("2")
+
+		instanceResource1.EXPECT().ImportState().Return(nil, nil)
+		instanceResource2.EXPECT().ImportState().Return(nil, nil)
+
+		instanceResource1.EXPECT().Read(f).Return(nil)
+		instanceResource2.EXPECT().Read(f).Return(nil)
+
+		instanceResource1.EXPECT().HCL(hw).Return(nil)
+		instanceResource2.EXPECT().HCL(hw).Return(nil)
+
+		instanceResource1.EXPECT().State(sw).Return(nil)
+		instanceResource2.EXPECT().State(sw).Return(nil)
+
+		instanceResource1.EXPECT().InstanceState().Return(nil)
+		instanceResource2.EXPECT().InstanceState().Return(nil)
+
+		hw.EXPECT().Sync().Return(nil)
+		hw.EXPECT().Interpolate(i)
+		sw.EXPECT().Sync().Return(nil)
+
+		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
+		require.NoError(t, err)
 	})
 }
