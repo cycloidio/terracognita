@@ -12,6 +12,11 @@
 - HCL lib version from V1 to V2 and all the implications
   ([PR #135](https://github.com/cycloidio/terracognita/pull/135))
 
+### Fixed
+
+- Crashing import by adding an error handling on provider errors
+  ([issue #138](https://github.com/cycloidio/terracognita/issues/138))
+
 ## [0.5.1] _2020-07-17_
 
 ### Fixed

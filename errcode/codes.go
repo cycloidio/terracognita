@@ -19,4 +19,8 @@ var (
 	ErrWriterAlreadyExistsKey = errors.New("the key already exists")
 
 	ErrFilterTargetsInvalid = errors.New("the filter targets has an invalid format")
+
+	// ErrProviderAPI will be raised when an error occurs provider side while
+	// using its APIs (authorization error, unavailable operation, ...)
+	ErrProviderAPI = errors.New("error while requesting the provider APIs")
 )
