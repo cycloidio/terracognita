@@ -102,9 +102,6 @@ $ export AWS_DEFAULT_REGION=xx-yyyy-0
 $ docker run \
 		-v "${PWD}"/outputs:/app/outputs \
 		cycloid/terracognita aws \
-		--access-key="${AWS_ACCESS_KEY_ID}" \
-		--secret-key="${AWS_SECRET_ACCESS_KEY}" \
-		--region="${AWS_DEFAULT_REGION}" \
 		--hcl app/outputs/resources.tf
 ```
 
