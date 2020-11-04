@@ -74,6 +74,7 @@ func TestImport(t *testing.T) {
 		hw.EXPECT().Sync().Return(nil)
 		hw.EXPECT().Interpolate(i)
 		sw.EXPECT().Sync().Return(nil)
+		sw.EXPECT().Interpolate(i)
 
 		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
 		require.NoError(t, err)
@@ -121,6 +122,7 @@ func TestImport(t *testing.T) {
 		hw.EXPECT().Sync().Return(nil)
 		hw.EXPECT().Interpolate(i)
 		sw.EXPECT().Sync().Return(nil)
+		sw.EXPECT().Interpolate(i)
 
 		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
 		require.NoError(t, err)
@@ -170,6 +172,7 @@ func TestImport(t *testing.T) {
 		hw.EXPECT().Sync().Return(nil)
 		hw.EXPECT().Interpolate(i)
 		sw.EXPECT().Sync().Return(nil)
+		sw.EXPECT().Interpolate(i)
 
 		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
 		require.NoError(t, err)
@@ -216,6 +219,7 @@ func TestImport(t *testing.T) {
 		hw.EXPECT().Sync().Return(nil)
 		hw.EXPECT().Interpolate(i)
 		sw.EXPECT().Sync().Return(nil)
+		sw.EXPECT().Interpolate(i)
 
 		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
 		require.NoError(t, err)
@@ -229,6 +233,7 @@ func TestImport(t *testing.T) {
 			sw       = mock.NewWriter(ctrl)
 			iamUser1 = mock.NewResource(ctrl)
 			iamUser2 = mock.NewResource(ctrl)
+			i        = make(map[string]string)
 
 			f = &filter.Filter{
 				Exclude: []string{"aws_instance"},
@@ -255,6 +260,7 @@ func TestImport(t *testing.T) {
 		iamUser2.EXPECT().InstanceState().Return(nil)
 
 		sw.EXPECT().Sync().Return(nil)
+		sw.EXPECT().Interpolate(i)
 
 		err := provider.Import(ctx, p, nil, sw, f, ioutil.Discard)
 		require.NoError(t, err)
@@ -341,6 +347,7 @@ func TestImport(t *testing.T) {
 		hw.EXPECT().Sync().Return(nil)
 		hw.EXPECT().Interpolate(i)
 		sw.EXPECT().Sync().Return(nil)
+		sw.EXPECT().Interpolate(i)
 
 		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
 		require.NoError(t, err)
@@ -386,6 +393,7 @@ func TestImport(t *testing.T) {
 		hw.EXPECT().Sync().Return(nil)
 		hw.EXPECT().Interpolate(i)
 		sw.EXPECT().Sync().Return(nil)
+		sw.EXPECT().Interpolate(i)
 
 		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
 		require.NoError(t, err)
