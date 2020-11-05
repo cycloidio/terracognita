@@ -187,6 +187,8 @@ jobs:
           path: pull-request
           status: pending
           target_url: 'https://console.cycloid.io/organizations/((customer))/projects/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID'
+        get_params:
+          integration_tool: checkout
 
       - task: unit-tests
         privileged: true
