@@ -2,13 +2,17 @@ package tag
 
 import (
 	"fmt"
+	"regexp"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/chr4/pwgen"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform/config"
 )
+
+// nameRegexp is the new regexp used to validate the names
+// of the resources on TF (defined on configs/configschema/internal_validate.go)
+var nameRegexp = regexp.MustCompile(`^[a-z0-9_]+$`)
 
 // Tag it's an easy representation of
 // a ec2.Filter for tags
@@ -48,5 +52,5 @@ func GetNameFromTag(key string, srd *schema.ResourceData, fallback string) strin
 // isValidResourceName checks with the TF regex
 // for names to validate if it's valid
 func isValidResourceName(name string) bool {
-	return config.NameRegexp.Match([]byte(name))
+	return nameRegexp.MatchString(name)
 }

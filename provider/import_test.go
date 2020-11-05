@@ -511,6 +511,7 @@ func TestImport(t *testing.T) {
 		hw.EXPECT().Sync().Return(nil)
 		hw.EXPECT().Interpolate(i)
 		sw.EXPECT().Sync().Return(nil)
+		sw.EXPECT().Interpolate(i)
 
 		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
 		require.NoError(t, err)

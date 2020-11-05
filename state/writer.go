@@ -76,10 +76,8 @@ func (w *Writer) Write(key string, value interface{}) error {
 	}
 
 	absProviderConf := addrs.AbsProviderConfig{
-		Module: nil,
-		ProviderConfig: addrs.ProviderConfig{
-			Type: addrs.NewLegacyProvider(r.Provider().String()),
-		},
+		Module:   nil,
+		Provider: addrs.NewDefaultProvider(r.Provider().String()),
 	}
 
 	src, err := r.ResourceInstanceObject().Encode(r.ImpliedType(), uint64(r.TFResource().SchemaVersion))
@@ -171,7 +169,7 @@ func (w *Writer) Interpolate(i map[string]string) {
 					s := strings.Split(dependency, ".")
 					rt := s[0]
 					rn := s[1]
-					instance.Current.Dependencies = append(instance.Current.Dependencies, addrs.AbsResource{
+					instance.Current.Dependencies = append(instance.Current.Dependencies, addrs.ConfigResource{
 						Module: nil,
 						Resource: addrs.Resource{
 							Mode: addrs.ManagedResourceMode,
