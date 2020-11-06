@@ -500,6 +500,9 @@ func elasticsearchDomains(ctx context.Context, a *aws, resourceType string, filt
 		names = append(names, dn.DomainName)
 	}
 
+	if len(names) == 0 {
+		return nil, nil
+	}
 	input := &elasticsearchservice.DescribeElasticsearchDomainsInput{
 		DomainNames: names,
 	}
