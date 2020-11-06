@@ -18,7 +18,7 @@ const (
 		"github.com/pkg/errors"
 
 		{{ range .AzureAPIs -}}
-		"github.com/Azure/azure-sdk-for-go/services/{{ .API }}/mgmt/{{ .APIVersion }}/{{ .API }}"
+		"github.com/Azure/azure-sdk-for-go/services/{{ if .IsPreview }}preview/{{ end }}{{ .API }}/mgmt/{{ .APIVersion }}{{ if .IsPreview }}-preview{{ end }}/{{ .API }}"
 		{{ end }}
 	)
 	`
@@ -81,6 +81,11 @@ type AzureAPI struct {
 	// Azure API Version to use
 	// ex: 2019-07-01
 	APIVersion string
+
+	// IsPreview defines if the API is a preview
+	// functionality
+	// https://docs.microsoft.com/en-us/azure/search/search-api-preview
+	IsPreview bool
 }
 
 // Function is the definition of one of the functions
