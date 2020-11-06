@@ -12,6 +12,7 @@ import (
 var azureAPIs = []AzureAPI{
 	AzureAPI{API: "compute", APIVersion: "2019-07-01"},
 	AzureAPI{API: "network", APIVersion: "2019-06-01"},
+	AzureAPI{API: "desktopvirtualization", APIVersion: "2019-12-10", IsPreview: true},
 }
 
 var functions = []Function{
@@ -21,6 +22,7 @@ var functions = []Function{
 	Function{Resource: "Interface", API: "network", ResourceGroup: true},
 	Function{Resource: "SecurityGroup", API: "network", ResourceGroup: true},
 	Function{Resource: "VirtualMachineScaleSet", API: "compute", ResourceGroup: true},
+	Function{Resource: "HostPool", ListFunction: "ListByResourceGroup", API: "desktopvirtualization", ResourceGroup: true},
 }
 
 func main() {

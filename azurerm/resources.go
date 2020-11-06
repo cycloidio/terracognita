@@ -16,12 +16,13 @@ type ResourceType int
 //go:generate enumer -type ResourceType -addprefix azurerm_ -transform snake -linecomment
 const (
 	ResourceGroup ResourceType = iota
-	VirtualMachine
-	VirtualNetwork
 	Subnet
+	VirtualDesktopHostPool
 	NetworkInterface
 	NetworkSecurityGroup
+	VirtualMachine
 	VirtualMachineScaleSet
+	VirtualNetwork
 )
 
 type rtFn func(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error)
@@ -35,6 +36,7 @@ var (
 		NetworkInterface:       networkInterfaces,
 		NetworkSecurityGroup:   networkSecurityGroups,
 		VirtualMachineScaleSet: virtualMachineScaleSets,
+		VirtualDesktopHostPool: virtualDesktopHostPools,
 	}
 )
 
@@ -129,6 +131,19 @@ func virtualMachineScaleSets(ctx context.Context, a *azurerm, resourceType strin
 	resources := make([]provider.Resource, 0, len(virtualMachineScaleSets))
 	for _, virtualMachineScaleSet := range virtualMachineScaleSets {
 		r := provider.NewResource(*virtualMachineScaleSet.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func virtualDesktopHostPools(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	pools, err := a.azurer.ListHostPools(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list host pools from reader")
+	}
+	resources := make([]provider.Resource, 0, len(pools))
+	for _, hostPool := range pools {
+		r := provider.NewResource(*hostPool.ID, resourceType, a)
 		resources = append(resources, r)
 	}
 	return resources, nil
