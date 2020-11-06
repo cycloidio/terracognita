@@ -7,7 +7,9 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-07-01/compute"
+	"github.com/Azure/azure-sdk-for-go/services/logic/mgmt/2019-05-01/logic"
 	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2019-06-01/network"
+	"github.com/Azure/azure-sdk-for-go/services/preview/desktopvirtualization/mgmt/2019-12-10-preview/desktopvirtualization"
 )
 
 // ListVirtualMachines returns a list of VirtualMachines within a subscription and a resource group
@@ -135,6 +137,144 @@ func (ar *AzureReader) ListVirtualMachineScaleSets(ctx context.Context) ([]compu
 		return nil, errors.Wrap(err, "unable to list compute.VirtualMachineScaleSet from Azure APIs")
 	}
 	resources := make([]compute.VirtualMachineScaleSet, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+}
+
+// ListHostPools returns a list of HostPools within a subscription and a resource group
+func (ar *AzureReader) ListHostPools(ctx context.Context) ([]desktopvirtualization.HostPool, error) {
+	client := desktopvirtualization.NewHostPoolsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName())
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list desktopvirtualization.HostPool from Azure APIs")
+	}
+	resources := make([]desktopvirtualization.HostPool, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+}
+
+// ListApplicationGroups returns a list of ApplicationGroups within a subscription and a resource group
+func (ar *AzureReader) ListApplicationGroups(ctx context.Context, filter string) ([]desktopvirtualization.ApplicationGroup, error) {
+	client := desktopvirtualization.NewApplicationGroupsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName(), filter)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list desktopvirtualization.ApplicationGroup from Azure APIs")
+	}
+	resources := make([]desktopvirtualization.ApplicationGroup, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+}
+
+// ListWorkflows returns a list of Workflows within a subscription and a resource group
+func (ar *AzureReader) ListWorkflows(ctx context.Context, top *int32, filter string) ([]logic.Workflow, error) {
+	client := logic.NewWorkflowsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName(), top, filter)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list logic.Workflow from Azure APIs")
+	}
+	resources := make([]logic.Workflow, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+}
+
+// ListWorkflowTriggers returns a list of WorkflowTriggers within a subscription and a resource group
+func (ar *AzureReader) ListWorkflowTriggers(ctx context.Context, workflowName string, top *int32, filter string) ([]logic.WorkflowTrigger, error) {
+	client := logic.NewWorkflowTriggersClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, ar.GetResourceGroupName(), workflowName, top, filter)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list logic.WorkflowTrigger from Azure APIs")
+	}
+	resources := make([]logic.WorkflowTrigger, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+}
+
+// ListWorkflowRuns returns a list of WorkflowRuns within a subscription and a resource group
+func (ar *AzureReader) ListWorkflowRuns(ctx context.Context, workflowName string, top *int32, filter string) ([]logic.WorkflowRun, error) {
+	client := logic.NewWorkflowRunsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, ar.GetResourceGroupName(), workflowName, top, filter)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list logic.WorkflowRun from Azure APIs")
+	}
+	resources := make([]logic.WorkflowRun, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+}
+
+// ListWorkflowRunActions returns a list of WorkflowRunActions within a subscription and a resource group
+func (ar *AzureReader) ListWorkflowRunActions(ctx context.Context, workflowName string, runName string, top *int32, filter string) ([]logic.WorkflowRunAction, error) {
+	client := logic.NewWorkflowRunActionsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, ar.GetResourceGroupName(), workflowName, runName, top, filter)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list logic.WorkflowRunAction from Azure APIs")
+	}
+	resources := make([]logic.WorkflowRunAction, 0)
 	for output.NotDone() {
 
 		for _, res := range output.Values() {

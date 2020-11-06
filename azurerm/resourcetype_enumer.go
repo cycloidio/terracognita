@@ -6,11 +6,11 @@ import (
 	"fmt"
 )
 
-const _ResourceTypeName = "azurerm_resource_groupazurerm_virtual_machineazurerm_virtual_networkazurerm_subnetazurerm_network_interfaceazurerm_network_security_groupazurerm_virtual_machine_scale_set"
+const _ResourceTypeName = "azurerm_resource_groupazurerm_subnetazurerm_virtual_desktop_host_poolazurerm_virtual_desktop_application_groupazurerm_logic_app_action_customazurerm_logic_app_trigger_customazurerm_logic_app_workflowazurerm_network_interfaceazurerm_network_security_groupazurerm_virtual_machineazurerm_virtual_machine_scale_setazurerm_virtual_network"
 
-var _ResourceTypeIndex = [...]uint8{0, 22, 45, 68, 82, 107, 137, 170}
+var _ResourceTypeIndex = [...]uint16{0, 22, 36, 69, 110, 141, 173, 199, 224, 254, 277, 310, 333}
 
-const _ResourceTypeLowerName = "azurerm_resource_groupazurerm_virtual_machineazurerm_virtual_networkazurerm_subnetazurerm_network_interfaceazurerm_network_security_groupazurerm_virtual_machine_scale_set"
+const _ResourceTypeLowerName = "azurerm_resource_groupazurerm_subnetazurerm_virtual_desktop_host_poolazurerm_virtual_desktop_application_groupazurerm_logic_app_action_customazurerm_logic_app_trigger_customazurerm_logic_app_workflowazurerm_network_interfaceazurerm_network_security_groupazurerm_virtual_machineazurerm_virtual_machine_scale_setazurerm_virtual_network"
 
 func (i ResourceType) String() string {
 	if i < 0 || i >= ResourceType(len(_ResourceTypeIndex)-1) {
@@ -19,33 +19,48 @@ func (i ResourceType) String() string {
 	return _ResourceTypeName[_ResourceTypeIndex[i]:_ResourceTypeIndex[i+1]]
 }
 
-var _ResourceTypeValues = []ResourceType{0, 1, 2, 3, 4, 5, 6}
+var _ResourceTypeValues = []ResourceType{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
 
 var _ResourceTypeNameToValueMap = map[string]ResourceType{
 	_ResourceTypeName[0:22]:         0,
 	_ResourceTypeLowerName[0:22]:    0,
-	_ResourceTypeName[22:45]:        1,
-	_ResourceTypeLowerName[22:45]:   1,
-	_ResourceTypeName[45:68]:        2,
-	_ResourceTypeLowerName[45:68]:   2,
-	_ResourceTypeName[68:82]:        3,
-	_ResourceTypeLowerName[68:82]:   3,
-	_ResourceTypeName[82:107]:       4,
-	_ResourceTypeLowerName[82:107]:  4,
-	_ResourceTypeName[107:137]:      5,
-	_ResourceTypeLowerName[107:137]: 5,
-	_ResourceTypeName[137:170]:      6,
-	_ResourceTypeLowerName[137:170]: 6,
+	_ResourceTypeName[22:36]:        1,
+	_ResourceTypeLowerName[22:36]:   1,
+	_ResourceTypeName[36:69]:        2,
+	_ResourceTypeLowerName[36:69]:   2,
+	_ResourceTypeName[69:110]:       3,
+	_ResourceTypeLowerName[69:110]:  3,
+	_ResourceTypeName[110:141]:      4,
+	_ResourceTypeLowerName[110:141]: 4,
+	_ResourceTypeName[141:173]:      5,
+	_ResourceTypeLowerName[141:173]: 5,
+	_ResourceTypeName[173:199]:      6,
+	_ResourceTypeLowerName[173:199]: 6,
+	_ResourceTypeName[199:224]:      7,
+	_ResourceTypeLowerName[199:224]: 7,
+	_ResourceTypeName[224:254]:      8,
+	_ResourceTypeLowerName[224:254]: 8,
+	_ResourceTypeName[254:277]:      9,
+	_ResourceTypeLowerName[254:277]: 9,
+	_ResourceTypeName[277:310]:      10,
+	_ResourceTypeLowerName[277:310]: 10,
+	_ResourceTypeName[310:333]:      11,
+	_ResourceTypeLowerName[310:333]: 11,
 }
 
 var _ResourceTypeNames = []string{
 	_ResourceTypeName[0:22],
-	_ResourceTypeName[22:45],
-	_ResourceTypeName[45:68],
-	_ResourceTypeName[68:82],
-	_ResourceTypeName[82:107],
-	_ResourceTypeName[107:137],
-	_ResourceTypeName[137:170],
+	_ResourceTypeName[22:36],
+	_ResourceTypeName[36:69],
+	_ResourceTypeName[69:110],
+	_ResourceTypeName[110:141],
+	_ResourceTypeName[141:173],
+	_ResourceTypeName[173:199],
+	_ResourceTypeName[199:224],
+	_ResourceTypeName[224:254],
+	_ResourceTypeName[254:277],
+	_ResourceTypeName[277:310],
+	_ResourceTypeName[310:333],
 }
 
 // ResourceTypeString retrieves an enum value from the enum constants string name.
