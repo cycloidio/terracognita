@@ -6,7 +6,7 @@ require (
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/aws/aws-sdk-go v1.35.9
 	github.com/chr4/pwgen v1.1.0
-	github.com/cycloidio/tfdocs v0.0.0-20200111145532-e6a80a93d7cc
+	github.com/cycloidio/tfdocs v0.0.0-20201106154358-49ea9e6f45e4
 	github.com/go-kit/kit v0.9.0
 	github.com/golang/mock v1.4.4
 	github.com/hashicorp/go-azure-helpers v0.12.0
