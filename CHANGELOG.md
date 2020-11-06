@@ -8,6 +8,8 @@
   ([PR #128](https://github.com/cycloidio/terracognita/pull/128))
 - cli option to deactivate interpolation
   ([PR #133](https://github.com/cycloidio/terracognita/pull/133))
+- AWS support for profile/config
+  ([Issue #48](https://github.com/cycloidio/terracognita/issues/48))
 
 ### Changed
 
@@ -17,7 +19,7 @@
 ### Fixed
 
 - Crashing import by adding an error handling on provider errors
-  ([issue #138](https://github.com/cycloidio/terracognita/issues/138))
+  ([Issue #138](https://github.com/cycloidio/terracognita/issues/138))
 
 ## [0.5.1] _2020-07-17_
 
