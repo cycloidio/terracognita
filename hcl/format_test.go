@@ -133,12 +133,12 @@ func TestFormat(t *testing.T) {
 			in: []byte(`
 			"resource" "aws_instance" "name" {
 				"env" = "value and ${this.must.stay}"
-				"role" = "$${this.is.a-role}"
+				"role" = ["$${this.is.a-role}","$${this.is.a-role2}","{value}"]
 			}`),
 			out: []byte(`
 			resource "aws_instance" "name" {
 				env = "value and ${this.must.stay}"
-				role = this.is.a-role
+				role = [this.is.a-role,this.is.a-role2,"{value}"]
 			}`),
 		},
 	}

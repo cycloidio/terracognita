@@ -18,13 +18,13 @@ If you are interested in contributing to Terracognita or simply curious about wh
 
 ## Cloud providers
 
-Terracognita currently imports AWS, GCP and AzureRM cloud provider as Terraform (0.12.26) resource/state.
+Terracognita currently imports AWS, GCP and AzureRM cloud provider as Terraform (0.13.5) resource/state.
 Please see the following versions as follow:
 
 Providers:
- * AWS: 2.65.0
- * AzureRM: 2.13.0
- * GCP: 3.25.0
+ * AWS: 3.1.0
+ * AzureRM: 2.34.0
+ * GCP: 3.40.0
 
 ## Installation
 

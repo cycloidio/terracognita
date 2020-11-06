@@ -9,8 +9,8 @@ import (
 	"github.com/cycloidio/terracognita/provider"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	tfgoogle "github.com/hashicorp/terraform-provider-google/google"
 	"github.com/pkg/errors"
-	tfgoogle "github.com/terraform-providers/terraform-provider-google/google"
 )
 
 type google struct {

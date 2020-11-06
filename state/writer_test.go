@@ -168,12 +168,12 @@ func TestSync(t *testing.T) {
          ],
          "mode":"managed",
          "name":"name",
-         "provider":"provider.aws",
+      	 "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
          "type":"aws_iam_user"
       }
    ],
    "serial":0,
-   "terraform_version":"0.12.26",
+   "terraform_version":"0.13.5",
    "version":4
 }`
 		)
@@ -228,7 +228,7 @@ func TestDependencies(t *testing.T) {
 			sgr    = "aws_security_group_rule"
 			state  = `{
   "version": 4,
-  "terraform_version": "0.12.26",
+  "terraform_version": "0.13.5",
   "serial": 0,
   "lineage": "lineage",
   "outputs": {},
@@ -237,7 +237,7 @@ func TestDependencies(t *testing.T) {
       "mode": "managed",
       "type": "aws_security_group",
       "name": "sg",
-      "provider": "provider.aws",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
       "instances": [
         {
           "schema_version": 1,
@@ -265,7 +265,7 @@ func TestDependencies(t *testing.T) {
       "mode": "managed",
       "type": "aws_security_group_rule",
       "name": "sgrule",
-      "provider": "provider.aws",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
       "instances": [
         {
           "schema_version": 2,
@@ -365,7 +365,7 @@ func TestDependencies(t *testing.T) {
 			sgr    = "aws_security_group_rule"
 			state  = `{
   "version": 4,
-  "terraform_version": "0.12.26",
+  "terraform_version": "0.13.5",
   "serial": 0,
   "lineage": "lineage",
   "outputs": {},
@@ -374,7 +374,7 @@ func TestDependencies(t *testing.T) {
       "mode": "managed",
       "type": "aws_security_group",
       "name": "sg",
-      "provider": "provider.aws",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
       "instances": [
         {
           "schema_version": 1,
@@ -402,7 +402,7 @@ func TestDependencies(t *testing.T) {
       "mode": "managed",
       "type": "aws_security_group_rule",
       "name": "sgrule",
-      "provider": "provider.aws",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
       "instances": [
         {
           "schema_version": 2,

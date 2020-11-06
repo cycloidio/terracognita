@@ -21,7 +21,7 @@ var (
 			// `$${a.b.c}` is the representation of HCL V1 interpolation passed
 			// trough hcl2/hclwrite. We need to change it to `a.b.c` to be HCL2
 			// compliant interpolation side.
-			match:   regexp.MustCompile(`"\$\${(.+)\.(.+)\.(.+)}"`),
+			match:   regexp.MustCompile(`"\$\${([^$}{]+)\.([^$}{]+)\.([^$}{]+)}"`),
 			replace: []byte(`$1.$2.$3`),
 		},
 		{
