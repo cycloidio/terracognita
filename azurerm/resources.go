@@ -20,6 +20,7 @@ const (
 	VirtualDesktopHostPool
 	VirtualDesktopApplicationGroup
 	LogicAppTriggerCustom
+	LogicAppActionCustom
 	LogicAppWorkflow
 	NetworkInterface
 	NetworkSecurityGroup
@@ -37,6 +38,7 @@ var (
 		VirtualNetwork:                 cacheVirtualNetworks,
 		Subnet:                         subnets,
 		LogicAppTriggerCustom:          logicAppTriggerCustoms,
+		LogicAppActionCustom:           logicAppActionCustoms,
 		LogicAppWorkflow:               logicAppWorkflows,
 		NetworkInterface:               networkInterfaces,
 		NetworkSecurityGroup:           networkSecurityGroups,
@@ -198,6 +200,33 @@ func logicAppTriggerCustoms(ctx context.Context, a *azurerm, resourceType string
 		for _, trigger := range triggers {
 			r := provider.NewResource(*trigger.ID, resourceType, a)
 			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func logicAppActionCustoms(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	appWorkflows, err := a.azurer.ListWorkflows(ctx, nil, "")
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list logic app workflows from reader")
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, appWorkflow := range appWorkflows {
+		runs, err := a.azurer.ListWorkflowRuns(ctx, *appWorkflow.Name, nil, "")
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list workflow runs from reader")
+		}
+
+		for _, run := range runs {
+			actions, err := a.azurer.ListWorkflowRunActions(ctx, *appWorkflow.Name, *run.Name, nil, "")
+			if err != nil {
+				return nil, errors.Wrap(err, "unable to list workflow run actions from reader")
+			}
+			for _, action := range actions {
+				r := provider.NewResource(*action.ID, resourceType, a)
+				resources = append(resources, r)
+			}
 		}
 	}
 	return resources, nil
