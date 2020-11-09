@@ -13,6 +13,7 @@ var azureAPIs = []AzureAPI{
 	AzureAPI{API: "compute", APIVersion: "2019-07-01"},
 	AzureAPI{API: "network", APIVersion: "2019-06-01"},
 	AzureAPI{API: "desktopvirtualization", APIVersion: "2019-12-10", IsPreview: true},
+	AzureAPI{API: "logic", APIVersion: "2019-05-01"},
 }
 
 var functions = []Function{
@@ -29,6 +30,16 @@ var functions = []Function{
 	Function{Resource: "VirtualMachineScaleSet", API: "compute", ResourceGroup: true},
 	Function{Resource: "HostPool", ListFunction: "ListByResourceGroup", API: "desktopvirtualization", ResourceGroup: true},
 	Function{Resource: "ApplicationGroup", ListFunction: "ListByResourceGroup", API: "desktopvirtualization", ResourceGroup: true, ExtraArgs: []Arg{
+		Arg{
+			Name: "filter",
+			Type: "string",
+		},
+	}},
+	Function{Resource: "Workflow", ListFunction: "ListByResourceGroup", API: "logic", ResourceGroup: true, ExtraArgs: []Arg{
+		Arg{
+			Name: "top",
+			Type: "*int32",
+		},
 		Arg{
 			Name: "filter",
 			Type: "string",

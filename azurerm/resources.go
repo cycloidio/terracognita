@@ -19,6 +19,7 @@ const (
 	Subnet
 	VirtualDesktopHostPool
 	VirtualDesktopApplicationGroup
+	LogicAppWorkflow
 	NetworkInterface
 	NetworkSecurityGroup
 	VirtualMachine
@@ -34,6 +35,7 @@ var (
 		VirtualMachine:                 virtualMachines,
 		VirtualNetwork:                 cacheVirtualNetworks,
 		Subnet:                         subnets,
+		LogicAppWorkflow:               logicAppWorkflows,
 		NetworkInterface:               networkInterfaces,
 		NetworkSecurityGroup:           networkSecurityGroups,
 		VirtualMachineScaleSet:         virtualMachineScaleSets,
@@ -161,6 +163,19 @@ func virtualApplicationGroups(ctx context.Context, a *azurerm, resourceType stri
 	resources := make([]provider.Resource, 0, len(applicationGroups))
 	for _, applicationGroup := range applicationGroups {
 		r := provider.NewResource(*applicationGroup.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func logicAppWorkflows(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	appWorkflows, err := a.azurer.ListWorkflows(ctx, nil, "")
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list logic app workflows from reader")
+	}
+	resources := make([]provider.Resource, 0, len(appWorkflows))
+	for _, appWorklow := range appWorkflows {
+		r := provider.NewResource(*appWorklow.ID, resourceType, a)
 		resources = append(resources, r)
 	}
 	return resources, nil
