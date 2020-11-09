@@ -45,6 +45,20 @@ var functions = []Function{
 			Type: "string",
 		},
 	}},
+	Function{Resource: "WorkflowTrigger", API: "logic", ResourceGroup: true, ExtraArgs: []Arg{
+		Arg{
+			Name: "workflowName",
+			Type: "string",
+		},
+		Arg{
+			Name: "top",
+			Type: "*int32",
+		},
+		Arg{
+			Name: "filter",
+			Type: "string",
+		},
+	}},
 }
 
 func main() {

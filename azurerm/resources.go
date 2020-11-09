@@ -19,6 +19,7 @@ const (
 	Subnet
 	VirtualDesktopHostPool
 	VirtualDesktopApplicationGroup
+	LogicAppTriggerCustom
 	LogicAppWorkflow
 	NetworkInterface
 	NetworkSecurityGroup
@@ -35,6 +36,7 @@ var (
 		VirtualMachine:                 virtualMachines,
 		VirtualNetwork:                 cacheVirtualNetworks,
 		Subnet:                         subnets,
+		LogicAppTriggerCustom:          logicAppTriggerCustoms,
 		LogicAppWorkflow:               logicAppWorkflows,
 		NetworkInterface:               networkInterfaces,
 		NetworkSecurityGroup:           networkSecurityGroups,
@@ -177,6 +179,26 @@ func logicAppWorkflows(ctx context.Context, a *azurerm, resourceType string, fil
 	for _, appWorklow := range appWorkflows {
 		r := provider.NewResource(*appWorklow.ID, resourceType, a)
 		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func logicAppTriggerCustoms(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	appWorkflows, err := a.azurer.ListWorkflows(ctx, nil, "")
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list logic app workflows from reader")
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, appWorkflow := range appWorkflows {
+		triggers, err := a.azurer.ListWorkflowTriggers(ctx, *appWorkflow.Name, nil, "")
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list logic app trigger HTTP requests from reader")
+		}
+		for _, trigger := range triggers {
+			r := provider.NewResource(*trigger.ID, resourceType, a)
+			resources = append(resources, r)
+		}
 	}
 	return resources, nil
 }
