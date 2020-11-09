@@ -18,12 +18,22 @@ var azureAPIs = []AzureAPI{
 var functions = []Function{
 	Function{Resource: "VirtualMachine", API: "compute", ResourceGroup: true},
 	Function{Resource: "VirtualNetwork", API: "network", ResourceGroup: true},
-	Function{Resource: "Subnet", API: "network", ResourceGroup: true, ExtraArgs: []string{"virtualNetworkName"}},
+	Function{Resource: "Subnet", API: "network", ResourceGroup: true, ExtraArgs: []Arg{
+		Arg{
+			Name: "virtualNetworkName",
+			Type: "string",
+		},
+	}},
 	Function{Resource: "Interface", API: "network", ResourceGroup: true},
 	Function{Resource: "SecurityGroup", API: "network", ResourceGroup: true},
 	Function{Resource: "VirtualMachineScaleSet", API: "compute", ResourceGroup: true},
 	Function{Resource: "HostPool", ListFunction: "ListByResourceGroup", API: "desktopvirtualization", ResourceGroup: true},
-	Function{Resource: "ApplicationGroup", ListFunction: "ListByResourceGroup", API: "desktopvirtualization", ResourceGroup: true, ExtraArgs: []string{"filter"}},
+	Function{Resource: "ApplicationGroup", ListFunction: "ListByResourceGroup", API: "desktopvirtualization", ResourceGroup: true, ExtraArgs: []Arg{
+		Arg{
+			Name: "filter",
+			Type: "string",
+		},
+	}},
 }
 
 func main() {
