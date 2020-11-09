@@ -18,6 +18,7 @@ const (
 	ResourceGroup ResourceType = iota
 	Subnet
 	VirtualDesktopHostPool
+	VirtualDesktopApplicationGroup
 	NetworkInterface
 	NetworkSecurityGroup
 	VirtualMachine
@@ -29,14 +30,15 @@ type rtFn func(ctx context.Context, a *azurerm, resourceType string, filters *fi
 
 var (
 	resources = map[ResourceType]rtFn{
-		ResourceGroup:          resourceGroup,
-		VirtualMachine:         virtualMachines,
-		VirtualNetwork:         cacheVirtualNetworks,
-		Subnet:                 subnets,
-		NetworkInterface:       networkInterfaces,
-		NetworkSecurityGroup:   networkSecurityGroups,
-		VirtualMachineScaleSet: virtualMachineScaleSets,
-		VirtualDesktopHostPool: virtualDesktopHostPools,
+		ResourceGroup:                  resourceGroup,
+		VirtualMachine:                 virtualMachines,
+		VirtualNetwork:                 cacheVirtualNetworks,
+		Subnet:                         subnets,
+		NetworkInterface:               networkInterfaces,
+		NetworkSecurityGroup:           networkSecurityGroups,
+		VirtualMachineScaleSet:         virtualMachineScaleSets,
+		VirtualDesktopApplicationGroup: virtualApplicationGroups,
+		VirtualDesktopHostPool:         virtualDesktopHostPools,
 	}
 )
 
@@ -144,6 +146,21 @@ func virtualDesktopHostPools(ctx context.Context, a *azurerm, resourceType strin
 	resources := make([]provider.Resource, 0, len(pools))
 	for _, hostPool := range pools {
 		r := provider.NewResource(*hostPool.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func virtualApplicationGroups(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	// the second argument; "filter" is set to "" because "Valid properties for filtering are applicationGroupType."
+	// https://godoc.org/github.com/Azure/azure-sdk-for-go/services/preview/desktopvirtualization/mgmt/2019-12-10-preview/desktopvirtualization#ApplicationGroupsClient.ListByResourceGroup
+	applicationGroups, err := a.azurer.ListApplicationGroups(ctx, "")
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list application groups from reader")
+	}
+	resources := make([]provider.Resource, 0, len(applicationGroups))
+	for _, applicationGroup := range applicationGroups {
+		r := provider.NewResource(*applicationGroup.ID, resourceType, a)
 		resources = append(resources, r)
 	}
 	return resources, nil

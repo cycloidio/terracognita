@@ -23,6 +23,7 @@ var functions = []Function{
 	Function{Resource: "SecurityGroup", API: "network", ResourceGroup: true},
 	Function{Resource: "VirtualMachineScaleSet", API: "compute", ResourceGroup: true},
 	Function{Resource: "HostPool", ListFunction: "ListByResourceGroup", API: "desktopvirtualization", ResourceGroup: true},
+	Function{Resource: "ApplicationGroup", ListFunction: "ListByResourceGroup", API: "desktopvirtualization", ResourceGroup: true, ExtraArgs: []string{"filter"}},
 }
 
 func main() {
