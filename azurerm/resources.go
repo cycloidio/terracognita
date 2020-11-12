@@ -25,6 +25,7 @@ const (
 	NetworkInterface
 	NetworkSecurityGroup
 	VirtualMachine
+	VirtualMachineExtension
 	VirtualMachineScaleSet
 	VirtualNetwork
 )
@@ -35,6 +36,7 @@ var (
 	resources = map[ResourceType]rtFn{
 		ResourceGroup:                  resourceGroup,
 		VirtualMachine:                 virtualMachines,
+		VirtualMachineExtension:        virtualMachineExtensions,
 		VirtualNetwork:                 cacheVirtualNetworks,
 		Subnet:                         subnets,
 		LogicAppTriggerCustom:          logicAppTriggerCustoms,
@@ -227,6 +229,27 @@ func logicAppActionCustoms(ctx context.Context, a *azurerm, resourceType string,
 				r := provider.NewResource(*action.ID, resourceType, a)
 				resources = append(resources, r)
 			}
+		}
+	}
+	return resources, nil
+}
+
+func virtualMachineExtensions(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	virtualMachines, err := a.azurer.ListVirtualMachines(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list virtual machines from reader")
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, virtualMachine := range virtualMachines {
+		extensions, err := a.azurer.ListVirtualMachineExtensions(ctx, *virtualMachine.Name, "")
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list virtual machine extensions from reader")
+		}
+
+		for _, extension := range extensions {
+			r := provider.NewResource(*extension.ID, resourceType, a)
+			resources = append(resources, r)
 		}
 	}
 	return resources, nil
