@@ -65,6 +65,9 @@ func virtualMachines(ctx context.Context, a *azurerm, resourceType string, filte
 	resources := make([]provider.Resource, 0, len(virtualMachines))
 	for _, virtualMachine := range virtualMachines {
 		r := provider.NewResource(*virtualMachine.ID, resourceType, a)
+		if err := r.Data().Set("name", *virtualMachine.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the virtual machine '%s'", *virtualMachine.Name)
+		}
 		resources = append(resources, r)
 	}
 	return resources, nil
@@ -180,22 +183,27 @@ func logicAppWorkflows(ctx context.Context, a *azurerm, resourceType string, fil
 		return nil, errors.Wrap(err, "unable to list logic app workflows from reader")
 	}
 	resources := make([]provider.Resource, 0, len(appWorkflows))
-	for _, appWorklow := range appWorkflows {
-		r := provider.NewResource(*appWorklow.ID, resourceType, a)
+	for _, appWorkflow := range appWorkflows {
+		r := provider.NewResource(*appWorkflow.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
+		if err := r.Data().Set("name", *appWorkflow.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the app workflow '%s'", *appWorkflow.Name)
+		}
 		resources = append(resources, r)
 	}
 	return resources, nil
 }
 
 func logicAppTriggerCustoms(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	appWorkflows, err := a.azurer.ListWorkflows(ctx, nil, "")
+	appWorkflowNames, err := getWorkflowNames(ctx, a, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list logic app workflows from reader")
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, appWorkflow := range appWorkflows {
-		triggers, err := a.azurer.ListWorkflowTriggers(ctx, *appWorkflow.Name, nil, "")
+	for _, appWorkflowName := range appWorkflowNames {
+		triggers, err := a.azurer.ListWorkflowTriggers(ctx, appWorkflowName, nil, "")
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list logic app trigger HTTP requests from reader")
 		}
@@ -208,20 +216,20 @@ func logicAppTriggerCustoms(ctx context.Context, a *azurerm, resourceType string
 }
 
 func logicAppActionCustoms(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	appWorkflows, err := a.azurer.ListWorkflows(ctx, nil, "")
+	appWorkflowNames, err := getWorkflowNames(ctx, a, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list logic app workflows from reader")
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, appWorkflow := range appWorkflows {
-		runs, err := a.azurer.ListWorkflowRuns(ctx, *appWorkflow.Name, nil, "")
+	for _, appWorkflowName := range appWorkflowNames {
+		runs, err := a.azurer.ListWorkflowRuns(ctx, appWorkflowName, nil, "")
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list workflow runs from reader")
 		}
 
 		for _, run := range runs {
-			actions, err := a.azurer.ListWorkflowRunActions(ctx, *appWorkflow.Name, *run.Name, nil, "")
+			actions, err := a.azurer.ListWorkflowRunActions(ctx, appWorkflowName, *run.Name, nil, "")
 			if err != nil {
 				return nil, errors.Wrap(err, "unable to list workflow run actions from reader")
 			}
@@ -235,14 +243,14 @@ func logicAppActionCustoms(ctx context.Context, a *azurerm, resourceType string,
 }
 
 func virtualMachineExtensions(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	virtualMachines, err := a.azurer.ListVirtualMachines(ctx)
+	virtualMachineNames, err := getVirtualMachineNames(ctx, a, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual machines from reader")
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, virtualMachine := range virtualMachines {
-		extensions, err := a.azurer.ListVirtualMachineExtensions(ctx, *virtualMachine.Name, "")
+	for _, virtualMachineName := range virtualMachineNames {
+		extensions, err := a.azurer.ListVirtualMachineExtensions(ctx, virtualMachineName, "")
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list virtual machine extensions from reader")
 		}
