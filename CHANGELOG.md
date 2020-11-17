@@ -10,6 +10,8 @@
   ([PR #133](https://github.com/cycloidio/terracognita/pull/133))
 - AWS support for profile/config
   ([Issue #48](https://github.com/cycloidio/terracognita/issues/48))
+- Azure Virtual Desktop resources
+  ([PR #145](https://github.com/cycloidio/terracognita/pull/145))
 
 ### Changed
 
