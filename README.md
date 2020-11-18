@@ -33,7 +33,7 @@ Providers:
 Visit the [releases](https://github.com/cycloidio/terracognita/releases) page to select your system, architecture and version you need. Then:
 
 ```shell
-$ curl -L https://github.com/cycloidio/terracognita/releases/download/v0.3.0/terracognita-linux-amd64.tar.gz -o terracognita-linux-amd64.tar.gz
+$ curl -L https://github.com/cycloidio/terracognita/releases/download/v0.5.1/terracognita-linux-amd64.tar.gz -o terracognita-linux-amd64.tar.gz
 $ tar -xf terracognita-linux-amd64.tar.gz
 $ chmod u+x terracognita-linux-amd64
 $ sudo mv terracognita-linux-amd64 /usr/local/bin/terracognita
