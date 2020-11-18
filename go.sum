@@ -248,8 +248,8 @@ github.com/cpuguy83/go-md2man/v2 v2.0.0/go.mod h1:maD7wRr/U5Z6m/iR4s+kqSMx2CaBsr
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/cycloidio/terraform v0.13.5-cy h1:SFRumRQiIQ83RmA5e52q8PJ3VjSBzk+ZVtyVypBaxDs=
 github.com/cycloidio/terraform v0.13.5-cy/go.mod h1:1H1qcnppNc/bBGc7poOfnmmBeQMlF0stEN3haY3emCU=
-github.com/cycloidio/tfdocs v0.0.0-20200111145532-e6a80a93d7cc h1:wJpFr2AiXfsVCCBPOYQUYvEfT+2cAgCuipgfB9hoXVw=
-github.com/cycloidio/tfdocs v0.0.0-20200111145532-e6a80a93d7cc/go.mod h1:FKvkOvkwOg6hl3uyCnNbLiANc6BMD/ljQAU8Nf8/X8E=
+github.com/cycloidio/tfdocs v0.0.0-20201106154358-49ea9e6f45e4 h1:MaRqoSVnOhK9aDUXHbpPlwUXDph4cJEKGkwXbfYuJ0M=
+github.com/cycloidio/tfdocs v0.0.0-20201106154358-49ea9e6f45e4/go.mod h1:FKvkOvkwOg6hl3uyCnNbLiANc6BMD/ljQAU8Nf8/X8E=
 github.com/davecgh/go-spew v0.0.0-20151105211317-5215b55f46b2/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=

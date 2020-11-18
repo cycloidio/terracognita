@@ -18,7 +18,7 @@ const (
 		"github.com/pkg/errors"
 
 		{{ range .AzureAPIs -}}
-		"github.com/Azure/azure-sdk-for-go/services/{{ .API }}/mgmt/{{ .APIVersion }}/{{ .API }}"
+		"github.com/Azure/azure-sdk-for-go/services/{{ if .IsPreview }}preview/{{ end }}{{ .API }}/mgmt/{{ .APIVersion }}{{ if .IsPreview }}-preview{{ end }}/{{ .API }}"
 		{{ end }}
 	)
 	`
@@ -26,11 +26,11 @@ const (
 	// functionTmpl it's the implementation of a reader function
 	functionTmpl = `
 	// List{{ .Name }} returns a list of {{ .Name }} within a subscription {{ if .Location }}and a location {{ end }}{{ if .ResourceGroup }}and a resource group {{ end }}
-	func (ar *AzureReader) List{{ .Name }}(ctx context.Context{{ range .ExtraArgs }},{{ . }} string{{ end }}) ([]{{ .API }}.{{ .Resource }}, error) {
+	func (ar *AzureReader) List{{ .Name }}(ctx context.Context{{ range .ExtraArgs }},{{ .Name }} {{ .Type }} {{ end }}) ([]{{ .API }}.{{ .Resource }}, error) {
 		client := {{ .API }}.New{{ .Resource }}sClient(ar.config.SubscriptionID)
 		client.Authorizer = ar.authorizer
 
-		output, err := client.{{ .ListFunction }}(ctx{{ if .Location }}, ar.GetLocation(){{ end }}{{ if .ResourceGroup }}, ar.GetResourceGroupName(){{ end }}{{ range .ExtraArgs }},{{ . }}{{ end }})
+		output, err := client.{{ .ListFunction }}(ctx{{ if .Location }}, ar.GetLocation(){{ end }}{{ if .ResourceGroup }}, ar.GetResourceGroupName(){{ end }}{{ range .ExtraArgs }},{{ .Name }}{{ end }})
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list {{ .API }}.{{ .Resource }} from Azure APIs")
 		}
@@ -70,6 +70,16 @@ func init() {
 	}
 }
 
+// Arg can be used to define
+// extra args to pass to the generated
+// functions
+type Arg struct {
+	// Name of the arg
+	Name string
+	// Type of the arg
+	Type string
+}
+
 // AzureAPI is the definition of one of the Azure APIs
 type AzureAPI struct {
 	// API is used to determine the
@@ -81,6 +91,11 @@ type AzureAPI struct {
 	// Azure API Version to use
 	// ex: 2019-07-01
 	APIVersion string
+
+	// IsPreview defines if the API is a preview
+	// functionality
+	// https://docs.microsoft.com/en-us/azure/search/search-api-preview
+	IsPreview bool
 }
 
 // Function is the definition of one of the functions
@@ -113,7 +128,7 @@ type Function struct {
 	Iterator bool
 
 	// ExtraArgs should be specified if extra arguments are required for the list function
-	ExtraArgs []string
+	ExtraArgs []Arg
 }
 
 // Execute uses the fnTmpl to interpolate f
