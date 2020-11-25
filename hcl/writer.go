@@ -13,8 +13,9 @@ import (
 	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/writer"
-	"github.com/hashicorp/hcl2/hclwrite"
+	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/pkg/errors"
+	"github.com/zclconf/go-cty/cty"
 	cjson "github.com/zclconf/go-cty/cty/json"
 )
 
@@ -130,22 +131,7 @@ func (w *Writer) Sync() error {
 					// we need to add a dedicated block for each object instead of having
 					// one block for the whole list
 					if value.Type().IsTupleType() {
-						iter := value.ElementIterator()
-						for iter.Next() {
-							_, val := iter.Element()
-							if val.Type().IsPrimitiveType() {
-								// the value is not an unconsistent object
-								bbody.SetAttributeValue(attr, value)
-								continue
-							}
-							obj := bbody.AppendNewBlock(attr, nil)
-							bobj := obj.Body()
-							ei := val.ElementIterator()
-							for ei.Next() {
-								kei, vei := ei.Element()
-								bobj.SetAttributeValue(kei.AsString(), vei)
-							}
-						}
+						writeTuple(body, bbody, attr, value)
 					} else {
 						bbody.SetAttributeValue(attr, value)
 					}
@@ -163,6 +149,54 @@ func (w *Writer) Sync() error {
 	w.writer.Write(formattedBytes)
 
 	return nil
+}
+
+// writeTuple will write anything that's already been identified as IsTupleType
+func writeTuple(pbody, body *hclwrite.Body, attr string, value cty.Value) {
+	// When it's empty it'll not be printed
+	// on the ElementIterator so it would be ignored
+	// and if it's on this stage it's required to be
+	// printed
+	if value.LengthInt() == 0 {
+		body.SetAttributeValue(attr, value)
+	}
+	iter := value.ElementIterator()
+	for iter.Next() {
+		_, val := iter.Element()
+		if val.Type().IsPrimitiveType() {
+			// the value is not an unconsistent object
+			// it's basically [1,2,3]
+			body.SetAttributeValue(attr, value)
+			continue
+		}
+
+		newBody := body
+
+		// only create a new body if we have a name for it
+		if attr != "" {
+			obj := body.AppendNewBlock(attr, nil)
+			newBody = obj.Body()
+		}
+
+		iterator := val.ElementIterator()
+		for iterator.Next() {
+			kei, vei := iterator.Element()
+
+			if vei.Type().IsTupleType() {
+				// If it was an object it has to be
+				// appended to the same one
+				if val.Type().IsObjectType() {
+					writeTuple(pbody, newBody, kei.AsString(), vei)
+				} else {
+					tobj := newBody.AppendNewBlock(kei.AsString(), nil)
+					btobj := tobj.Body()
+					writeTuple(newBody, btobj, "", vei)
+				}
+			} else {
+				newBody.SetAttributeValue(kei.AsString(), vei)
+			}
+		}
+	}
 }
 
 // Interpolate replaces the hardcoded resources link
