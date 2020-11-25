@@ -495,7 +495,9 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 			// Example would be aws_security_group
 			if v.Type == schema.TypeSet {
 				s, ok := cfgr.GetOk(kk)
-				if !ok {
+				// If the value is Required we need to add it
+				// even if it's not sent
+				if (!ok || s == nil) && !v.Required {
 					continue
 				}
 
@@ -541,10 +543,13 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 			continue
 		}
 
+		// Format the ConflictsWith so they are "standard"
+		conflictsWith := formatConflictsWith(v.ConflictsWith)
+
 		// A value in which this one conflicts has been set before
 		// so we should no set this one as it'll raise an error of
 		// `conflicts with *` on Terraform
-		if hasConflict(res, v.ConflictsWith) {
+		if hasConflict(res, conflictsWith) {
 			continue
 		}
 
@@ -558,8 +563,8 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 		// If the ConflictsWith has values we store them on the
 		// conflicts map so none of those attributes is added after
 		// this one has been added
-		if len(v.ConflictsWith) != 0 {
-			for _, c := range v.ConflictsWith {
+		if len(conflictsWith) != 0 {
+			for _, c := range conflictsWith {
 				conflicts[c] = k
 			}
 		}
@@ -577,6 +582,18 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 		}
 	}
 	return res
+}
+
+// formatConflictsWith get's the last element of the string, the
+// cws look like this sometimes '["name", "a.name", "a.0.name"]'
+// and as we always need the "name" from all of them we just have
+// to abstract the last element
+func formatConflictsWith(cws []string) []string {
+	for i, cw := range cws {
+		aux := strings.Split(cw, ".")
+		cws[i] = aux[len(aux)-1]
+	}
+	return cws
 }
 
 // hasConflict checks if any of the keys is present on the res
