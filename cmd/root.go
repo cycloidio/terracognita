@@ -5,17 +5,21 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path"
 	"strings"
 
+	"github.com/adrg/xdg"
 	"github.com/cycloidio/terracognita/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var (
-	hclOut                    io.Writer
-	stateOut                  io.Writer
-	closeOut                  []io.Closer
+	hclOut   io.Writer
+	stateOut io.Writer
+
+	closeOut = make([]io.Closer, 0, 0)
+
 	include, exclude, targets []string
 	logsOut                   io.Writer
 
@@ -23,19 +27,31 @@ var (
 	RootCmd = &cobra.Command{
 		Use:   "terracognita",
 		Short: "Reads from Providers and generates a Terraform configuration",
-		Long:  "Reads from Providers and generates a Terraform configuration, all the flags can be used also with ENV (ex: --access-key == ACCESS_KEY)",
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		Long:  "Reads from Providers and generates a Terraform configuration, all the flags can be used also with ENV (ex: --aws-access-key == AWS_ACCESS_KEY)",
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			err := os.MkdirAll(path.Dir(viper.GetString("log-file")), 0700)
+			if err != nil {
+				return err
+			}
+			logFile, err := os.OpenFile(viper.GetString("log-file"), os.O_APPEND|os.O_TRUNC|os.O_RDWR|os.O_CREATE, 0644)
+			if err != nil {
+				return err
+			}
+			closeOut = append(closeOut, logFile)
 			// Initialize the logs by setting by default the logs
 			// to Stdout, but if 'v' or 'd' is defined the logger
 			// will be initialized and structured logs will be used
 			// and if 'd' it's defined TF_LOG will be used too
 			if viper.GetBool("verbose") || viper.GetBool("debug") {
 				logsOut = ioutil.Discard
-				log.Init(os.Stdout, viper.GetBool("debug"))
+				w := io.MultiWriter(os.Stdout, logFile)
+				log.Init(w, viper.GetBool("debug"))
 			} else {
 				logsOut = os.Stdout
-				log.Init(ioutil.Discard, false)
+				log.Init(logFile, false)
 			}
+
+			return nil
 		},
 	}
 )
@@ -52,7 +68,6 @@ func requiredStringFlags(names ...string) error {
 
 func preRunEOutput(cmd *cobra.Command, args []string) error {
 	// Initializes/Validates the HCL and TFSTATE flags
-	closeOut = make([]io.Closer, 0)
 	if viper.GetString("hcl") != "" {
 		f, err := os.OpenFile(viper.GetString("hcl"), os.O_APPEND|os.O_TRUNC|os.O_RDWR|os.O_CREATE, 0644)
 		if err != nil {
@@ -114,6 +129,9 @@ func init() {
 
 	RootCmd.PersistentFlags().BoolP("debug", "d", false, "Activate the debug mode wich includes TF logs via TF_LOG=TRACE|DEBUG|INFO|WARN|ERROR configuration https://www.terraform.io/docs/internals/debugging.html")
 	_ = viper.BindPFlag("debug", RootCmd.PersistentFlags().Lookup("debug"))
+
+	RootCmd.PersistentFlags().String("log-file", path.Join(xdg.CacheHome, "terracognita", "terracognita.log"), "Write the logs with -v to this destination")
+	_ = viper.BindPFlag("log-file", RootCmd.PersistentFlags().Lookup("log-file"))
 
 	RootCmd.PersistentFlags().BoolP("interpolate", "", true, "Activate the interpolation for the HCL and the dependencies building for the State file")
 	_ = viper.BindPFlag("interpolate", RootCmd.PersistentFlags().Lookup("interpolate"))
