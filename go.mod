@@ -3,6 +3,7 @@ module github.com/cycloidio/terracognita
 require (
 	github.com/Azure/azure-sdk-for-go v46.4.0+incompatible
 	github.com/Azure/go-autorest/autorest v0.11.10
+	github.com/adrg/xdg v0.2.3
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/aws/aws-sdk-go v1.35.9
 	github.com/chr4/pwgen v1.1.0
