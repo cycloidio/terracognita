@@ -12,6 +12,8 @@
   ([Issue #48](https://github.com/cycloidio/terracognita/issues/48))
 - Azure Virtual Desktop resources
   ([PR #145](https://github.com/cycloidio/terracognita/pull/145))
+- Log File to always write the last -v logs to
+  ([Issue #149](https://github.com/cycloidio/terracognita/issues/149))
 
 ### Changed
 

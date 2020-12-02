@@ -93,7 +93,7 @@ func Import(ctx context.Context, p Provider, hcl, tfstate writer.Writer, f *filt
 				// we filter the error: if it's an error provider side, we continue
 				// the import but we print the error.
 				if errors.Is(err, errcode.ErrProviderAPI) {
-					fmt.Fprintf(out, "\nunable to import resource %s: %s\n", t, err.Error())
+					logger.Log("msg", fmt.Sprintf("unable to import resource %s: %s\n", t, err.Error()))
 				} else {
 					return errors.WithStack(err)
 				}
