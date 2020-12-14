@@ -28,14 +28,6 @@ Providers:
 
 ## Installation
 
-### Install via brew
-
-If you're macOS user and using [Homebrew](https://brew.sh/), you can install via brew command:
-
-```sh
-$ brew install terracognita
-```
-
 ### Binary
 
 Visit the [releases](https://github.com/cycloidio/terracognita/releases) page to select your system, architecture and version you need. To pull the latest release:
@@ -67,6 +59,14 @@ aur/terracognita 1:0.3.0-1 (+0 0.00%)
     Reads from existing Cloud Providers (reverse Terraform) and generates your infrastructure as code on Terraform configuration
 aur/terracognita-git 1:v0.3.0.r27.gdfc5a99-1 (+0 0.00%)
     Reads from existing Cloud Providers (reverse Terraform) and generates your infrastructure as code on Terraform configuration
+```
+
+### Install via brew
+
+If you're macOS user and using [Homebrew](https://brew.sh/), you can install via brew command:
+
+```sh
+$ brew install terracognita
 ```
 
 ## Usage
