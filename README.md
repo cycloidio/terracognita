@@ -55,10 +55,18 @@ There are two entries in the AUR: [terracognita-git](https://aur.archlinux.org/p
 
 ```shell
 $ yay -Ss terracognita
-aur/terracognita 1:0.3.0-1 (+0 0.00%) 
+aur/terracognita 1:0.3.0-1 (+0 0.00%)
     Reads from existing Cloud Providers (reverse Terraform) and generates your infrastructure as code on Terraform configuration
-aur/terracognita-git 1:v0.3.0.r27.gdfc5a99-1 (+0 0.00%) 
+aur/terracognita-git 1:v0.3.0.r27.gdfc5a99-1 (+0 0.00%)
     Reads from existing Cloud Providers (reverse Terraform) and generates your infrastructure as code on Terraform configuration
+```
+
+### Install via brew
+
+If you're macOS user and using [Homebrew](https://brew.sh/), you can install via brew command:
+
+```sh
+$ brew install terracognita
 ```
 
 ## Usage
