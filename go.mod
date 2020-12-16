@@ -1,5 +1,7 @@
 module github.com/cycloidio/terracognita
 
+go 1.15
+
 require (
 	github.com/Azure/azure-sdk-for-go v46.4.0+incompatible
 	github.com/Azure/go-autorest/autorest v0.11.10
@@ -35,5 +37,3 @@ replace github.com/hashicorp/aws-sdk-go-base v0.6.0 => github.com/hashicorp/aws-
 
 // To remove the panic issue of using TF
 replace github.com/hashicorp/terraform => github.com/cycloidio/terraform v0.13.5-cy
-
-go 1.14
