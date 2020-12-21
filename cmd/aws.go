@@ -44,7 +44,7 @@ var (
 
 			// We define aliases so we have an easier access on the code
 			viper.RegisterAlias("access-key", "aws-access-key")
-			viper.RegisterAlias("secret-key", "aws-secret-key")
+			viper.RegisterAlias("secret-key", "aws-secret-access-key")
 			viper.RegisterAlias("session-token", "aws-session-token")
 			viper.RegisterAlias("region", "aws-default-region")
 		},
