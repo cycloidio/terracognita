@@ -45,10 +45,10 @@ import (
 // See:
 //  * https://docs.aws.amazon.com/AWSEC2/latest/APIReference/errors-overview.html#CommonErrors
 //  * https://docs.aws.amazon.com/STS/latest/APIReference/CommonErrors.html
-func New(ctx context.Context, accessKey string, secretKey string, region string, config *aws.Config) (Reader, error) {
+func New(ctx context.Context, accessKey string, secretKey string, region string, sessionToken string, config *aws.Config) (Reader, error) {
 	var c = connector{}
 
-	creds, ec2s, sts, err := configureAWS(accessKey, secretKey)
+	creds, ec2s, sts, err := configureAWS(accessKey, secretKey, sessionToken)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ type serviceConnector struct {
 // a Security Token Service client.
 // The only AWS error code that this function return is
 // * EmptyStaticCreds
-func configureAWS(accessKey string, secretKey string) (*credentials.Credentials, ec2iface.EC2API, stsiface.STSAPI, error) {
+func configureAWS(accessKey, secretKey, token string) (*credentials.Credentials, ec2iface.EC2API, stsiface.STSAPI, error) {
 	/* The default region is only used to (1) get the list of region and
 	 * (2) get the account ID associated with the credentials.
 	 *
@@ -124,7 +124,6 @@ func configureAWS(accessKey string, secretKey string) (*credentials.Credentials,
 	 * not try to establish any connections with AWS services.
 	 */
 	const defaultRegion string = "eu-west-1"
-	var token = ""
 
 	creds := credentials.NewStaticCredentials(accessKey, secretKey, token)
 	_, err := creds.Get()
