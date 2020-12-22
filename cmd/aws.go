@@ -35,6 +35,7 @@ var (
 			viper.BindPFlag("aws-access-key", cmd.Flags().Lookup("aws-access-key"))
 			viper.BindPFlag("aws-secret-access-key", cmd.Flags().Lookup("aws-secret-access-key"))
 			viper.BindPFlag("aws-default-region", cmd.Flags().Lookup("aws-default-region"))
+			viper.BindPFlag("aws-session-token", cmd.Flags().Lookup("aws-session-token"))
 
 			viper.BindPFlag("aws-shared-credentials-file", cmd.Flags().Lookup("aws-shared-credentials-file"))
 			viper.BindPFlag("aws-profile", cmd.Flags().Lookup("aws-profile"))
@@ -43,7 +44,8 @@ var (
 
 			// We define aliases so we have an easier access on the code
 			viper.RegisterAlias("access-key", "aws-access-key")
-			viper.RegisterAlias("secret-key", "aws-secret-key")
+			viper.RegisterAlias("secret-key", "aws-secret-access-key")
+			viper.RegisterAlias("session-token", "aws-session-token")
 			viper.RegisterAlias("region", "aws-default-region")
 		},
 		PostRunE: postRunEOutput,
@@ -70,7 +72,7 @@ var (
 
 			ctx := context.Background()
 
-			awsP, err := aws.NewProvider(ctx, viper.GetString("access-key"), viper.GetString("secret-key"), viper.GetString("region"))
+			awsP, err := aws.NewProvider(ctx, viper.GetString("access-key"), viper.GetString("secret-key"), viper.GetString("region"), viper.GetString("session-token"))
 			if err != nil {
 				return err
 			}
@@ -115,6 +117,7 @@ func init() {
 	// Required flags
 	awsCmd.Flags().String("aws-access-key", "", "Access Key (required)")
 	awsCmd.Flags().String("aws-secret-access-key", "", "Secret Key (required)")
+	awsCmd.Flags().String("aws-session-token", "", "Use to validate the temporary security credentials")
 	awsCmd.Flags().String("aws-default-region", "", "Region to search in, for now * is not supported (required)")
 	awsCmd.Flags().String("aws-shared-credentials-file", "", "Path to the AWS credential path")
 	awsCmd.Flags().String("aws-profile", "", "Name of the Profile to use with the Credentials")
@@ -154,6 +157,10 @@ func loadAWSCredentials() error {
 
 	if !viper.IsSet("secret-key") {
 		viper.Set("secret-key", value.SecretAccessKey)
+	}
+
+	if !viper.IsSet("session-token") {
+		viper.Set("session-token", value.SessionToken)
 	}
 
 	return nil

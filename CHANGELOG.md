@@ -14,6 +14,8 @@
   ([PR #145](https://github.com/cycloidio/terracognita/pull/145))
 - Log File to always write the last -v logs to
   ([Issue #149](https://github.com/cycloidio/terracognita/issues/149))
+- Authentication using AWS session token
+  ([Issue #154](https://github.com/cycloidio/terracognita/issues/154))
 
 ### Changed
 
