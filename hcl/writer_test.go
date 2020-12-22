@@ -111,10 +111,10 @@ func TestHCLWriter_Sync(t *testing.T) {
 			value = map[string]interface{}{
 				"key": "value",
 			}
-			hcl = `resource "type" "name" {
+			hcl = `
+resource "type" "name" {
   key = "value"
 }
-
 `
 		)
 
@@ -124,7 +124,112 @@ func TestHCLWriter_Sync(t *testing.T) {
 		err = hw.Sync()
 		require.NoError(t, err)
 
-		assert.Equal(t, hcl, b.String())
+		assert.Equal(t, strings.Join(strings.Fields(hcl), " "), strings.Join(strings.Fields(b.String()), " "))
+	})
+	t.Run("Slice", func(t *testing.T) {
+		var (
+			b     = &bytes.Buffer{}
+			hw    = hcl.NewWriter(b, &writer.Options{Interpolate: true})
+			value = map[string]interface{}{
+				"ingress": []map[string]interface{}{
+					{
+						"cidr_blocks": []string{"0.0.0.0/0"},
+						"from_port":   80,
+					},
+					{
+						"cidr_blocks": []string{"0.0.0.0/1"},
+						"from_port":   81,
+					},
+				},
+			}
+			hcl = `
+resource "type" "name" {
+  ingress {
+		cidr_blocks = ["0.0.0.0/0"]
+		from_port = 80
+	}
+
+  ingress {
+		cidr_blocks = ["0.0.0.0/1"]
+		from_port = 81
+	}
+}
+`
+		)
+
+		err := hw.Write("type.name", value)
+		require.NoError(t, err)
+
+		err = hw.Sync()
+		require.NoError(t, err)
+
+		assert.Equal(t, strings.Join(strings.Fields(hcl), " "), strings.Join(strings.Fields(b.String()), " "))
+	})
+	t.Run("EmptySlice", func(t *testing.T) {
+		var (
+			b     = &bytes.Buffer{}
+			hw    = hcl.NewWriter(b, &writer.Options{Interpolate: true})
+			value = map[string]interface{}{
+				"ingress": []map[string]interface{}{
+					{
+						"cidr_blocks": []string{},
+						"from_port":   80,
+					},
+				},
+			}
+			hcl = `
+resource "type" "name" {
+  ingress {
+		cidr_blocks = []
+		from_port = 80
+	}
+}
+`
+		)
+
+		err := hw.Write("type.name", value)
+		require.NoError(t, err)
+
+		err = hw.Sync()
+		require.NoError(t, err)
+
+		assert.Equal(t, strings.Join(strings.Fields(hcl), " "), strings.Join(strings.Fields(b.String()), " "))
+	})
+	t.Run("NestedMap", func(t *testing.T) {
+		var (
+			b     = &bytes.Buffer{}
+			hw    = hcl.NewWriter(b, &writer.Options{Interpolate: true})
+			value = map[string]interface{}{
+				"ingress": []map[string]interface{}{
+					{
+						"cidr_blocks": []string{},
+						"from_port": map[string]interface{}{
+							"in":  "vin",
+							"out": "vout",
+						},
+					},
+				},
+			}
+			hcl = `
+resource "type" "name" {
+  ingress {
+		cidr_blocks = []
+		from_port {
+			in = "vin"
+			out = "vout"
+		}
+	}
+}
+`
+		)
+
+		err := hw.Write("type.name", value)
+		require.NoError(t, err)
+
+		err = hw.Sync()
+		require.NoError(t, err)
+
+		assert.Equal(t, strings.Join(strings.Fields(hcl), " "), strings.Join(strings.Fields(b.String()), " "))
 	})
 }
 

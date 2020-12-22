@@ -26,6 +26,8 @@
 
 - Crashing import by adding an error handling on provider errors
   ([Issue #138](https://github.com/cycloidio/terracognita/issues/138))
+- No more issues for HCL2 when generated
+  ([PR #148](https://github.com/cycloidio/terracognita/pull/148))
 
 ## [0.5.1] _2020-07-17_
 
