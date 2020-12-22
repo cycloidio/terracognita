@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.6.0] _2020-12-22_
+
 ### Added
 
 - state dependencies between resources using `dependencies`
@@ -16,6 +18,8 @@
   ([Issue #149](https://github.com/cycloidio/terracognita/issues/149))
 - Authentication using AWS session token
   ([Issue #154](https://github.com/cycloidio/terracognita/issues/154))
+- Support for Homebrew
+  ([Issue #153](https://github.com/cycloidio/terracognita/issues/153))
 
 ### Changed
 
