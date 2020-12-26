@@ -7,6 +7,7 @@
 [![GoDoc](https://godoc.org/github.com/cycloidio/terracognita?status.svg)](https://godoc.org/github.com/cycloidio/terracognita)
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/cycloid-community/terracognita)
 [![AUR package](https://repology.org/badge/version-for-repo/aur/terracognita.svg)](https://repology.org/project/terracognita/versions)
+[![Homebrew](https://img.shields.io/badge/dynamic/json.svg?url=https://formulae.brew.sh/api/formula/terracognita.json&query=$.versions.stable&label=homebrew)](https://formulae.brew.sh/formula/terracognita)
 
 Imports your current Cloud infrastructure to an Infrastructure As Code [Terraform](https://www.terraform.io/) configuration (HCL) or/and to a Terraform State.
 
