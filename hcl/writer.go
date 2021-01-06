@@ -99,6 +99,9 @@ func (w *Writer) Has(key string) (bool, error) {
 // Sync writes the content of the Config to the
 // internal w with the correct format
 func (w *Writer) Sync() error {
+	if err := w.opts.PreSync(w.Config["resource"]); err != nil {
+		return fmt.Errorf("unable to pre-sync the HCL configuration: %w", err)
+	}
 	logger := log.Get()
 	logger = kitlog.With(logger, "func", "writer.Write(HCL)")
 
