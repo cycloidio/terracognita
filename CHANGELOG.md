@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Fixed
+
+- AWS IOpS attribute is only valid for io1 and io2 type
+  ([Issue #157](https://github.com/cycloidio/terracognita/issues/157))
+
 ## [0.6.0] _2020-12-22_
 
 ### Added
