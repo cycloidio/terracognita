@@ -85,7 +85,40 @@ var (
 			}
 
 			var hclW, stateW writer.Writer
-			options := &writer.Options{Interpolate: viper.GetBool("interpolate")}
+			options := &writer.Options{
+				Interpolate: viper.GetBool("interpolate"),
+				PreSync: func(i interface{}) error {
+					for rt, resource := range i.(map[string]map[string]interface{}) {
+						// we loop over a resource (e.g: aws_instance.oDSOj)
+						for _, block := range resource {
+							// we remove IOPS for GP2 volume types
+							// https://github.com/cycloidio/terracognita/issues/157
+							if rt == "aws_instance" {
+								if bds, ok := block.(map[string]interface{})["root_block_device"]; ok {
+									for _, bd := range bds.([]interface{}) {
+										if vt, ok := bd.(map[string]interface{})["volume_type"].(string); ok && vt == "gp2" {
+											delete(bd.(map[string]interface{}), "iops")
+										}
+									}
+								}
+								if bds, ok := block.(map[string]interface{})["ebs_block_device"]; ok {
+									for _, bd := range bds.([]interface{}) {
+										if vt, ok := bd.(map[string]interface{})["volume_type"].(string); ok && vt == "gp2" {
+											delete(bd.(map[string]interface{}), "iops")
+										}
+									}
+								}
+							}
+							if rt == "aws_ebs_volume" {
+								if t, ok := block.(map[string]interface{})["type"]; ok && t == "gp2" {
+									delete(block.(map[string]interface{}), "iops")
+								}
+							}
+						}
+					}
+					return nil
+				},
+			}
 
 			if hclOut != nil {
 				logger.Log("msg", "initializing HCL writer")
