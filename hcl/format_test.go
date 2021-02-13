@@ -141,6 +141,19 @@ func TestFormat(t *testing.T) {
 				role = [this.is.a-role,this.is.a-role2,"{value}"]
 			}`),
 		},
+		{
+			name: "ReplaceVariables11To12Format",
+			in: []byte(`
+			"resource" "aws_instance" "name" {
+				"env" = "value and ${this.must.stay}"
+				"role" = ["$${var.isa-role}","$${var.isa-role2}","{value}"]
+			}`),
+			out: []byte(`
+			resource "aws_instance" "name" {
+				env = "value and ${this.must.stay}"
+				role = [var.isa-role,var.isa-role2,"{value}"]
+			}`),
+		},
 	}
 
 	for _, tt := range tests {
