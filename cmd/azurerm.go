@@ -23,14 +23,19 @@ var (
 		Use:   "azurerm",
 		Short: "Terracognita reads from Azure and generates hcl resources and/or terraform state",
 		Long:  "Terracognita reads from Azure and generates hcl resources and/or terraform state",
-		PreRun: func(cmd *cobra.Command, args []string) {
-			preRunEOutput(cmd, args)
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			err := preRunEOutput(cmd, args)
+			if err != nil {
+				return err
+			}
 			viper.BindPFlag("client-id", cmd.Flags().Lookup("client-id"))
 			viper.BindPFlag("client-secret", cmd.Flags().Lookup("client-secret"))
 			viper.BindPFlag("environment", cmd.Flags().Lookup("environment"))
 			viper.BindPFlag("resource-group-name", cmd.Flags().Lookup("resource-group-name"))
 			viper.BindPFlag("subscription-id", cmd.Flags().Lookup("subscription-id"))
 			viper.BindPFlag("tenant-id", cmd.Flags().Lookup("tenant-id"))
+
+			return nil
 		},
 		PostRunE: postRunEOutput,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -65,7 +70,10 @@ var (
 			}
 
 			var hclW, stateW writer.Writer
-			options := &writer.Options{Interpolate: viper.GetBool("interpolate")}
+			options, err := getWriterOptions()
+			if err != nil {
+				return err
+			}
 
 			if hclOut != nil {
 				logger.Log("msg", "initializing HCL writer")

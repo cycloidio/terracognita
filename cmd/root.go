@@ -1,21 +1,29 @@
 package cmd
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/adrg/xdg"
+	"github.com/cycloidio/mxwriter"
+	"github.com/cycloidio/terracognita/hcl"
 	"github.com/cycloidio/terracognita/log"
+	"github.com/cycloidio/terracognita/writer"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
 )
 
 var (
-	hclOut   io.Writer
+	isHCLDir bool
+	hclOut   io.ReadWriter
 	stateOut io.Writer
 
 	closeOut = make([]io.Closer, 0, 0)
@@ -68,13 +76,88 @@ func requiredStringFlags(names ...string) error {
 
 func preRunEOutput(cmd *cobra.Command, args []string) error {
 	// Initializes/Validates the HCL and TFSTATE flags
-	if viper.GetString("hcl") != "" {
-		f, err := os.OpenFile(viper.GetString("hcl"), os.O_APPEND|os.O_TRUNC|os.O_RDWR|os.O_CREATE, 0644)
-		if err != nil {
-			return fmt.Errorf("could not OpenFile %s because: %s", viper.GetString("hcl"), err)
+	if module := viper.GetString("module"); module != "" {
+
+		// We check if there is any error checking it
+		// if its NotExist we do not care as we'll create it
+		// but if it exists and it's not a Dir then we fail
+		fi, err := os.Stat(module)
+		if err != nil && !os.IsNotExist(err) {
+			return err
 		}
-		hclOut = f
-		closeOut = append(closeOut, f)
+		if err == nil && !fi.IsDir() {
+			return fmt.Errorf("the --module must be a directory: %s", module)
+		}
+
+		// It means is a existing directory
+		// so we'll ask for confirmation before deleting the
+		// existent content
+		if err == nil {
+			fmt.Printf("We are about to remove all content from %q, are you sure? Yes/No (Y/N):\n", module)
+			var s string
+			fmt.Scanf("%s\n", &s)
+			s = strings.ToLower(s)
+			if s != "yes" && s != "y" {
+				return errors.New("the import was stopped")
+			}
+		}
+
+		// Clean the module dir
+		err = os.RemoveAll(module)
+		if err != nil {
+			return err
+		}
+
+		// Recreate it just if it was not created
+		// RemoveAll will not return error if
+		// it does not exists
+		err = os.MkdirAll(module, 0700)
+		if err != nil {
+			return err
+		}
+
+		hclOut = mxwriter.NewMux()
+	} else if hcl := viper.GetString("hcl"); hcl != "" {
+		// We check if there is any error checking it
+		// if its NotExist we do not care as we'll create it
+		fi, err := os.Stat(hcl)
+		if err != nil && !os.IsNotExist(err) {
+			return err
+		}
+		hasExt := filepath.Ext(hcl) != ""
+		if (err == nil && !fi.IsDir()) || hasExt {
+			isHCLDir = false
+		} else {
+			isHCLDir = true
+			// It means is a existing directory
+			// so we'll ask for confirmation before deleting the
+			// existent content
+			if err == nil {
+				fmt.Printf("We are about to remove all content from %q, are you sure? Yes/No (Y/N):\n", hcl)
+				var s string
+				fmt.Scanf("%s\n", &s)
+				s = strings.ToLower(s)
+				if s != "yes" && s != "y" {
+					return errors.New("the import was stopped")
+				}
+			}
+
+			// Clean the module dir
+			err = os.RemoveAll(hcl)
+			if err != nil {
+				return err
+			}
+
+			// Recreate it just if it was not created
+			// RemoveAll will not return error if
+			// it does not exists
+			err = os.MkdirAll(hcl, 0700)
+			if err != nil {
+				return err
+			}
+		}
+
+		hclOut = mxwriter.NewMux()
 	}
 	if viper.GetString("tfstate") != "" {
 		f, err := os.OpenFile(viper.GetString("tfstate"), os.O_APPEND|os.O_TRUNC|os.O_RDWR|os.O_CREATE, 0644)
@@ -85,8 +168,8 @@ func preRunEOutput(cmd *cobra.Command, args []string) error {
 		closeOut = append(closeOut, f)
 	}
 
-	if len(closeOut) == 0 {
-		return fmt.Errorf("one of --hcl or --tfstate are required")
+	if viper.GetString("tfstate") == "" && viper.GetString("hcl") == "" && viper.GetString("module") == "" {
+		return fmt.Errorf("one of --module, --hcl  or --tfstate are required")
 	}
 	return nil
 }
@@ -99,7 +182,108 @@ func postRunEOutput(cmd *cobra.Command, args []string) error {
 		}
 	}
 
+	if m := viper.GetString("module"); m != "" {
+		dm, err := mxwriter.NewDemux(hclOut)
+		if err != nil {
+			return err
+		}
+
+		moduleName := filepath.Base(m)
+		mdir := fmt.Sprintf("module-%s", moduleName)
+
+		err = os.Mkdir(filepath.Join(m, mdir), 0700)
+		if err != nil {
+			return err
+		}
+
+		for _, k := range dm.Keys() {
+			var (
+				filep string
+			)
+			if k == hcl.ModuleCategoryKey {
+				filep = filepath.Join(m, "module.tf")
+			} else {
+				filep = filepath.Join(m, mdir, fmt.Sprintf("%s.tf", k))
+			}
+
+			f, err := os.OpenFile(filep, os.O_APPEND|os.O_TRUNC|os.O_RDWR|os.O_CREATE, 0644)
+			if err != nil {
+				return fmt.Errorf("could not OpenFile %s because: %s", filep, err)
+			}
+			io.Copy(f, dm.Read(k))
+			f.Close()
+		}
+	} else if hcl := viper.GetString("hcl"); hcl != "" {
+		dm, err := mxwriter.NewDemux(hclOut)
+		if err != nil {
+			return err
+		}
+		if isHCLDir {
+			for _, k := range dm.Keys() {
+				filep := filepath.Join(hcl, fmt.Sprintf("%s.tf", k))
+
+				f, err := os.OpenFile(filep, os.O_APPEND|os.O_TRUNC|os.O_RDWR|os.O_CREATE, 0644)
+				if err != nil {
+					return fmt.Errorf("could not OpenFile %s because: %s", filep, err)
+				}
+				io.Copy(f, dm.Read(k))
+				f.Close()
+			}
+		} else {
+			f, err := os.OpenFile(viper.GetString("hcl"), os.O_APPEND|os.O_TRUNC|os.O_RDWR|os.O_CREATE, 0644)
+			if err != nil {
+				return fmt.Errorf("could not OpenFile %s because: %s", viper.GetString("hcl"), err)
+			}
+			io.Copy(f, hclOut)
+			f.Close()
+		}
+	}
+
 	return nil
+}
+
+// getWriterOptions will initialize the common writer.Options from the flags
+func getWriterOptions() (*writer.Options, error) {
+	var module string
+	var mv = make(map[string]struct{})
+	if m := viper.GetString("module"); m != "" {
+		module = filepath.Base(m)
+
+		if pmv := viper.GetString("module-variables"); pmv != "" {
+			b, err := ioutil.ReadFile(pmv)
+			if err != nil {
+				return nil, fmt.Errorf("could not ReadFile on path %q: %w", pmv, err)
+			}
+
+			var values map[string][]string
+			switch filepath.Ext(pmv) {
+			case ".yml", "yaml":
+				err := yaml.Unmarshal(b, &values)
+				if err != nil {
+					return nil, fmt.Errorf("invalid YAML on module-variables file %s: %w", pmv, err)
+				}
+			case ".json":
+				err = json.Unmarshal(b, &values)
+				if err != nil {
+					return nil, fmt.Errorf("invalid JSON on module-variables file %s: %w", pmv, err)
+				}
+			default:
+				return nil, fmt.Errorf("invalid module-variables %s, only supported extensions are yaml/yml/json", pmv)
+			}
+
+			for k, v := range values {
+				for _, vv := range v {
+					mv[fmt.Sprintf("%s.%s", k, vv)] = struct{}{}
+				}
+			}
+		}
+	}
+
+	return &writer.Options{
+		Interpolate:     viper.GetBool("interpolate"),
+		Module:          module,
+		ModuleVariables: mv,
+	}, nil
 }
 
 func init() {
@@ -109,11 +293,17 @@ func init() {
 	RootCmd.AddCommand(azurermCmd)
 	RootCmd.AddCommand(versionCmd)
 
-	RootCmd.PersistentFlags().String("hcl", "", "HCL output file")
+	RootCmd.PersistentFlags().String("hcl", "", "HCL output file or directory. If it's a directory it'll be emptied before importing")
 	_ = viper.BindPFlag("hcl", RootCmd.PersistentFlags().Lookup("hcl"))
 
 	RootCmd.PersistentFlags().String("tfstate", "", "TFState output file")
 	_ = viper.BindPFlag("tfstate", RootCmd.PersistentFlags().Lookup("tfstate"))
+
+	RootCmd.PersistentFlags().String("module", "", "Generates the output in module format into the directory specified. With this flag (--module) the --hcl is ignored and will be generated inside of the module")
+	_ = viper.BindPFlag("module", RootCmd.PersistentFlags().Lookup("module"))
+
+	RootCmd.PersistentFlags().String("module-variables", "", "Path to a file containing the list of attributes to use as variables when building the module. The format is a JSON/YAML, more information on https://github.com/cycloidio/terracognita#modules")
+	_ = viper.BindPFlag("module-variables", RootCmd.PersistentFlags().Lookup("module-variables"))
 
 	RootCmd.PersistentFlags().StringSliceVarP(&include, "include", "i", []string{}, "List of resources to import, this names are the ones on TF (ex: aws_instance). If not set then means that all the resources will be imported")
 	_ = viper.BindPFlag("include", RootCmd.PersistentFlags().Lookup("include"))

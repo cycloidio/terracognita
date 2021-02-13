@@ -29,8 +29,11 @@ var (
 		Use:   "aws",
 		Short: "Terracognita reads from AWS and generates hcl resources and/or terraform state",
 		Long:  "Terracognita reads from AWS and generates hcl resources and/or terraform state",
-		PreRun: func(cmd *cobra.Command, args []string) {
-			preRunEOutput(cmd, args)
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			err := preRunEOutput(cmd, args)
+			if err != nil {
+				return err
+			}
 
 			viper.BindPFlag("aws-access-key", cmd.Flags().Lookup("aws-access-key"))
 			viper.BindPFlag("aws-secret-access-key", cmd.Flags().Lookup("aws-secret-access-key"))
@@ -47,6 +50,8 @@ var (
 			viper.RegisterAlias("secret-key", "aws-secret-access-key")
 			viper.RegisterAlias("session-token", "aws-session-token")
 			viper.RegisterAlias("region", "aws-default-region")
+
+			return nil
 		},
 		PostRunE: postRunEOutput,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -85,7 +90,10 @@ var (
 			}
 
 			var hclW, stateW writer.Writer
-			options := &writer.Options{Interpolate: viper.GetBool("interpolate")}
+			options, err := getWriterOptions()
+			if err != nil {
+				return err
+			}
 
 			if hclOut != nil {
 				logger.Log("msg", "initializing HCL writer")
