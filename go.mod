@@ -9,6 +9,7 @@ require (
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/aws/aws-sdk-go v1.35.9
 	github.com/chr4/pwgen v1.1.0
+	github.com/cycloidio/mxwriter v1.0.2
 	github.com/cycloidio/tfdocs v0.0.0-20201106154358-49ea9e6f45e4
 	github.com/go-kit/kit v0.9.0
 	github.com/golang/mock v1.4.4
@@ -21,15 +22,19 @@ require (
 	github.com/hashicorp/vault v1.0.3 // indirect
 	github.com/jinzhu/inflection v1.0.0
 	github.com/keybase/go-crypto v0.0.0-20181127160227-255a5089e85a // indirect
+	github.com/pascaldekloe/name v1.0.1
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/viper v1.7.0
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.7.0
 	github.com/terraform-providers/terraform-provider-aws v1.60.1-0.20200807230610-d5346d47e3af
 	github.com/terraform-providers/terraform-provider-azurerm v1.44.1-0.20201029183808-d721bcc1bb55
 	github.com/terraform-providers/terraform-provider-random v2.0.0+incompatible // indirect
 	github.com/zclconf/go-cty v1.5.1
+	golang.org/x/lint v0.0.0-20201208152925-83fdc39ff7b5 // indirect
+	golang.org/x/tools v0.1.0 // indirect
 	google.golang.org/api v0.31.1-0.20200914161323-7b3b1fe2dc94
+	gopkg.in/yaml.v2 v2.3.0
 )
 
 // Force an specific version if not the AWS provider does not compile

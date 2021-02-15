@@ -87,6 +87,59 @@ clean:                           Removes binary and/or docker image
 
 [![asciicast](https://asciinema.org/a/330055.svg)](https://asciinema.org/a/330055)
 
+### Modules
+
+Terracognita can generate Terraform Modules directly when importing. To enable this feature you'll need to use the `--module {module/path/name}` and then on that specific path is where the module will be generated. The path has to be directory or a none existent path (it'll be created), the content of the path will be deleted (after user confirmation) so we can have a clean import.
+
+The output structure will look like (having `--module test`) this where each file aggregates the resources from the same "category":
+
+```
+test/
+├── module-test
+│   ├── autoscaling.tf
+│   ├── cloud_front.tf
+│   ├── cloud_watch.tf
+│   ├── ec2.tf
+│   ├── elastic_load_balancing_v2_alb_nlb.tf
+│   ├── iam.tf
+│   ├── rds.tf
+│   ├── route53_resolver.tf
+│   ├── route53.tf
+│   ├── s3.tf
+│   ├── ses.tf
+│   └── variables.tf
+└── module.tf
+```
+
+By default all the attributes will be changed for variables, those variables will then be on the `module-{name}/variables.tf` and exposed on the `module.tf` like so:
+
+```hcl
+module "test" {
+  # aws_instance_front_instance_type = "t2.small"
+  [...]
+  source = "module-test"
+}
+```
+
+If you want to change this behavior, as for big infrastructures this will create a lot of variables, you can use the `--module-varibles path/to/file` and the file will have the list of attributes that you want to actually be used as variables, it can be in JSON or YAML:
+
+```json
+{
+  "aws_instance": [
+    "instance_type",
+    "cpu_threads_per_core",
+    "cpu_core_count"
+  ]
+}
+```
+
+```yaml
+aws_instance:
+  - instance_type
+  - cpu_threads_per_core
+  - cpu_core_count
+```
+
 ### Docker
 
 You can use directly [the image built](https://hub.docker.com/r/cycloid/terracognita), or you can build your own.

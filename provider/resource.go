@@ -11,6 +11,7 @@ import (
 	"github.com/chr4/pwgen"
 	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/filter"
+	"github.com/cycloidio/terracognita/hcl"
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/tag"
 	"github.com/cycloidio/terracognita/writer"
@@ -23,6 +24,7 @@ import (
 	"github.com/hashicorp/terraform/configs/hcl2shim"
 	"github.com/hashicorp/terraform/providers"
 	"github.com/hashicorp/terraform/states"
+	"github.com/pascaldekloe/name"
 	"github.com/pkg/errors"
 	"github.com/zclconf/go-cty/cty"
 )
@@ -424,6 +426,18 @@ func (r *resource) State(w writer.Writer) error {
 // writes it to HCL
 func (r *resource) HCL(w writer.Writer) error {
 	cfg := mergeFullConfig(r.data, r.tfResource.Schema, "")
+
+	resourceFunc, ok := providerResources[r.provider.String()]
+	if !ok {
+		return errors.New(fmt.Sprintf("provider %s is not supported", r.provider.String()))
+	}
+
+	tfdoc, err := resourceFunc(r.Type())
+	if err != nil {
+		return errors.New(fmt.Sprintf("provider %s with resource %s is not supported", r.provider.String(), r.Type()))
+	}
+	// This will convert all Category into snake_case
+	cfg[hcl.ResourceCategoryKey] = strings.ToLower(name.Delimit(tfdoc.Category, '_'))
 
 	// If it does not have any configName we will generate one
 	// and store it, so net time it'll use that one on any config

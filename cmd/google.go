@@ -25,13 +25,18 @@ var (
 		Use:   "google",
 		Short: "Terracognita reads from GCP and generates hcl resources and/or terraform state",
 		Long:  "Terracognita reads from GCP and generates hcl resources and/or terraform state",
-		PreRun: func(cmd *cobra.Command, args []string) {
-			preRunEOutput(cmd, args)
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			err := preRunEOutput(cmd, args)
+			if err != nil {
+				return err
+			}
 			viper.BindPFlag("credentials", cmd.Flags().Lookup("credentials"))
 			viper.BindPFlag("project", cmd.Flags().Lookup("project"))
 			viper.BindPFlag("region", cmd.Flags().Lookup("region"))
 			viper.BindPFlag("labels", cmd.Flags().Lookup("labels"))
 			viper.BindPFlag("max-results", cmd.Flags().Lookup("max-results"))
+
+			return nil
 		},
 		PostRunE: postRunEOutput,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -73,7 +78,10 @@ var (
 			}
 
 			var hclW, stateW writer.Writer
-			options := &writer.Options{Interpolate: viper.GetBool("interpolate")}
+			options, err := getWriterOptions()
+			if err != nil {
+				return err
+			}
 
 			if hclOut != nil {
 				logger.Log("msg", "initializing HCL writer")

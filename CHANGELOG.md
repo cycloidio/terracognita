@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Added
+
+- Ability to create Modules directly when importing
+  ([Issue #141](https://github.com/cycloidio/terracognita/issues/141))
+
 ## [0.6.0] _2020-12-22_
 
 ### Added

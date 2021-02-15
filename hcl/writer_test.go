@@ -1,10 +1,11 @@
 package hcl_test
 
 import (
-	"bytes"
+	"io/ioutil"
 	"strings"
 	"testing"
 
+	"github.com/cycloidio/mxwriter"
 	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/hcl"
 	"github.com/cycloidio/terracognita/writer"
@@ -17,17 +18,15 @@ func TestNewHCLWriter(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		hw := hcl.NewWriter(nil, &writer.Options{Interpolate: true})
 
-		assert.Equal(t, map[string]interface{}{
-			"resource": make(map[string]map[string]interface{}),
-		}, hw.Config)
+		assert.Equal(t, map[string]map[string]interface{}{}, hw.Config)
 	})
 }
 
 func TestHCLWriter_Write(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		var (
-			b     = &bytes.Buffer{}
-			hw    = hcl.NewWriter(b, &writer.Options{Interpolate: true})
+			mw    = mxwriter.NewMux()
+			hw    = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
 			value = map[string]interface{}{
 				"key": "value",
 			}
@@ -37,11 +36,13 @@ func TestHCLWriter_Write(t *testing.T) {
 		err := hw.Write(key, value)
 		require.NoError(t, err)
 
-		assert.Equal(t, map[string]interface{}{
-			"resource": map[string]map[string]interface{}{
-				"type": map[string]interface{}{
-					"name": map[string]interface{}{
-						"key": "value",
+		assert.Equal(t, map[string]map[string]interface{}{
+			"hcl": map[string]interface{}{
+				"resource": map[string]map[string]interface{}{
+					"type": map[string]interface{}{
+						"name": map[string]interface{}{
+							"key": "value",
+						},
 					},
 				},
 			},
@@ -54,12 +55,21 @@ func TestHCLWriter_Write(t *testing.T) {
 			ok, err = hw.Has("type.new")
 			require.NoError(t, err)
 			assert.False(t, ok)
+
+			t.Run("Empty", func(t *testing.T) {
+				mw = mxwriter.NewMux()
+				hw = hcl.NewWriter(mw, &writer.Options{Interpolate: true, Module: "s"})
+
+				ok, err = hw.Has("type.new")
+				require.NoError(t, err)
+				assert.False(t, ok)
+			})
 		})
 	})
 	t.Run("ErrRequiredKey", func(t *testing.T) {
 		var (
-			b  = &bytes.Buffer{}
-			hw = hcl.NewWriter(b, &writer.Options{Interpolate: true})
+			mw = mxwriter.NewMux()
+			hw = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
 		)
 
 		err := hw.Write("", nil)
@@ -67,8 +77,8 @@ func TestHCLWriter_Write(t *testing.T) {
 	})
 	t.Run("ErrRequiredValue", func(t *testing.T) {
 		var (
-			b  = &bytes.Buffer{}
-			hw = hcl.NewWriter(b, &writer.Options{Interpolate: true})
+			mw = mxwriter.NewMux()
+			hw = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
 		)
 
 		err := hw.Write("type.name", nil)
@@ -76,8 +86,8 @@ func TestHCLWriter_Write(t *testing.T) {
 	})
 	t.Run("ErrInvalidKey", func(t *testing.T) {
 		var (
-			b  = &bytes.Buffer{}
-			hw = hcl.NewWriter(b, &writer.Options{Interpolate: true})
+			mw = mxwriter.NewMux()
+			hw = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
 		)
 
 		err := hw.Write("type.name.name", "")
@@ -91,14 +101,14 @@ func TestHCLWriter_Write(t *testing.T) {
 	})
 	t.Run("ErrAlreadyExistsKey", func(t *testing.T) {
 		var (
-			b  = &bytes.Buffer{}
-			hw = hcl.NewWriter(b, &writer.Options{Interpolate: true})
+			mw = mxwriter.NewMux()
+			hw = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
 		)
 
-		err := hw.Write("type.name", "")
+		err := hw.Write("type.name", map[string]interface{}{})
 		require.NoError(t, err)
 
-		err = hw.Write("type.name", "")
+		err = hw.Write("type.name", map[string]interface{}{})
 		assert.Equal(t, errcode.ErrWriterAlreadyExistsKey, errors.Cause(err))
 	})
 }
@@ -106,8 +116,8 @@ func TestHCLWriter_Write(t *testing.T) {
 func TestHCLWriter_Sync(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		var (
-			b     = &bytes.Buffer{}
-			hw    = hcl.NewWriter(b, &writer.Options{Interpolate: true})
+			mx    = mxwriter.NewMux()
+			hw    = hcl.NewWriter(mx, &writer.Options{Interpolate: true})
 			value = map[string]interface{}{
 				"key": "value",
 			}
@@ -124,12 +134,122 @@ resource "type" "name" {
 		err = hw.Sync()
 		require.NoError(t, err)
 
-		assert.Equal(t, strings.Join(strings.Fields(hcl), " "), strings.Join(strings.Fields(b.String()), " "))
+		b, err := ioutil.ReadAll(mx)
+		require.NoError(t, err)
+
+		assert.Equal(t, strings.Join(strings.Fields(hcl), " "), strings.Join(strings.Fields(string(b)), " "))
+	})
+	t.Run("Module", func(t *testing.T) {
+		var (
+			mx    = mxwriter.NewMux()
+			hw    = hcl.NewWriter(mx, &writer.Options{Interpolate: true, Module: "test"})
+			value = map[string]interface{}{
+				"key": "value",
+			}
+			value2 = map[string]interface{}{
+				"key":  "value",
+				"key2": "value",
+			}
+			hcl = `
+resource "type" "name" {
+  key = var.type_name_key
+}
+
+resource "type" "name2" {
+  key = var.type_name2_key
+	key2 = var.type_name2_key2
+}
+
+module "test" {
+	# type_name2_key = "value"
+	# type_name2_key2 = "value"
+	# type_name_key = "value"
+  source = "module-test"
+}
+
+variable "type_name2_key" {
+	default = "value"
+}
+
+variable "type_name2_key2" {
+	default = "value"
+}
+
+variable "type_name_key" {
+	default = "value"
+}
+`
+		)
+
+		err := hw.Write("type.name", value)
+		require.NoError(t, err)
+
+		err = hw.Write("type.name2", value2)
+		require.NoError(t, err)
+
+		err = hw.Sync()
+		require.NoError(t, err)
+
+		b, err := ioutil.ReadAll(mx)
+		require.NoError(t, err)
+
+		assert.Equal(t, strings.Join(strings.Fields(hcl), " "), strings.Join(strings.Fields(string(b)), " "))
+	})
+	t.Run("ModuleVariables", func(t *testing.T) {
+		var (
+			mx    = mxwriter.NewMux()
+			hw    = hcl.NewWriter(mx, &writer.Options{Interpolate: true, Module: "test", ModuleVariables: map[string]struct{}{"type.key": struct{}{}}})
+			value = map[string]interface{}{
+				"key": "value",
+			}
+			value2 = map[string]interface{}{
+				"key":  "value",
+				"key2": "value",
+			}
+			hcl = `
+resource "type" "name" {
+  key = var.type_name_key
+}
+
+resource "type" "name2" {
+  key = var.type_name2_key
+	key2 = "value"
+}
+
+module "test" {
+	# type_name2_key = "value"
+	# type_name_key = "value"
+  source = "module-test"
+}
+
+variable "type_name2_key" {
+	default = "value"
+}
+
+variable "type_name_key" {
+	default = "value"
+}
+`
+		)
+
+		err := hw.Write("type.name", value)
+		require.NoError(t, err)
+
+		err = hw.Write("type.name2", value2)
+		require.NoError(t, err)
+
+		err = hw.Sync()
+		require.NoError(t, err)
+
+		b, err := ioutil.ReadAll(mx)
+		require.NoError(t, err)
+
+		assert.Equal(t, strings.Join(strings.Fields(hcl), " "), strings.Join(strings.Fields(string(b)), " "))
 	})
 	t.Run("Slice", func(t *testing.T) {
 		var (
-			b     = &bytes.Buffer{}
-			hw    = hcl.NewWriter(b, &writer.Options{Interpolate: true})
+			mw    = mxwriter.NewMux()
+			hw    = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
 			value = map[string]interface{}{
 				"ingress": []map[string]interface{}{
 					{
@@ -163,12 +283,15 @@ resource "type" "name" {
 		err = hw.Sync()
 		require.NoError(t, err)
 
-		assert.Equal(t, strings.Join(strings.Fields(hcl), " "), strings.Join(strings.Fields(b.String()), " "))
+		b, err := ioutil.ReadAll(mw)
+		require.NoError(t, err)
+
+		assert.Equal(t, strings.Join(strings.Fields(hcl), " "), strings.Join(strings.Fields(string(b)), " "))
 	})
 	t.Run("EmptySlice", func(t *testing.T) {
 		var (
-			b     = &bytes.Buffer{}
-			hw    = hcl.NewWriter(b, &writer.Options{Interpolate: true})
+			mw    = mxwriter.NewMux()
+			hw    = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
 			value = map[string]interface{}{
 				"ingress": []map[string]interface{}{
 					{
@@ -193,12 +316,15 @@ resource "type" "name" {
 		err = hw.Sync()
 		require.NoError(t, err)
 
-		assert.Equal(t, strings.Join(strings.Fields(hcl), " "), strings.Join(strings.Fields(b.String()), " "))
+		b, err := ioutil.ReadAll(mw)
+		require.NoError(t, err)
+
+		assert.Equal(t, strings.Join(strings.Fields(hcl), " "), strings.Join(strings.Fields(string(b)), " "))
 	})
 	t.Run("NestedMap", func(t *testing.T) {
 		var (
-			b     = &bytes.Buffer{}
-			hw    = hcl.NewWriter(b, &writer.Options{Interpolate: true})
+			mw    = mxwriter.NewMux()
+			hw    = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
 			value = map[string]interface{}{
 				"ingress": []map[string]interface{}{
 					{
@@ -229,15 +355,18 @@ resource "type" "name" {
 		err = hw.Sync()
 		require.NoError(t, err)
 
-		assert.Equal(t, strings.Join(strings.Fields(hcl), " "), strings.Join(strings.Fields(b.String()), " "))
+		b, err := ioutil.ReadAll(mw)
+		require.NoError(t, err)
+
+		assert.Equal(t, strings.Join(strings.Fields(hcl), " "), strings.Join(strings.Fields(string(b)), " "))
 	})
 }
 
 func TestHCLWriter_Interpolate(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		var (
-			b     = &bytes.Buffer{}
-			hw    = hcl.NewWriter(b, &writer.Options{Interpolate: true})
+			mw    = mxwriter.NewMux()
+			hw    = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
 			value = map[string]interface{}{
 				"network": "to-be-interpolated",
 			}
@@ -251,14 +380,19 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 		hw.Write("aType.aName", network)
 
 		hw.Interpolate(i)
-		hw.Sync()
 
-		assert.Contains(t, b.String(), "network = aType.aName.id")
+		err := hw.Sync()
+		require.NoError(t, err)
+
+		b, err := ioutil.ReadAll(mw)
+		require.NoError(t, err)
+
+		assert.Contains(t, string(b), "network = aType.aName.id")
 	})
 	t.Run("SuccessAvoidInterpolaception", func(t *testing.T) {
 		var (
-			b     = &bytes.Buffer{}
-			hw    = hcl.NewWriter(b, &writer.Options{Interpolate: true})
+			mw    = mxwriter.NewMux()
+			hw    = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
 			value = map[string]interface{}{
 				"network": "to-be-interpolated",
 			}
@@ -273,14 +407,19 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 		hw.Write("aType.aName", network)
 
 		hw.Interpolate(i)
-		hw.Sync()
 
-		assert.Contains(t, b.String(), "to-be-interpolated")
+		err := hw.Sync()
+		require.NoError(t, err)
+
+		b, err := ioutil.ReadAll(mw)
+		require.NoError(t, err)
+
+		assert.Contains(t, string(b), "to-be-interpolated")
 	})
 	t.Run("SuccessMutualInterpolation", func(t *testing.T) {
 		var (
-			b        = &bytes.Buffer{}
-			hw       = hcl.NewWriter(b, &writer.Options{Interpolate: true})
+			mw       = mxwriter.NewMux()
+			hw       = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
 			instance = map[string]interface{}{
 				"subnet_id": "1234",
 			}
@@ -296,15 +435,21 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 		hw.Write("aws_instance.instance", instance)
 
 		hw.Interpolate(i)
-		hw.Sync()
+
+		err := hw.Sync()
+		require.NoError(t, err)
+
+		b, err := ioutil.ReadAll(mw)
+		require.NoError(t, err)
+
 		// the only way to assert that there is one interpolation is to
 		// check if we have exactly one value starting by `aws_`
-		assert.Equal(t, 1, strings.Count(b.String(), "= aws_"))
+		assert.Equal(t, 1, strings.Count(string(b), "= aws_"))
 	})
 	t.Run("SuccessNoInterpolation", func(t *testing.T) {
 		var (
-			b     = &bytes.Buffer{}
-			hw    = hcl.NewWriter(b, &writer.Options{Interpolate: false})
+			mw    = mxwriter.NewMux()
+			hw    = hcl.NewWriter(mw, &writer.Options{Interpolate: false})
 			value = map[string]interface{}{
 				"network": "should-not-be-interpolated",
 			}
@@ -319,8 +464,13 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 		hw.Write("aType.aName", network)
 
 		hw.Interpolate(i)
-		hw.Sync()
 
-		assert.Contains(t, b.String(), "network = \"should-not-be-interpolated\"")
+		err := hw.Sync()
+		require.NoError(t, err)
+
+		b, err := ioutil.ReadAll(mw)
+		require.NoError(t, err)
+
+		assert.Contains(t, string(b), "network = \"should-not-be-interpolated\"")
 	})
 }
