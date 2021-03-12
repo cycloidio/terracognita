@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.6.1] _2021-03-12_
+
 ### Added
 
 - Ability to create Modules directly when importing
