@@ -32,6 +32,7 @@ groups:
       - bump-to-next-patch-version
       - bump-to-next-minor-version
       - bump-to-next-major-version
+      - aur
 
   - name: tests
     jobs:
@@ -47,6 +48,7 @@ groups:
       - bump-to-next-patch-version
       - bump-to-next-minor-version
       - bump-to-next-major-version
+      - aur
 
 resource_types:
   - name: slack-notification
@@ -484,6 +486,38 @@ jobs:
                   <li><em><a href="https://console.cycloid.io/organizations/((customer))/projects/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID">Build link</a></em></li>
                   </ul>
                 title: Success build image of terracognita on master environment
+
+  - name: aur
+    serial: true
+    max_in_flight: 1
+    build_logs_to_retain: 20
+    plan:
+      - do:
+          - get: ((branch))
+            resource: repo-((branch))
+            passed: [ release-((branch)) ]
+            trigger: true
+            params:
+              fetch_tags: true
+          - task: publish
+            params:
+              SSH_PRIVATE_KEY: ((ssh-private-key))
+            config:
+              platform: linux
+              image_resource:
+                type: docker-image
+                source:
+                  repository: alpine
+                  tag: 3.12
+              run:
+                path: /bin/sh
+                args:
+                  - '-c'
+                  - |
+                    apk add --update --no-progress git jq curl wget sed
+                    sh master/scripts/deploy/aur.sh
+              inputs:
+                - name: ((branch))
 
   - name: bump-to-next-patch-version
     serial: true

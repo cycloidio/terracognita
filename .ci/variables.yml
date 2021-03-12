@@ -34,3 +34,6 @@ initial-version: 1.0.0
 slack-deployment-url: ((slack_webhook.url))
 event-login: ((cycloid_bot_account.login))
 event-password: ((cycloid_bot_account.password))
+
+# aur publishing
+ssh-private-key: ((ssh_aur.ssh_key))
