@@ -13,7 +13,7 @@ shared:
 
   - &run-unit-tests
     args:
-    - '-ec'
+    - '-ecx'
     - |
       export GOPATH=${PWD}/go
       export PATH="$GOPATH/bin:$PATH"
@@ -32,6 +32,7 @@ groups:
       - bump-to-next-patch-version
       - bump-to-next-minor-version
       - bump-to-next-major-version
+      - aur
 
   - name: tests
     jobs:
@@ -47,6 +48,7 @@ groups:
       - bump-to-next-patch-version
       - bump-to-next-minor-version
       - bump-to-next-major-version
+      - aur
 
 resource_types:
   - name: slack-notification
@@ -59,7 +61,7 @@ resource_types:
     type: docker-image
     source:
       repository: teliaoss/github-pr-resource
-      tag: v0.15.0
+      tag: v0.21.0
 
   - name: report-github-status
     type: docker-image
@@ -129,6 +131,7 @@ resources:
       uri: ((github-repo-uri))
       branch: ((branch))
       private_key: ((github-private-key))
+      fetch_tags: true
 
   - name: gh-release
     type: github-release
@@ -146,6 +149,7 @@ resources:
       private_key: ((github-private-key))
       file: rc-version
       initial_version: ((initial-version))
+      fetch_tags: true
 
   - name: repo-version
     type: semver
@@ -156,6 +160,7 @@ resources:
       private_key: ((github-private-key))
       file: version
       initial_version: ((initial-version))
+      fetch_tags: true
 
   - name: slack-alert
     type: slack-notification
@@ -484,6 +489,38 @@ jobs:
                   <li><em><a href="https://console.cycloid.io/organizations/((customer))/projects/((project))/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_ID">Build link</a></em></li>
                   </ul>
                 title: Success build image of terracognita on master environment
+
+  - name: aur
+    serial: true
+    max_in_flight: 1
+    build_logs_to_retain: 20
+    plan:
+      - do:
+          - get: ((branch))
+            resource: repo-((branch))
+            passed: [ release-((branch)) ]
+            trigger: true
+            params:
+              fetch_tags: true
+          - task: publish
+            params:
+              SSH_PRIVATE_KEY: ((ssh-private-key))
+            config:
+              platform: linux
+              image_resource:
+                type: docker-image
+                source:
+                  repository: alpine
+                  tag: 3.12
+              run:
+                path: /bin/sh
+                args:
+                  - '-c'
+                  - |
+                    apk add --update --no-progress git jq curl wget sed
+                    sh master/scripts/deploy/aur.sh
+              inputs:
+                - name: ((branch))
 
   - name: bump-to-next-patch-version
     serial: true
