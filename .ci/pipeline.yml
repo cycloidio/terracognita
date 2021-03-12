@@ -13,7 +13,7 @@ shared:
 
   - &run-unit-tests
     args:
-    - '-ec'
+    - '-ecx'
     - |
       export GOPATH=${PWD}/go
       export PATH="$GOPATH/bin:$PATH"
@@ -61,7 +61,7 @@ resource_types:
     type: docker-image
     source:
       repository: teliaoss/github-pr-resource
-      tag: v0.15.0
+      tag: v0.21.0
 
   - name: report-github-status
     type: docker-image
@@ -131,6 +131,7 @@ resources:
       uri: ((github-repo-uri))
       branch: ((branch))
       private_key: ((github-private-key))
+      fetch_tags: true
 
   - name: gh-release
     type: github-release
@@ -148,6 +149,7 @@ resources:
       private_key: ((github-private-key))
       file: rc-version
       initial_version: ((initial-version))
+      fetch_tags: true
 
   - name: repo-version
     type: semver
@@ -158,6 +160,7 @@ resources:
       private_key: ((github-private-key))
       file: version
       initial_version: ((initial-version))
+      fetch_tags: true
 
   - name: slack-alert
     type: slack-notification
