@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.6.2] _2021-03-18_
+
+We had an error on the Pipeline of the last release so we made a quick patch release to fix it
+
 ## [0.6.1] _2021-03-12_
 
 ### Added
