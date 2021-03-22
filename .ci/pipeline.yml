@@ -517,7 +517,7 @@ jobs:
                 args:
                   - '-c'
                   - |
-                    apk add --update --no-progress git jq curl wget sed
+                    apk add --update --no-progress git jq curl wget sed openssh
                     sh master/scripts/deploy/aur.sh
               inputs:
                 - name: ((branch))
