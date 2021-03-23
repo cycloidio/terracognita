@@ -44,7 +44,7 @@ sha256sum_amd64=$(sha256sum terracognita-linux-amd64.tar.gz | awk '{ print $1 }'
 echo "$SSH_PRIVATE_KEY" > id_rsa.aur; chmod 600 ./id_rsa.aur
 
 # clone the actual AUR
-GIT_SSH_COMMAND="ssh -i ./id_rsa.aur" git clone ssh://aur@aur.archlinux.org/terracognita.git && cd terracognita
+GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -i ./id_rsa.aur" git clone ssh://aur@aur.archlinux.org/terracognita.git && cd terracognita
 
 # update the manifests (PKGBUILD and .SRCINFO)
 # update the package version, the URLs and the sha256sums
@@ -62,11 +62,15 @@ sed -i "s/pkgver = [^\"]*/pkgver = ${tag_name:1}/" .SRCINFO
 # show git diff
 git --no-pager diff
 
+# configure git
+git config --global user.name "cycloid"
+git config --global user.email "cycloid@build"
+
 # commit the files
 # TODO: sign the commit by the CI
 git commit -am "terracognita: bump to version $tag_name"
 
 # push the files
-GIT_SSH_COMMAND="ssh -i ../id_rsa.aur" git push -u origin master
+GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -i ../id_rsa.aur" git push -u origin master
 
 cd ../; rm -rf terracognita* id_rsa.aur
