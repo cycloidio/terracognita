@@ -85,7 +85,7 @@ build:                           Bulids the binary
 clean:                           Removes binary and/or docker image
 ```
 
-[![asciicast](https://asciinema.org/a/330055.svg)](https://asciinema.org/a/330055)
+[![asciicast](https://asciinema.org/a/330055.svg)](https://asciinema.org/a/330055) [![Join the chat at https://gitter.im/cycloidio/terracognita](https://badges.gitter.im/cycloidio/terracognita.svg)](https://gitter.im/cycloidio/terracognita?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ### Modules
 
