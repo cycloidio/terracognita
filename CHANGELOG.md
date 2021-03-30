@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.6.3] _2021-03-30_
+
 ### Fixed
 
 - Empty array values on modules now are generated correctly and not failing
