@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Fixed
+
+- Empty array values on modules now are generated correctly and not failing
+  ([PR #174](https://github.com/cycloidio/terracognita/pull/174))
+
 ## [0.6.2] _2021-03-18_
 
 We had an error on the Pipeline of the last release so we made a quick patch release to fix it
