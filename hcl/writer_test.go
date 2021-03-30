@@ -149,6 +149,7 @@ resource "type" "name" {
 			value2 = map[string]interface{}{
 				"key":  "value",
 				"key2": "value",
+				"key3": []interface{}{},
 			}
 			hcl = `
 resource "type" "name" {
@@ -158,11 +159,13 @@ resource "type" "name" {
 resource "type" "name2" {
   key = var.type_name2_key
 	key2 = var.type_name2_key2
+	key3 = var.type_name2_key3
 }
 
 module "test" {
 	# type_name2_key = "value"
 	# type_name2_key2 = "value"
+	# type_name2_key3 = []
 	# type_name_key = "value"
   source = "module-test"
 }
@@ -173,6 +176,10 @@ variable "type_name2_key" {
 
 variable "type_name2_key2" {
 	default = "value"
+}
+
+variable "type_name2_key3" {
+	default = []
 }
 
 variable "type_name_key" {

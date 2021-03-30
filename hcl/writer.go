@@ -256,6 +256,8 @@ func getValueKeys(val cty.Value) []string {
 	return keys
 }
 
+// setVariables will replace all the values for variables or just the ones ModuleVariables
+// if it has been defined
 func (w *Writer) setVariables() {
 	variables := make(map[string]interface{})
 	for c, cfg := range w.Config {
@@ -286,6 +288,16 @@ func walkVariables(cfg map[string]interface{}, validVariables map[string]struct{
 		case map[string]interface{}:
 			cfg[key] = walkVariables(v, validVariables, currentKey, variables)
 		case []interface{}:
+			if len(v) == 0 {
+				if hasKey(validVariables, currentKey) {
+					varName := strings.ReplaceAll(currentKey, ".", "_")
+					variables[varName] = map[string]interface{}{
+						"default": cfg[key],
+					}
+					cfg[key] = fmt.Sprintf("${var.%s}", varName)
+				}
+				continue
+			}
 			// For slices we need to check the first element, if it's a map then
 			// it has complex data, if not it's a "simple" slice of values
 			if _, ok := v[0].(map[string]interface{}); ok {
