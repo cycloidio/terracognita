@@ -5,6 +5,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/tag"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/stretchr/testify/assert"
@@ -19,6 +20,46 @@ func TestToEC2Filer(t *testing.T) {
 			Values: []*string{aws.String("tag-value")},
 		}, tt.ToEC2Filter())
 	})
+}
+
+func TestNew(t *testing.T) {
+	tests := []struct {
+		Name  string
+		STag  string
+		ETag  tag.Tag
+		Error bool
+	}{
+		{
+			Name: "Success",
+			STag: "key:val",
+			ETag: tag.Tag{Name: "key", Value: "val"},
+		},
+		{
+			Name:  "ErrorEmpty",
+			STag:  "",
+			Error: true,
+		},
+		{
+			Name:  "ErrorNoSeparator",
+			STag:  "key",
+			Error: true,
+		},
+		{
+			Name:  "ErrorMoreThanOneSeparator",
+			STag:  "key:value:what",
+			Error: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
+			tg, err := tag.New(tt.STag)
+			if tt.Error {
+				assert.EqualError(t, err, errcode.ErrTagInvalidForamt.Error())
+			}
+			assert.Equal(t, tt.ETag, tg)
+		})
+	}
 }
 
 func TestGetNameFromTag(t *testing.T) {

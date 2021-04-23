@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	kitlog "github.com/go-kit/kit/log"
 	"github.com/pkg/errors"
@@ -48,13 +47,13 @@ var (
 			}
 
 			// Initialize the tags
-			tags := make([]tag.Tag, 0, len(viper.GetStringSlice("tags")))
-			for _, t := range viper.GetStringSlice("tags") {
-				values := strings.Split(t, ":")
-				if len(values) != 2 {
-					return errors.New("invalid format for --tags, the expected format is 'NAME:VALUE'")
+			tags := make([]tag.Tag, 0, len(viper.GetStringSlice("labels")))
+			for _, t := range viper.GetStringSlice("labels") {
+				tg, err := tag.New(t)
+				if err != nil {
+					return fmt.Errorf("invalid format for --labels with value %q: %w", t, err)
 				}
-				tags = append(tags, tag.Tag{Name: values[0], Value: values[1]})
+				tags = append(tags, tg)
 			}
 
 			ctx := context.Background()
