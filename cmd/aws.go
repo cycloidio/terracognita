@@ -2,9 +2,7 @@ package cmd
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -68,11 +66,11 @@ var (
 			// Initialize the tags
 			tags := make([]tag.Tag, 0, len(viper.GetStringSlice("tags")))
 			for _, t := range viper.GetStringSlice("tags") {
-				values := strings.Split(t, ":")
-				if len(values) != 2 {
-					return errors.New("invalid format for --tags, the expected format is 'NAME:VALUE'")
+				tg, err := tag.New(t)
+				if err != nil {
+					return fmt.Errorf("invalid format for --tags with value %q: %w", t, err)
 				}
-				tags = append(tags, tag.Tag{Name: values[0], Value: values[1]})
+				tags = append(tags, tg)
 			}
 
 			ctx := context.Background()

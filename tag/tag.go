@@ -3,10 +3,12 @@ package tag
 import (
 	"fmt"
 	"regexp"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/chr4/pwgen"
+	"github.com/cycloidio/terracognita/errcode"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -19,6 +21,15 @@ var nameRegexp = regexp.MustCompile(`^[a-z0-9_]+$`)
 type Tag struct {
 	Name  string
 	Value string
+}
+
+// New initializes a tag with the format NAME:VALUE that we use
+func New(t string) (Tag, error) {
+	values := strings.Split(t, ":")
+	if len(values) != 2 {
+		return Tag{}, errcode.ErrTagInvalidForamt
+	}
+	return Tag{Name: values[0], Value: values[1]}, nil
 }
 
 // ToEC2Filter transforms the Tag to a ec2.Filter

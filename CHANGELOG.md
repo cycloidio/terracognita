@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Fixed
+
+- `--labels` flag is correctly read now on Google CMD
+
 ## [0.6.3] _2021-03-30_
 
 ### Fixed

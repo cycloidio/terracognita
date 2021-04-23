@@ -20,6 +20,8 @@ var (
 
 	ErrFilterTargetsInvalid = errors.New("the filter targets has an invalid format")
 
+	ErrTagInvalidForamt = errors.New("invalid format for tag, the expected format is 'NAME:VALUE'")
+
 	// ErrProviderAPI will be raised when an error occurs provider side while
 	// using its APIs (authorization error, unavailable operation, ...)
 	ErrProviderAPI = errors.New("error while requesting the provider APIs")
