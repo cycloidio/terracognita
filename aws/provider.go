@@ -16,13 +16,14 @@ import (
 	tfaws "github.com/terraform-providers/terraform-provider-aws/aws"
 )
 
-// skippableErrors is a list of errors
+// skippableCodes is a list of codes
 // which won't make Terracognita failed
 // but they will be printed on the output
-// they are based on the err.Message() content
+// they are based on the err.Code() content
 // of the AWS error
-var skippableErrors = map[string]struct{}{
-	"Unavailable Operation": struct{}{},
+var skippableCodes = map[string]struct{}{
+	"InvalidAction":         struct{}{},
+	"AccessDeniedException": struct{}{},
 }
 
 type aws struct {
@@ -86,7 +87,7 @@ func (a *aws) Resources(ctx context.Context, t string, f *filter.Filter) ([]prov
 		// we filter the error from AWS and return a custom error
 		// type if it's an error that we want to skip
 		if reqErr, ok := err.(awserr.RequestFailure); ok {
-			if _, ok := skippableErrors[reqErr.Message()]; ok {
+			if _, ok := skippableCodes[reqErr.Code()]; ok {
 				return nil, fmt.Errorf("%w: %v", errcode.ErrProviderAPI, reqErr)
 			}
 		}

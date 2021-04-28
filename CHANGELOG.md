@@ -1,8 +1,14 @@
 ## [Unreleased]
 
+### Changed
+
+- AWS error handling from Message to Code and added 'AccessDeniedException'
+  ([Issue #171](https://github.com/cycloidio/terracognita/issues/171))
+
 ### Fixed
 
 - `--labels` flag is correctly read now on Google CMD
+  ([PR #180](https://github.com/cycloidio/terracognita/pull/180))
 
 ## [0.6.3] _2021-03-30_
 
