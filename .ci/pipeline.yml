@@ -99,8 +99,7 @@ resources:
   - name: cycloid-events
     type: cycloid-events
     source:
-      api_login: ((event-login))
-      api_password: ((event-password))
+      api_key: ((event-key))
       api_url: 'https://http-api.cycloid.io'
       icon: fa-code-branch
       organization: ((customer))
