@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.6.4] _2021-04-29_
+
 ### Changed
 
 - AWS error handling from Message to Code and added 'AccessDeniedException'
