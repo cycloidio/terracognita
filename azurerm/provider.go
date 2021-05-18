@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/pkg/errors"
 	tfazurerm "github.com/terraform-providers/terraform-provider-azurerm/azurerm"
 
@@ -32,7 +32,7 @@ func NewProvider(ctx context.Context, clientID, clientSecret, environment, resou
 	}
 
 	log.Get().Log("func", "azurerm.NewProvider", "msg", "loading TF provider")
-	tfp := tfazurerm.Provider().(*schema.Provider)
+	tfp := tfazurerm.Provider()
 
 	rawCfg := terraform.NewResourceConfigRaw(map[string]interface{}{
 		"client_id":       clientID,
@@ -43,8 +43,8 @@ func NewProvider(ctx context.Context, clientID, clientSecret, environment, resou
 	})
 
 	log.Get().Log("func", "azurerm.NewProvider", "msg", "loading TF client")
-	if err := tfp.Configure(rawCfg); err != nil {
-		return nil, fmt.Errorf("could not initialize 'terraform/azurerm.Provider.Configure()' because: %s", err)
+	if diags := tfp.Configure(ctx, rawCfg); diags.HasError() {
+		return nil, fmt.Errorf("could not initialize 'terraform/azurerm.Provider.Configure()' because: %s", diags[0].Summary)
 	}
 
 	return &azurerm{
