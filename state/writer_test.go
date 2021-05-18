@@ -161,6 +161,7 @@ func TestSync(t *testing.T) {
                   "path":null,
                   "permissions_boundary":null,
                   "tags":null,
+                  "tags_all":null,
                   "unique_id":null
                },
                "schema_version":0
@@ -255,7 +256,8 @@ func TestDependencies(t *testing.T) {
               "create": null,
               "delete": null
             },
-	    "tags": null,
+						"tags": null,
+						"tags_all": null,
             "vpc_id": null
           }
         }
@@ -392,7 +394,8 @@ func TestDependencies(t *testing.T) {
               "create": null,
               "delete": null
             },
-	    "tags": null,
+	    			"tags": null,
+						"tags_all": null,
             "vpc_id": null
           }
         }
