@@ -9,6 +9,7 @@ import (
 	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/provider"
+	"github.com/cycloidio/terracognita/util"
 	"github.com/cycloidio/terracognita/writer"
 	"github.com/hashicorp/terraform/addrs"
 	"github.com/hashicorp/terraform/states"
@@ -80,7 +81,12 @@ func (w *Writer) Write(key string, value interface{}) error {
 		Provider: addrs.NewDefaultProvider(r.Provider().String()),
 	}
 
-	src, err := r.ResourceInstanceObject().Encode(r.ImpliedType(), uint64(r.TFResource().SchemaVersion))
+	zt, err := util.HashicorpToZclonfType(r.ImpliedType())
+	if err != nil {
+		return err
+	}
+
+	src, err := r.ResourceInstanceObject().Encode(zt, uint64(r.TFResource().SchemaVersion))
 	if err != nil {
 		return err
 	}
