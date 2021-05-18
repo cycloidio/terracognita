@@ -5,7 +5,9 @@ import (
 
 	"github.com/cycloidio/terracognita/cache"
 	"github.com/cycloidio/terracognita/errcode"
+	"github.com/cycloidio/terracognita/mock"
 	"github.com/cycloidio/terracognita/provider"
+	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -13,9 +15,13 @@ import (
 
 func TestSetGet(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
 		c := cache.New()
-		r := provider.NewResource("id", "", nil)
+		p := mock.NewProvider(ctrl)
+		p.EXPECT().TFProvider().Return(nil)
+		r := provider.NewResource("id", "", p)
 		err := c.Set("k", []provider.Resource{r})
+		defer ctrl.Finish()
 		require.NoError(t, err)
 
 		rs, err := c.Get("k")
