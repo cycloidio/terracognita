@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/chr4/pwgen"
@@ -14,19 +13,19 @@ import (
 	"github.com/cycloidio/terracognita/hcl"
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/tag"
+	"github.com/cycloidio/terracognita/util"
 	"github.com/cycloidio/terracognita/writer"
 	awsdocs "github.com/cycloidio/tfdocs/providers/aws"
 	azuredocs "github.com/cycloidio/tfdocs/providers/azurerm"
 	googledocs "github.com/cycloidio/tfdocs/providers/google"
 	tfdocs "github.com/cycloidio/tfdocs/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"github.com/hashicorp/terraform/configs/hcl2shim"
+	"github.com/hashicorp/go-cty/cty"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/hashicorp/terraform/providers"
 	"github.com/hashicorp/terraform/states"
 	"github.com/pascaldekloe/name"
 	"github.com/pkg/errors"
-	"github.com/zclconf/go-cty/cty"
 )
 
 //go:generate mockgen -destination=../mock/resource.go -mock_names=Resource=Resource -package mock github.com/cycloidio/terracognita/provider Resource
@@ -60,7 +59,7 @@ type Resource interface {
 	// Provider is the Provider of that Resource
 	Provider() Provider
 
-	// ImportResourceState imports the Resource state
+	// ImportState imports the Resource state
 	// to the Resource and could return []Resource if
 	// it imported more than one state, this list does not
 	// include the actual Resource on parameters, so if
@@ -106,8 +105,9 @@ type resource struct {
 
 	tfResource *schema.Resource
 
-	data  *schema.ResourceData
-	state *terraform.InstanceState
+	data       *schema.ResourceData
+	state      *terraform.InstanceState
+	stateValue cty.Value
 
 	provider Provider
 
@@ -117,6 +117,8 @@ type resource struct {
 	configName string
 
 	resourceInstanceObject *states.ResourceInstanceObject
+
+	client *GRPCClient
 }
 
 var (
@@ -136,6 +138,7 @@ func NewResource(id, rt string, p Provider) Resource {
 		id:           id,
 		resourceType: rt,
 		provider:     p,
+		client:       NewGRPCClient(p.TFProvider()),
 	}
 }
 
@@ -198,9 +201,25 @@ func (r *resource) ImportState() ([]Resource, error) {
 		logger.Log("func", "ImportState", "resource", r.Type(), "msg", "This resource it's not Importable")
 		return nil, nil
 	}
-	newInstanceStates, err := r.provider.TFProvider().ImportState(r.InstanceInfo(), r.ID())
-	if err != nil {
+
+	irsresp := r.client.ImportResourceState(ImportResourceStateRequest{
+		TypeName: r.resourceType,
+		ID:       r.id,
+	})
+	if err := irsresp.Diagnostics.Err(); err != nil {
 		return nil, errors.Wrapf(err, "could not import resource %s with id %s", r.resourceType, r.id)
+	}
+	// This converts value to state so we can follow the 2 API
+	newInstanceStates := make([]*terraform.InstanceState, 0, len(irsresp.ImportedResources))
+	for _, ir := range irsresp.ImportedResources {
+		is := terraform.NewInstanceStateShimmedFromValue(ir.State, r.TFResource().SchemaVersion)
+		// It's not set from the NewInstanceStateShimmedFromValue
+		// and we need it later on to create a new Resource
+		// as this may be different from the current Resource
+		is.Ephemeral = terraform.EphemeralState{
+			Type: ir.TypeName,
+		}
+		newInstanceStates = append(newInstanceStates, is)
 	}
 
 	resources := make([]Resource, 0, len(newInstanceStates)-1)
@@ -222,6 +241,7 @@ func (r *resource) ImportState() ([]Resource, error) {
 			resources = append(resources, res)
 		} else {
 			r.state = is
+			r.stateValue = irsresp.ImportedResources[i].State
 		}
 
 	}
@@ -230,25 +250,26 @@ func (r *resource) ImportState() ([]Resource, error) {
 }
 
 func (r *resource) Read(f *filter.Filter) error {
-
-	// If we did not need the 'data' this should be
-	// r.provider.TFProvider().RefreshWithoutUpgrade()
-	// but that way we would not have the data and we need
-	// it to generate the HCL
-	newInstanceState, data, err := r.refreshWithoutUpgrade(r.state, r.provider.TFClient())
-	if err != nil {
-		return err
+	rrreq := ReadResourceRequest{
+		TypeName:   r.Type(),
+		PriorState: r.stateValue,
 	}
+	rrres := r.client.ReadResource(rrreq)
+	if err := rrres.Diagnostics.Err(); err != nil {
+		return errors.Wrapf(err, "could not read resource %s with id %s", r.resourceType, r.id)
+	}
+	newInstanceState := terraform.NewInstanceStateShimmedFromValue(rrres.NewState, r.TFResource().SchemaVersion)
 	r.state = newInstanceState
+	r.stateValue = rrres.NewState
 
 	// The old provider API used an empty id to signal that the remote
 	// object appears to have been deleted, but our new protocol expects
 	// to see a null value (in the cty sense) in that case.
-	if newInstanceState == nil || newInstanceState.ID == "" {
+	if rrres.NewState.IsNull() || newInstanceState.ID == "" {
 		return errors.Wrapf(errcode.ErrProviderResourceNotRead, "the resource %q with ID %q did not return an ID", r.resourceType, r.id)
 	}
 
-	r.data = data
+	r.data = r.TFResource().Data(r.state)
 
 	// Some resources can not be filtered by tags,
 	// so we have to do it manually
@@ -268,28 +289,12 @@ func (r *resource) Read(f *filter.Filter) error {
 		}
 	}
 
-	// helper/schema should always copy the ID over, but do it again just to be safe
-	newInstanceState.Attributes["id"] = newInstanceState.ID
-
-	newStateVal, err := hcl2shim.HCL2ValueFromFlatmap(newInstanceState.Attributes, r.ImpliedType())
-	if err != nil {
-		return err
-	}
-
-	// In case it's not Imported we need a state
-	if r.state == nil {
-		r.state = &terraform.InstanceState{}
-	}
-
-	oldStateVal, err := hcl2shim.HCL2ValueFromFlatmap(r.state.Attributes, r.ImpliedType())
-	if err != nil {
-		return err
-	}
-
-	newStateVal = normalizeNullValues(newStateVal, oldStateVal, false)
-	newStateVal = copyTimeoutValues(newStateVal, oldStateVal)
-
 	meta, err := json.Marshal(r.state.Meta)
+	if err != nil {
+		return err
+	}
+
+	zstate, err := util.HashicorpToZclonfValue(rrres.NewState, r.tfResource.CoreConfigSchema().ImpliedType())
 	if err != nil {
 		return err
 	}
@@ -297,97 +302,12 @@ func (r *resource) Read(f *filter.Filter) error {
 	rio := providers.ImportedResource{
 		TypeName: r.resourceType,
 		Private:  meta,
-		State:    newStateVal,
+		State:    zstate,
 	}.AsInstanceObject()
 
 	r.resourceInstanceObject = rio
 
 	return nil
-}
-
-// refreshWithoutUpgrade reads the instance state, but does not call
-// MigrateState or the StateUpgraders, since those are now invoked in a
-// separate API call.
-// RefreshWithoutUpgrade is part of the new plugin shims.
-//
-// Copied from TF directly as we need the schema.ResourceData to generate
-// the HCL for now and with this we can get it
-func (r *resource) refreshWithoutUpgrade(s *terraform.InstanceState, meta interface{}) (*terraform.InstanceState, *schema.ResourceData, error) {
-	logger := log.Get()
-	// If there is no InstanceState means that it's not importable but we have to
-	// read it to put it on the config
-	if s != nil {
-		// If the ID is already somehow blank, it doesn't exist
-		if s.ID == "" {
-			return nil, nil, nil
-		}
-
-		rt := schema.ResourceTimeout{}
-		if _, ok := s.Meta[schema.TimeoutKey]; ok {
-			if err := rt.StateDecode(s); err != nil {
-				logger.Log("func", "refreshWithoutUpgrade", "resource", r.Type(), "msg", fmt.Sprintf("[ERR] Error decoding ResourceTimeout: %s", err))
-			}
-		}
-
-		if r.TFResource().Exists != nil {
-			// Make a copy of data so that if it is modified it doesn't
-			// affect our Read later.
-			data, err := schema.InternalMap(r.TFResource().Schema).Data(s, nil)
-			if err != nil {
-				return nil, nil, err
-			}
-
-			exists, err := r.TFResource().Exists(data, meta)
-			if err != nil {
-				return nil, nil, err
-			}
-
-			if !exists {
-				return nil, nil, nil
-			}
-		}
-	}
-
-	data, err := schema.InternalMap(r.TFResource().Schema).Data(s, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	// If the resouorce it's not Importer then the state it's not important
-	// and we can use the already created Data.
-	// This may only happen when the Read requires something that it's not
-	// and ID
-	if r.Data() != nil && r.tfResource.Importer == nil {
-		data = r.Data()
-	}
-
-	// If it has no ID on the data but yes on the resource set it
-	// this happens in resources which are not Imported (data will be nil)
-	// and the ID was setted only to the Resource on the initialization of
-	// the provider
-	if (data == nil || data.Id() == "") && r.ID() != "" {
-		data = r.Data()
-		data.SetId(r.ID())
-	}
-
-	err = r.TFResource().Read(data, meta)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	state := data.State()
-	if state != nil && state.ID == "" {
-		state = nil
-	}
-
-	if state != nil && r.TFResource().SchemaVersion > 0 {
-		if state.Meta == nil {
-			state.Meta = make(map[string]interface{})
-		}
-		state.Meta["schema_version"] = strconv.Itoa(r.TFResource().SchemaVersion)
-	}
-
-	return state, data, nil
 }
 
 // State calculates the state of the Resource and
@@ -758,205 +678,4 @@ func isConfig(sch *schema.Schema) bool {
 		return false
 	}
 	return true
-}
-
-// COPIED FROM TF AS THOSE ARE PRIVATE BUT NEEDED
-
-// Zero values and empty containers may be interchanged by the apply process.
-// When there is a discrepency between src and dst value being null or empty,
-// prefer the src value. This takes a little more liberty with set types, since
-// we can't correlate modified set values. In the case of sets, if the src set
-// was wholly known we assume the value was correctly applied and copy that
-// entirely to the new value.
-// While apply prefers the src value, during plan we prefer dst whenever there
-// is an unknown or a set is involved, since the plan can alter the value
-// however it sees fit. This however means that a CustomizeDiffFunction may not
-// be able to change a null to an empty value or vice versa, but that should be
-// very uncommon nor was it reliable before 0.12 either.
-func normalizeNullValues(dst, src cty.Value, apply bool) cty.Value {
-	ty := dst.Type()
-	if !src.IsNull() && !src.IsKnown() {
-		// Return src during plan to retain unknown interpolated placeholders,
-		// which could be lost if we're only updating a resource. If this is a
-		// read scenario, then there shouldn't be any unknowns at all.
-		if dst.IsNull() && !apply {
-			return src
-		}
-		return dst
-	}
-
-	// Handle null/empty changes for collections during apply.
-	// A change between null and empty values prefers src to make sure the state
-	// is consistent between plan and apply.
-	if ty.IsCollectionType() && apply {
-		dstEmpty := !dst.IsNull() && dst.IsKnown() && dst.LengthInt() == 0
-		srcEmpty := !src.IsNull() && src.IsKnown() && src.LengthInt() == 0
-
-		if (src.IsNull() && dstEmpty) || (srcEmpty && dst.IsNull()) {
-			return src
-		}
-	}
-
-	if src.IsNull() || !src.IsKnown() || !dst.IsKnown() {
-		return dst
-	}
-
-	switch {
-	case ty.IsMapType(), ty.IsObjectType():
-		var dstMap map[string]cty.Value
-		if !dst.IsNull() {
-			dstMap = dst.AsValueMap()
-		}
-		if dstMap == nil {
-			dstMap = map[string]cty.Value{}
-		}
-
-		srcMap := src.AsValueMap()
-		for key, v := range srcMap {
-			dstVal, ok := dstMap[key]
-			if !ok && apply && ty.IsMapType() {
-				// don't transfer old map values to dst during apply
-				continue
-			}
-
-			if dstVal == cty.NilVal {
-				if !apply && ty.IsMapType() {
-					// let plan shape this map however it wants
-					continue
-				}
-				dstVal = cty.NullVal(v.Type())
-			}
-
-			dstMap[key] = normalizeNullValues(dstVal, v, apply)
-		}
-
-		// you can't call MapVal/ObjectVal with empty maps, but nothing was
-		// copied in anyway. If the dst is nil, and the src is known, assume the
-		// src is correct.
-		if len(dstMap) == 0 {
-			if dst.IsNull() && src.IsWhollyKnown() && apply {
-				return src
-			}
-			return dst
-		}
-
-		if ty.IsMapType() {
-			// helper/schema will populate an optional+computed map with
-			// unknowns which we have to fixup here.
-			// It would be preferable to simply prevent any known value from
-			// becoming unknown, but concessions have to be made to retain the
-			// broken legacy behavior when possible.
-			for k, srcVal := range srcMap {
-				if !srcVal.IsNull() && srcVal.IsKnown() {
-					dstVal, ok := dstMap[k]
-					if !ok {
-						continue
-					}
-
-					if !dstVal.IsNull() && !dstVal.IsKnown() {
-						dstMap[k] = srcVal
-					}
-				}
-			}
-
-			return cty.MapVal(dstMap)
-		}
-
-		return cty.ObjectVal(dstMap)
-
-	case ty.IsSetType():
-		// If the original was wholly known, then we expect that is what the
-		// provider applied. The apply process loses too much information to
-		// reliably re-create the set.
-		if src.IsWhollyKnown() && apply {
-			return src
-		}
-
-	case ty.IsListType(), ty.IsTupleType():
-		// If the dst is null, and the src is known, then we lost an empty value
-		// so take the original.
-		if dst.IsNull() {
-			if src.IsWhollyKnown() && src.LengthInt() == 0 && apply {
-				return src
-			}
-
-			// if dst is null and src only contains unknown values, then we lost
-			// those during a read or plan.
-			if !apply && !src.IsNull() {
-				allUnknown := true
-				for _, v := range src.AsValueSlice() {
-					if v.IsKnown() {
-						allUnknown = false
-						break
-					}
-				}
-				if allUnknown {
-					return src
-				}
-			}
-
-			return dst
-		}
-
-		// if the lengths are identical, then iterate over each element in succession.
-		srcLen := src.LengthInt()
-		dstLen := dst.LengthInt()
-		if srcLen == dstLen && srcLen > 0 {
-			srcs := src.AsValueSlice()
-			dsts := dst.AsValueSlice()
-
-			for i := 0; i < srcLen; i++ {
-				dsts[i] = normalizeNullValues(dsts[i], srcs[i], apply)
-			}
-
-			if ty.IsTupleType() {
-				return cty.TupleVal(dsts)
-			}
-			return cty.ListVal(dsts)
-		}
-
-	case ty.IsPrimitiveType():
-		if dst.IsNull() && src.IsWhollyKnown() && apply {
-			return src
-		}
-	}
-
-	return dst
-}
-
-// helper/schema throws away timeout values from the config and stores them in
-// the Private/Meta fields. we need to copy those values into the planned state
-// so that core doesn't see a perpetual diff with the timeout block.
-func copyTimeoutValues(to cty.Value, from cty.Value) cty.Value {
-	// if `to` is null we are planning to remove it altogether.
-	if to.IsNull() {
-		return to
-	}
-	toAttrs := to.AsValueMap()
-	// We need to remove the key since the hcl2shims will add a non-null block
-	// because we can't determine if a single block was null from the flatmapped
-	// values. This needs to conform to the correct schema for marshaling, so
-	// change the value to null rather than deleting it from the object map.
-	timeouts, ok := toAttrs[schema.TimeoutsConfigKey]
-	if ok {
-		toAttrs[schema.TimeoutsConfigKey] = cty.NullVal(timeouts.Type())
-	}
-
-	// if from is null then there are no timeouts to copy
-	if from.IsNull() {
-		return cty.ObjectVal(toAttrs)
-	}
-
-	fromAttrs := from.AsValueMap()
-	timeouts, ok = fromAttrs[schema.TimeoutsConfigKey]
-
-	// timeouts shouldn't be unknown, but don't copy possibly invalid values either
-	if !ok || timeouts.IsNull() || !timeouts.IsWhollyKnown() {
-		// no timeouts block to copy
-		return cty.ObjectVal(toAttrs)
-	}
-
-	toAttrs[schema.TimeoutsConfigKey] = timeouts
-
-	return cty.ObjectVal(toAttrs)
 }
