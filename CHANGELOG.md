@@ -7,6 +7,11 @@
 - Skip resources that are not Importable from the Provider
   ([PR #191](https://github.com/cycloidio/terracognita/pull/191))
 
+### Changed
+
+- Migrate all the logic to use terraform-plugin-sdk/v2
+  ([Issue #151](https://github.com/cycloidio/terracognita/issues/151))
+
 ## [0.6.4] _2021-04-29_
 
 ### Changed
