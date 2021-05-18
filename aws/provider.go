@@ -11,7 +11,7 @@ import (
 	"github.com/cycloidio/terracognita/filter"
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/provider"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/pkg/errors"
 	tfaws "github.com/terraform-providers/terraform-provider-aws/aws"
 )
@@ -56,7 +56,7 @@ func NewProvider(ctx context.Context, accessKey, secretKey, region, sessionToken
 		return nil, fmt.Errorf("could not initialize 'terraform/aws.Config.Client()' because: %s", err)
 	}
 
-	tfp := tfaws.Provider().(*schema.Provider)
+	tfp := tfaws.Provider()
 	tfp.SetMeta(awsClient)
 
 	return &aws{
