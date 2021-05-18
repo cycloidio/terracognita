@@ -11,10 +11,10 @@ import (
 	provider "github.com/cycloidio/terracognita/provider"
 	writer "github.com/cycloidio/terracognita/writer"
 	gomock "github.com/golang/mock/gomock"
-	schema "github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	terraform "github.com/hashicorp/terraform-plugin-sdk/terraform"
+	cty "github.com/hashicorp/go-cty/cty"
+	schema "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	terraform "github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	states "github.com/hashicorp/terraform/states"
-	cty "github.com/zclconf/go-cty/cty"
 )
 
 // Resource is a mock of Resource interface
