@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Fixed
+
+- `tc_category` no longer added to the generated HCL
+  ([PR #187](https://github.com/cycloidio/terracognita/pull/187))
+
 ## [0.6.4] _2021-04-29_
 
 ### Changed

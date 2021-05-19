@@ -31,8 +31,8 @@ require (
 	github.com/terraform-providers/terraform-provider-azurerm v1.44.1-0.20201029183808-d721bcc1bb55
 	github.com/terraform-providers/terraform-provider-random v2.0.0+incompatible // indirect
 	github.com/zclconf/go-cty v1.5.1
-	golang.org/x/lint v0.0.0-20201208152925-83fdc39ff7b5 // indirect
-	golang.org/x/tools v0.1.0 // indirect
+	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
+	golang.org/x/tools v0.1.1 // indirect
 	google.golang.org/api v0.31.1-0.20200914161323-7b3b1fe2dc94
 	gopkg.in/yaml.v2 v2.3.0
 )

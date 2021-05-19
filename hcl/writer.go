@@ -212,6 +212,12 @@ func (w *Writer) Sync() error {
 						attrKeys := getValueKeys(resource)
 						attrMap := resource.AsValueMap()
 						for _, attr := range attrKeys {
+							// We do not want to print on the HCL the
+							// resource category as it's just for
+							// internal usage
+							if attr == ResourceCategoryKey {
+								continue
+							}
 							value := attrMap[attr]
 							// in JSON representation, we can have a list of object
 							// e.g with ingress:[{ingress1}, {ingress2}, ... {ingressN}]
