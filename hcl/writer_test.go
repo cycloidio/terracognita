@@ -119,7 +119,8 @@ func TestHCLWriter_Sync(t *testing.T) {
 			mx    = mxwriter.NewMux()
 			hw    = hcl.NewWriter(mx, &writer.Options{Interpolate: true})
 			value = map[string]interface{}{
-				"key": "value",
+				"key":         "value",
+				"tc_category": "some-category",
 			}
 			hcl = `
 resource "type" "name" {
