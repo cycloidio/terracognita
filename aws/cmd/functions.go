@@ -75,6 +75,18 @@ var (
 
 		// ec2
 		Function{
+			HasNotPagination: true,
+			Entity:           "Addresses",
+			SingularEntity:   "Address",
+			Prefix:           "Describe",
+			Service:          "ec2",
+			Documentation: `
+			// GetAddresses returns all EC2 Addresses based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		Function{
 			FnAttributeList: "Reservations#Instances",
 			Entity:          "Instances",
 			Prefix:          "Describe",

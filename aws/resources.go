@@ -61,6 +61,7 @@ const (
 	DBParameterGroup
 	DBSubnetGroup
 	EBSVolume
+	EIP
 	ElasticacheCluster
 	ElasticsearchDomain
 	ElasticsearchDomainPolicy
@@ -155,6 +156,7 @@ var (
 		DBSubnetGroup:                  dbSubnetGroups,
 		//EBSSnapshot:         ebsSnapshots,
 		EBSVolume:                      ebsVolumes,
+		EIP:                            eips,
 		ElasticacheCluster:             elasticacheClusters,
 		ElasticsearchDomain:            elasticsearchDomains,
 		ElasticsearchDomainPolicy:      elasticsearchDomains,
@@ -405,6 +407,28 @@ func ebsVolumes(ctx context.Context, a *aws, resourceType string, filters *filte
 		if err != nil {
 			return nil, err
 		}
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func eips(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	eips, err := a.awsr.GetAddresses(ctx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+
+	for _, i := range eips {
+
+		r, err := initializeResource(a, *i.AllocationId, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
 		resources = append(resources, r)
 	}
 
