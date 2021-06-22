@@ -13,6 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/cloudfront/cloudfrontiface"
 	"github.com/aws/aws-sdk-go/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go/service/configservice/configserviceiface"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 	"github.com/aws/aws-sdk-go/service/elasticache/elasticacheiface"
@@ -93,6 +94,7 @@ type serviceConnector struct {
 	cloudfront           cloudfrontiface.CloudFrontAPI
 	cloudwatch           cloudwatchiface.CloudWatchAPI
 	configservice        configserviceiface.ConfigServiceAPI
+	dynamodb             dynamodbiface.DynamoDBAPI
 	ec2                  ec2iface.EC2API
 	elasticache          elasticacheiface.ElastiCacheAPI
 	elasticsearchservice elasticsearchserviceiface.ElasticsearchServiceAPI

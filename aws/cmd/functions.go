@@ -1029,5 +1029,35 @@ var (
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
+		// DynamoDB
+		Function{
+			FnName:                     "GetDynamodbTables",
+			Entity:                     "Tables",
+			FnAttributeList:            "TableNames",
+			FnOutput:                   "string",
+			Prefix:                     "List",
+			Service:                    "dynamodb",
+			FnPaginationAttribute:      "LastEvaluatedTableName",
+			FnInputPaginationAttribute: "ExclusiveStartTableName",
+			Documentation: `
+			// GetDynamodbTables returns the dynamodb talbles on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		Function{
+			FnName:                     "GetDynamodbGlobalTables",
+			Entity:                     "GlobalTables",
+			FnAttributeList:            "GlobalTables",
+			SingularEntity:             "GlobalTable",
+			Prefix:                     "List",
+			Service:                    "dynamodb",
+			FnPaginationAttribute:      "LastEvaluatedGlobalTableName",
+			FnInputPaginationAttribute: "ExclusiveStartGlobalTableName",
+			Documentation: `
+			// GetDynamodbGlobalTables returns the dynamodb global tables on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
 	}
 )

@@ -60,6 +60,8 @@ const (
 	DBInstance
 	DBParameterGroup
 	DBSubnetGroup
+	DynamodbGlobalTable
+	DynamodbTable
 	EBSVolume
 	EIP
 	ElasticacheCluster
@@ -154,6 +156,8 @@ var (
 		DBInstance:                     dbInstances,
 		DBParameterGroup:               dbParameterGroups,
 		DBSubnetGroup:                  dbSubnetGroups,
+		DynamodbGlobalTable:            dynamodbGlobalTables,
+		DynamodbTable:                  dynamodbTables,
 		//EBSSnapshot:         ebsSnapshots,
 		EBSVolume:                      ebsVolumes,
 		EIP:                            eips,
@@ -955,6 +959,49 @@ func dbSubnetGroups(ctx context.Context, a *aws, resourceType string, filters *f
 	}
 
 	return resources, nil
+}
+
+func dynamodbGlobalTables(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	dynamodbGlobalTables, err := a.awsr.GetDynamodbGlobalTables(ctx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range dynamodbGlobalTables {
+
+		r, err := initializeResource(a, *i.GlobalTableName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func dynamodbTables(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	dynamodbTables, err := a.awsr.GetDynamodbTables(ctx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range dynamodbTables {
+
+		r, err := initializeResource(a, *i, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+
 }
 
 func s3Buckets(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
