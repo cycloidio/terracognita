@@ -9,6 +9,7 @@ import (
 	awsSDK "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/aws/aws-sdk-go/service/ecs"
 	"github.com/aws/aws-sdk-go/service/elasticsearchservice"
 	"github.com/aws/aws-sdk-go/service/elb"
 	"github.com/aws/aws-sdk-go/service/elbv2"
@@ -63,6 +64,8 @@ const (
 	DynamodbGlobalTable
 	DynamodbTable
 	EBSVolume
+	ECSCluster
+	ECSService
 	EIP
 	ElasticacheCluster
 	ElasticsearchDomain
@@ -160,6 +163,8 @@ var (
 		DynamodbTable:                  dynamodbTables,
 		//EBSSnapshot:         ebsSnapshots,
 		EBSVolume:                      ebsVolumes,
+		ECSCluster:                     cacheECSClusters,
+		ECSService:                     ecsServices,
 		EIP:                            eips,
 		ElasticacheCluster:             elasticacheClusters,
 		ElasticsearchDomain:            elasticsearchDomains,
@@ -412,6 +417,107 @@ func ebsVolumes(ctx context.Context, a *aws, resourceType string, filters *filte
 			return nil, err
 		}
 		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func ecsClusters(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+
+	ecsClustersArns, err := a.awsr.GetECSClustersArns(ctx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+
+	// limited to 100 clusters arns by GetECSClusters call
+	chunkSize := 100
+	for c := 0; c < len(ecsClustersArns); c += chunkSize {
+		end := c + chunkSize
+
+		if end > len(ecsClustersArns) {
+			end = len(ecsClustersArns)
+		}
+
+		var input = &ecs.DescribeClustersInput{
+			Clusters: ecsClustersArns[c:end],
+		}
+
+		ecsClusters, err := a.awsr.GetECSClusters(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, i := range ecsClusters {
+			r, err := initializeResource(a, *i.ClusterName, resourceType)
+			if err != nil {
+				return nil, err
+			}
+
+			resources = append(resources, r)
+		}
+	}
+
+	return resources, nil
+}
+
+func ecsServices(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	// get cacheECSClustersArns
+	ecsClustersArns, err := getECSClustersNames(ctx, a, ECSCluster.String(), filters)
+	if err != nil {
+		return nil, err
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+
+	for _, ca := range ecsClustersArns {
+		// optimisation to get 100 by 100 instead of default 10
+		var input = &ecs.ListServicesInput{
+			Cluster:    &ca,
+			MaxResults: awsSDK.Int64(100),
+		}
+
+		ecsServicesArns, err := a.awsr.GetECSServicesArns(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		// GetECSServices limite DescribeServicesInput.Services 10 by 10
+		chunkSize := 10
+		for c := 0; c < len(ecsServicesArns); c += chunkSize {
+			end := c + chunkSize
+
+			if end > len(ecsServicesArns) {
+				end = len(ecsServicesArns)
+			}
+
+			var inputSvc = &ecs.DescribeServicesInput{
+				Cluster:  &ca,
+				Services: ecsServicesArns[c:end],
+			}
+
+			ecsServices, err := a.awsr.GetECSServices(ctx, inputSvc)
+
+			if err != nil {
+				return nil, err
+			}
+
+			for _, i := range ecsServices {
+
+				r, err := initializeResource(a, fmt.Sprintf("%s/%s", ca, *i.ServiceName), resourceType)
+				if err != nil {
+					return nil, err
+				}
+
+				resources = append(resources, r)
+			}
+		}
 	}
 
 	return resources, nil

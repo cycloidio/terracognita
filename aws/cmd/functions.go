@@ -1029,6 +1029,7 @@ var (
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
+
 		// DynamoDB
 		Function{
 			FnName:                     "GetDynamodbTables",
@@ -1044,7 +1045,6 @@ var (
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
-
 		Function{
 			FnName:                     "GetDynamodbGlobalTables",
 			Entity:                     "GlobalTables",
@@ -1056,6 +1056,62 @@ var (
 			FnInputPaginationAttribute: "ExclusiveStartGlobalTableName",
 			Documentation: `
 			// GetDynamodbGlobalTables returns the dynamodb global tables on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		// ECS
+		Function{
+			FnName:                     "GetECSClustersArns",
+			Entity:                     "Clusters",
+			FnAttributeList:            "ClusterArns",
+			FnOutput:                   "string",
+			Prefix:                     "List",
+			Service:                    "ecs",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
+			Documentation: `
+			// GetECSClustersArns returns the ecs clusters arns on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:           "GetECSClusters",
+			Entity:           "Clusters",
+			FnAttributeList:  "Clusters",
+			SingularEntity:   "Cluster",
+			Prefix:           "Describe",
+			Service:          "ecs",
+			HasNotPagination: true,
+			Documentation: `
+			// GetECSClusters returns the ecs clusters on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:                     "GetECSServicesArns",
+			Entity:                     "Services",
+			FnAttributeList:            "ServiceArns",
+			FnOutput:                   "string",
+			Prefix:                     "List",
+			Service:                    "ecs",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
+			Documentation: `
+			// GetECSServicesArns returns the ecs services arns on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:           "GetECSServices",
+			Entity:           "Services",
+			FnAttributeList:  "Services",
+			SingularEntity:   "Service",
+			Prefix:           "Describe",
+			Service:          "ecs",
+			HasNotPagination: true,
+			Documentation: `
+			// GetECSServices returns the ecs services on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},

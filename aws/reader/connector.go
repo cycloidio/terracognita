@@ -16,6 +16,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
+	"github.com/aws/aws-sdk-go/service/ecs/ecsiface"
 	"github.com/aws/aws-sdk-go/service/elasticache/elasticacheiface"
 	"github.com/aws/aws-sdk-go/service/elasticsearchservice/elasticsearchserviceiface"
 	"github.com/aws/aws-sdk-go/service/elb/elbiface"
@@ -96,6 +97,7 @@ type serviceConnector struct {
 	configservice        configserviceiface.ConfigServiceAPI
 	dynamodb             dynamodbiface.DynamoDBAPI
 	ec2                  ec2iface.EC2API
+	ecs                  ecsiface.ECSAPI
 	elasticache          elasticacheiface.ElastiCacheAPI
 	elasticsearchservice elasticsearchserviceiface.ElasticsearchServiceAPI
 	elb                  elbiface.ELBAPI
