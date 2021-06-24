@@ -2,6 +2,7 @@ package aws
 
 import (
 	"context"
+	"strings"
 
 	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/filter"
@@ -346,6 +347,42 @@ func getECSClustersNames(ctx context.Context, a *aws, rt string, filters *filter
 	names := make([]string, 0, len(rs))
 	for _, i := range rs {
 		names = append(names, i.ID())
+	}
+
+	return names, nil
+}
+
+func cacheGlueDatabases(ctx context.Context, a *aws, rt string, filters *filter.Filter) ([]provider.Resource, error) {
+
+	rs, err := a.cache.Get(rt)
+	if err != nil {
+		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
+			return nil, errors.WithStack(err)
+		}
+
+		rs, err = glueCatalogDatabases(ctx, a, rt, filters)
+		if err != nil {
+			return nil, err
+		}
+
+		err = a.cache.Set(rt, rs)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return rs, nil
+}
+
+func getGlueDatabasesNames(ctx context.Context, a *aws, rt string, filters *filter.Filter) ([]string, error) {
+	rs, err := cacheGlueDatabases(ctx, a, rt, filters)
+	if err != nil {
+		return nil, err
+	}
+
+	names := make([]string, 0, len(rs))
+	for _, i := range rs {
+		names = append(names, strings.SplitN(i.ID(), ":", 2)[1])
 	}
 
 	return names, nil

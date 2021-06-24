@@ -13,6 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/elasticsearchservice"
 	"github.com/aws/aws-sdk-go/service/elb"
 	"github.com/aws/aws-sdk-go/service/elbv2"
+	"github.com/aws/aws-sdk-go/service/glue"
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/route53"
 	"github.com/aws/aws-sdk-go/service/ses"
@@ -52,6 +53,9 @@ const (
 	APIGatewayStage
 	APIGatewayResource
 	APIGatewayRestAPI
+	AthenaWorkgroup
+	//AthenaDatabase // conflict with GlueDatabase
+	//AthenaTable // conflict with GlueTable
 	AutoscalingGroup
 	AutoscalingPolicy
 	CloudfrontDistribution
@@ -71,6 +75,8 @@ const (
 	ElasticsearchDomain
 	ElasticsearchDomainPolicy
 	ELB
+	GlueCatalogDatabase
+	GlueCatalogTable
 	IAMAccessKey
 	IAMAccountAlias
 	IAMAccountPasswordPolicy
@@ -150,6 +156,7 @@ var (
 		APIGatewayStage:                apiGatewayStages,
 		APIGatewayResource:             apiGatewayResources,
 		APIGatewayRestAPI:              apiGatewayRestApis,
+		AthenaWorkgroup:                athenaWorkgroups,
 		AutoscalingGroup:               autoscalingGroups,
 		AutoscalingPolicy:              autoscalingPolicies,
 		CloudfrontDistribution:         cloudfrontDistributions,
@@ -170,6 +177,8 @@ var (
 		ElasticsearchDomain:            elasticsearchDomains,
 		ElasticsearchDomainPolicy:      elasticsearchDomains,
 		ELB:                            elbs,
+		GlueCatalogDatabase:            cacheGlueDatabases,
+		GlueCatalogTable:               glueCatalogTables,
 		IAMAccessKey:                   iamAccessKeys,
 		IAMAccountAlias:                iamAccountAliases,
 		IAMAccountPasswordPolicy:       iamAccountPasswordPolicy,
@@ -425,7 +434,6 @@ func ebsVolumes(ctx context.Context, a *aws, resourceType string, filters *filte
 func ecsClusters(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 
 	ecsClustersArns, err := a.awsr.GetECSClustersArns(ctx, nil)
-
 	if err != nil {
 		return nil, err
 	}
@@ -700,6 +708,57 @@ func elbs(ctx context.Context, a *aws, resourceType string, filters *filter.Filt
 		resources = append(resources, r)
 	}
 
+	return resources, nil
+}
+
+func glueCatalogDatabases(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	glueCatalogDatabases, err := a.awsr.GetGlueDatabases(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range glueCatalogDatabases {
+		r, err := initializeResource(a, fmt.Sprintf("%s:%s", *i.CatalogId, *i.Name), resourceType)
+		if err != nil {
+			return nil, err
+		}
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func glueCatalogTables(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	glueCatalogDatabases, err := getGlueDatabasesNames(ctx, a, GlueCatalogDatabase.String(), filters)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(glueCatalogDatabases) == 0 {
+		return nil, nil
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, db := range glueCatalogDatabases {
+		input := &glue.GetTablesInput{
+			DatabaseName: &db,
+		}
+
+		glueCatalogTables, err := a.awsr.GetGlueTables(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, i := range glueCatalogTables {
+			r, err := initializeResource(a, fmt.Sprintf("%s:%s:%s", *i.CatalogId, *i.DatabaseName, *i.Name), resourceType)
+			if err != nil {
+				return nil, err
+			}
+
+			resources = append(resources, r)
+		}
+	}
 	return resources, nil
 }
 
@@ -2258,6 +2317,31 @@ func apiGatewayRestApis(ctx context.Context, a *aws, resourceType string, filter
 	for _, i := range apiGatewayRestApis {
 
 		r, err := initializeResource(a, *i.Id, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func athenaWorkgroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+
+	athenaWorkGroups, err := a.awsr.GetAthenaWorkGroups(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, w := range athenaWorkGroups {
+		// skip the default primary managed by aws
+		if *w.Name == "primary" {
+			continue
+		}
+
+		r, err := initializeResource(a, *w.Name, resourceType)
 		if err != nil {
 			return nil, err
 		}

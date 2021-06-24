@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/apigateway/apigatewayiface"
+	"github.com/aws/aws-sdk-go/service/athena/athenaiface"
 	"github.com/aws/aws-sdk-go/service/autoscaling/autoscalingiface"
 	"github.com/aws/aws-sdk-go/service/cloudfront/cloudfrontiface"
 	"github.com/aws/aws-sdk-go/service/cloudwatch/cloudwatchiface"
@@ -21,6 +22,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/elasticsearchservice/elasticsearchserviceiface"
 	"github.com/aws/aws-sdk-go/service/elb/elbiface"
 	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
+	"github.com/aws/aws-sdk-go/service/glue/glueiface"
 	"github.com/aws/aws-sdk-go/service/iam/iamiface"
 	"github.com/aws/aws-sdk-go/service/lambda/lambdaiface"
 	"github.com/aws/aws-sdk-go/service/rds/rdsiface"
@@ -91,6 +93,7 @@ func (c *connector) GetRegion() string {
 
 type serviceConnector struct {
 	apigateway           apigatewayiface.APIGatewayAPI
+	athena               athenaiface.AthenaAPI
 	autoscaling          autoscalingiface.AutoScalingAPI
 	cloudfront           cloudfrontiface.CloudFrontAPI
 	cloudwatch           cloudwatchiface.CloudWatchAPI
@@ -102,6 +105,7 @@ type serviceConnector struct {
 	elasticsearchservice elasticsearchserviceiface.ElasticsearchServiceAPI
 	elb                  elbiface.ELBAPI
 	elbv2                elbv2iface.ELBV2API
+	glue                 glueiface.GlueAPI
 	iam                  iamiface.IAMAPI
 	lambda               lambdaiface.LambdaAPI
 	rds                  rdsiface.RDSAPI

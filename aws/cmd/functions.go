@@ -61,6 +61,52 @@ var (
 			`,
 		},
 
+		// Glue
+		Function{
+			FnName:                     "GetGlueDatabases",
+			Entity:                     "Databases",
+			FnAttributeList:            "DatabaseList",
+			SingularEntity:             "Database",
+			Prefix:                     "Get",
+			Service:                    "glue",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
+			Documentation: `
+			// GetGlueDatabases returns the Glue databases on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:                     "GetGlueTables",
+			Entity:                     "Tables",
+			FnAttributeList:            "TableList",
+			SingularEntity:             "TableData",
+			Prefix:                     "Get",
+			Service:                    "glue",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
+			Documentation: `
+			// GetGlueTables returns the Glue Tables on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		// Athena
+		Function{
+			FnName:                     "GetAthenaWorkGroups",
+			Entity:                     "WorkGroups",
+			FnAttributeList:            "WorkGroups",
+			SingularEntity:             "WorkGroupSummary",
+			Prefix:                     "List",
+			Service:                    "athena",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
+			Documentation: `
+			// GetAthenaDataCatalogs returns the Athena worker groups on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
 		// cloudwatch
 		Function{
 			Entity:          "MetricAlarms",
