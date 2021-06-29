@@ -80,6 +80,7 @@ const (
 	EIP
 	EKSCluster
 	ElasticacheCluster
+	ElasticacheReplicationGroup
 	ElasticsearchDomain
 	ElasticsearchDomainPolicy
 	ELB
@@ -190,6 +191,7 @@ var (
 		EIP:                            eips,
 		EKSCluster:                     eksClusters,
 		ElasticacheCluster:             elasticacheClusters,
+		ElasticacheReplicationGroup:    elasticacheReplicationGroups,
 		ElasticsearchDomain:            elasticsearchDomains,
 		ElasticsearchDomainPolicy:      elasticsearchDomains,
 		ELB:                            elbs,
@@ -601,7 +603,6 @@ func eksClusters(ctx context.Context, a *aws, resourceType string, filters *filt
 
 	resources := make([]provider.Resource, 0)
 	for _, i := range eksClusters {
-
 		var input = &eks.DescribeClusterInput{
 			Name: i,
 		}
@@ -682,6 +683,24 @@ func elasticacheClusters(ctx context.Context, a *aws, resourceType string, filte
 	resources := make([]provider.Resource, 0)
 	for _, v := range cacheClusters {
 		r, err := initializeResource(a, *v.CacheClusterId, resourceType)
+		if err != nil {
+			return nil, err
+		}
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func elasticacheReplicationGroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	elasticacheReplicationGroups, err := a.awsr.GetElastiCacheReplicationGroups(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range elasticacheReplicationGroups {
+		r, err := initializeResource(a, *i.ReplicationGroupId, resourceType)
 		if err != nil {
 			return nil, err
 		}

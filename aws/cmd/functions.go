@@ -432,6 +432,20 @@ var (
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
+		Function{
+			FnName:                     "GetElastiCacheReplicationGroups",
+			Entity:                     "ReplicationGroups",
+			FnAttributeList:            "ReplicationGroups",
+			SingularEntity:             "ReplicationGroup",
+			Prefix:                     "Describe",
+			Service:                    "elasticache",
+			FnPaginationAttribute:      "Marker",
+			FnInputPaginationAttribute: "Marker",
+			Documentation: `
+			// GetElastiCacheReplicationGroups returns the EKS Replication groups on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
 
 		// elasticsearch
 		Function{
