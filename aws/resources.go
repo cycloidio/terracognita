@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ecs"
+	"github.com/aws/aws-sdk-go/service/eks"
 	"github.com/aws/aws-sdk-go/service/elasticsearchservice"
 	"github.com/aws/aws-sdk-go/service/elb"
 	"github.com/aws/aws-sdk-go/service/elbv2"
@@ -77,6 +78,7 @@ const (
 	ECSService
 	EFSFileSystem
 	EIP
+	EKSCluster
 	ElasticacheCluster
 	ElasticsearchDomain
 	ElasticsearchDomainPolicy
@@ -186,6 +188,7 @@ var (
 		ECSService:                     ecsServices,
 		EFSFileSystem:                  efsFileSystems,
 		EIP:                            eips,
+		EKSCluster:                     eksClusters,
 		ElasticacheCluster:             elasticacheClusters,
 		ElasticsearchDomain:            elasticsearchDomains,
 		ElasticsearchDomainPolicy:      elasticsearchDomains,
@@ -568,7 +571,6 @@ func efsFileSystems(ctx context.Context, a *aws, resourceType string, filters *f
 
 func eips(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	eips, err := a.awsr.GetAddresses(ctx, nil)
-
 	if err != nil {
 		return nil, err
 	}
@@ -576,8 +578,39 @@ func eips(ctx context.Context, a *aws, resourceType string, filters *filter.Filt
 	resources := make([]provider.Resource, 0)
 
 	for _, i := range eips {
-
 		r, err := initializeResource(a, *i.AllocationId, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func eksClusters(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	eksClusters, err := a.awsr.GetEKSClusters(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(eksClusters) == 0 {
+		return nil, nil
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range eksClusters {
+
+		var input = &eks.DescribeClusterInput{
+			Name: i,
+		}
+		eksCluster, err := a.awsr.GetEKSCluster(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		r, err := initializeResource(a, *eksCluster.Name, resourceType)
 		if err != nil {
 			return nil, err
 		}

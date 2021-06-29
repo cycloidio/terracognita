@@ -377,6 +377,36 @@ var (
 			`,
 		},
 
+		// eks
+		Function{
+			FnName:                     "GetEKSClusters",
+			Entity:                     "Clusters",
+			FnAttributeList:            "Clusters",
+			FnOutput:                   "string",
+			Prefix:                     "List",
+			Service:                    "eks",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
+			Documentation: `
+			// GetEKSClusters returns the EKS Clusters on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:           "GetEKSCluster",
+			Entity:           "Cluster",
+			FnAttributeList:  "Cluster",
+			SingularEntity:   "Cluster",
+			Prefix:           "Describe",
+			Service:          "eks",
+			HasNotPagination: true,
+			HasNoSlice:       true,
+			Documentation: `
+			// GetEKSCluster returns the EKS Cluster on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
 		// elasticache
 		Function{
 			FnName:                "GetElastiCacheClusters",
