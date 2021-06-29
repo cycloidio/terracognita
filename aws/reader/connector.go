@@ -17,11 +17,13 @@ import (
 	"github.com/aws/aws-sdk-go/service/configservice/configserviceiface"
 	"github.com/aws/aws-sdk-go/service/databasemigrationservice/databasemigrationserviceiface"
 	"github.com/aws/aws-sdk-go/service/dax/daxiface"
+	"github.com/aws/aws-sdk-go/service/directconnect/directconnectiface"
 	"github.com/aws/aws-sdk-go/service/directoryservice/directoryserviceiface"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 	"github.com/aws/aws-sdk-go/service/ecs/ecsiface"
+	"github.com/aws/aws-sdk-go/service/efs/efsiface"
 	"github.com/aws/aws-sdk-go/service/elasticache/elasticacheiface"
 	"github.com/aws/aws-sdk-go/service/elasticsearchservice/elasticsearchserviceiface"
 	"github.com/aws/aws-sdk-go/service/elb/elbiface"
@@ -106,10 +108,12 @@ type serviceConnector struct {
 	configservice            configserviceiface.ConfigServiceAPI
 	databasemigrationservice databasemigrationserviceiface.DatabaseMigrationServiceAPI
 	dax                      daxiface.DAXAPI
+	directconnect            directconnectiface.DirectConnectAPI
 	directoryservice         directoryserviceiface.DirectoryServiceAPI
 	dynamodb                 dynamodbiface.DynamoDBAPI
 	ec2                      ec2iface.EC2API
 	ecs                      ecsiface.ECSAPI
+	efs                      efsiface.EFSAPI
 	elasticache              elasticacheiface.ElastiCacheAPI
 	elasticsearchservice     elasticsearchserviceiface.ElasticsearchServiceAPI
 	elb                      elbiface.ELBAPI

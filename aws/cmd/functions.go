@@ -345,6 +345,38 @@ var (
 			`,
 		},
 
+		// directconnect / dx
+		Function{
+			FnName:                     "GetDirectConnectGateways",
+			Entity:                     "DirectConnectGateways",
+			FnAttributeList:            "DirectConnectGateways",
+			SingularEntity:             "Gateway",
+			Prefix:                     "Describe",
+			Service:                    "directconnect",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
+			Documentation: `
+			// GetDirectConnectGateways returns the Direct Connect gateways on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		// efs
+		Function{
+			FnName:                     "GetEFSFileSystems",
+			Entity:                     "FileSystems",
+			FnAttributeList:            "FileSystems",
+			SingularEntity:             "FileSystemDescription",
+			Prefix:                     "Describe",
+			Service:                    "efs",
+			FnPaginationAttribute:      "NextMarker",
+			FnInputPaginationAttribute: "Marker",
+			Documentation: `
+			// GetEFSFileSystems returns the EFS File Systems on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
 		// elasticache
 		Function{
 			FnName:                "GetElastiCacheClusters",

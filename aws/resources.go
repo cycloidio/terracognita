@@ -69,11 +69,13 @@ const (
 	DBSubnetGroup
 	DirectoryServiceDirectory
 	DmsReplicationInstance
+	DXGateway
 	DynamodbGlobalTable
 	DynamodbTable
 	EBSVolume
 	ECSCluster
 	ECSService
+	EFSFileSystem
 	EIP
 	ElasticacheCluster
 	ElasticsearchDomain
@@ -175,12 +177,14 @@ var (
 		DBSubnetGroup:                  dbSubnetGroups,
 		DirectoryServiceDirectory:      directoryServiceDirectories,
 		DmsReplicationInstance:         dmsReplicationInstances,
+		DXGateway:                      dxGateways,
 		DynamodbGlobalTable:            dynamodbGlobalTables,
 		DynamodbTable:                  dynamodbTables,
 		//EBSSnapshot:         ebsSnapshots,
 		EBSVolume:                      ebsVolumes,
 		ECSCluster:                     cacheECSClusters,
 		ECSService:                     ecsServices,
+		EFSFileSystem:                  efsFileSystems,
 		EIP:                            eips,
 		ElasticacheCluster:             elasticacheClusters,
 		ElasticsearchDomain:            elasticsearchDomains,
@@ -536,6 +540,27 @@ func ecsServices(ctx context.Context, a *aws, resourceType string, filters *filt
 				resources = append(resources, r)
 			}
 		}
+	}
+
+	return resources, nil
+}
+
+func efsFileSystems(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	efsFileSystems, err := a.awsr.GetEFSFileSystems(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+
+	for _, i := range efsFileSystems {
+
+		r, err := initializeResource(a, *i.FileSystemId, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
 	}
 
 	return resources, nil
@@ -2488,6 +2513,25 @@ func dmsReplicationInstances(ctx context.Context, a *aws, resourceType string, f
 	resources := make([]provider.Resource, 0)
 	for _, i := range dmsReplicationInstances {
 		r, err := initializeResource(a, *i.ReplicationInstanceIdentifier, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func dxGateways(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	dxGateways, err := a.awsr.GetDirectConnectGateways(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range dxGateways {
+		r, err := initializeResource(a, *i.DirectConnectGatewayId, resourceType)
 		if err != nil {
 			return nil, err
 		}
