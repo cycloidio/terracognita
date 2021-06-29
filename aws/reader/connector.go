@@ -22,6 +22,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/elasticsearchservice/elasticsearchserviceiface"
 	"github.com/aws/aws-sdk-go/service/elb/elbiface"
 	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
+	"github.com/aws/aws-sdk-go/service/fsx/fsxiface"
 	"github.com/aws/aws-sdk-go/service/glue/glueiface"
 	"github.com/aws/aws-sdk-go/service/iam/iamiface"
 	"github.com/aws/aws-sdk-go/service/lambda/lambdaiface"
@@ -105,6 +106,7 @@ type serviceConnector struct {
 	elasticsearchservice elasticsearchserviceiface.ElasticsearchServiceAPI
 	elb                  elbiface.ELBAPI
 	elbv2                elbv2iface.ELBV2API
+	fsx                  fsxiface.FSxAPI
 	glue                 glueiface.GlueAPI
 	iam                  iamiface.IAMAPI
 	lambda               lambdaiface.LambdaAPI

@@ -648,6 +648,22 @@ var (
 			`,
 		},
 
+		// fsx
+		Function{
+			FnName:                     "GetFSXFileSystems",
+			Entity:                     "FileSystems",
+			FnAttributeList:            "FileSystems",
+			SingularEntity:             "FileSystem",
+			Prefix:                     "Describe",
+			Service:                    "fsx",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
+			Documentation: `
+			// GetFSXFileSystems returns the fsx filesystems arns on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
 		// iam
 		Function{
 			Entity:                "AccessKeys",

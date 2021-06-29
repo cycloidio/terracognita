@@ -75,6 +75,7 @@ const (
 	ElasticsearchDomain
 	ElasticsearchDomainPolicy
 	ELB
+	FsxLustreFileSystem
 	GlueCatalogDatabase
 	GlueCatalogTable
 	IAMAccessKey
@@ -177,6 +178,7 @@ var (
 		ElasticsearchDomain:            elasticsearchDomains,
 		ElasticsearchDomainPolicy:      elasticsearchDomains,
 		ELB:                            elbs,
+		FsxLustreFileSystem:            fsxLustreFileSystems,
 		GlueCatalogDatabase:            cacheGlueDatabases,
 		GlueCatalogTable:               glueCatalogTables,
 		IAMAccessKey:                   iamAccessKeys,
@@ -702,6 +704,24 @@ func elbs(ctx context.Context, a *aws, resourceType string, filters *filter.Filt
 	resources := make([]provider.Resource, 0)
 	for _, v := range lbs {
 		r, err := initializeResource(a, *v.LoadBalancerName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func fsxLustreFileSystems(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	fsxLustreFileSystems, err := a.awsr.GetFSXFileSystems(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range fsxLustreFileSystems {
+		r, err := initializeResource(a, *i.FileSystemId, resourceType)
 		if err != nil {
 			return nil, err
 		}
