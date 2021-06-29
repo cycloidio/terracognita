@@ -281,6 +281,22 @@ var (
 		  `,
 		},
 
+		// batch
+		Function{
+			FnName:                     "GetBatchJobDefinitions",
+			Entity:                     "JobDefinitions",
+			FnAttributeList:            "JobDefinitions",
+			SingularEntity:             "JobDefinition",
+			Prefix:                     "Describe",
+			Service:                    "batch",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
+			Documentation: `
+			// GetBatchJobDefinitions returns the batch jobs on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
 		// elasticache
 		Function{
 			FnName:                "GetElastiCacheClusters",

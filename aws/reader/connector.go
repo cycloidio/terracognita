@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/apigateway/apigatewayiface"
 	"github.com/aws/aws-sdk-go/service/athena/athenaiface"
 	"github.com/aws/aws-sdk-go/service/autoscaling/autoscalingiface"
+	"github.com/aws/aws-sdk-go/service/batch/batchiface"
 	"github.com/aws/aws-sdk-go/service/cloudfront/cloudfrontiface"
 	"github.com/aws/aws-sdk-go/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go/service/configservice/configserviceiface"
@@ -96,6 +97,7 @@ type serviceConnector struct {
 	apigateway           apigatewayiface.APIGatewayAPI
 	athena               athenaiface.AthenaAPI
 	autoscaling          autoscalingiface.AutoScalingAPI
+	batch                batchiface.BatchAPI
 	cloudfront           cloudfrontiface.CloudFrontAPI
 	cloudwatch           cloudwatchiface.CloudWatchAPI
 	configservice        configserviceiface.ConfigServiceAPI

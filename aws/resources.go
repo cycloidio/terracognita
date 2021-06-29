@@ -58,6 +58,7 @@ const (
 	//AthenaTable // conflict with GlueTable
 	AutoscalingGroup
 	AutoscalingPolicy
+	BatchJobDefinition
 	CloudfrontDistribution
 	CloudfrontOriginAccessIdentity
 	CloudfrontPublicKey
@@ -160,6 +161,7 @@ var (
 		AthenaWorkgroup:                athenaWorkgroups,
 		AutoscalingGroup:               autoscalingGroups,
 		AutoscalingPolicy:              autoscalingPolicies,
+		BatchJobDefinition:             batchJobDefinitions,
 		CloudfrontDistribution:         cloudfrontDistributions,
 		CloudfrontOriginAccessIdentity: cloudfrontOriginAccessIdentities,
 		CloudfrontPublicKey:            cloudfrontPublicKeys,
@@ -2404,6 +2406,25 @@ func autoscalingPolicies(ctx context.Context, a *aws, resourceType string, filte
 	for _, i := range autoscalingPolicies {
 
 		r, err := initializeResource(a, *i.AutoScalingGroupName+"/"+*i.PolicyName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func batchJobDefinitions(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	batchJobDefinitions, err := a.awsr.GetBatchJobDefinitions(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range batchJobDefinitions {
+		r, err := initializeResource(a, *i.JobDefinitionArn, resourceType)
 		if err != nil {
 			return nil, err
 		}
