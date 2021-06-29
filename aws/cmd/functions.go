@@ -297,6 +297,54 @@ var (
 			`,
 		},
 
+		// dax
+		Function{
+			FnName:                     "GetDAXClusters",
+			Entity:                     "Clusters",
+			FnAttributeList:            "Clusters",
+			SingularEntity:             "Cluster",
+			Prefix:                     "Describe",
+			Service:                    "dax",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
+			Documentation: `
+			// GetDAXClusters returns the DAX clusters on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		// directoryservice
+		Function{
+			FnName:                     "GetDirectoryServiceDirectories",
+			Entity:                     "Directories",
+			FnAttributeList:            "DirectoryDescriptions",
+			SingularEntity:             "DirectoryDescription",
+			Prefix:                     "Describe",
+			Service:                    "directoryservice",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
+			Documentation: `
+			// GetDirectoryServiceDirectories returns the Directory Service directorie on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		// dms / databasemigrationservice
+		Function{
+			FnName:                     "GetDMSDescribeReplicationInstances",
+			Entity:                     "ReplicationInstances",
+			FnAttributeList:            "ReplicationInstances",
+			SingularEntity:             "ReplicationInstance",
+			Prefix:                     "Describe",
+			Service:                    "databasemigrationservice",
+			FnPaginationAttribute:      "Marker",
+			FnInputPaginationAttribute: "Marker",
+			Documentation: `
+			// GetDMSDescribeReplicationInstances returns the DMS replication instances on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
 		// elasticache
 		Function{
 			FnName:                "GetElastiCacheClusters",

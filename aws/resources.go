@@ -63,9 +63,12 @@ const (
 	CloudfrontOriginAccessIdentity
 	CloudfrontPublicKey
 	CloudwatchMetricAlarm
+	DaxCluster
 	DBInstance
 	DBParameterGroup
 	DBSubnetGroup
+	DirectoryServiceDirectory
+	DmsReplicationInstance
 	DynamodbGlobalTable
 	DynamodbTable
 	EBSVolume
@@ -166,9 +169,12 @@ var (
 		CloudfrontOriginAccessIdentity: cloudfrontOriginAccessIdentities,
 		CloudfrontPublicKey:            cloudfrontPublicKeys,
 		CloudwatchMetricAlarm:          cloudwatchMetricAlarms,
+		DaxCluster:                     daxClusters,
 		DBInstance:                     dbInstances,
 		DBParameterGroup:               dbParameterGroups,
 		DBSubnetGroup:                  dbSubnetGroups,
+		DirectoryServiceDirectory:      directoryServiceDirectories,
+		DmsReplicationInstance:         dmsReplicationInstances,
 		DynamodbGlobalTable:            dynamodbGlobalTables,
 		DynamodbTable:                  dynamodbTables,
 		//EBSSnapshot:         ebsSnapshots,
@@ -2425,6 +2431,63 @@ func batchJobDefinitions(ctx context.Context, a *aws, resourceType string, filte
 	resources := make([]provider.Resource, 0)
 	for _, i := range batchJobDefinitions {
 		r, err := initializeResource(a, *i.JobDefinitionArn, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func daxClusters(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	daxClusters, err := a.awsr.GetDAXClusters(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range daxClusters {
+		r, err := initializeResource(a, *i.ClusterName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func directoryServiceDirectories(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	directoryServiceDirectories, err := a.awsr.GetDirectoryServiceDirectories(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range directoryServiceDirectories {
+		r, err := initializeResource(a, *i.DirectoryId, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func dmsReplicationInstances(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	dmsReplicationInstances, err := a.awsr.GetDMSDescribeReplicationInstances(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range dmsReplicationInstances {
+		r, err := initializeResource(a, *i.ReplicationInstanceIdentifier, resourceType)
 		if err != nil {
 			return nil, err
 		}

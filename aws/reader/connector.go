@@ -15,6 +15,9 @@ import (
 	"github.com/aws/aws-sdk-go/service/cloudfront/cloudfrontiface"
 	"github.com/aws/aws-sdk-go/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go/service/configservice/configserviceiface"
+	"github.com/aws/aws-sdk-go/service/databasemigrationservice/databasemigrationserviceiface"
+	"github.com/aws/aws-sdk-go/service/dax/daxiface"
+	"github.com/aws/aws-sdk-go/service/directoryservice/directoryserviceiface"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
@@ -94,32 +97,35 @@ func (c *connector) GetRegion() string {
 }
 
 type serviceConnector struct {
-	apigateway           apigatewayiface.APIGatewayAPI
-	athena               athenaiface.AthenaAPI
-	autoscaling          autoscalingiface.AutoScalingAPI
-	batch                batchiface.BatchAPI
-	cloudfront           cloudfrontiface.CloudFrontAPI
-	cloudwatch           cloudwatchiface.CloudWatchAPI
-	configservice        configserviceiface.ConfigServiceAPI
-	dynamodb             dynamodbiface.DynamoDBAPI
-	ec2                  ec2iface.EC2API
-	ecs                  ecsiface.ECSAPI
-	elasticache          elasticacheiface.ElastiCacheAPI
-	elasticsearchservice elasticsearchserviceiface.ElasticsearchServiceAPI
-	elb                  elbiface.ELBAPI
-	elbv2                elbv2iface.ELBV2API
-	fsx                  fsxiface.FSxAPI
-	glue                 glueiface.GlueAPI
-	iam                  iamiface.IAMAPI
-	lambda               lambdaiface.LambdaAPI
-	rds                  rdsiface.RDSAPI
-	region               string
-	route53resolver      route53resolveriface.Route53ResolverAPI
-	route53              route53iface.Route53API
-	s3downloader         s3manageriface.DownloaderAPI
-	s3                   s3iface.S3API
-	ses                  sesiface.SESAPI
-	session              *session.Session
+	apigateway               apigatewayiface.APIGatewayAPI
+	athena                   athenaiface.AthenaAPI
+	autoscaling              autoscalingiface.AutoScalingAPI
+	batch                    batchiface.BatchAPI
+	cloudfront               cloudfrontiface.CloudFrontAPI
+	cloudwatch               cloudwatchiface.CloudWatchAPI
+	configservice            configserviceiface.ConfigServiceAPI
+	databasemigrationservice databasemigrationserviceiface.DatabaseMigrationServiceAPI
+	dax                      daxiface.DAXAPI
+	directoryservice         directoryserviceiface.DirectoryServiceAPI
+	dynamodb                 dynamodbiface.DynamoDBAPI
+	ec2                      ec2iface.EC2API
+	ecs                      ecsiface.ECSAPI
+	elasticache              elasticacheiface.ElastiCacheAPI
+	elasticsearchservice     elasticsearchserviceiface.ElasticsearchServiceAPI
+	elb                      elbiface.ELBAPI
+	elbv2                    elbv2iface.ELBV2API
+	fsx                      fsxiface.FSxAPI
+	glue                     glueiface.GlueAPI
+	iam                      iamiface.IAMAPI
+	lambda                   lambdaiface.LambdaAPI
+	rds                      rdsiface.RDSAPI
+	region                   string
+	route53resolver          route53resolveriface.Route53ResolverAPI
+	route53                  route53iface.Route53API
+	s3downloader             s3manageriface.DownloaderAPI
+	s3                       s3iface.S3API
+	ses                      sesiface.SESAPI
+	session                  *session.Session
 }
 
 // configureAWS creates a new static credential with the passed accessKey and
