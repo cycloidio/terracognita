@@ -1137,6 +1137,21 @@ var (
 			`,
 		},
 
+		// kinesis
+		Function{
+			FnName:           "GetKinesisStreams",
+			Entity:           "Streams",
+			FnAttributeList:  "StreamNames",
+			FnOutput:         "string",
+			Prefix:           "List",
+			Service:          "kinesis",
+			HasNotPagination: true,
+			Documentation: `
+			// GetKinesisStreams returns the Kinesis Streams on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
 		// ses
 		Function{
 			Entity:           "ActiveReceiptRuleSet",

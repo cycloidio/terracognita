@@ -115,6 +115,7 @@ const (
 	IAMUserSSHKey
 	InternetGateway
 	KeyPair
+	KinesisStream
 	LambdaFunction
 	LaunchConfiguration
 	LaunchTemplate
@@ -226,6 +227,7 @@ var (
 		Instance:                       instances,
 		InternetGateway:                internetGateways,
 		KeyPair:                        keyPairs,
+		KinesisStream:                  kinesisStreams,
 		LambdaFunction:                 lambdaFunctions,
 		LaunchConfiguration:            launchConfigurations,
 		LaunchTemplate:                 launchTemplates,
@@ -396,6 +398,25 @@ func keyPairs(ctx context.Context, a *aws, resourceType string, filters *filter.
 	for _, i := range keyPairs {
 
 		r, err := initializeResource(a, *i.KeyName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func kinesisStreams(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	kinesisStreams, err := a.awsr.GetKinesisStreams(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range kinesisStreams {
+		r, err := initializeResource(a, *i, resourceType)
 		if err != nil {
 			return nil, err
 		}

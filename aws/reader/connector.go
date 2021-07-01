@@ -34,6 +34,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/fsx/fsxiface"
 	"github.com/aws/aws-sdk-go/service/glue/glueiface"
 	"github.com/aws/aws-sdk-go/service/iam/iamiface"
+	"github.com/aws/aws-sdk-go/service/kinesis/kinesisiface"
 	"github.com/aws/aws-sdk-go/service/lambda/lambdaiface"
 	"github.com/aws/aws-sdk-go/service/rds/rdsiface"
 	"github.com/aws/aws-sdk-go/service/route53/route53iface"
@@ -127,6 +128,7 @@ type serviceConnector struct {
 	fsx                      fsxiface.FSxAPI
 	glue                     glueiface.GlueAPI
 	iam                      iamiface.IAMAPI
+	kinesis                  kinesisiface.KinesisAPI
 	lambda                   lambdaiface.LambdaAPI
 	rds                      rdsiface.RDSAPI
 	region                   string
