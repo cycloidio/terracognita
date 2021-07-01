@@ -26,9 +26,11 @@ import (
 	"github.com/aws/aws-sdk-go/service/efs/efsiface"
 	"github.com/aws/aws-sdk-go/service/eks/eksiface"
 	"github.com/aws/aws-sdk-go/service/elasticache/elasticacheiface"
+	"github.com/aws/aws-sdk-go/service/elasticbeanstalk/elasticbeanstalkiface"
 	"github.com/aws/aws-sdk-go/service/elasticsearchservice/elasticsearchserviceiface"
 	"github.com/aws/aws-sdk-go/service/elb/elbiface"
 	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
+	"github.com/aws/aws-sdk-go/service/emr/emriface"
 	"github.com/aws/aws-sdk-go/service/fsx/fsxiface"
 	"github.com/aws/aws-sdk-go/service/glue/glueiface"
 	"github.com/aws/aws-sdk-go/service/iam/iamiface"
@@ -117,9 +119,11 @@ type serviceConnector struct {
 	efs                      efsiface.EFSAPI
 	eks                      eksiface.EKSAPI
 	elasticache              elasticacheiface.ElastiCacheAPI
+	elasticbeanstalk         elasticbeanstalkiface.ElasticBeanstalkAPI
 	elasticsearchservice     elasticsearchserviceiface.ElasticsearchServiceAPI
 	elb                      elbiface.ELBAPI
 	elbv2                    elbv2iface.ELBV2API
+	emr                      emriface.EMRAPI
 	fsx                      fsxiface.FSxAPI
 	glue                     glueiface.GlueAPI
 	iam                      iamiface.IAMAPI

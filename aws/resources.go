@@ -81,9 +81,11 @@ const (
 	EKSCluster
 	ElasticacheCluster
 	ElasticacheReplicationGroup
+	ElasticBeanstalkApplication
 	ElasticsearchDomain
 	ElasticsearchDomainPolicy
 	ELB
+	EMRCluster
 	FsxLustreFileSystem
 	GlueCatalogDatabase
 	GlueCatalogTable
@@ -111,6 +113,7 @@ const (
 	IAMUserPolicy
 	IAMUserPolicyAttachment
 	IAMUserSSHKey
+	InternetGateway
 	KeyPair
 	LambdaFunction
 	LaunchConfiguration
@@ -192,9 +195,11 @@ var (
 		EKSCluster:                     eksClusters,
 		ElasticacheCluster:             elasticacheClusters,
 		ElasticacheReplicationGroup:    elasticacheReplicationGroups,
+		ElasticBeanstalkApplication:    elasticBeanstalkApplications,
 		ElasticsearchDomain:            elasticsearchDomains,
 		ElasticsearchDomainPolicy:      elasticsearchDomains,
 		ELB:                            elbs,
+		EMRCluster:                     emrClusters,
 		FsxLustreFileSystem:            fsxLustreFileSystems,
 		GlueCatalogDatabase:            cacheGlueDatabases,
 		GlueCatalogTable:               glueCatalogTables,
@@ -219,6 +224,7 @@ var (
 		IAMUserPolicy:                  iamUserPolicies,
 		IAMUserSSHKey:                  iamUserSSHKeys,
 		Instance:                       instances,
+		InternetGateway:                internetGateways,
 		KeyPair:                        keyPairs,
 		LambdaFunction:                 lambdaFunctions,
 		LaunchConfiguration:            launchConfigurations,
@@ -275,6 +281,28 @@ func instances(ctx context.Context, a *aws, resourceType string, filters *filter
 	resources := make([]provider.Resource, 0)
 	for _, i := range instances {
 		r, err := initializeResource(a, *i.InstanceId, resourceType)
+		if err != nil {
+			return nil, err
+		}
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func internetGateways(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	var input = &ec2.DescribeInternetGatewaysInput{
+		Filters: toEC2Filters(filters),
+	}
+
+	internetGateways, err := a.awsr.GetEC2InternetGateways(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range internetGateways {
+		r, err := initializeResource(a, *i.InternetGatewayId, resourceType)
 		if err != nil {
 			return nil, err
 		}
@@ -710,6 +738,24 @@ func elasticacheReplicationGroups(ctx context.Context, a *aws, resourceType stri
 	return resources, nil
 }
 
+func elasticBeanstalkApplications(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	elasticBeanstalkApplications, err := a.awsr.GetElasticBeanstalkApplications(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range elasticBeanstalkApplications {
+		r, err := initializeResource(a, *i.ApplicationName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
 func elasticsearchDomains(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	// this function is use for both aws_elasticsearch_domain and aws_elasticsearch_domain_policy
 	// if both defined, execute only aws_elasticsearch_domain
@@ -789,6 +835,24 @@ func elbs(ctx context.Context, a *aws, resourceType string, filters *filter.Filt
 	resources := make([]provider.Resource, 0)
 	for _, v := range lbs {
 		r, err := initializeResource(a, *v.LoadBalancerName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func emrClusters(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	emrClusters, err := a.awsr.GetEMRClusters(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range emrClusters {
+		r, err := initializeResource(a, *i.Id, resourceType)
 		if err != nil {
 			return nil, err
 		}

@@ -297,6 +297,49 @@ var (
 			`,
 		},
 
+		// cloudfront
+		Function{
+			FnName:                     "GetCloudFrontDistributions",
+			Entity:                     "Distributions",
+			Prefix:                     "List",
+			Service:                    "cloudfront",
+			SingularEntity:             "DistributionSummary",
+			FnPaginationAttribute:      "DistributionList.NextMarker",
+			FnInputPaginationAttribute: "Marker",
+			FnAttributeList:            "DistributionList.Items",
+			Documentation: `
+			// GetCloudFrontDistributions returns all the CloudFront Distributions on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:                     "GetCloudFrontPublicKeys",
+			Entity:                     "PublicKeys",
+			SingularEntity:             "PublicKeySummary",
+			FnAttributeList:            "PublicKeyList.Items",
+			FnPaginationAttribute:      "PublicKeyList.NextMarker",
+			FnInputPaginationAttribute: "Marker",
+			Prefix:                     "List",
+			Service:                    "cloudfront",
+			Documentation: `
+			// GetCloudFrontPublicKeys returns all the CloudFront Public Keys on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:                     "CloudFrontOriginAccessIdentities",
+			Prefix:                     "List",
+			Service:                    "cloudfront",
+			SingularEntity:             "OriginAccessIdentitySummary",
+			FnAttributeList:            "CloudFrontOriginAccessIdentityList.Items",
+			FnPaginationAttribute:      "CloudFrontOriginAccessIdentityList.NextMarker",
+			FnInputPaginationAttribute: "Marker",
+			Documentation: `
+			// GetCloudFrontOriginAccessIdentities returns all the CloudFront Origin Access Identities on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
 		// dax
 		Function{
 			FnName:                     "GetDAXClusters",
@@ -357,6 +400,76 @@ var (
 			FnInputPaginationAttribute: "NextToken",
 			Documentation: `
 			// GetDirectConnectGateways returns the Direct Connect gateways on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		// ECS
+		Function{
+			FnName:                     "GetECSClustersArns",
+			Entity:                     "Clusters",
+			FnAttributeList:            "ClusterArns",
+			FnOutput:                   "string",
+			Prefix:                     "List",
+			Service:                    "ecs",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
+			Documentation: `
+			// GetECSClustersArns returns the ecs clusters arns on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:           "GetECSClusters",
+			Entity:           "Clusters",
+			FnAttributeList:  "Clusters",
+			SingularEntity:   "Cluster",
+			Prefix:           "Describe",
+			Service:          "ecs",
+			HasNotPagination: true,
+			Documentation: `
+			// GetECSClusters returns the ecs clusters on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:                     "GetECSServicesArns",
+			Entity:                     "Services",
+			FnAttributeList:            "ServiceArns",
+			FnOutput:                   "string",
+			Prefix:                     "List",
+			Service:                    "ecs",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
+			Documentation: `
+			// GetECSServicesArns returns the ecs services arns on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:           "GetECSServices",
+			Entity:           "Services",
+			FnAttributeList:  "Services",
+			SingularEntity:   "Service",
+			Prefix:           "Describe",
+			Service:          "ecs",
+			HasNotPagination: true,
+			Documentation: `
+			// GetECSServices returns the ecs services on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:                     "GetEC2InternetGateways",
+			Entity:                     "InternetGateways",
+			FnAttributeList:            "InternetGateways",
+			SingularEntity:             "InternetGateway",
+			Prefix:                     "Describe",
+			Service:                    "ec2",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
+			Documentation: `
+			// GetEC2InternetGateways returns the EC2 Internet Gateways on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
@@ -443,6 +556,21 @@ var (
 			FnInputPaginationAttribute: "Marker",
 			Documentation: `
 			// GetElastiCacheReplicationGroups returns the EKS Replication groups on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		// elasticbeanstalk
+		Function{
+			FnName:           "GetElasticBeanstalkApplications",
+			Entity:           "Applications",
+			FnAttributeList:  "Applications",
+			SingularEntity:   "ApplicationDescription",
+			Prefix:           "Describe",
+			Service:          "elasticbeanstalk",
+			HasNotPagination: true,
+			Documentation: `
+			// GetElasticBeanstalkApplications returns the ElasticBeanstalk Applications on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
@@ -630,6 +758,21 @@ var (
 			`,
 		},
 
+		// emr
+		Function{
+			FnName:                "GetEMRClusters",
+			Entity:                "Clusters",
+			FnAttributeList:       "Clusters",
+			SingularEntity:        "ClusterSummary",
+			Prefix:                "List",
+			Service:               "emr",
+			FnPaginationAttribute: "Marker",
+			Documentation: `
+			// GetEMRClusters returns the EMR Clusters on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
 		// rds
 		Function{
 			Entity:                "DBInstances",
@@ -742,49 +885,6 @@ var (
 			// See https://docs.aws.amazon.com/config/latest/APIReference/API_GetDiscoveredResourceCounts.html
 			// for more information about what to enable in your AWS account, the list of
 			// supported resources, etc.
-			`,
-		},
-
-		// cloudfront
-		Function{
-			FnName:                     "GetCloudFrontDistributions",
-			Entity:                     "Distributions",
-			Prefix:                     "List",
-			Service:                    "cloudfront",
-			SingularEntity:             "DistributionSummary",
-			FnPaginationAttribute:      "DistributionList.NextMarker",
-			FnInputPaginationAttribute: "Marker",
-			FnAttributeList:            "DistributionList.Items",
-			Documentation: `
-			// GetCloudFrontDistributions returns all the CloudFront Distributions on the given input
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			FnName:                     "GetCloudFrontPublicKeys",
-			Entity:                     "PublicKeys",
-			SingularEntity:             "PublicKeySummary",
-			FnAttributeList:            "PublicKeyList.Items",
-			FnPaginationAttribute:      "PublicKeyList.NextMarker",
-			FnInputPaginationAttribute: "Marker",
-			Prefix:                     "List",
-			Service:                    "cloudfront",
-			Documentation: `
-			// GetCloudFrontPublicKeys returns all the CloudFront Public Keys on the given input
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			Entity:                     "CloudFrontOriginAccessIdentities",
-			Prefix:                     "List",
-			Service:                    "cloudfront",
-			SingularEntity:             "OriginAccessIdentitySummary",
-			FnAttributeList:            "CloudFrontOriginAccessIdentityList.Items",
-			FnPaginationAttribute:      "CloudFrontOriginAccessIdentityList.NextMarker",
-			FnInputPaginationAttribute: "Marker",
-			Documentation: `
-			// GetCloudFrontOriginAccessIdentities returns all the CloudFront Origin Access Identities on the given input
-			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 
@@ -1258,62 +1358,6 @@ var (
 			FnInputPaginationAttribute: "ExclusiveStartGlobalTableName",
 			Documentation: `
 			// GetDynamodbGlobalTables returns the dynamodb global tables on the given input
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-
-		// ECS
-		Function{
-			FnName:                     "GetECSClustersArns",
-			Entity:                     "Clusters",
-			FnAttributeList:            "ClusterArns",
-			FnOutput:                   "string",
-			Prefix:                     "List",
-			Service:                    "ecs",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
-			Documentation: `
-			// GetECSClustersArns returns the ecs clusters arns on the given input
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			FnName:           "GetECSClusters",
-			Entity:           "Clusters",
-			FnAttributeList:  "Clusters",
-			SingularEntity:   "Cluster",
-			Prefix:           "Describe",
-			Service:          "ecs",
-			HasNotPagination: true,
-			Documentation: `
-			// GetECSClusters returns the ecs clusters on the given input
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			FnName:                     "GetECSServicesArns",
-			Entity:                     "Services",
-			FnAttributeList:            "ServiceArns",
-			FnOutput:                   "string",
-			Prefix:                     "List",
-			Service:                    "ecs",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
-			Documentation: `
-			// GetECSServicesArns returns the ecs services arns on the given input
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			FnName:           "GetECSServices",
-			Entity:           "Services",
-			FnAttributeList:  "Services",
-			SingularEntity:   "Service",
-			Prefix:           "Describe",
-			Service:          "ecs",
-			HasNotPagination: true,
-			Documentation: `
-			// GetECSServices returns the ecs services on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
