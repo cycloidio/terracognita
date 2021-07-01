@@ -1152,6 +1152,54 @@ var (
 			`,
 		},
 
+		// lightsail
+		Function{
+			FnName:                     "GetLightsailInstances",
+			Entity:                     "Instances",
+			FnAttributeList:            "Instances",
+			SingularEntity:             "Instance",
+			Prefix:                     "Get",
+			Service:                    "lightsail",
+			FnPaginationAttribute:      "NextPageToken",
+			FnInputPaginationAttribute: "PageToken",
+			Documentation: `
+		  // GetLightsailInstances returns the Lightsail Instances on the given input
+		  // Returned values are commented in the interface doc comment block.
+		  `,
+		},
+
+		// mediastore
+		Function{
+			FnName:                     "GetMediastoreContainers",
+			Entity:                     "Containers",
+			FnAttributeList:            "Containers",
+			SingularEntity:             "Container",
+			Prefix:                     "List",
+			Service:                    "mediastore",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
+			Documentation: `
+		  // GetMediastoreContainers returns the Mediastore Containers on the given input
+		  // Returned values are commented in the interface doc comment block.
+		  `,
+		},
+
+		// mq
+		Function{
+			FnName:                     "GetMQBrokers",
+			Entity:                     "Brokers",
+			FnAttributeList:            "BrokerSummaries",
+			SingularEntity:             "BrokerSummary",
+			Prefix:                     "List",
+			Service:                    "mq",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
+			Documentation: `
+		  // GetMQBrokers returns the MQ Brokers on the given input
+		  // Returned values are commented in the interface doc comment block.
+		  `,
+		},
+
 		// ses
 		Function{
 			Entity:           "ActiveReceiptRuleSet",

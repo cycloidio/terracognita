@@ -36,6 +36,9 @@ import (
 	"github.com/aws/aws-sdk-go/service/iam/iamiface"
 	"github.com/aws/aws-sdk-go/service/kinesis/kinesisiface"
 	"github.com/aws/aws-sdk-go/service/lambda/lambdaiface"
+	"github.com/aws/aws-sdk-go/service/lightsail/lightsailiface"
+	"github.com/aws/aws-sdk-go/service/mediastore/mediastoreiface"
+	"github.com/aws/aws-sdk-go/service/mq/mqiface"
 	"github.com/aws/aws-sdk-go/service/rds/rdsiface"
 	"github.com/aws/aws-sdk-go/service/route53/route53iface"
 	"github.com/aws/aws-sdk-go/service/route53resolver/route53resolveriface"
@@ -130,6 +133,9 @@ type serviceConnector struct {
 	iam                      iamiface.IAMAPI
 	kinesis                  kinesisiface.KinesisAPI
 	lambda                   lambdaiface.LambdaAPI
+	lightsail                lightsailiface.LightsailAPI
+	mediastore               mediastoreiface.MediaStoreAPI
+	mq                       mqiface.MQAPI
 	rds                      rdsiface.RDSAPI
 	region                   string
 	route53resolver          route53resolveriface.Route53ResolverAPI

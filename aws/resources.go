@@ -126,6 +126,9 @@ const (
 	LBListenerRule
 	LBTargetGroup
 	LBTargetGroupAttachment
+	LightsailInstance
+	MediaStoreContainer
+	MQBroker
 	Route53DelegationSet
 	Route53HealthCheck
 	Route53QueryLog
@@ -238,6 +241,9 @@ var (
 		LBListenerRule:                 albListenerRules,
 		LBTargetGroup:                  albTargetGroups,
 		LBTargetGroupAttachment:        albTargetGroupAttachments,
+		LightsailInstance:              lightsailInstances,
+		MediaStoreContainer:            mediaStoreContainers,
+		MQBroker:                       mqBrokers,
 		Route53DelegationSet:           route53DelegationSets,
 		Route53HealthCheck:             route53HealthChecks,
 		Route53QueryLog:                route53QueryLogs,
@@ -268,6 +274,303 @@ var (
 
 func initializeResource(a *aws, ID, t string) (provider.Resource, error) {
 	return provider.NewResource(ID, t, a), nil
+}
+
+func apiGatewayDeployments(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+
+	apiGatewayRestApis, err := getAPIGatewayRestApis(ctx, a, APIGatewayRestAPI.String(), filters)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, rapi := range apiGatewayRestApis {
+
+		var input = &apigateway.GetDeploymentsInput{
+			RestApiId: awsSDK.String(rapi),
+		}
+
+		apiGatewayDeployments, err := a.awsr.GetAPIGatewayDeployments(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, i := range apiGatewayDeployments {
+
+			r, err := initializeResource(a, fmt.Sprintf("%s:%s", *i.Id, rapi), resourceType)
+			if err != nil {
+				return nil, err
+			}
+
+			// TODO this resource is not importable. Define our own ResourceImporter
+			// Should be removed when terraform will support it
+			// more detail: https://github.com/cycloidio/terracognita/issues/120
+			importer := &schema.ResourceImporter{
+				State: func(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+					parts := strings.SplitN(d.Id(), ":", 2)
+
+					if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+						return nil, fmt.Errorf("unexpected format of ID (%s), expected targetId_port_TargetGroupArn", d.Id())
+					}
+
+					d.Set("rest_api_id", parts[1])
+					d.SetId(parts[0])
+
+					return []*schema.ResourceData{d}, nil
+				},
+			}
+
+			r.SetImporter(importer)
+
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func apiGatewayStages(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+
+	apiGatewayRestApis, err := getAPIGatewayRestApis(ctx, a, APIGatewayRestAPI.String(), filters)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, rapi := range apiGatewayRestApis {
+
+		var input = &apigateway.GetStagesInput{
+			RestApiId: awsSDK.String(rapi),
+		}
+
+		apiGatewayStages, err := a.awsr.GetAPIGatewayStages(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, i := range apiGatewayStages {
+			r, err := initializeResource(a, fmt.Sprintf("%s/%s", rapi, *i.StageName), resourceType)
+			if err != nil {
+				return nil, err
+			}
+
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func apiGatewayResources(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+
+	apiGatewayRestApis, err := getAPIGatewayRestApis(ctx, a, APIGatewayRestAPI.String(), filters)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, rapi := range apiGatewayRestApis {
+
+		var input = &apigateway.GetResourcesInput{
+			RestApiId: awsSDK.String(rapi),
+		}
+
+		apiGatewayResources, err := a.awsr.GetAPIGatewayResources(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, i := range apiGatewayResources {
+			r, err := initializeResource(a, fmt.Sprintf("%s/%s", rapi, *i.Id), resourceType)
+			if err != nil {
+				return nil, err
+			}
+
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func apiGatewayRestApis(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	apiGatewayRestApis, err := a.awsr.GetAPIGatewayRestAPIs(ctx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range apiGatewayRestApis {
+
+		r, err := initializeResource(a, *i.Id, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func athenaWorkgroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+
+	athenaWorkGroups, err := a.awsr.GetAthenaWorkGroups(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, w := range athenaWorkGroups {
+		// skip the default primary managed by aws
+		if *w.Name == "primary" {
+			continue
+		}
+
+		r, err := initializeResource(a, *w.Name, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func autoscalingGroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	autoscalingGroups, err := a.awsr.GetAutoScalingGroups(ctx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range autoscalingGroups {
+
+		r, err := initializeResource(a, *i.AutoScalingGroupName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func autoscalingPolicies(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	autoscalingPolicies, err := a.awsr.GetAutoScalingPolicies(ctx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range autoscalingPolicies {
+
+		r, err := initializeResource(a, *i.AutoScalingGroupName+"/"+*i.PolicyName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func batchJobDefinitions(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	batchJobDefinitions, err := a.awsr.GetBatchJobDefinitions(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range batchJobDefinitions {
+		r, err := initializeResource(a, *i.JobDefinitionArn, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func daxClusters(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	daxClusters, err := a.awsr.GetDAXClusters(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range daxClusters {
+		r, err := initializeResource(a, *i.ClusterName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func directoryServiceDirectories(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	directoryServiceDirectories, err := a.awsr.GetDirectoryServiceDirectories(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range directoryServiceDirectories {
+		r, err := initializeResource(a, *i.DirectoryId, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func dmsReplicationInstances(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	dmsReplicationInstances, err := a.awsr.GetDMSDescribeReplicationInstances(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range dmsReplicationInstances {
+		r, err := initializeResource(a, *i.ReplicationInstanceIdentifier, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func dxGateways(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	dxGateways, err := a.awsr.GetDirectConnectGateways(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range dxGateways {
+		r, err := initializeResource(a, *i.DirectConnectGatewayId, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
 }
 
 func instances(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
@@ -2382,131 +2685,15 @@ func launchTemplates(ctx context.Context, a *aws, resourceType string, filters *
 	return resources, nil
 }
 
-func apiGatewayDeployments(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-
-	apiGatewayRestApis, err := getAPIGatewayRestApis(ctx, a, APIGatewayRestAPI.String(), filters)
+func lightsailInstances(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	lightsailInstances, err := a.awsr.GetLightsailInstances(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, rapi := range apiGatewayRestApis {
-
-		var input = &apigateway.GetDeploymentsInput{
-			RestApiId: awsSDK.String(rapi),
-		}
-
-		apiGatewayDeployments, err := a.awsr.GetAPIGatewayDeployments(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, i := range apiGatewayDeployments {
-
-			r, err := initializeResource(a, fmt.Sprintf("%s:%s", *i.Id, rapi), resourceType)
-			if err != nil {
-				return nil, err
-			}
-
-			// TODO this resource is not importable. Define our own ResourceImporter
-			// Should be removed when terraform will support it
-			// more detail: https://github.com/cycloidio/terracognita/issues/120
-			importer := &schema.ResourceImporter{
-				State: func(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-					parts := strings.SplitN(d.Id(), ":", 2)
-
-					if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
-						return nil, fmt.Errorf("unexpected format of ID (%s), expected targetId_port_TargetGroupArn", d.Id())
-					}
-
-					d.Set("rest_api_id", parts[1])
-					d.SetId(parts[0])
-
-					return []*schema.ResourceData{d}, nil
-				},
-			}
-
-			r.SetImporter(importer)
-
-			resources = append(resources, r)
-		}
-	}
-	return resources, nil
-}
-
-func apiGatewayStages(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-
-	apiGatewayRestApis, err := getAPIGatewayRestApis(ctx, a, APIGatewayRestAPI.String(), filters)
-	if err != nil {
-		return nil, err
-	}
-
-	resources := make([]provider.Resource, 0)
-	for _, rapi := range apiGatewayRestApis {
-
-		var input = &apigateway.GetStagesInput{
-			RestApiId: awsSDK.String(rapi),
-		}
-
-		apiGatewayStages, err := a.awsr.GetAPIGatewayStages(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, i := range apiGatewayStages {
-			r, err := initializeResource(a, fmt.Sprintf("%s/%s", rapi, *i.StageName), resourceType)
-			if err != nil {
-				return nil, err
-			}
-
-			resources = append(resources, r)
-		}
-	}
-	return resources, nil
-}
-
-func apiGatewayResources(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-
-	apiGatewayRestApis, err := getAPIGatewayRestApis(ctx, a, APIGatewayRestAPI.String(), filters)
-	if err != nil {
-		return nil, err
-	}
-
-	resources := make([]provider.Resource, 0)
-	for _, rapi := range apiGatewayRestApis {
-
-		var input = &apigateway.GetResourcesInput{
-			RestApiId: awsSDK.String(rapi),
-		}
-
-		apiGatewayResources, err := a.awsr.GetAPIGatewayResources(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, i := range apiGatewayResources {
-			r, err := initializeResource(a, fmt.Sprintf("%s/%s", rapi, *i.Id), resourceType)
-			if err != nil {
-				return nil, err
-			}
-
-			resources = append(resources, r)
-		}
-	}
-	return resources, nil
-}
-
-func apiGatewayRestApis(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	apiGatewayRestApis, err := a.awsr.GetAPIGatewayRestAPIs(ctx, nil)
-
-	if err != nil {
-		return nil, err
-	}
-
-	resources := make([]provider.Resource, 0)
-	for _, i := range apiGatewayRestApis {
-
-		r, err := initializeResource(a, *i.Id, resourceType)
+	for _, i := range lightsailInstances {
+		r, err := initializeResource(a, *i.Name, resourceType)
 		if err != nil {
 			return nil, err
 		}
@@ -2517,21 +2704,15 @@ func apiGatewayRestApis(ctx context.Context, a *aws, resourceType string, filter
 	return resources, nil
 }
 
-func athenaWorkgroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-
-	athenaWorkGroups, err := a.awsr.GetAthenaWorkGroups(ctx, nil)
+func mediaStoreContainers(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	mediaStoreContainers, err := a.awsr.GetMediastoreContainers(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, w := range athenaWorkGroups {
-		// skip the default primary managed by aws
-		if *w.Name == "primary" {
-			continue
-		}
-
-		r, err := initializeResource(a, *w.Name, resourceType)
+	for _, i := range mediaStoreContainers {
+		r, err := initializeResource(a, *i.Name, resourceType)
 		if err != nil {
 			return nil, err
 		}
@@ -2542,133 +2723,15 @@ func athenaWorkgroups(ctx context.Context, a *aws, resourceType string, filters 
 	return resources, nil
 }
 
-func autoscalingGroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	autoscalingGroups, err := a.awsr.GetAutoScalingGroups(ctx, nil)
-
+func mqBrokers(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	mqBrokers, err := a.awsr.GetMQBrokers(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	resources := make([]provider.Resource, 0)
-	for _, i := range autoscalingGroups {
-
-		r, err := initializeResource(a, *i.AutoScalingGroupName, resourceType)
-		if err != nil {
-			return nil, err
-		}
-
-		resources = append(resources, r)
-	}
-
-	return resources, nil
-}
-
-func autoscalingPolicies(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	autoscalingPolicies, err := a.awsr.GetAutoScalingPolicies(ctx, nil)
-
-	if err != nil {
-		return nil, err
-	}
-
-	resources := make([]provider.Resource, 0)
-	for _, i := range autoscalingPolicies {
-
-		r, err := initializeResource(a, *i.AutoScalingGroupName+"/"+*i.PolicyName, resourceType)
-		if err != nil {
-			return nil, err
-		}
-
-		resources = append(resources, r)
-	}
-
-	return resources, nil
-}
-
-func batchJobDefinitions(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	batchJobDefinitions, err := a.awsr.GetBatchJobDefinitions(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	resources := make([]provider.Resource, 0)
-	for _, i := range batchJobDefinitions {
-		r, err := initializeResource(a, *i.JobDefinitionArn, resourceType)
-		if err != nil {
-			return nil, err
-		}
-
-		resources = append(resources, r)
-	}
-
-	return resources, nil
-}
-
-func daxClusters(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	daxClusters, err := a.awsr.GetDAXClusters(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	resources := make([]provider.Resource, 0)
-	for _, i := range daxClusters {
-		r, err := initializeResource(a, *i.ClusterName, resourceType)
-		if err != nil {
-			return nil, err
-		}
-
-		resources = append(resources, r)
-	}
-
-	return resources, nil
-}
-
-func directoryServiceDirectories(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	directoryServiceDirectories, err := a.awsr.GetDirectoryServiceDirectories(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	resources := make([]provider.Resource, 0)
-	for _, i := range directoryServiceDirectories {
-		r, err := initializeResource(a, *i.DirectoryId, resourceType)
-		if err != nil {
-			return nil, err
-		}
-
-		resources = append(resources, r)
-	}
-
-	return resources, nil
-}
-
-func dmsReplicationInstances(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	dmsReplicationInstances, err := a.awsr.GetDMSDescribeReplicationInstances(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	resources := make([]provider.Resource, 0)
-	for _, i := range dmsReplicationInstances {
-		r, err := initializeResource(a, *i.ReplicationInstanceIdentifier, resourceType)
-		if err != nil {
-			return nil, err
-		}
-
-		resources = append(resources, r)
-	}
-
-	return resources, nil
-}
-
-func dxGateways(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	dxGateways, err := a.awsr.GetDirectConnectGateways(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	resources := make([]provider.Resource, 0)
-	for _, i := range dxGateways {
-		r, err := initializeResource(a, *i.DirectConnectGatewayId, resourceType)
+	for _, i := range mqBrokers {
+		r, err := initializeResource(a, *i.BrokerId, resourceType)
 		if err != nil {
 			return nil, err
 		}
