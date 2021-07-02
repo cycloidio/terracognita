@@ -166,6 +166,7 @@ const (
 	VolumeAttachment
 	VPC
 	VPCPeeringConnection
+	VPNGateway
 )
 
 type rtFn func(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error)
@@ -287,6 +288,7 @@ var (
 		VolumeAttachment:              volumeAttachments,
 		VPCPeeringConnection:          vpcPeeringConnections,
 		VPC:                           vpcs,
+		VPNGateway:                    vpnGateways,
 	}
 )
 
@@ -698,6 +700,28 @@ func vpcPeeringConnections(ctx context.Context, a *aws, resourceType string, fil
 			return nil, err
 		}
 
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func vpnGateways(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	var input = &ec2.DescribeVpnGatewaysInput{
+		Filters: toEC2Filters(filters),
+	}
+
+	vpnGateways, err := a.awsr.GetVPNGateways(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range vpnGateways {
+		r, err := initializeResource(a, *i.VpnGatewayId, resourceType)
+		if err != nil {
+			return nil, err
+		}
 		resources = append(resources, r)
 	}
 

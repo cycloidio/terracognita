@@ -436,6 +436,19 @@ var (
 					// Returned values are commented in the interface doc comment block.
 					`,
 		},
+		Function{
+			FnName:           "GetVPNGateways",
+			Entity:           "VpnGateways",
+			FnAttributeList:  "VpnGateways",
+			SingularEntity:   "VpnGateway",
+			Prefix:           "Describe",
+			Service:          "ec2",
+			HasNotPagination: true,
+			Documentation: `
+			// GetVPNGateways returns the ec2 VPN Gateways on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
 
 		// ECS
 		Function{
