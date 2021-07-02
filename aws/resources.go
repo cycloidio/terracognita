@@ -16,6 +16,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/elbv2"
 	"github.com/aws/aws-sdk-go/service/glue"
 	"github.com/aws/aws-sdk-go/service/iam"
+	"github.com/aws/aws-sdk-go/service/neptune"
+	"github.com/aws/aws-sdk-go/service/rds"
 	"github.com/aws/aws-sdk-go/service/route53"
 	"github.com/aws/aws-sdk-go/service/ses"
 	"github.com/cycloidio/terracognita/filter"
@@ -129,6 +131,10 @@ const (
 	LightsailInstance
 	MediaStoreContainer
 	MQBroker
+	NatGateway
+	NeptuneCluster
+	RDSCluster
+	RDSGlobalCluster
 	Route53DelegationSet
 	Route53HealthCheck
 	Route53QueryLog
@@ -244,6 +250,10 @@ var (
 		LightsailInstance:              lightsailInstances,
 		MediaStoreContainer:            mediaStoreContainers,
 		MQBroker:                       mqBrokers,
+		NatGateway:                     natGateways,
+		NeptuneCluster:                 neptuneClusters,
+		RDSCluster:                     rdsClusters,
+		RDSGlobalCluster:               rdsGlobalClusters,
 		Route53DelegationSet:           route53DelegationSets,
 		Route53HealthCheck:             route53HealthChecks,
 		Route53QueryLog:                route53QueryLogs,
@@ -2740,6 +2750,127 @@ func mqBrokers(ctx context.Context, a *aws, resourceType string, filters *filter
 	}
 
 	return resources, nil
+}
+
+func natGateways(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	var input = &ec2.DescribeNatGatewaysInput{
+		MaxResults: awsSDK.Int64(100),
+		Filter:     toEC2Filters(filters),
+	}
+
+	natGateways, err := a.awsr.GetEC2NatGateways(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range natGateways {
+		r, err := initializeResource(a, *i.NatGatewayId, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func neptuneClusters(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	var input = &neptune.DescribeDBClustersInput{
+		Filters: toNeptuneFilters(filters),
+	}
+
+	neptuneClusters, err := a.awsr.GetNeptuneDBClusters(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range neptuneClusters {
+		r, err := initializeResource(a, *i.DBClusterIdentifier, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func rdsClusters(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	var input = &rds.DescribeDBClustersInput{
+		Filters: toRDSFilters(filters),
+	}
+
+	rdsClusters, err := a.awsr.GetRDSDBClusters(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range rdsClusters {
+		r, err := initializeResource(a, *i.DBClusterIdentifier, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func rdsGlobalClusters(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	var input = &rds.DescribeGlobalClustersInput{
+		Filters: toRDSFilters(filters),
+	}
+
+	rdsGlobalClusters, err := a.awsr.GetRDSGlobalClusters(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range rdsGlobalClusters {
+		r, err := initializeResource(a, *i.GlobalClusterIdentifier, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func toNeptuneFilters(filters *filter.Filter) []*neptune.Filter {
+	tags := filters.Tags
+	if len(tags) == 0 {
+		return nil
+	}
+	filtersNeptune := make([]*neptune.Filter, 0, len(tags))
+
+	for _, t := range tags {
+		filtersNeptune = append(filtersNeptune, t.ToNeptuneFilter())
+	}
+
+	return filtersNeptune
+}
+
+func toRDSFilters(filters *filter.Filter) []*rds.Filter {
+	tags := filters.Tags
+	if len(tags) == 0 {
+		return nil
+	}
+	filtersRds := make([]*rds.Filter, 0, len(tags))
+
+	for _, t := range tags {
+		filtersRds = append(filtersRds, t.ToRDSFilter())
+	}
+
+	return filtersRds
 }
 
 func toEC2Filters(filters *filter.Filter) []*ec2.Filter {

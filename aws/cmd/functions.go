@@ -194,6 +194,20 @@ var (
 			`,
 		},
 		Function{
+			FnName:                     "GetEC2NatGateways",
+			Entity:                     "NatGateways",
+			FnAttributeList:            "NatGateways",
+			SingularEntity:             "NatGateway",
+			Prefix:                     "Describe",
+			Service:                    "ec2",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
+			Documentation: `
+		  // GetEC2NatGateways returns the EC2 nat gateways on the given input
+		  // Returned values are commented in the interface doc comment block.
+		  `,
+		},
+		Function{
 			Entity:  "SecurityGroups",
 			Prefix:  "Describe",
 			Service: "ec2",
@@ -251,10 +265,12 @@ var (
 
 		// autoscaling
 		Function{
-			Entity:         "AutoScalingGroups",
-			SingularEntity: "Group",
-			Prefix:         "Describe",
-			Service:        "autoscaling",
+			Entity:                     "AutoScalingGroups",
+			SingularEntity:             "Group",
+			Prefix:                     "Describe",
+			Service:                    "autoscaling",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
 			Documentation: `
 			// GetAutoScalingGroups returns all AutoScalingGroup belonging to the Account ID based on the input given.
 			// Returned values are commented in the interface doc comment block.
@@ -773,7 +789,52 @@ var (
 			`,
 		},
 
+		// netptune
+		Function{
+			FnName:                     "GetNeptuneDBClusters",
+			Entity:                     "DBClusters",
+			FnAttributeList:            "DBClusters",
+			SingularEntity:             "DBCluster",
+			Prefix:                     "Describe",
+			Service:                    "neptune",
+			FnPaginationAttribute:      "Marker",
+			FnInputPaginationAttribute: "Marker",
+			Documentation: `
+		  // GetNeptuneDBClusters returns the Neptune DBClusters on the given input
+		  // Returned values are commented in the interface doc comment block.
+		  `,
+		},
+
 		// rds
+		Function{
+			FnName:                     "GetRDSDBClusters",
+			Entity:                     "DBClusters",
+			FnAttributeList:            "DBClusters",
+			SingularEntity:             "DBCluster",
+			Prefix:                     "Describe",
+			Service:                    "rds",
+			FnPaginationAttribute:      "Marker",
+			FnInputPaginationAttribute: "Marker",
+			Documentation: `
+		  // GetRDSDBClusters returns the RDS DB Clusters on the given input
+		  // Returned values are commented in the interface doc comment block.
+		  `,
+		},
+
+		Function{
+			FnName:                     "GetRDSGlobalClusters",
+			Entity:                     "GlobalClusters",
+			FnAttributeList:            "GlobalClusters",
+			SingularEntity:             "GlobalCluster",
+			Prefix:                     "Describe",
+			Service:                    "rds",
+			FnPaginationAttribute:      "Marker",
+			FnInputPaginationAttribute: "Marker",
+			Documentation: `
+		  // GetRDSGlobalClusters returns the RDS Global Clusters on the given input
+		  // Returned values are commented in the interface doc comment block.
+		  `,
+		},
 		Function{
 			Entity:                "DBInstances",
 			FnPaginationAttribute: "Marker",

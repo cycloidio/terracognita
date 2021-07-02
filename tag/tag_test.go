@@ -5,6 +5,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/aws/aws-sdk-go/service/neptune"
+	"github.com/aws/aws-sdk-go/service/rds"
 	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/tag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -19,6 +21,26 @@ func TestToEC2Filer(t *testing.T) {
 			Name:   aws.String("tag:tag-name"),
 			Values: []*string{aws.String("tag-value")},
 		}, tt.ToEC2Filter())
+	})
+}
+
+func TestToNeptuneFiler(t *testing.T) {
+	t.Run("Success", func(t *testing.T) {
+		tt := tag.Tag{Name: "tag-name", Value: "tag-value"}
+		assert.Equal(t, &neptune.Filter{
+			Name:   aws.String("tag:tag-name"),
+			Values: []*string{aws.String("tag-value")},
+		}, tt.ToNeptuneFilter())
+	})
+}
+
+func TestToRDSFiler(t *testing.T) {
+	t.Run("Success", func(t *testing.T) {
+		tt := tag.Tag{Name: "tag-name", Value: "tag-value"}
+		assert.Equal(t, &rds.Filter{
+			Name:   aws.String("tag:tag-name"),
+			Values: []*string{aws.String("tag-value")},
+		}, tt.ToRDSFilter())
 	})
 }
 
