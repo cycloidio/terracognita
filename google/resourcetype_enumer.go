@@ -19,51 +19,78 @@ func (i ResourceType) String() string {
 	return _ResourceTypeName[_ResourceTypeIndex[i]:_ResourceTypeIndex[i+1]]
 }
 
-var _ResourceTypeValues = []ResourceType{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}
+// An "invalid array index" compiler error signifies that the constant values have changed.
+// Re-run the stringer command to generate them again.
+func _ResourceTypeNoOp() {
+	var x [1]struct{}
+	_ = x[ComputeInstance-(0)]
+	_ = x[ComputeFirewall-(1)]
+	_ = x[ComputeNetwork-(2)]
+	_ = x[ComputeHealthCheck-(3)]
+	_ = x[ComputeInstanceGroup-(4)]
+	_ = x[ComputeInstanceIAMPolicy-(5)]
+	_ = x[ComputeBackendBucket-(6)]
+	_ = x[ComputeBackendService-(7)]
+	_ = x[ComputeSSLCertificate-(8)]
+	_ = x[ComputeTargetHTTPProxy-(9)]
+	_ = x[ComputeTargetHTTPSProxy-(10)]
+	_ = x[ComputeURLMap-(11)]
+	_ = x[ComputeGlobalForwardingRule-(12)]
+	_ = x[ComputeForwardingRule-(13)]
+	_ = x[ComputeDisk-(14)]
+	_ = x[DNSManagedZone-(15)]
+	_ = x[DNSRecordSet-(16)]
+	_ = x[ProjectIAMCustomRole-(17)]
+	_ = x[StorageBucket-(18)]
+	_ = x[StorageBucketIAMPolicy-(19)]
+	_ = x[SQLDatabaseInstance-(20)]
+}
+
+var _ResourceTypeValues = []ResourceType{ComputeInstance, ComputeFirewall, ComputeNetwork, ComputeHealthCheck, ComputeInstanceGroup, ComputeInstanceIAMPolicy, ComputeBackendBucket, ComputeBackendService, ComputeSSLCertificate, ComputeTargetHTTPProxy, ComputeTargetHTTPSProxy, ComputeURLMap, ComputeGlobalForwardingRule, ComputeForwardingRule, ComputeDisk, DNSManagedZone, DNSRecordSet, ProjectIAMCustomRole, StorageBucket, StorageBucketIAMPolicy, SQLDatabaseInstance}
 
 var _ResourceTypeNameToValueMap = map[string]ResourceType{
-	_ResourceTypeName[0:23]:         0,
-	_ResourceTypeLowerName[0:23]:    0,
-	_ResourceTypeName[23:46]:        1,
-	_ResourceTypeLowerName[23:46]:   1,
-	_ResourceTypeName[46:68]:        2,
-	_ResourceTypeLowerName[46:68]:   2,
-	_ResourceTypeName[68:95]:        3,
-	_ResourceTypeLowerName[68:95]:   3,
-	_ResourceTypeName[95:124]:       4,
-	_ResourceTypeLowerName[95:124]:  4,
-	_ResourceTypeName[124:158]:      5,
-	_ResourceTypeLowerName[124:158]: 5,
-	_ResourceTypeName[158:187]:      6,
-	_ResourceTypeLowerName[158:187]: 6,
-	_ResourceTypeName[187:217]:      7,
-	_ResourceTypeLowerName[187:217]: 7,
-	_ResourceTypeName[217:247]:      8,
-	_ResourceTypeLowerName[217:247]: 8,
-	_ResourceTypeName[247:279]:      9,
-	_ResourceTypeLowerName[247:279]: 9,
-	_ResourceTypeName[279:312]:      10,
-	_ResourceTypeLowerName[279:312]: 10,
-	_ResourceTypeName[312:334]:      11,
-	_ResourceTypeLowerName[312:334]: 11,
-	_ResourceTypeName[334:371]:      12,
-	_ResourceTypeLowerName[334:371]: 12,
-	_ResourceTypeName[371:401]:      13,
-	_ResourceTypeLowerName[371:401]: 13,
-	_ResourceTypeName[401:420]:      14,
-	_ResourceTypeLowerName[401:420]: 14,
-	_ResourceTypeName[420:443]:      15,
-	_ResourceTypeLowerName[420:443]: 15,
-	_ResourceTypeName[443:464]:      16,
-	_ResourceTypeLowerName[443:464]: 16,
-	_ResourceTypeName[464:494]:      17,
-	_ResourceTypeLowerName[464:494]: 17,
-	_ResourceTypeName[494:515]:      18,
-	_ResourceTypeLowerName[494:515]: 18,
-	_ResourceTypeName[515:547]:      19,
-	_ResourceTypeLowerName[515:547]: 19,
-	_ResourceTypeName[547:575]:      20,
-	_ResourceTypeLowerName[547:575]: 20,
+	_ResourceTypeName[0:23]:         ComputeInstance,
+	_ResourceTypeLowerName[0:23]:    ComputeInstance,
+	_ResourceTypeName[23:46]:        ComputeFirewall,
+	_ResourceTypeLowerName[23:46]:   ComputeFirewall,
+	_ResourceTypeName[46:68]:        ComputeNetwork,
+	_ResourceTypeLowerName[46:68]:   ComputeNetwork,
+	_ResourceTypeName[68:95]:        ComputeHealthCheck,
+	_ResourceTypeLowerName[68:95]:   ComputeHealthCheck,
+	_ResourceTypeName[95:124]:       ComputeInstanceGroup,
+	_ResourceTypeLowerName[95:124]:  ComputeInstanceGroup,
+	_ResourceTypeName[124:158]:      ComputeInstanceIAMPolicy,
+	_ResourceTypeLowerName[124:158]: ComputeInstanceIAMPolicy,
+	_ResourceTypeName[158:187]:      ComputeBackendBucket,
+	_ResourceTypeLowerName[158:187]: ComputeBackendBucket,
+	_ResourceTypeName[187:217]:      ComputeBackendService,
+	_ResourceTypeLowerName[187:217]: ComputeBackendService,
+	_ResourceTypeName[217:247]:      ComputeSSLCertificate,
+	_ResourceTypeLowerName[217:247]: ComputeSSLCertificate,
+	_ResourceTypeName[247:279]:      ComputeTargetHTTPProxy,
+	_ResourceTypeLowerName[247:279]: ComputeTargetHTTPProxy,
+	_ResourceTypeName[279:312]:      ComputeTargetHTTPSProxy,
+	_ResourceTypeLowerName[279:312]: ComputeTargetHTTPSProxy,
+	_ResourceTypeName[312:334]:      ComputeURLMap,
+	_ResourceTypeLowerName[312:334]: ComputeURLMap,
+	_ResourceTypeName[334:371]:      ComputeGlobalForwardingRule,
+	_ResourceTypeLowerName[334:371]: ComputeGlobalForwardingRule,
+	_ResourceTypeName[371:401]:      ComputeForwardingRule,
+	_ResourceTypeLowerName[371:401]: ComputeForwardingRule,
+	_ResourceTypeName[401:420]:      ComputeDisk,
+	_ResourceTypeLowerName[401:420]: ComputeDisk,
+	_ResourceTypeName[420:443]:      DNSManagedZone,
+	_ResourceTypeLowerName[420:443]: DNSManagedZone,
+	_ResourceTypeName[443:464]:      DNSRecordSet,
+	_ResourceTypeLowerName[443:464]: DNSRecordSet,
+	_ResourceTypeName[464:494]:      ProjectIAMCustomRole,
+	_ResourceTypeLowerName[464:494]: ProjectIAMCustomRole,
+	_ResourceTypeName[494:515]:      StorageBucket,
+	_ResourceTypeLowerName[494:515]: StorageBucket,
+	_ResourceTypeName[515:547]:      StorageBucketIAMPolicy,
+	_ResourceTypeLowerName[515:547]: StorageBucketIAMPolicy,
+	_ResourceTypeName[547:575]:      SQLDatabaseInstance,
+	_ResourceTypeLowerName[547:575]: SQLDatabaseInstance,
 }
 
 var _ResourceTypeNames = []string{

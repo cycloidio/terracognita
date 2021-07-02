@@ -111,6 +111,13 @@ func Import(ctx context.Context, p Provider, hcl, tfstate writer.Writer, f *filt
 				return err
 			}
 
+			// If the InstanceState is nil after the ImportState it
+			// means that nothing was imported (potentially is not even Importable)
+			// so we have to skip the resource
+			if re.InstanceState() == nil {
+				continue
+			}
+
 			// In case there is more than one State to import
 			// we create a new slice with those elements and iterate
 			// over it
