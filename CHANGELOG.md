@@ -4,6 +4,8 @@
 
 - `tc_category` no longer added to the generated HCL
   ([PR #187](https://github.com/cycloidio/terracognita/pull/187))
+- Skip resources that are not Importable from the Provider
+  ([PR #191](https://github.com/cycloidio/terracognita/pull/191))
 
 ## [0.6.4] _2021-04-29_
 

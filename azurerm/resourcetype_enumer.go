@@ -19,35 +19,54 @@ func (i ResourceType) String() string {
 	return _ResourceTypeName[_ResourceTypeIndex[i]:_ResourceTypeIndex[i+1]]
 }
 
-var _ResourceTypeValues = []ResourceType{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+// An "invalid array index" compiler error signifies that the constant values have changed.
+// Re-run the stringer command to generate them again.
+func _ResourceTypeNoOp() {
+	var x [1]struct{}
+	_ = x[ResourceGroup-(0)]
+	_ = x[Subnet-(1)]
+	_ = x[VirtualDesktopHostPool-(2)]
+	_ = x[VirtualDesktopApplicationGroup-(3)]
+	_ = x[LogicAppTriggerCustom-(4)]
+	_ = x[LogicAppActionCustom-(5)]
+	_ = x[LogicAppWorkflow-(6)]
+	_ = x[NetworkInterface-(7)]
+	_ = x[NetworkSecurityGroup-(8)]
+	_ = x[VirtualMachine-(9)]
+	_ = x[VirtualMachineExtension-(10)]
+	_ = x[VirtualMachineScaleSet-(11)]
+	_ = x[VirtualNetwork-(12)]
+}
+
+var _ResourceTypeValues = []ResourceType{ResourceGroup, Subnet, VirtualDesktopHostPool, VirtualDesktopApplicationGroup, LogicAppTriggerCustom, LogicAppActionCustom, LogicAppWorkflow, NetworkInterface, NetworkSecurityGroup, VirtualMachine, VirtualMachineExtension, VirtualMachineScaleSet, VirtualNetwork}
 
 var _ResourceTypeNameToValueMap = map[string]ResourceType{
-	_ResourceTypeName[0:22]:         0,
-	_ResourceTypeLowerName[0:22]:    0,
-	_ResourceTypeName[22:36]:        1,
-	_ResourceTypeLowerName[22:36]:   1,
-	_ResourceTypeName[36:69]:        2,
-	_ResourceTypeLowerName[36:69]:   2,
-	_ResourceTypeName[69:110]:       3,
-	_ResourceTypeLowerName[69:110]:  3,
-	_ResourceTypeName[110:142]:      4,
-	_ResourceTypeLowerName[110:142]: 4,
-	_ResourceTypeName[142:173]:      5,
-	_ResourceTypeLowerName[142:173]: 5,
-	_ResourceTypeName[173:199]:      6,
-	_ResourceTypeLowerName[173:199]: 6,
-	_ResourceTypeName[199:224]:      7,
-	_ResourceTypeLowerName[199:224]: 7,
-	_ResourceTypeName[224:254]:      8,
-	_ResourceTypeLowerName[224:254]: 8,
-	_ResourceTypeName[254:277]:      9,
-	_ResourceTypeLowerName[254:277]: 9,
-	_ResourceTypeName[277:310]:      10,
-	_ResourceTypeLowerName[277:310]: 10,
-	_ResourceTypeName[310:343]:      11,
-	_ResourceTypeLowerName[310:343]: 11,
-	_ResourceTypeName[343:366]:      12,
-	_ResourceTypeLowerName[343:366]: 12,
+	_ResourceTypeName[0:22]:         ResourceGroup,
+	_ResourceTypeLowerName[0:22]:    ResourceGroup,
+	_ResourceTypeName[22:36]:        Subnet,
+	_ResourceTypeLowerName[22:36]:   Subnet,
+	_ResourceTypeName[36:69]:        VirtualDesktopHostPool,
+	_ResourceTypeLowerName[36:69]:   VirtualDesktopHostPool,
+	_ResourceTypeName[69:110]:       VirtualDesktopApplicationGroup,
+	_ResourceTypeLowerName[69:110]:  VirtualDesktopApplicationGroup,
+	_ResourceTypeName[110:142]:      LogicAppTriggerCustom,
+	_ResourceTypeLowerName[110:142]: LogicAppTriggerCustom,
+	_ResourceTypeName[142:173]:      LogicAppActionCustom,
+	_ResourceTypeLowerName[142:173]: LogicAppActionCustom,
+	_ResourceTypeName[173:199]:      LogicAppWorkflow,
+	_ResourceTypeLowerName[173:199]: LogicAppWorkflow,
+	_ResourceTypeName[199:224]:      NetworkInterface,
+	_ResourceTypeLowerName[199:224]: NetworkInterface,
+	_ResourceTypeName[224:254]:      NetworkSecurityGroup,
+	_ResourceTypeLowerName[224:254]: NetworkSecurityGroup,
+	_ResourceTypeName[254:277]:      VirtualMachine,
+	_ResourceTypeLowerName[254:277]: VirtualMachine,
+	_ResourceTypeName[277:310]:      VirtualMachineExtension,
+	_ResourceTypeLowerName[277:310]: VirtualMachineExtension,
+	_ResourceTypeName[310:343]:      VirtualMachineScaleSet,
+	_ResourceTypeLowerName[310:343]: VirtualMachineScaleSet,
+	_ResourceTypeName[343:366]:      VirtualNetwork,
+	_ResourceTypeLowerName[343:366]: VirtualNetwork,
 }
 
 var _ResourceTypeNames = []string{

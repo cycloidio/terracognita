@@ -115,7 +115,6 @@ const (
 	SESConfigurationSet
 	SESDomainDKIM
 	SESDomainIdentity
-	SESDomainIdentityVerification
 	SESDomainMailFrom
 	// Read on TF is nil so ...
 	// SESEventDestination
@@ -201,23 +200,22 @@ var (
 		Route53ZoneAssociation:         route53ZoneAssociations,
 		Route53Zone:                    cacheRoute53Zones,
 		//S3BucketObject:      s3_bucket_objects,
-		S3Bucket:                      s3Buckets,
-		SecurityGroup:                 securityGroups,
-		SESActiveReceiptRuleSet:       sesActiveReceiptRuleSets,
-		SESConfigurationSet:           sesConfigurationSets,
-		SESDomainDKIM:                 sesDomainGeneral,
-		SESDomainIdentity:             cacheSESDomainIdentities,
-		SESDomainIdentityVerification: sesDomainGeneral,
-		SESDomainMailFrom:             sesDomainGeneral,
-		SESIdentityNotificationTopic:  sesIdentityNotificationTopics,
-		SESReceiptFilter:              sesReceiptFilters,
-		SESReceiptRule:                sesReceiptRules,
-		SESReceiptRuleSet:             sesReceiptRuleSets,
-		SESTemplate:                   sesTemplates,
-		Subnet:                        subnets,
-		VolumeAttachment:              volumeAttachments,
-		VPCPeeringConnection:          vpcPeeringConnections,
-		VPC:                           vpcs,
+		S3Bucket:                     s3Buckets,
+		SecurityGroup:                securityGroups,
+		SESActiveReceiptRuleSet:      sesActiveReceiptRuleSets,
+		SESConfigurationSet:          sesConfigurationSets,
+		SESDomainDKIM:                sesDomainGeneral,
+		SESDomainIdentity:            cacheSESDomainIdentities,
+		SESDomainMailFrom:            sesDomainGeneral,
+		SESIdentityNotificationTopic: sesIdentityNotificationTopics,
+		SESReceiptFilter:             sesReceiptFilters,
+		SESReceiptRule:               sesReceiptRules,
+		SESReceiptRuleSet:            sesReceiptRuleSets,
+		SESTemplate:                  sesTemplates,
+		Subnet:                       subnets,
+		VolumeAttachment:             volumeAttachments,
+		VPCPeeringConnection:         vpcPeeringConnections,
+		VPC:                          vpcs,
 	}
 )
 
