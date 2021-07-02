@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.6.4] _2021-07-02_
+
 ### Fixed
 
 - `tc_category` no longer added to the generated HCL
