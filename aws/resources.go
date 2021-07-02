@@ -20,6 +20,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/rds"
 	"github.com/aws/aws-sdk-go/service/route53"
 	"github.com/aws/aws-sdk-go/service/ses"
+	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/cycloidio/terracognita/filter"
 	"github.com/cycloidio/terracognita/provider"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -135,6 +136,7 @@ const (
 	NeptuneCluster
 	RDSCluster
 	RDSGlobalCluster
+	RedshiftCluster
 	Route53DelegationSet
 	Route53HealthCheck
 	Route53QueryLog
@@ -158,6 +160,8 @@ const (
 	SESReceiptRule
 	SESReceiptRuleSet
 	SESTemplate
+	SQSQueue
+	StoragegatewayGateway
 	Subnet
 	VolumeAttachment
 	VPC
@@ -254,6 +258,7 @@ var (
 		NeptuneCluster:                 neptuneClusters,
 		RDSCluster:                     rdsClusters,
 		RDSGlobalCluster:               rdsGlobalClusters,
+		RedshiftCluster:                redshiftClusters,
 		Route53DelegationSet:           route53DelegationSets,
 		Route53HealthCheck:             route53HealthChecks,
 		Route53QueryLog:                route53QueryLogs,
@@ -263,22 +268,25 @@ var (
 		Route53ZoneAssociation:         route53ZoneAssociations,
 		Route53Zone:                    cacheRoute53Zones,
 		//S3BucketObject:      s3_bucket_objects,
-		S3Bucket:                     s3Buckets,
-		SecurityGroup:                securityGroups,
-		SESActiveReceiptRuleSet:      sesActiveReceiptRuleSets,
-		SESConfigurationSet:          sesConfigurationSets,
-		SESDomainDKIM:                sesDomainGeneral,
-		SESDomainIdentity:            cacheSESDomainIdentities,
-		SESDomainMailFrom:            sesDomainGeneral,
-		SESIdentityNotificationTopic: sesIdentityNotificationTopics,
-		SESReceiptFilter:             sesReceiptFilters,
-		SESReceiptRule:               sesReceiptRules,
-		SESReceiptRuleSet:            sesReceiptRuleSets,
-		SESTemplate:                  sesTemplates,
-		Subnet:                       subnets,
-		VolumeAttachment:             volumeAttachments,
-		VPCPeeringConnection:         vpcPeeringConnections,
-		VPC:                          vpcs,
+		S3Bucket:                      s3Buckets,
+		SecurityGroup:                 securityGroups,
+		SESActiveReceiptRuleSet:       sesActiveReceiptRuleSets,
+		SESConfigurationSet:           sesConfigurationSets,
+		SESDomainDKIM:                 sesDomainGeneral,
+		SESDomainIdentity:             cacheSESDomainIdentities,
+		SESDomainIdentityVerification: sesDomainGeneral,
+		SESDomainMailFrom:             sesDomainGeneral,
+		SESIdentityNotificationTopic:  sesIdentityNotificationTopics,
+		SESReceiptFilter:              sesReceiptFilters,
+		SESReceiptRule:                sesReceiptRules,
+		SESReceiptRuleSet:             sesReceiptRuleSets,
+		SESTemplate:                   sesTemplates,
+		SQSQueue:                      sqsQueues,
+		StoragegatewayGateway:         storagegatewayGateways,
+		Subnet:                        subnets,
+		VolumeAttachment:              volumeAttachments,
+		VPCPeeringConnection:          vpcPeeringConnections,
+		VPC:                           vpcs,
 	}
 )
 
@@ -2628,6 +2636,48 @@ func sesTemplates(ctx context.Context, a *aws, resourceType string, filters *fil
 	return resources, nil
 }
 
+func sqsQueues(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	var input = &sqs.ListQueuesInput{
+		MaxResults: awsSDK.Int64(1000),
+	}
+
+	sqsQueues, err := a.awsr.GetSQSQueues(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range sqsQueues {
+		r, err := initializeResource(a, *i, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func storagegatewayGateways(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	storagegatewayGateways, err := a.awsr.GetStorageGatewayGateways(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range storagegatewayGateways {
+		r, err := initializeResource(a, *i.GatewayARN, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
 func lambdaFunctions(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	lambdaFunctions, err := a.awsr.GetLambdaFunctions(ctx, nil)
 
@@ -2835,6 +2885,25 @@ func rdsGlobalClusters(ctx context.Context, a *aws, resourceType string, filters
 	resources := make([]provider.Resource, 0)
 	for _, i := range rdsGlobalClusters {
 		r, err := initializeResource(a, *i.GlobalClusterIdentifier, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func redshiftClusters(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	redshiftClusters, err := a.awsr.GetRedshiftClusters(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range redshiftClusters {
+		r, err := initializeResource(a, *i.ClusterIdentifier, resourceType)
 		if err != nil {
 			return nil, err
 		}

@@ -61,36 +61,6 @@ var (
 			`,
 		},
 
-		// Glue
-		Function{
-			FnName:                     "GetGlueDatabases",
-			Entity:                     "Databases",
-			FnAttributeList:            "DatabaseList",
-			SingularEntity:             "Database",
-			Prefix:                     "Get",
-			Service:                    "glue",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
-			Documentation: `
-			// GetGlueDatabases returns the Glue databases on the given input
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			FnName:                     "GetGlueTables",
-			Entity:                     "Tables",
-			FnAttributeList:            "TableList",
-			SingularEntity:             "TableData",
-			Prefix:                     "Get",
-			Service:                    "glue",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
-			Documentation: `
-			// GetGlueTables returns the Glue Tables on the given input
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-
 		// Athena
 		Function{
 			FnName:                     "GetAthenaWorkGroups",
@@ -103,162 +73,6 @@ var (
 			FnInputPaginationAttribute: "NextToken",
 			Documentation: `
 			// GetAthenaDataCatalogs returns the Athena worker groups on the given input
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-
-		// cloudwatch
-		Function{
-			Entity:          "MetricAlarms",
-			FnServiceEntity: "Alarms",
-			Prefix:          "Describe",
-			Service:         "cloudwatch",
-			Documentation: `
-			// GetMetricAlarms returns all cloudwatch alarms based on the input given.
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-
-		// ec2
-		Function{
-			HasNotPagination: true,
-			Entity:           "Addresses",
-			SingularEntity:   "Address",
-			Prefix:           "Describe",
-			Service:          "ec2",
-			Documentation: `
-			// GetAddresses returns all EC2 Addresses based on the input given.
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-
-		Function{
-			FnAttributeList: "Reservations#Instances",
-			Entity:          "Instances",
-			Prefix:          "Describe",
-			Service:         "ec2",
-			Documentation: `
-			// GetInstances returns all EC2 instances based on the input given.
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			Entity:  "Vpcs",
-			Prefix:  "Describe",
-			Service: "ec2",
-			Documentation: `
-			// GetVpcs returns all EC2 VPCs based on the input given.
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			Entity:  "VpcPeeringConnections",
-			Prefix:  "Describe",
-			Service: "ec2",
-			Documentation: `
-			// GetVpcPeeringConnections returns all VpcPeeringConnections based on the input given.
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-
-		Function{
-			HasNotPagination: true,
-			Entity:           "Images",
-			Prefix:           "Describe",
-			Service:          "ec2",
-			Documentation: `
-			// GetImages returns all EC2 AMI based on the input given.
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			HasNotPagination: true,
-			Entity:           "Images",
-			Prefix:           "Describe",
-			Service:          "ec2",
-			FilterByOwner:    "Owners",
-			Documentation: `
-			// GetOwnImages returns all EC2 AMI belonging to the Account ID based on the input given.
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			SingularEntity:   "KeyPairInfo",
-			HasNotPagination: true,
-			Entity:           "KeyPairs",
-			Prefix:           "Describe",
-			Service:          "ec2",
-			Documentation: `
-			// GetKeyPairs returns all KeyPairs based on the input given.
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			FnName:                     "GetEC2NatGateways",
-			Entity:                     "NatGateways",
-			FnAttributeList:            "NatGateways",
-			SingularEntity:             "NatGateway",
-			Prefix:                     "Describe",
-			Service:                    "ec2",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
-			Documentation: `
-		  // GetEC2NatGateways returns the EC2 nat gateways on the given input
-		  // Returned values are commented in the interface doc comment block.
-		  `,
-		},
-		Function{
-			Entity:  "SecurityGroups",
-			Prefix:  "Describe",
-			Service: "ec2",
-			Documentation: `
-			// GetSecurityGroups returns all EC2 security groups based on the input given.
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			Entity:  "Subnets",
-			Prefix:  "Describe",
-			Service: "ec2",
-			Documentation: `
-			// GetSubnets returns all EC2 subnets based on the input given.
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			Entity:  "Volumes",
-			Prefix:  "Describe",
-			Service: "ec2",
-			Documentation: `
-			// GetVolumes returns all EC2 volumes based on the input given.
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			Entity:  "Snapshots",
-			Prefix:  "Describe",
-			Service: "ec2",
-			Documentation: `
-			// GetSnapshots returns all snapshots based on the input given.
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			Entity:        "Snapshots",
-			Prefix:        "Describe",
-			Service:       "ec2",
-			FilterByOwner: "OwnerIds",
-			Documentation: `
-			// GetOwnSnapshots returns all snapshots belonging to the Account ID based on the input given.
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			Entity:  "LaunchTemplates",
-			Prefix:  "Describe",
-			Service: "ec2",
-			Documentation: `
-			// GetLaunchTemplates returns all LaunchTemplate belonging to the Account ID based on the input given.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
@@ -356,6 +170,35 @@ var (
 			`,
 		},
 
+		// cloudwatch
+		Function{
+			Entity:          "MetricAlarms",
+			FnServiceEntity: "Alarms",
+			Prefix:          "Describe",
+			Service:         "cloudwatch",
+			Documentation: `
+			// GetMetricAlarms returns all cloudwatch alarms based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		// configservice
+		Function{
+			FnName:          "GetRecordedResourceCounts",
+			Entity:          "DiscoveredResourceCounts",
+			SingularEntity:  "ResourceCount",
+			FnAttributeList: "ResourceCounts",
+			Prefix:          "Get",
+			Service:         "configservice",
+			Documentation: `
+			// GetRecordedResourceCounts returns counts of the AWS resources which have
+			// been recorded by AWS Config.
+			// See https://docs.aws.amazon.com/config/latest/APIReference/API_GetDiscoveredResourceCounts.html
+			// for more information about what to enable in your AWS account, the list of
+			// supported resources, etc.
+			`,
+		},
+
 		// dax
 		Function{
 			FnName:                     "GetDAXClusters",
@@ -368,6 +211,22 @@ var (
 			FnInputPaginationAttribute: "NextToken",
 			Documentation: `
 			// GetDAXClusters returns the DAX clusters on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		// directconnect / dx
+		Function{
+			FnName:                     "GetDirectConnectGateways",
+			Entity:                     "DirectConnectGateways",
+			FnAttributeList:            "DirectConnectGateways",
+			SingularEntity:             "Gateway",
+			Prefix:                     "Describe",
+			Service:                    "directconnect",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
+			Documentation: `
+			// GetDirectConnectGateways returns the Direct Connect gateways on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
@@ -404,20 +263,178 @@ var (
 			`,
 		},
 
-		// directconnect / dx
+		// DynamoDB
 		Function{
-			FnName:                     "GetDirectConnectGateways",
-			Entity:                     "DirectConnectGateways",
-			FnAttributeList:            "DirectConnectGateways",
-			SingularEntity:             "Gateway",
+			FnName:                     "GetDynamodbTables",
+			Entity:                     "Tables",
+			FnAttributeList:            "TableNames",
+			FnOutput:                   "string",
+			Prefix:                     "List",
+			Service:                    "dynamodb",
+			FnPaginationAttribute:      "LastEvaluatedTableName",
+			FnInputPaginationAttribute: "ExclusiveStartTableName",
+			Documentation: `
+					// GetDynamodbTables returns the dynamodb talbles on the given input
+					// Returned values are commented in the interface doc comment block.
+					`,
+		},
+		Function{
+			FnName:                     "GetDynamodbGlobalTables",
+			Entity:                     "GlobalTables",
+			FnAttributeList:            "GlobalTables",
+			SingularEntity:             "GlobalTable",
+			Prefix:                     "List",
+			Service:                    "dynamodb",
+			FnPaginationAttribute:      "LastEvaluatedGlobalTableName",
+			FnInputPaginationAttribute: "ExclusiveStartGlobalTableName",
+			Documentation: `
+					// GetDynamodbGlobalTables returns the dynamodb global tables on the given input
+					// Returned values are commented in the interface doc comment block.
+					`,
+		},
+
+		// ec2
+		Function{
+			HasNotPagination: true,
+			Entity:           "Addresses",
+			SingularEntity:   "Address",
+			Prefix:           "Describe",
+			Service:          "ec2",
+			Documentation: `
+					// GetAddresses returns all EC2 Addresses based on the input given.
+					// Returned values are commented in the interface doc comment block.
+					`,
+		},
+
+		Function{
+			FnAttributeList: "Reservations#Instances",
+			Entity:          "Instances",
+			Prefix:          "Describe",
+			Service:         "ec2",
+			Documentation: `
+					// GetInstances returns all EC2 instances based on the input given.
+					// Returned values are commented in the interface doc comment block.
+					`,
+		},
+		Function{
+			Entity:  "Vpcs",
+			Prefix:  "Describe",
+			Service: "ec2",
+			Documentation: `
+					// GetVpcs returns all EC2 VPCs based on the input given.
+					// Returned values are commented in the interface doc comment block.
+					`,
+		},
+		Function{
+			Entity:  "VpcPeeringConnections",
+			Prefix:  "Describe",
+			Service: "ec2",
+			Documentation: `
+					// GetVpcPeeringConnections returns all VpcPeeringConnections based on the input given.
+					// Returned values are commented in the interface doc comment block.
+					`,
+		},
+
+		Function{
+			HasNotPagination: true,
+			Entity:           "Images",
+			Prefix:           "Describe",
+			Service:          "ec2",
+			Documentation: `
+					// GetImages returns all EC2 AMI based on the input given.
+					// Returned values are commented in the interface doc comment block.
+					`,
+		},
+		Function{
+			HasNotPagination: true,
+			Entity:           "Images",
+			Prefix:           "Describe",
+			Service:          "ec2",
+			FilterByOwner:    "Owners",
+			Documentation: `
+					// GetOwnImages returns all EC2 AMI belonging to the Account ID based on the input given.
+					// Returned values are commented in the interface doc comment block.
+					`,
+		},
+		Function{
+			SingularEntity:   "KeyPairInfo",
+			HasNotPagination: true,
+			Entity:           "KeyPairs",
+			Prefix:           "Describe",
+			Service:          "ec2",
+			Documentation: `
+					// GetKeyPairs returns all KeyPairs based on the input given.
+					// Returned values are commented in the interface doc comment block.
+					`,
+		},
+		Function{
+			FnName:                     "GetEC2NatGateways",
+			Entity:                     "NatGateways",
+			FnAttributeList:            "NatGateways",
+			SingularEntity:             "NatGateway",
 			Prefix:                     "Describe",
-			Service:                    "directconnect",
+			Service:                    "ec2",
 			FnPaginationAttribute:      "NextToken",
 			FnInputPaginationAttribute: "NextToken",
 			Documentation: `
-			// GetDirectConnectGateways returns the Direct Connect gateways on the given input
-			// Returned values are commented in the interface doc comment block.
-			`,
+				  // GetEC2NatGateways returns the EC2 nat gateways on the given input
+				  // Returned values are commented in the interface doc comment block.
+				  `,
+		},
+		Function{
+			Entity:  "SecurityGroups",
+			Prefix:  "Describe",
+			Service: "ec2",
+			Documentation: `
+					// GetSecurityGroups returns all EC2 security groups based on the input given.
+					// Returned values are commented in the interface doc comment block.
+					`,
+		},
+		Function{
+			Entity:  "Subnets",
+			Prefix:  "Describe",
+			Service: "ec2",
+			Documentation: `
+					// GetSubnets returns all EC2 subnets based on the input given.
+					// Returned values are commented in the interface doc comment block.
+					`,
+		},
+		Function{
+			Entity:  "Volumes",
+			Prefix:  "Describe",
+			Service: "ec2",
+			Documentation: `
+					// GetVolumes returns all EC2 volumes based on the input given.
+					// Returned values are commented in the interface doc comment block.
+					`,
+		},
+		Function{
+			Entity:  "Snapshots",
+			Prefix:  "Describe",
+			Service: "ec2",
+			Documentation: `
+					// GetSnapshots returns all snapshots based on the input given.
+					// Returned values are commented in the interface doc comment block.
+					`,
+		},
+		Function{
+			Entity:        "Snapshots",
+			Prefix:        "Describe",
+			Service:       "ec2",
+			FilterByOwner: "OwnerIds",
+			Documentation: `
+					// GetOwnSnapshots returns all snapshots belonging to the Account ID based on the input given.
+					// Returned values are commented in the interface doc comment block.
+					`,
+		},
+		Function{
+			Entity:  "LaunchTemplates",
+			Prefix:  "Describe",
+			Service: "ec2",
+			Documentation: `
+					// GetLaunchTemplates returns all LaunchTemplate belonging to the Account ID based on the input given.
+					// Returned values are commented in the interface doc comment block.
+					`,
 		},
 
 		// ECS
@@ -789,166 +806,6 @@ var (
 			`,
 		},
 
-		// netptune
-		Function{
-			FnName:                     "GetNeptuneDBClusters",
-			Entity:                     "DBClusters",
-			FnAttributeList:            "DBClusters",
-			SingularEntity:             "DBCluster",
-			Prefix:                     "Describe",
-			Service:                    "neptune",
-			FnPaginationAttribute:      "Marker",
-			FnInputPaginationAttribute: "Marker",
-			Documentation: `
-		  // GetNeptuneDBClusters returns the Neptune DBClusters on the given input
-		  // Returned values are commented in the interface doc comment block.
-		  `,
-		},
-
-		// rds
-		Function{
-			FnName:                     "GetRDSDBClusters",
-			Entity:                     "DBClusters",
-			FnAttributeList:            "DBClusters",
-			SingularEntity:             "DBCluster",
-			Prefix:                     "Describe",
-			Service:                    "rds",
-			FnPaginationAttribute:      "Marker",
-			FnInputPaginationAttribute: "Marker",
-			Documentation: `
-		  // GetRDSDBClusters returns the RDS DB Clusters on the given input
-		  // Returned values are commented in the interface doc comment block.
-		  `,
-		},
-
-		Function{
-			FnName:                     "GetRDSGlobalClusters",
-			Entity:                     "GlobalClusters",
-			FnAttributeList:            "GlobalClusters",
-			SingularEntity:             "GlobalCluster",
-			Prefix:                     "Describe",
-			Service:                    "rds",
-			FnPaginationAttribute:      "Marker",
-			FnInputPaginationAttribute: "Marker",
-			Documentation: `
-		  // GetRDSGlobalClusters returns the RDS Global Clusters on the given input
-		  // Returned values are commented in the interface doc comment block.
-		  `,
-		},
-		Function{
-			Entity:                "DBInstances",
-			FnPaginationAttribute: "Marker",
-			Prefix:                "Describe",
-			Service:               "rds",
-			Documentation: `
-			// GetDBInstances returns all DB instances based on the input given.
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			FnName:           "GetDBInstancesTags",
-			Entity:           "TagsForResource",
-			SingularEntity:   "Tag",
-			FnAttributeList:  "TagList",
-			HasNotPagination: true,
-			Prefix:           "List",
-			Service:          "rds",
-			Documentation: `
-			// GetDBInstancesTags returns a list of tags from an ARN, extra filters for tags can also be provided.
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			Entity:                "DBParameterGroups",
-			FnPaginationAttribute: "Marker",
-			Prefix:                "Describe",
-			Service:               "rds",
-			Documentation: `
-			// GetDBParameterGroups returns all DB parameterGroups based on the input given.
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			Entity:                "DBSubnetGroups",
-			FnPaginationAttribute: "Marker",
-			Prefix:                "Describe",
-			Service:               "rds",
-			Documentation: `
-			// GetDBSubnetGroups returns all DB DBSubnetGroups based on the input given.
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-
-		// s3
-		Function{
-			// TODO: https://github.com/cycloidio/terracognita/issues/76
-			FnName:       "ListBuckets",
-			Entity:       "Buckets",
-			Prefix:       "List",
-			Service:      "s3",
-			NoGenerateFn: true,
-			Documentation: `
-			// ListBuckets returns all S3 buckets based on the input given and specifically
-			// filtering by Location as ListBuckets does not do it by itself
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			FnName:           "GetBucketTags",
-			Entity:           "BucketTagging",
-			SingularEntity:   "Tag",
-			FnAttributeList:  "TagSet",
-			HasNotPagination: true,
-			Prefix:           "Get",
-			Service:          "s3",
-			Documentation: `
-			// GetBucketTags returns tags associated with S3 buckets based on the input given.
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			// TODO: https://github.com/cycloidio/terracognita/issues/76
-			FnName:                     "ListObjects",
-			Entity:                     "Objects",
-			FnAttributeList:            "Contents",
-			FnPaginationAttribute:      "NextMarker",
-			FnInputPaginationAttribute: "Marker",
-			Prefix:                     "List",
-			Service:                    "s3",
-			Documentation: `
-			// ListObjects returns a list of all S3 objects in a bucket based on the input given.
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			FnName:           "GetObjectsTags",
-			Entity:           "ObjectTagging",
-			SingularEntity:   "Tag",
-			FnAttributeList:  "TagSet",
-			HasNotPagination: true,
-			Prefix:           "Get",
-			Service:          "s3",
-			Documentation: `
-			// GetObjectsTags returns tags associated with S3 objects based on the input given.
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			FnName:          "GetRecordedResourceCounts",
-			Entity:          "DiscoveredResourceCounts",
-			SingularEntity:  "ResourceCount",
-			FnAttributeList: "ResourceCounts",
-			Prefix:          "Get",
-			Service:         "configservice",
-			Documentation: `
-			// GetRecordedResourceCounts returns counts of the AWS resources which have
-			// been recorded by AWS Config.
-			// See https://docs.aws.amazon.com/config/latest/APIReference/API_GetDiscoveredResourceCounts.html
-			// for more information about what to enable in your AWS account, the list of
-			// supported resources, etc.
-			`,
-		},
-
 		// fsx
 		Function{
 			FnName:                     "GetFSXFileSystems",
@@ -961,6 +818,36 @@ var (
 			FnInputPaginationAttribute: "NextToken",
 			Documentation: `
 			// GetFSXFileSystems returns the fsx filesystems arns on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		// Glue
+		Function{
+			FnName:                     "GetGlueDatabases",
+			Entity:                     "Databases",
+			FnAttributeList:            "DatabaseList",
+			SingularEntity:             "Database",
+			Prefix:                     "Get",
+			Service:                    "glue",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
+			Documentation: `
+			// GetGlueDatabases returns the Glue databases on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:                     "GetGlueTables",
+			Entity:                     "Tables",
+			FnAttributeList:            "TableList",
+			SingularEntity:             "TableData",
+			Prefix:                     "Get",
+			Service:                    "glue",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
+			Documentation: `
+			// GetGlueTables returns the Glue Tables on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
@@ -1213,6 +1100,22 @@ var (
 			`,
 		},
 
+		// Lambda
+		Function{
+			FnName:                     "GetLambdaFunctions",
+			Entity:                     "Functions",
+			FnAttributeList:            "Functions",
+			SingularEntity:             "FunctionConfiguration",
+			Prefix:                     "List",
+			Service:                    "lambda",
+			FnPaginationAttribute:      "NextMarker",
+			FnInputPaginationAttribute: "Marker",
+			Documentation: `
+			// GetLambdaFunctions returns the lambda Functions on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
 		// lightsail
 		Function{
 			FnName:                     "GetLightsailInstances",
@@ -1261,84 +1164,108 @@ var (
 		  `,
 		},
 
-		// ses
+		// netptune
 		Function{
-			Entity:           "ActiveReceiptRuleSet",
-			Prefix:           "Describe",
-			HasNoSlice:       true,
-			HasNotPagination: true,
-			FnAttributeList:  "Metadata.Name",
-			FnOutput:         "string",
-			Service:          "ses",
+			FnName:                     "GetNeptuneDBClusters",
+			Entity:                     "DBClusters",
+			FnAttributeList:            "DBClusters",
+			SingularEntity:             "DBCluster",
+			Prefix:                     "Describe",
+			Service:                    "neptune",
+			FnPaginationAttribute:      "Marker",
+			FnInputPaginationAttribute: "Marker",
 			Documentation: `
-			// GetActiveReceiptRuleSet returns the SES ActiveReceiptRuleSet on the given input
+		  // GetNeptuneDBClusters returns the Neptune DBClusters on the given input
+		  // Returned values are commented in the interface doc comment block.
+		  `,
+		},
+
+		// rds
+		Function{
+			FnName:                     "GetRDSDBClusters",
+			Entity:                     "DBClusters",
+			FnAttributeList:            "DBClusters",
+			SingularEntity:             "DBCluster",
+			Prefix:                     "Describe",
+			Service:                    "rds",
+			FnPaginationAttribute:      "Marker",
+			FnInputPaginationAttribute: "Marker",
+			Documentation: `
+		  // GetRDSDBClusters returns the RDS DB Clusters on the given input
+		  // Returned values are commented in the interface doc comment block.
+		  `,
+		},
+
+		Function{
+			FnName:                     "GetRDSGlobalClusters",
+			Entity:                     "GlobalClusters",
+			FnAttributeList:            "GlobalClusters",
+			SingularEntity:             "GlobalCluster",
+			Prefix:                     "Describe",
+			Service:                    "rds",
+			FnPaginationAttribute:      "Marker",
+			FnInputPaginationAttribute: "Marker",
+			Documentation: `
+		  // GetRDSGlobalClusters returns the RDS Global Clusters on the given input
+		  // Returned values are commented in the interface doc comment block.
+		  `,
+		},
+		Function{
+			Entity:                "DBInstances",
+			FnPaginationAttribute: "Marker",
+			Prefix:                "Describe",
+			Service:               "rds",
+			Documentation: `
+			// GetDBInstances returns all DB instances based on the input given.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:           "ActiveReceiptRuleSet",
-			FnName:           "GetActiveReceiptRulesSet",
-			Prefix:           "Describe",
-			HasNotPagination: true,
-			FnAttributeList:  "Rules",
-			SingularEntity:   "ReceiptRule",
-			Service:          "ses",
-			Documentation: `
-			// GetActiveReceiptRulesSet returns the SES ActiveReceiptRuleSet on the given input
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			Entity:   "Identities",
-			FnOutput: "string",
-			Prefix:   "List",
-			Service:  "ses",
-			Documentation: `
-			// GetIdentities returns the SES Identities on the given input
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			FnAttributeList:  "Filters",
-			Entity:           "ReceiptFilters",
+			FnName:           "GetDBInstancesTags",
+			Entity:           "TagsForResource",
+			SingularEntity:   "Tag",
+			FnAttributeList:  "TagList",
 			HasNotPagination: true,
 			Prefix:           "List",
-			Service:          "ses",
+			Service:          "rds",
 			Documentation: `
-			// GetReceiptFilters returns the SES ReceiptFilters on the given input
+			// GetDBInstancesTags returns a list of tags from an ARN, extra filters for tags can also be provided.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:  "ConfigurationSets",
-			Prefix:  "List",
-			Service: "ses",
+			Entity:                "DBParameterGroups",
+			FnPaginationAttribute: "Marker",
+			Prefix:                "Describe",
+			Service:               "rds",
 			Documentation: `
-			// GetConfigurationSets returns the SES ConfigurationSets on the given input
+			// GetDBParameterGroups returns all DB parameterGroups based on the input given.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			Entity:           "IdentityNotificationAttributes",
-			Prefix:           "Get",
-			Service:          "ses",
-			FnAttributeList:  "NotificationAttributes",
-			SingularEntity:   "IdentityNotificationAttributes",
-			IsMap:            true,
-			HasNotPagination: true,
+			Entity:                "DBSubnetGroups",
+			FnPaginationAttribute: "Marker",
+			Prefix:                "Describe",
+			Service:               "rds",
 			Documentation: `
-			// GetIdentityNotificationAttributes returns the SES IdentityNotificationAttributes on the given input
+			// GetDBSubnetGroups returns all DB DBSubnetGroups based on the input given.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
+
+		// redshift
 		Function{
-			Entity:          "Templates",
-			Prefix:          "List",
-			FnAttributeList: "TemplatesMetadata",
-			SingularEntity:  "TemplateMetadata",
-			Service:         "ses",
+			FnName:                     "GetRedshiftClusters",
+			Entity:                     "Clusters",
+			FnAttributeList:            "Clusters",
+			SingularEntity:             "Cluster",
+			Prefix:                     "Describe",
+			Service:                    "redshift",
+			FnPaginationAttribute:      "Marker",
+			FnInputPaginationAttribute: "Marker",
 			Documentation: `
-			// GetTemplates returns the SES Templates on the given input
+			// GetRedshiftClusters returns the Redshift Clusters on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
@@ -1440,48 +1367,171 @@ var (
 			`,
 		},
 
-		// Lambda
+		// s3
 		Function{
-			FnName:                     "GetLambdaFunctions",
-			Entity:                     "Functions",
-			FnAttributeList:            "Functions",
-			SingularEntity:             "FunctionConfiguration",
-			Prefix:                     "List",
-			Service:                    "lambda",
+			// TODO: https://github.com/cycloidio/terracognita/issues/76
+			FnName:       "ListBuckets",
+			Entity:       "Buckets",
+			Prefix:       "List",
+			Service:      "s3",
+			NoGenerateFn: true,
+			Documentation: `
+			// ListBuckets returns all S3 buckets based on the input given and specifically
+			// filtering by Location as ListBuckets does not do it by itself
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:           "GetBucketTags",
+			Entity:           "BucketTagging",
+			SingularEntity:   "Tag",
+			FnAttributeList:  "TagSet",
+			HasNotPagination: true,
+			Prefix:           "Get",
+			Service:          "s3",
+			Documentation: `
+			// GetBucketTags returns tags associated with S3 buckets based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			// TODO: https://github.com/cycloidio/terracognita/issues/76
+			FnName:                     "ListObjects",
+			Entity:                     "Objects",
+			FnAttributeList:            "Contents",
 			FnPaginationAttribute:      "NextMarker",
 			FnInputPaginationAttribute: "Marker",
+			Prefix:                     "List",
+			Service:                    "s3",
 			Documentation: `
-			// GetLambdaFunctions returns the lambda Functions on the given input
+			// ListObjects returns a list of all S3 objects in a bucket based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:           "GetObjectsTags",
+			Entity:           "ObjectTagging",
+			SingularEntity:   "Tag",
+			FnAttributeList:  "TagSet",
+			HasNotPagination: true,
+			Prefix:           "Get",
+			Service:          "s3",
+			Documentation: `
+			// GetObjectsTags returns tags associated with S3 objects based on the input given.
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 
-		// DynamoDB
+		// ses
 		Function{
-			FnName:                     "GetDynamodbTables",
-			Entity:                     "Tables",
-			FnAttributeList:            "TableNames",
-			FnOutput:                   "string",
-			Prefix:                     "List",
-			Service:                    "dynamodb",
-			FnPaginationAttribute:      "LastEvaluatedTableName",
-			FnInputPaginationAttribute: "ExclusiveStartTableName",
+			Entity:           "ActiveReceiptRuleSet",
+			Prefix:           "Describe",
+			HasNoSlice:       true,
+			HasNotPagination: true,
+			FnAttributeList:  "Metadata.Name",
+			FnOutput:         "string",
+			Service:          "ses",
 			Documentation: `
-			// GetDynamodbTables returns the dynamodb talbles on the given input
+			// GetActiveReceiptRuleSet returns the SES ActiveReceiptRuleSet on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			FnName:                     "GetDynamodbGlobalTables",
-			Entity:                     "GlobalTables",
-			FnAttributeList:            "GlobalTables",
-			SingularEntity:             "GlobalTable",
-			Prefix:                     "List",
-			Service:                    "dynamodb",
-			FnPaginationAttribute:      "LastEvaluatedGlobalTableName",
-			FnInputPaginationAttribute: "ExclusiveStartGlobalTableName",
+			Entity:           "ActiveReceiptRuleSet",
+			FnName:           "GetActiveReceiptRulesSet",
+			Prefix:           "Describe",
+			HasNotPagination: true,
+			FnAttributeList:  "Rules",
+			SingularEntity:   "ReceiptRule",
+			Service:          "ses",
 			Documentation: `
-			// GetDynamodbGlobalTables returns the dynamodb global tables on the given input
+			// GetActiveReceiptRulesSet returns the SES ActiveReceiptRuleSet on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:   "Identities",
+			FnOutput: "string",
+			Prefix:   "List",
+			Service:  "ses",
+			Documentation: `
+			// GetIdentities returns the SES Identities on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnAttributeList:  "Filters",
+			Entity:           "ReceiptFilters",
+			HasNotPagination: true,
+			Prefix:           "List",
+			Service:          "ses",
+			Documentation: `
+			// GetReceiptFilters returns the SES ReceiptFilters on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "ConfigurationSets",
+			Prefix:  "List",
+			Service: "ses",
+			Documentation: `
+			// GetConfigurationSets returns the SES ConfigurationSets on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:           "IdentityNotificationAttributes",
+			Prefix:           "Get",
+			Service:          "ses",
+			FnAttributeList:  "NotificationAttributes",
+			SingularEntity:   "IdentityNotificationAttributes",
+			IsMap:            true,
+			HasNotPagination: true,
+			Documentation: `
+			// GetIdentityNotificationAttributes returns the SES IdentityNotificationAttributes on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:          "Templates",
+			Prefix:          "List",
+			FnAttributeList: "TemplatesMetadata",
+			SingularEntity:  "TemplateMetadata",
+			Service:         "ses",
+			Documentation: `
+			// GetTemplates returns the SES Templates on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		// sqs
+		Function{
+			FnName:                     "GetSQSQueues",
+			Entity:                     "Queues",
+			FnAttributeList:            "QueueUrls",
+			FnOutput:                   "string",
+			Prefix:                     "List",
+			Service:                    "sqs",
+			FnPaginationAttribute:      "NextToken",
+			FnInputPaginationAttribute: "NextToken",
+			Documentation: `
+			// GetSQSQueues returns the SQS Queues on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		// storagegateway
+		Function{
+			FnName:                     "GetStorageGatewayGateways",
+			Entity:                     "Gateways",
+			FnAttributeList:            "Gateways",
+			SingularEntity:             "GatewayInfo",
+			Prefix:                     "List",
+			Service:                    "storagegateway",
+			FnPaginationAttribute:      "Marker",
+			FnInputPaginationAttribute: "Marker",
+			Documentation: `
+			// GetStorageGatewayGateways returns the StorageGateway Gateways on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},

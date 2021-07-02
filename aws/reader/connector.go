@@ -41,11 +41,14 @@ import (
 	"github.com/aws/aws-sdk-go/service/mq/mqiface"
 	"github.com/aws/aws-sdk-go/service/neptune/neptuneiface"
 	"github.com/aws/aws-sdk-go/service/rds/rdsiface"
+	"github.com/aws/aws-sdk-go/service/redshift/redshiftiface"
 	"github.com/aws/aws-sdk-go/service/route53/route53iface"
 	"github.com/aws/aws-sdk-go/service/route53resolver/route53resolveriface"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager/s3manageriface"
 	"github.com/aws/aws-sdk-go/service/ses/sesiface"
+	"github.com/aws/aws-sdk-go/service/sqs/sqsiface"
+	"github.com/aws/aws-sdk-go/service/storagegateway/storagegatewayiface"
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/aws/aws-sdk-go/service/sts/stsiface"
 )
@@ -139,6 +142,7 @@ type serviceConnector struct {
 	mq                       mqiface.MQAPI
 	neptune                  neptuneiface.NeptuneAPI
 	rds                      rdsiface.RDSAPI
+	redshift                 redshiftiface.RedshiftAPI
 	region                   string
 	route53resolver          route53resolveriface.Route53ResolverAPI
 	route53                  route53iface.Route53API
@@ -146,6 +150,8 @@ type serviceConnector struct {
 	s3                       s3iface.S3API
 	ses                      sesiface.SESAPI
 	session                  *session.Session
+	sqs                      sqsiface.SQSAPI
+	storagegateway           storagegatewayiface.StorageGatewayAPI
 }
 
 // configureAWS creates a new static credential with the passed accessKey and
