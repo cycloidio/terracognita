@@ -34,10 +34,10 @@ Providers:
 Visit the [releases](https://github.com/cycloidio/terracognita/releases) page to select your system, architecture and version you need. To pull the latest release:
 
 ```shell
-$ curl -L https://github.com/cycloidio/terracognita/releases/latest/download/terracognita-linux-amd64.tar.gz -o terracognita-linux-amd64.tar.gz
-$ tar -xf terracognita-linux-amd64.tar.gz
-$ chmod u+x terracognita-linux-amd64
-$ sudo mv terracognita-linux-amd64 /usr/local/bin/terracognita
+curl -L https://github.com/cycloidio/terracognita/releases/latest/download/terracognita-linux-amd64.tar.gz -o terracognita-linux-amd64.tar.gz
+tar -xf terracognita-linux-amd64.tar.gz
+chmod u+x terracognita-linux-amd64
+sudo mv terracognita-linux-amd64 /usr/local/bin/terracognita
 ```
 
 ### Development
@@ -45,9 +45,9 @@ $ sudo mv terracognita-linux-amd64 /usr/local/bin/terracognita
 You can build and install with the latest sources, you will enjoy the new features and bug fixes. It uses Go Modules, so GO 1.16+ is required.
 
 ```shell
-$ git clone https://github.com/cycloidio/terracognita
-$ cd terracognita
-$ make install
+git clone https://github.com/cycloidio/terracognita
+cd terracognita
+make install
 ```
 
 ### Arch Linux
@@ -55,11 +55,11 @@ $ make install
 There are two entries in the AUR: [terracognita-git](https://aur.archlinux.org/packages/terracognita-git/) (targets the latest git commit) and [terracognita](https://aur.archlinux.org/packages/terracognita) (targets the latest stable release).
 
 ```shell
-$ yay -Ss terracognita
-aur/terracognita 1:0.3.0-1 (+0 0.00%)
-    Reads from existing Cloud Providers (reverse Terraform) and generates your infrastructure as code on Terraform configuration
-aur/terracognita-git 1:v0.3.0.r27.gdfc5a99-1 (+0 0.00%)
-    Reads from existing Cloud Providers (reverse Terraform) and generates your infrastructure as code on Terraform configuration
+yay -Ss terracognita
+  aur/terracognita 1:0.3.0-1 (+0 0.00%)
+      Reads from existing Cloud Providers (reverse Terraform) and generates your infrastructure as code on Terraform configuration
+  aur/terracognita-git 1:v0.3.0.r27.gdfc5a99-1 (+0 0.00%)
+      Reads from existing Cloud Providers (reverse Terraform) and generates your infrastructure as code on Terraform configuration
 ```
 
 ### Install via brew
@@ -67,23 +67,29 @@ aur/terracognita-git 1:v0.3.0.r27.gdfc5a99-1 (+0 0.00%)
 If you're macOS user and using [Homebrew](https://brew.sh/), you can install via brew command:
 
 ```sh
-$ brew install terracognita
+brew install terracognita
 ```
 
 ## Usage
 
-Using the `terracognita --help` you will know the basics.
+The main usage of Terracognita is:
 
 ```bash
-$ make help
-help: Makefile                   This help dialog
-lint: $(GOLANGCI_LINT) $(GOLINT) Runs the linter
-test:                            Runs the tests
-ci: lint test                    Runs the linter and the tests
-dbuild:                          Builds the docker image with same name as the binary
-build:                           Bulids the binary
-clean:                           Removes binary and/or docker image
+terracognita [TERRAFORM_PROVIDER] [--flags]
 ```
+
+You replace the `TERRAFORM_PROVIDER` with the Provider you want to use (for example `aws`) and then add the other required flags.
+Each Provider has different flags and different required flags.
+
+The more general ones are the `--hcl` or `--module` and `--tfstate` which indicates the output file for the HCL (or module)
+and the TFState that will be generated.
+
+You can also `--include` or `--exclude` multiple resources by using the Terraform name it has like `aws_instance`.
+
+For more options you can always use `terracognita --help` and `terracognita [TERRAFORM_PROVIDER] --help` for the
+specific documentation of the Provider.
+
+We also have `make help` that provide some helpers on using the actual codebase of Terracognita
 
 [![asciicast](https://asciinema.org/a/330055.svg)](https://asciinema.org/a/330055)
 
@@ -146,22 +152,22 @@ You can use directly [the image built](https://hub.docker.com/r/cycloid/terracog
 To build your Docker image just run:
 
 ```bash
-$ make dbuild
+make dbuild
 ```
 
 And then depending on the image you want to use (`cycloid/terracognita` or your local build `terracognita`):
 
 ```bash
-$ docker run cycloid/terracognita -h
+docker run cycloid/terracognita -h
 ```
 
 Example:
 
 ```bash
-$ export AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXXXXXX
-$ export AWS_SECRET_ACCESS_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-$ export AWS_DEFAULT_REGION=xx-yyyy-0
-$ docker run \
+export AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXXXXXX
+export AWS_SECRET_ACCESS_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+export AWS_DEFAULT_REGION=xx-yyyy-0
+docker run \
 		-v "${PWD}"/outputs:/app/outputs \
 		cycloid/terracognita aws \
 		--hcl app/outputs/resources.tf
@@ -197,8 +203,8 @@ variable "region" {}
 Then run the terraform init & plan commands:
 
 ```bash
-$ terraform init
-$ terraform plan -var access_key=$AWS_ACCESS_KEY_ID -var secret_key=$AWS_SECRET_ACCESS_KEY -var region=$AWS_DEFAULT_REGION
+terraform init
+terraform plan -var access_key=$AWS_ACCESS_KEY_ID -var secret_key=$AWS_SECRET_ACCESS_KEY -var region=$AWS_DEFAULT_REGION
 ```
 
 ## License
