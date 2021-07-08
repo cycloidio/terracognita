@@ -9,24 +9,46 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/apigateway/apigatewayiface"
+	"github.com/aws/aws-sdk-go/service/athena/athenaiface"
 	"github.com/aws/aws-sdk-go/service/autoscaling/autoscalingiface"
+	"github.com/aws/aws-sdk-go/service/batch/batchiface"
 	"github.com/aws/aws-sdk-go/service/cloudfront/cloudfrontiface"
 	"github.com/aws/aws-sdk-go/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go/service/configservice/configserviceiface"
+	"github.com/aws/aws-sdk-go/service/databasemigrationservice/databasemigrationserviceiface"
+	"github.com/aws/aws-sdk-go/service/dax/daxiface"
+	"github.com/aws/aws-sdk-go/service/directconnect/directconnectiface"
+	"github.com/aws/aws-sdk-go/service/directoryservice/directoryserviceiface"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
+	"github.com/aws/aws-sdk-go/service/ecs/ecsiface"
+	"github.com/aws/aws-sdk-go/service/efs/efsiface"
+	"github.com/aws/aws-sdk-go/service/eks/eksiface"
 	"github.com/aws/aws-sdk-go/service/elasticache/elasticacheiface"
+	"github.com/aws/aws-sdk-go/service/elasticbeanstalk/elasticbeanstalkiface"
 	"github.com/aws/aws-sdk-go/service/elasticsearchservice/elasticsearchserviceiface"
 	"github.com/aws/aws-sdk-go/service/elb/elbiface"
 	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
+	"github.com/aws/aws-sdk-go/service/emr/emriface"
+	"github.com/aws/aws-sdk-go/service/fsx/fsxiface"
+	"github.com/aws/aws-sdk-go/service/glue/glueiface"
 	"github.com/aws/aws-sdk-go/service/iam/iamiface"
+	"github.com/aws/aws-sdk-go/service/kinesis/kinesisiface"
 	"github.com/aws/aws-sdk-go/service/lambda/lambdaiface"
+	"github.com/aws/aws-sdk-go/service/lightsail/lightsailiface"
+	"github.com/aws/aws-sdk-go/service/mediastore/mediastoreiface"
+	"github.com/aws/aws-sdk-go/service/mq/mqiface"
+	"github.com/aws/aws-sdk-go/service/neptune/neptuneiface"
 	"github.com/aws/aws-sdk-go/service/rds/rdsiface"
+	"github.com/aws/aws-sdk-go/service/redshift/redshiftiface"
 	"github.com/aws/aws-sdk-go/service/route53/route53iface"
 	"github.com/aws/aws-sdk-go/service/route53resolver/route53resolveriface"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager/s3manageriface"
 	"github.com/aws/aws-sdk-go/service/ses/sesiface"
+	"github.com/aws/aws-sdk-go/service/sqs/sqsiface"
+	"github.com/aws/aws-sdk-go/service/storagegateway/storagegatewayiface"
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/aws/aws-sdk-go/service/sts/stsiface"
 )
@@ -88,26 +110,48 @@ func (c *connector) GetRegion() string {
 }
 
 type serviceConnector struct {
-	apigateway           apigatewayiface.APIGatewayAPI
-	autoscaling          autoscalingiface.AutoScalingAPI
-	cloudfront           cloudfrontiface.CloudFrontAPI
-	cloudwatch           cloudwatchiface.CloudWatchAPI
-	configservice        configserviceiface.ConfigServiceAPI
-	ec2                  ec2iface.EC2API
-	elasticache          elasticacheiface.ElastiCacheAPI
-	elasticsearchservice elasticsearchserviceiface.ElasticsearchServiceAPI
-	elb                  elbiface.ELBAPI
-	elbv2                elbv2iface.ELBV2API
-	iam                  iamiface.IAMAPI
-	lambda               lambdaiface.LambdaAPI
-	rds                  rdsiface.RDSAPI
-	region               string
-	route53resolver      route53resolveriface.Route53ResolverAPI
-	route53              route53iface.Route53API
-	s3downloader         s3manageriface.DownloaderAPI
-	s3                   s3iface.S3API
-	ses                  sesiface.SESAPI
-	session              *session.Session
+	apigateway               apigatewayiface.APIGatewayAPI
+	athena                   athenaiface.AthenaAPI
+	autoscaling              autoscalingiface.AutoScalingAPI
+	batch                    batchiface.BatchAPI
+	cloudfront               cloudfrontiface.CloudFrontAPI
+	cloudwatch               cloudwatchiface.CloudWatchAPI
+	configservice            configserviceiface.ConfigServiceAPI
+	databasemigrationservice databasemigrationserviceiface.DatabaseMigrationServiceAPI
+	dax                      daxiface.DAXAPI
+	directconnect            directconnectiface.DirectConnectAPI
+	directoryservice         directoryserviceiface.DirectoryServiceAPI
+	dynamodb                 dynamodbiface.DynamoDBAPI
+	ec2                      ec2iface.EC2API
+	ecs                      ecsiface.ECSAPI
+	efs                      efsiface.EFSAPI
+	eks                      eksiface.EKSAPI
+	elasticache              elasticacheiface.ElastiCacheAPI
+	elasticbeanstalk         elasticbeanstalkiface.ElasticBeanstalkAPI
+	elasticsearchservice     elasticsearchserviceiface.ElasticsearchServiceAPI
+	elb                      elbiface.ELBAPI
+	elbv2                    elbv2iface.ELBV2API
+	emr                      emriface.EMRAPI
+	fsx                      fsxiface.FSxAPI
+	glue                     glueiface.GlueAPI
+	iam                      iamiface.IAMAPI
+	kinesis                  kinesisiface.KinesisAPI
+	lambda                   lambdaiface.LambdaAPI
+	lightsail                lightsailiface.LightsailAPI
+	mediastore               mediastoreiface.MediaStoreAPI
+	mq                       mqiface.MQAPI
+	neptune                  neptuneiface.NeptuneAPI
+	rds                      rdsiface.RDSAPI
+	redshift                 redshiftiface.RedshiftAPI
+	region                   string
+	route53resolver          route53resolveriface.Route53ResolverAPI
+	route53                  route53iface.Route53API
+	s3downloader             s3manageriface.DownloaderAPI
+	s3                       s3iface.S3API
+	ses                      sesiface.SESAPI
+	session                  *session.Session
+	sqs                      sqsiface.SQSAPI
+	storagegateway           storagegatewayiface.StorageGatewayAPI
 }
 
 // configureAWS creates a new static credential with the passed accessKey and

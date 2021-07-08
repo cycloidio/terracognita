@@ -4,6 +4,7 @@ package google
 
 import (
 	"fmt"
+	"strings"
 )
 
 const _ResourceTypeName = "google_compute_instancegoogle_compute_firewallgoogle_compute_networkgoogle_compute_health_checkgoogle_compute_instance_groupgoogle_compute_instance_iam_policygoogle_compute_backend_bucketgoogle_compute_backend_servicegoogle_compute_ssl_certificategoogle_compute_target_http_proxygoogle_compute_target_https_proxygoogle_compute_url_mapgoogle_compute_global_forwarding_rulegoogle_compute_forwarding_rulegoogle_compute_diskgoogle_dns_managed_zonegoogle_dns_record_setgoogle_project_iam_custom_rolegoogle_storage_bucketgoogle_storage_bucket_iam_policygoogle_sql_database_instance"
@@ -120,6 +121,10 @@ var _ResourceTypeNames = []string{
 // ResourceTypeString retrieves an enum value from the enum constants string name.
 // Throws an error if the param is not part of the enum.
 func ResourceTypeString(s string) (ResourceType, error) {
+	if val, ok := _ResourceTypeNameToValueMap[s]; ok {
+		return val, nil
+	}
+	s = strings.ToLower(s)
 	if val, ok := _ResourceTypeNameToValueMap[s]; ok {
 		return val, nil
 	}

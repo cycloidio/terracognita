@@ -4,6 +4,7 @@ package azurerm
 
 import (
 	"fmt"
+	"strings"
 )
 
 const _ResourceTypeName = "azurerm_resource_groupazurerm_subnetazurerm_virtual_desktop_host_poolazurerm_virtual_desktop_application_groupazurerm_logic_app_trigger_customazurerm_logic_app_action_customazurerm_logic_app_workflowazurerm_network_interfaceazurerm_network_security_groupazurerm_virtual_machineazurerm_virtual_machine_extensionazurerm_virtual_machine_scale_setazurerm_virtual_network"
@@ -88,6 +89,10 @@ var _ResourceTypeNames = []string{
 // ResourceTypeString retrieves an enum value from the enum constants string name.
 // Throws an error if the param is not part of the enum.
 func ResourceTypeString(s string) (ResourceType, error) {
+	if val, ok := _ResourceTypeNameToValueMap[s]; ok {
+		return val, nil
+	}
+	s = strings.ToLower(s)
 	if val, ok := _ResourceTypeNameToValueMap[s]; ok {
 		return val, nil
 	}

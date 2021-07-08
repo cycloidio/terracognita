@@ -108,7 +108,7 @@ We have an `aws/cmd` that generates the `aws/reader` interface, which is then us
 1. Add your function
 
 Functions are based on `https://github.com/aws/aws-sdk-go/tree/master/service`.
-For example with `aws_db_parameter_group` you should be able to find the Entity, Prefix, Service in https://github.com/aws/aws-sdk-go/blob/master/service/rds/rdsiface/interface.go#L313
+For example with `aws_db_parameter_group` you should be able to find the Entity, Prefix, Service in https://github.com/aws/aws-sdk-go/blob/master/service/rds/rdsiface/interface.go#L343
 In our case we want to read data, the dedicated function is `DescribeDBParameterGroups`.
 
   * Entity: use the function name without prefix "DBParameterGroups"

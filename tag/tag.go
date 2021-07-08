@@ -7,6 +7,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/aws/aws-sdk-go/service/neptune"
+	"github.com/aws/aws-sdk-go/service/rds"
 	"github.com/chr4/pwgen"
 	"github.com/cycloidio/terracognita/errcode"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -36,6 +38,24 @@ func New(t string) (Tag, error) {
 // to use on AWS filters
 func (t Tag) ToEC2Filter() *ec2.Filter {
 	return &ec2.Filter{
+		Name:   aws.String(fmt.Sprintf("tag:%s", t.Name)),
+		Values: []*string{aws.String(t.Value)},
+	}
+}
+
+// ToRDSFilter transforms the Tag to a rds.Filter
+// to use on AWS filters
+func (t Tag) ToRDSFilter() *rds.Filter {
+	return &rds.Filter{
+		Name:   aws.String(fmt.Sprintf("tag:%s", t.Name)),
+		Values: []*string{aws.String(t.Value)},
+	}
+}
+
+// ToNeptuneFilter transforms the Tag to a Neptune.Filter
+// to use on AWS filters
+func (t Tag) ToNeptuneFilter() *neptune.Filter {
+	return &neptune.Filter{
 		Name:   aws.String(fmt.Sprintf("tag:%s", t.Name)),
 		Values: []*string{aws.String(t.Value)},
 	}
