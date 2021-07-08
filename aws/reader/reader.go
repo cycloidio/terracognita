@@ -74,6 +74,10 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetAPIGatewayDeployments(ctx context.Context, input *apigateway.GetDeploymentsInput) ([]*apigateway.Deployment, error)
 
+	// GetAPIGatewayResources returns the Resource Functions on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetAPIGatewayResources(ctx context.Context, input *apigateway.GetResourcesInput) ([]*apigateway.Resource, error)
+
 	// GetAPIGatewayRestAPIs returns the RestApi Functions on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetAPIGatewayRestAPIs(ctx context.Context, input *apigateway.GetRestApisInput) ([]*apigateway.RestApi, error)
@@ -81,10 +85,6 @@ type Reader interface {
 	// GetAPIGatewayStages returns the Stage Functions on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetAPIGatewayStages(ctx context.Context, input *apigateway.GetStagesInput) ([]*apigateway.Stage, error)
-
-	// GetAPIGatewayResources returns the Resource Functions on the given input
-	// Returned values are commented in the interface doc comment block.
-	GetAPIGatewayResources(ctx context.Context, input *apigateway.GetResourcesInput) ([]*apigateway.Resource, error)
 
 	// GetAthenaDataCatalogs returns the Athena worker groups on the given input
 	// Returned values are commented in the interface doc comment block.
@@ -110,13 +110,13 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetCloudFrontDistributions(ctx context.Context, input *cloudfront.ListDistributionsInput) ([]*cloudfront.DistributionSummary, error)
 
-	// GetCloudFrontPublicKeys returns all the CloudFront Public Keys on the given input
-	// Returned values are commented in the interface doc comment block.
-	GetCloudFrontPublicKeys(ctx context.Context, input *cloudfront.ListPublicKeysInput) ([]*cloudfront.PublicKeySummary, error)
-
 	// GetCloudFrontOriginAccessIdentities returns all the CloudFront Origin Access Identities on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetCloudFrontOriginAccessIdentities(ctx context.Context, input *cloudfront.ListCloudFrontOriginAccessIdentitiesInput) ([]*cloudfront.OriginAccessIdentitySummary, error)
+
+	// GetCloudFrontPublicKeys returns all the CloudFront Public Keys on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetCloudFrontPublicKeys(ctx context.Context, input *cloudfront.ListPublicKeysInput) ([]*cloudfront.PublicKeySummary, error)
 
 	// GetMetricAlarms returns all cloudwatch alarms based on the input given.
 	// Returned values are commented in the interface doc comment block.
@@ -145,29 +145,17 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetDMSDescribeReplicationInstances(ctx context.Context, input *databasemigrationservice.DescribeReplicationInstancesInput) ([]*databasemigrationservice.ReplicationInstance, error)
 
-	// GetDynamodbTables returns the dynamodb talbles on the given input
-	// Returned values are commented in the interface doc comment block.
-	GetDynamodbTables(ctx context.Context, input *dynamodb.ListTablesInput) ([]*string, error)
-
 	// GetDynamodbGlobalTables returns the dynamodb global tables on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetDynamodbGlobalTables(ctx context.Context, input *dynamodb.ListGlobalTablesInput) ([]*dynamodb.GlobalTable, error)
 
+	// GetDynamodbTables returns the dynamodb talbles on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetDynamodbTables(ctx context.Context, input *dynamodb.ListTablesInput) ([]*string, error)
+
 	// GetAddresses returns all EC2 Addresses based on the input given.
 	// Returned values are commented in the interface doc comment block.
 	GetAddresses(ctx context.Context, input *ec2.DescribeAddressesInput) ([]*ec2.Address, error)
-
-	// GetInstances returns all EC2 instances based on the input given.
-	// Returned values are commented in the interface doc comment block.
-	GetInstances(ctx context.Context, input *ec2.DescribeInstancesInput) ([]*ec2.Instance, error)
-
-	// GetVpcs returns all EC2 VPCs based on the input given.
-	// Returned values are commented in the interface doc comment block.
-	GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) ([]*ec2.Vpc, error)
-
-	// GetVpcPeeringConnections returns all VpcPeeringConnections based on the input given.
-	// Returned values are commented in the interface doc comment block.
-	GetVpcPeeringConnections(ctx context.Context, input *ec2.DescribeVpcPeeringConnectionsInput) ([]*ec2.VpcPeeringConnection, error)
 
 	// GetImages returns all EC2 AMI based on the input given.
 	// Returned values are commented in the interface doc comment block.
@@ -177,9 +165,17 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetOwnImages(ctx context.Context, input *ec2.DescribeImagesInput) ([]*ec2.Image, error)
 
+	// GetInstances returns all EC2 instances based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetInstances(ctx context.Context, input *ec2.DescribeInstancesInput) ([]*ec2.Instance, error)
+
 	// GetKeyPairs returns all KeyPairs based on the input given.
 	// Returned values are commented in the interface doc comment block.
 	GetKeyPairs(ctx context.Context, input *ec2.DescribeKeyPairsInput) ([]*ec2.KeyPairInfo, error)
+
+	// GetLaunchTemplates returns all LaunchTemplate belonging to the Account ID based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetLaunchTemplates(ctx context.Context, input *ec2.DescribeLaunchTemplatesInput) ([]*ec2.LaunchTemplate, error)
 
 	// GetEC2NatGateways returns the EC2 nat gateways on the given input
 	// Returned values are commented in the interface doc comment block.
@@ -189,14 +185,6 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetSecurityGroups(ctx context.Context, input *ec2.DescribeSecurityGroupsInput) ([]*ec2.SecurityGroup, error)
 
-	// GetSubnets returns all EC2 subnets based on the input given.
-	// Returned values are commented in the interface doc comment block.
-	GetSubnets(ctx context.Context, input *ec2.DescribeSubnetsInput) ([]*ec2.Subnet, error)
-
-	// GetVolumes returns all EC2 volumes based on the input given.
-	// Returned values are commented in the interface doc comment block.
-	GetVolumes(ctx context.Context, input *ec2.DescribeVolumesInput) ([]*ec2.Volume, error)
-
 	// GetSnapshots returns all snapshots based on the input given.
 	// Returned values are commented in the interface doc comment block.
 	GetSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput) ([]*ec2.Snapshot, error)
@@ -205,9 +193,21 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetOwnSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput) ([]*ec2.Snapshot, error)
 
-	// GetLaunchTemplates returns all LaunchTemplate belonging to the Account ID based on the input given.
+	// GetSubnets returns all EC2 subnets based on the input given.
 	// Returned values are commented in the interface doc comment block.
-	GetLaunchTemplates(ctx context.Context, input *ec2.DescribeLaunchTemplatesInput) ([]*ec2.LaunchTemplate, error)
+	GetSubnets(ctx context.Context, input *ec2.DescribeSubnetsInput) ([]*ec2.Subnet, error)
+
+	// GetVolumes returns all EC2 volumes based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetVolumes(ctx context.Context, input *ec2.DescribeVolumesInput) ([]*ec2.Volume, error)
+
+	// GetVpcs returns all EC2 VPCs based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) ([]*ec2.Vpc, error)
+
+	// GetVpcPeeringConnections returns all VpcPeeringConnections based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetVpcPeeringConnections(ctx context.Context, input *ec2.DescribeVpcPeeringConnectionsInput) ([]*ec2.VpcPeeringConnection, error)
 
 	// GetVPNGateways returns the ec2 VPN Gateways on the given input
 	// Returned values are commented in the interface doc comment block.
@@ -221,6 +221,10 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetECSClusters(ctx context.Context, input *ecs.DescribeClustersInput) ([]*ecs.Cluster, error)
 
+	// GetEC2InternetGateways returns the EC2 Internet Gateways on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetEC2InternetGateways(ctx context.Context, input *ec2.DescribeInternetGatewaysInput) ([]*ec2.InternetGateway, error)
+
 	// GetECSServicesArns returns the ecs services arns on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetECSServicesArns(ctx context.Context, input *ecs.ListServicesInput) ([]*string, error)
@@ -229,61 +233,65 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetECSServices(ctx context.Context, input *ecs.DescribeServicesInput) ([]*ecs.Service, error)
 
-	// GetEC2InternetGateways returns the EC2 Internet Gateways on the given input
-	// Returned values are commented in the interface doc comment block.
-	GetEC2InternetGateways(ctx context.Context, input *ec2.DescribeInternetGatewaysInput) ([]*ec2.InternetGateway, error)
-
 	// GetEFSFileSystems returns the EFS File Systems on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetEFSFileSystems(ctx context.Context, input *efs.DescribeFileSystemsInput) ([]*efs.FileSystemDescription, error)
-
-	// GetEKSClusters returns the EKS Clusters on the given input
-	// Returned values are commented in the interface doc comment block.
-	GetEKSClusters(ctx context.Context, input *eks.ListClustersInput) ([]*string, error)
 
 	// GetEKSCluster returns the EKS Cluster on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetEKSCluster(ctx context.Context, input *eks.DescribeClusterInput) (*eks.Cluster, error)
 
+	// GetEKSClusters returns the EKS Clusters on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetEKSClusters(ctx context.Context, input *eks.ListClustersInput) ([]*string, error)
+
 	// GetElastiCacheClusters returns all Elasticache clusters based on the input given.
 	// Returned values are commented in the interface doc comment block.
 	GetElastiCacheClusters(ctx context.Context, input *elasticache.DescribeCacheClustersInput) ([]*elasticache.CacheCluster, error)
-
-	// GetElastiCacheTags returns a list of tags of Elasticache resources based on its ARN.
-	// Returned values are commented in the interface doc comment block.
-	GetElastiCacheTags(ctx context.Context, input *elasticache.ListTagsForResourceInput) ([]*elasticache.Tag, error)
 
 	// GetElastiCacheReplicationGroups returns the EKS Replication groups on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetElastiCacheReplicationGroups(ctx context.Context, input *elasticache.DescribeReplicationGroupsInput) ([]*elasticache.ReplicationGroup, error)
 
+	// GetElastiCacheTags returns a list of tags of Elasticache resources based on its ARN.
+	// Returned values are commented in the interface doc comment block.
+	GetElastiCacheTags(ctx context.Context, input *elasticache.ListTagsForResourceInput) ([]*elasticache.Tag, error)
+
 	// GetElasticBeanstalkApplications returns the ElasticBeanstalk Applications on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetElasticBeanstalkApplications(ctx context.Context, input *elasticbeanstalk.DescribeApplicationsInput) ([]*elasticbeanstalk.ApplicationDescription, error)
-
-	// GetElasticsearchDomains returns a list of domains of Elasticsearch resources.
-	// Returned values are commented in the interface doc comment block.
-	GetElasticsearchDomains(ctx context.Context, input *elasticsearchservice.DescribeElasticsearchDomainsInput) ([]*elasticsearchservice.ElasticsearchDomainStatus, error)
 
 	// GetElasticsearchDomainNames returns a list of domainNames of Elasticsearch resources.
 	// Returned values are commented in the interface doc comment block.
 	GetElasticsearchDomainNames(ctx context.Context, input *elasticsearchservice.ListDomainNamesInput) ([]*elasticsearchservice.DomainInfo, error)
 
-	// GetLoadBalancers returns a list of ELB (v1) based on the input from the different regions.
+	// GetElasticsearchDomains returns a list of domains of Elasticsearch resources.
 	// Returned values are commented in the interface doc comment block.
-	GetLoadBalancers(ctx context.Context, input *elb.DescribeLoadBalancersInput) ([]*elb.LoadBalancerDescription, error)
-
-	// GetLoadBalancersTags returns a list of Tags based on the input from the different regions.
-	// Returned values are commented in the interface doc comment block.
-	GetLoadBalancersTags(ctx context.Context, input *elb.DescribeTagsInput) ([]*elb.TagDescription, error)
+	GetElasticsearchDomains(ctx context.Context, input *elasticsearchservice.DescribeElasticsearchDomainsInput) ([]*elasticsearchservice.ElasticsearchDomainStatus, error)
 
 	// GetLoadBalancerAttributes returns a list of Attributes based on the input from the different regions.
 	// Returned values are commented in the interface doc comment block.
 	GetLoadBalancerAttributes(ctx context.Context, input *elb.DescribeLoadBalancerAttributesInput) ([]*elb.AdditionalAttribute, error)
 
+	// GetLoadBalancers returns a list of ELB (v1) based on the input from the different regions.
+	// Returned values are commented in the interface doc comment block.
+	GetLoadBalancers(ctx context.Context, input *elb.DescribeLoadBalancersInput) ([]*elb.LoadBalancerDescription, error)
+
 	// GetLoadBalancerPolicies returns a list of Policies based on the input from the different regions.
 	// Returned values are commented in the interface doc comment block.
 	GetLoadBalancerPolicies(ctx context.Context, input *elb.DescribeLoadBalancerPoliciesInput) ([]*elb.PolicyDescription, error)
+
+	// GetLoadBalancersTags returns a list of Tags based on the input from the different regions.
+	// Returned values are commented in the interface doc comment block.
+	GetLoadBalancersTags(ctx context.Context, input *elb.DescribeTagsInput) ([]*elb.TagDescription, error)
+
+	// GetListenerCertificates returns a list of ListenerCertificates based on the input from the different regions.
+	// Returned values are commented in the interface doc comment block.
+	GetListenerCertificates(ctx context.Context, input *elbv2.DescribeListenerCertificatesInput) ([]*elbv2.Certificate, error)
+
+	// GetLoadBalancersV2Listeners returns a list of Listeners based on the input from the different regions.
+	// Returned values are commented in the interface doc comment block.
+	GetLoadBalancersV2Listeners(ctx context.Context, input *elbv2.DescribeListenersInput) ([]*elbv2.Listener, error)
 
 	// GetLoadBalancersV2 returns a list of ELB (v2) - also known as ALB - based on the input from the different regions.
 	// Returned values are commented in the interface doc comment block.
@@ -293,9 +301,9 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetLoadBalancersV2Tags(ctx context.Context, input *elbv2.DescribeTagsInput) ([]*elbv2.TagDescription, error)
 
-	// GetLoadBalancersV2Listeners returns a list of Listeners based on the input from the different regions.
+	// GetLoadBalancersV2TargetGroupAttributes returns a list of TargetGroupAttributes based on the input from the different regions.
 	// Returned values are commented in the interface doc comment block.
-	GetLoadBalancersV2Listeners(ctx context.Context, input *elbv2.DescribeListenersInput) ([]*elbv2.Listener, error)
+	GetLoadBalancersV2TargetGroupAttributes(ctx context.Context, input *elbv2.DescribeTargetGroupAttributesInput) ([]*elbv2.TargetGroupAttribute, error)
 
 	// GetLoadBalancersV2TargetGroups returns a list of TargetGroups based on the input from the different regions.
 	// Returned values are commented in the interface doc comment block.
@@ -305,17 +313,9 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetLoadBalancersV2TargetHealth(ctx context.Context, input *elbv2.DescribeTargetHealthInput) ([]*elbv2.TargetHealthDescription, error)
 
-	// GetListenerCertificates returns a list of ListenerCertificates based on the input from the different regions.
-	// Returned values are commented in the interface doc comment block.
-	GetListenerCertificates(ctx context.Context, input *elbv2.DescribeListenerCertificatesInput) ([]*elbv2.Certificate, error)
-
 	// GetLoadBalancersV2Rules returns a list of Rules based on the input from the different regions.
 	// Returned values are commented in the interface doc comment block.
 	GetLoadBalancersV2Rules(ctx context.Context, input *elbv2.DescribeRulesInput) ([]*elbv2.Rule, error)
-
-	// GetLoadBalancersV2TargetGroupAttributes returns a list of TargetGroupAttributes based on the input from the different regions.
-	// Returned values are commented in the interface doc comment block.
-	GetLoadBalancersV2TargetGroupAttributes(ctx context.Context, input *elbv2.DescribeTargetGroupAttributesInput) ([]*elbv2.TargetGroupAttribute, error)
 
 	// GetEMRClusters returns the EMR Clusters on the given input
 	// Returned values are commented in the interface doc comment block.
@@ -345,9 +345,17 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetAccountPasswordPolicy(ctx context.Context, input *iam.GetAccountPasswordPolicyInput) (*iam.PasswordPolicy, error)
 
-	// GetGroups returns the IAM Groups on the given input
+	// GetAttachedGroupPolicies returns the IAM AttachedGroupPolicies on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetGroups(ctx context.Context, input *iam.ListGroupsInput) ([]*iam.Group, error)
+	GetAttachedGroupPolicies(ctx context.Context, input *iam.ListAttachedGroupPoliciesInput) ([]*iam.AttachedPolicy, error)
+
+	// GetAttachedRolePolicies returns the IAM AttachedRolePolicies on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetAttachedRolePolicies(ctx context.Context, input *iam.ListAttachedRolePoliciesInput) ([]*iam.AttachedPolicy, error)
+
+	// GetAttachedUserPolicies returns the IAM AttachedUserPolicies on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetAttachedUserPolicies(ctx context.Context, input *iam.ListAttachedUserPoliciesInput) ([]*iam.AttachedPolicy, error)
 
 	// GetGroupUsers returns a list of IAM users that are in the specified IAM group
 	// Returned values are commented in the interface doc comment block.
@@ -357,17 +365,17 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetGroupPolicies(ctx context.Context, input *iam.ListGroupPoliciesInput) ([]*string, error)
 
-	// GetAttachedGroupPolicies returns the IAM AttachedGroupPolicies on the given input
+	// GetGroups returns the IAM Groups on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetAttachedGroupPolicies(ctx context.Context, input *iam.ListAttachedGroupPoliciesInput) ([]*iam.AttachedPolicy, error)
-
-	// GetIstanceProfiles returns the IAM InstanceProfiles on the given input
-	// Returned values are commented in the interface doc comment block.
-	GetInstanceProfiles(ctx context.Context, input *iam.ListInstanceProfilesInput) ([]*iam.InstanceProfile, error)
+	GetGroups(ctx context.Context, input *iam.ListGroupsInput) ([]*iam.Group, error)
 
 	// GetGroupsForUser returns the IAM GroupsForUser on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetGroupsForUser(ctx context.Context, input *iam.ListGroupsForUserInput) ([]*iam.Group, error)
+
+	// GetIstanceProfiles returns the IAM InstanceProfiles on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetInstanceProfiles(ctx context.Context, input *iam.ListInstanceProfilesInput) ([]*iam.InstanceProfile, error)
 
 	// GetOpenIDConnectProviders returns the IAM OpenIDConnectProviders on the given input
 	// Returned values are commented in the interface doc comment block.
@@ -377,17 +385,13 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetPolicies(ctx context.Context, input *iam.ListPoliciesInput) ([]*iam.Policy, error)
 
-	// GetRoles returns the IAM Roles on the given input
-	// Returned values are commented in the interface doc comment block.
-	GetRoles(ctx context.Context, input *iam.ListRolesInput) ([]*iam.Role, error)
-
 	// GetRolePolicies returns the IAM RolePolicies on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetRolePolicies(ctx context.Context, input *iam.ListRolePoliciesInput) ([]*string, error)
 
-	// GetAttachedRolePolicies returns the IAM AttachedRolePolicies on the given input
+	// GetRoles returns the IAM Roles on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetAttachedRolePolicies(ctx context.Context, input *iam.ListAttachedRolePoliciesInput) ([]*iam.AttachedPolicy, error)
+	GetRoles(ctx context.Context, input *iam.ListRolesInput) ([]*iam.Role, error)
 
 	// GetSAMLProviders returns the IAM SAMLProviders on the given input
 	// Returned values are commented in the interface doc comment block.
@@ -397,21 +401,17 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetServerCertificates(ctx context.Context, input *iam.ListServerCertificatesInput) ([]*iam.ServerCertificateMetadata, error)
 
-	// GetUsers returns the IAM Users on the given input
+	// GetSSHPublicKeys returns the IAM SSHPublicKeys on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetUsers(ctx context.Context, input *iam.ListUsersInput) ([]*iam.User, error)
+	GetSSHPublicKeys(ctx context.Context, input *iam.ListSSHPublicKeysInput) ([]*iam.SSHPublicKeyMetadata, error)
 
 	// GetUserPolicies returns the IAM UserPolicies on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetUserPolicies(ctx context.Context, input *iam.ListUserPoliciesInput) ([]*string, error)
 
-	// GetAttachedUserPolicies returns the IAM AttachedUserPolicies on the given input
+	// GetUsers returns the IAM Users on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetAttachedUserPolicies(ctx context.Context, input *iam.ListAttachedUserPoliciesInput) ([]*iam.AttachedPolicy, error)
-
-	// GetSSHPublicKeys returns the IAM SSHPublicKeys on the given input
-	// Returned values are commented in the interface doc comment block.
-	GetSSHPublicKeys(ctx context.Context, input *iam.ListSSHPublicKeysInput) ([]*iam.SSHPublicKeyMetadata, error)
+	GetUsers(ctx context.Context, input *iam.ListUsersInput) ([]*iam.User, error)
 
 	// GetKinesisStreams returns the Kinesis Streams on the given input
 	// Returned values are commented in the interface doc comment block.
@@ -441,17 +441,9 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetRDSDBClusters(ctx context.Context, input *rds.DescribeDBClustersInput) ([]*rds.DBCluster, error)
 
-	// GetRDSGlobalClusters returns the RDS Global Clusters on the given input
-	// Returned values are commented in the interface doc comment block.
-	GetRDSGlobalClusters(ctx context.Context, input *rds.DescribeGlobalClustersInput) ([]*rds.GlobalCluster, error)
-
 	// GetDBInstances returns all DB instances based on the input given.
 	// Returned values are commented in the interface doc comment block.
 	GetDBInstances(ctx context.Context, input *rds.DescribeDBInstancesInput) ([]*rds.DBInstance, error)
-
-	// GetDBInstancesTags returns a list of tags from an ARN, extra filters for tags can also be provided.
-	// Returned values are commented in the interface doc comment block.
-	GetDBInstancesTags(ctx context.Context, input *rds.ListTagsForResourceInput) ([]*rds.Tag, error)
 
 	// GetDBParameterGroups returns all DB parameterGroups based on the input given.
 	// Returned values are commented in the interface doc comment block.
@@ -461,29 +453,37 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetDBSubnetGroups(ctx context.Context, input *rds.DescribeDBSubnetGroupsInput) ([]*rds.DBSubnetGroup, error)
 
+	// GetRDSGlobalClusters returns the RDS Global Clusters on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetRDSGlobalClusters(ctx context.Context, input *rds.DescribeGlobalClustersInput) ([]*rds.GlobalCluster, error)
+
+	// GetDBInstancesTags returns a list of tags from an ARN, extra filters for tags can also be provided.
+	// Returned values are commented in the interface doc comment block.
+	GetDBInstancesTags(ctx context.Context, input *rds.ListTagsForResourceInput) ([]*rds.Tag, error)
+
 	// GetRedshiftClusters returns the Redshift Clusters on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetRedshiftClusters(ctx context.Context, input *redshift.DescribeClustersInput) ([]*redshift.Cluster, error)
-
-	// GetReusableDelegationSets returns the Route53 ReusableDelegationSets on the given input
-	// Returned values are commented in the interface doc comment block.
-	GetReusableDelegationSets(ctx context.Context, input *route53.ListReusableDelegationSetsInput) ([]*route53.DelegationSet, error)
-
-	// GetHealthChecks returns the Route53 HealthChecks on the given input
-	// Returned values are commented in the interface doc comment block.
-	GetHealthChecks(ctx context.Context, input *route53.ListHealthChecksInput) ([]*route53.HealthCheck, error)
 
 	// GetQueryLoggingConfigs returns the Route53 QueryLoggingConfigs on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetQueryLoggingConfigs(ctx context.Context, input *route53.ListQueryLoggingConfigsInput) ([]*route53.QueryLoggingConfig, error)
 
-	// GetResourceRecordSets returns the Route53 ResourceRecordSets on the given input
+	// GetHealthChecks returns the Route53 HealthChecks on the given input
 	// Returned values are commented in the interface doc comment block.
-	GetResourceRecordSets(ctx context.Context, input *route53.ListResourceRecordSetsInput) ([]*route53.ResourceRecordSet, error)
+	GetHealthChecks(ctx context.Context, input *route53.ListHealthChecksInput) ([]*route53.HealthCheck, error)
 
 	// GetHostedZones returns the Route53 HostedZones on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetHostedZones(ctx context.Context, input *route53.ListHostedZonesInput) ([]*route53.HostedZone, error)
+
+	// GetResourceRecordSets returns the Route53 ResourceRecordSets on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetResourceRecordSets(ctx context.Context, input *route53.ListResourceRecordSetsInput) ([]*route53.ResourceRecordSet, error)
+
+	// GetReusableDelegationSets returns the Route53 ReusableDelegationSets on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetReusableDelegationSets(ctx context.Context, input *route53.ListReusableDelegationSetsInput) ([]*route53.DelegationSet, error)
 
 	// GetVPCAssociationAuthorizations returns the Route53 VPCAssociationAuthorizations on the given input
 	// Returned values are commented in the interface doc comment block.
@@ -493,13 +493,13 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetResolverEndpoints(ctx context.Context, input *route53resolver.ListResolverEndpointsInput) ([]*route53resolver.ResolverEndpoint, error)
 
-	// GetResolverRules returns the Route53Resolver ResolverRules on the given input
-	// Returned values are commented in the interface doc comment block.
-	GetResolverRules(ctx context.Context, input *route53resolver.ListResolverRulesInput) ([]*route53resolver.ResolverRule, error)
-
 	// GetResolverRuleAssociations returns the Route53Resolver ResolverRuleAssociations on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetResolverRuleAssociations(ctx context.Context, input *route53resolver.ListResolverRuleAssociationsInput) ([]*route53resolver.ResolverRuleAssociation, error)
+
+	// GetResolverRules returns the Route53Resolver ResolverRules on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetResolverRules(ctx context.Context, input *route53resolver.ListResolverRulesInput) ([]*route53resolver.ResolverRule, error)
 
 	// ListBuckets returns all S3 buckets based on the input given and specifically
 	// filtering by Location as ListBuckets does not do it by itself
@@ -526,21 +526,21 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetActiveReceiptRulesSet(ctx context.Context, input *ses.DescribeActiveReceiptRuleSetInput) ([]*ses.ReceiptRule, error)
 
-	// GetIdentities returns the SES Identities on the given input
-	// Returned values are commented in the interface doc comment block.
-	GetIdentities(ctx context.Context, input *ses.ListIdentitiesInput) ([]*string, error)
-
-	// GetReceiptFilters returns the SES ReceiptFilters on the given input
-	// Returned values are commented in the interface doc comment block.
-	GetReceiptFilters(ctx context.Context, input *ses.ListReceiptFiltersInput) ([]*ses.ReceiptFilter, error)
-
 	// GetConfigurationSets returns the SES ConfigurationSets on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetConfigurationSets(ctx context.Context, input *ses.ListConfigurationSetsInput) ([]*ses.ConfigurationSet, error)
 
+	// GetIdentities returns the SES Identities on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetIdentities(ctx context.Context, input *ses.ListIdentitiesInput) ([]*string, error)
+
 	// GetIdentityNotificationAttributes returns the SES IdentityNotificationAttributes on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetIdentityNotificationAttributes(ctx context.Context, input *ses.GetIdentityNotificationAttributesInput) (map[string]*ses.IdentityNotificationAttributes, error)
+
+	// GetReceiptFilters returns the SES ReceiptFilters on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetReceiptFilters(ctx context.Context, input *ses.ListReceiptFiltersInput) ([]*ses.ReceiptFilter, error)
 
 	// GetTemplates returns the SES Templates on the given input
 	// Returned values are commented in the interface doc comment block.
@@ -575,6 +575,37 @@ func (c *connector) GetAPIGatewayDeployments(ctx context.Context, input *apigate
 
 		if input == nil {
 			input = &apigateway.GetDeploymentsInput{}
+		}
+		input.Position = o.Position
+		hasNextToken = o.Position != nil
+
+		opt = append(opt, o.Items...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetAPIGatewayResources(ctx context.Context, input *apigateway.GetResourcesInput) ([]*apigateway.Resource, error) {
+	if c.svc.apigateway == nil {
+		c.svc.apigateway = apigateway.New(c.svc.session)
+	}
+
+	opt := make([]*apigateway.Resource, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.apigateway.GetResourcesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.Items == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &apigateway.GetResourcesInput{}
 		}
 		input.Position = o.Position
 		hasNextToken = o.Position != nil
@@ -638,37 +669,6 @@ func (c *connector) GetAPIGatewayStages(ctx context.Context, input *apigateway.G
 		hasNextToken = false
 
 		opt = append(opt, o.Item...)
-
-	}
-
-	return opt, nil
-}
-
-func (c *connector) GetAPIGatewayResources(ctx context.Context, input *apigateway.GetResourcesInput) ([]*apigateway.Resource, error) {
-	if c.svc.apigateway == nil {
-		c.svc.apigateway = apigateway.New(c.svc.session)
-	}
-
-	opt := make([]*apigateway.Resource, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.apigateway.GetResourcesWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.Items == nil {
-			hasNextToken = false
-			continue
-		}
-
-		if input == nil {
-			input = &apigateway.GetResourcesInput{}
-		}
-		input.Position = o.Position
-		hasNextToken = o.Position != nil
-
-		opt = append(opt, o.Items...)
 
 	}
 
@@ -861,37 +861,6 @@ func (c *connector) GetCloudFrontDistributions(ctx context.Context, input *cloud
 	return opt, nil
 }
 
-func (c *connector) GetCloudFrontPublicKeys(ctx context.Context, input *cloudfront.ListPublicKeysInput) ([]*cloudfront.PublicKeySummary, error) {
-	if c.svc.cloudfront == nil {
-		c.svc.cloudfront = cloudfront.New(c.svc.session)
-	}
-
-	opt := make([]*cloudfront.PublicKeySummary, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.cloudfront.ListPublicKeysWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.PublicKeyList == nil {
-			hasNextToken = false
-			continue
-		}
-
-		if input == nil {
-			input = &cloudfront.ListPublicKeysInput{}
-		}
-		input.Marker = o.PublicKeyList.NextMarker
-		hasNextToken = o.PublicKeyList.NextMarker != nil
-
-		opt = append(opt, o.PublicKeyList.Items...)
-
-	}
-
-	return opt, nil
-}
-
 func (c *connector) GetCloudFrontOriginAccessIdentities(ctx context.Context, input *cloudfront.ListCloudFrontOriginAccessIdentitiesInput) ([]*cloudfront.OriginAccessIdentitySummary, error) {
 	if c.svc.cloudfront == nil {
 		c.svc.cloudfront = cloudfront.New(c.svc.session)
@@ -917,6 +886,37 @@ func (c *connector) GetCloudFrontOriginAccessIdentities(ctx context.Context, inp
 		hasNextToken = o.CloudFrontOriginAccessIdentityList.NextMarker != nil
 
 		opt = append(opt, o.CloudFrontOriginAccessIdentityList.Items...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetCloudFrontPublicKeys(ctx context.Context, input *cloudfront.ListPublicKeysInput) ([]*cloudfront.PublicKeySummary, error) {
+	if c.svc.cloudfront == nil {
+		c.svc.cloudfront = cloudfront.New(c.svc.session)
+	}
+
+	opt := make([]*cloudfront.PublicKeySummary, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.cloudfront.ListPublicKeysWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.PublicKeyList == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &cloudfront.ListPublicKeysInput{}
+		}
+		input.Marker = o.PublicKeyList.NextMarker
+		hasNextToken = o.PublicKeyList.NextMarker != nil
+
+		opt = append(opt, o.PublicKeyList.Items...)
 
 	}
 
@@ -1109,37 +1109,6 @@ func (c *connector) GetDMSDescribeReplicationInstances(ctx context.Context, inpu
 	return opt, nil
 }
 
-func (c *connector) GetDynamodbTables(ctx context.Context, input *dynamodb.ListTablesInput) ([]*string, error) {
-	if c.svc.dynamodb == nil {
-		c.svc.dynamodb = dynamodb.New(c.svc.session)
-	}
-
-	opt := make([]*string, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.dynamodb.ListTablesWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.TableNames == nil {
-			hasNextToken = false
-			continue
-		}
-
-		if input == nil {
-			input = &dynamodb.ListTablesInput{}
-		}
-		input.ExclusiveStartTableName = o.LastEvaluatedTableName
-		hasNextToken = o.LastEvaluatedTableName != nil
-
-		opt = append(opt, o.TableNames...)
-
-	}
-
-	return opt, nil
-}
-
 func (c *connector) GetDynamodbGlobalTables(ctx context.Context, input *dynamodb.ListGlobalTablesInput) ([]*dynamodb.GlobalTable, error) {
 	if c.svc.dynamodb == nil {
 		c.svc.dynamodb = dynamodb.New(c.svc.session)
@@ -1171,6 +1140,37 @@ func (c *connector) GetDynamodbGlobalTables(ctx context.Context, input *dynamodb
 	return opt, nil
 }
 
+func (c *connector) GetDynamodbTables(ctx context.Context, input *dynamodb.ListTablesInput) ([]*string, error) {
+	if c.svc.dynamodb == nil {
+		c.svc.dynamodb = dynamodb.New(c.svc.session)
+	}
+
+	opt := make([]*string, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.dynamodb.ListTablesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.TableNames == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &dynamodb.ListTablesInput{}
+		}
+		input.ExclusiveStartTableName = o.LastEvaluatedTableName
+		hasNextToken = o.LastEvaluatedTableName != nil
+
+		opt = append(opt, o.TableNames...)
+
+	}
+
+	return opt, nil
+}
+
 func (c *connector) GetAddresses(ctx context.Context, input *ec2.DescribeAddressesInput) ([]*ec2.Address, error) {
 	if c.svc.ec2 == nil {
 		c.svc.ec2 = ec2.New(c.svc.session)
@@ -1192,101 +1192,6 @@ func (c *connector) GetAddresses(ctx context.Context, input *ec2.DescribeAddress
 		hasNextToken = false
 
 		opt = append(opt, o.Addresses...)
-
-	}
-
-	return opt, nil
-}
-
-func (c *connector) GetInstances(ctx context.Context, input *ec2.DescribeInstancesInput) ([]*ec2.Instance, error) {
-	if c.svc.ec2 == nil {
-		c.svc.ec2 = ec2.New(c.svc.session)
-	}
-
-	opt := make([]*ec2.Instance, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.ec2.DescribeInstancesWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.Reservations == nil {
-			hasNextToken = false
-			continue
-		}
-
-		if input == nil {
-			input = &ec2.DescribeInstancesInput{}
-		}
-		input.NextToken = o.NextToken
-		hasNextToken = o.NextToken != nil
-
-		for _, v := range o.Reservations {
-			opt = append(opt, v.Instances...)
-		}
-
-	}
-
-	return opt, nil
-}
-
-func (c *connector) GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) ([]*ec2.Vpc, error) {
-	if c.svc.ec2 == nil {
-		c.svc.ec2 = ec2.New(c.svc.session)
-	}
-
-	opt := make([]*ec2.Vpc, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.ec2.DescribeVpcsWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.Vpcs == nil {
-			hasNextToken = false
-			continue
-		}
-
-		if input == nil {
-			input = &ec2.DescribeVpcsInput{}
-		}
-		input.NextToken = o.NextToken
-		hasNextToken = o.NextToken != nil
-
-		opt = append(opt, o.Vpcs...)
-
-	}
-
-	return opt, nil
-}
-
-func (c *connector) GetVpcPeeringConnections(ctx context.Context, input *ec2.DescribeVpcPeeringConnectionsInput) ([]*ec2.VpcPeeringConnection, error) {
-	if c.svc.ec2 == nil {
-		c.svc.ec2 = ec2.New(c.svc.session)
-	}
-
-	opt := make([]*ec2.VpcPeeringConnection, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.ec2.DescribeVpcPeeringConnectionsWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.VpcPeeringConnections == nil {
-			hasNextToken = false
-			continue
-		}
-
-		if input == nil {
-			input = &ec2.DescribeVpcPeeringConnectionsInput{}
-		}
-		input.NextToken = o.NextToken
-		hasNextToken = o.NextToken != nil
-
-		opt = append(opt, o.VpcPeeringConnections...)
 
 	}
 
@@ -1352,6 +1257,39 @@ func (c *connector) GetOwnImages(ctx context.Context, input *ec2.DescribeImagesI
 	return opt, nil
 }
 
+func (c *connector) GetInstances(ctx context.Context, input *ec2.DescribeInstancesInput) ([]*ec2.Instance, error) {
+	if c.svc.ec2 == nil {
+		c.svc.ec2 = ec2.New(c.svc.session)
+	}
+
+	opt := make([]*ec2.Instance, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeInstancesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.Reservations == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &ec2.DescribeInstancesInput{}
+		}
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		for _, v := range o.Reservations {
+			opt = append(opt, v.Instances...)
+		}
+
+	}
+
+	return opt, nil
+}
+
 func (c *connector) GetKeyPairs(ctx context.Context, input *ec2.DescribeKeyPairsInput) ([]*ec2.KeyPairInfo, error) {
 	if c.svc.ec2 == nil {
 		c.svc.ec2 = ec2.New(c.svc.session)
@@ -1373,6 +1311,37 @@ func (c *connector) GetKeyPairs(ctx context.Context, input *ec2.DescribeKeyPairs
 		hasNextToken = false
 
 		opt = append(opt, o.KeyPairs...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetLaunchTemplates(ctx context.Context, input *ec2.DescribeLaunchTemplatesInput) ([]*ec2.LaunchTemplate, error) {
+	if c.svc.ec2 == nil {
+		c.svc.ec2 = ec2.New(c.svc.session)
+	}
+
+	opt := make([]*ec2.LaunchTemplate, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeLaunchTemplatesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.LaunchTemplates == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &ec2.DescribeLaunchTemplatesInput{}
+		}
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.LaunchTemplates...)
 
 	}
 
@@ -1435,68 +1404,6 @@ func (c *connector) GetSecurityGroups(ctx context.Context, input *ec2.DescribeSe
 		hasNextToken = o.NextToken != nil
 
 		opt = append(opt, o.SecurityGroups...)
-
-	}
-
-	return opt, nil
-}
-
-func (c *connector) GetSubnets(ctx context.Context, input *ec2.DescribeSubnetsInput) ([]*ec2.Subnet, error) {
-	if c.svc.ec2 == nil {
-		c.svc.ec2 = ec2.New(c.svc.session)
-	}
-
-	opt := make([]*ec2.Subnet, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.ec2.DescribeSubnetsWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.Subnets == nil {
-			hasNextToken = false
-			continue
-		}
-
-		if input == nil {
-			input = &ec2.DescribeSubnetsInput{}
-		}
-		input.NextToken = o.NextToken
-		hasNextToken = o.NextToken != nil
-
-		opt = append(opt, o.Subnets...)
-
-	}
-
-	return opt, nil
-}
-
-func (c *connector) GetVolumes(ctx context.Context, input *ec2.DescribeVolumesInput) ([]*ec2.Volume, error) {
-	if c.svc.ec2 == nil {
-		c.svc.ec2 = ec2.New(c.svc.session)
-	}
-
-	opt := make([]*ec2.Volume, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.ec2.DescribeVolumesWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.Volumes == nil {
-			hasNextToken = false
-			continue
-		}
-
-		if input == nil {
-			input = &ec2.DescribeVolumesInput{}
-		}
-		input.NextToken = o.NextToken
-		hasNextToken = o.NextToken != nil
-
-		opt = append(opt, o.Volumes...)
 
 	}
 
@@ -1570,31 +1477,124 @@ func (c *connector) GetOwnSnapshots(ctx context.Context, input *ec2.DescribeSnap
 	return opt, nil
 }
 
-func (c *connector) GetLaunchTemplates(ctx context.Context, input *ec2.DescribeLaunchTemplatesInput) ([]*ec2.LaunchTemplate, error) {
+func (c *connector) GetSubnets(ctx context.Context, input *ec2.DescribeSubnetsInput) ([]*ec2.Subnet, error) {
 	if c.svc.ec2 == nil {
 		c.svc.ec2 = ec2.New(c.svc.session)
 	}
 
-	opt := make([]*ec2.LaunchTemplate, 0)
+	opt := make([]*ec2.Subnet, 0)
 
 	hasNextToken := true
 	for hasNextToken {
-		o, err := c.svc.ec2.DescribeLaunchTemplatesWithContext(ctx, input)
+		o, err := c.svc.ec2.DescribeSubnetsWithContext(ctx, input)
 		if err != nil {
 			return nil, err
 		}
-		if o.LaunchTemplates == nil {
+		if o.Subnets == nil {
 			hasNextToken = false
 			continue
 		}
 
 		if input == nil {
-			input = &ec2.DescribeLaunchTemplatesInput{}
+			input = &ec2.DescribeSubnetsInput{}
 		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 
-		opt = append(opt, o.LaunchTemplates...)
+		opt = append(opt, o.Subnets...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetVolumes(ctx context.Context, input *ec2.DescribeVolumesInput) ([]*ec2.Volume, error) {
+	if c.svc.ec2 == nil {
+		c.svc.ec2 = ec2.New(c.svc.session)
+	}
+
+	opt := make([]*ec2.Volume, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeVolumesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.Volumes == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &ec2.DescribeVolumesInput{}
+		}
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.Volumes...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) ([]*ec2.Vpc, error) {
+	if c.svc.ec2 == nil {
+		c.svc.ec2 = ec2.New(c.svc.session)
+	}
+
+	opt := make([]*ec2.Vpc, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeVpcsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.Vpcs == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &ec2.DescribeVpcsInput{}
+		}
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.Vpcs...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetVpcPeeringConnections(ctx context.Context, input *ec2.DescribeVpcPeeringConnectionsInput) ([]*ec2.VpcPeeringConnection, error) {
+	if c.svc.ec2 == nil {
+		c.svc.ec2 = ec2.New(c.svc.session)
+	}
+
+	opt := make([]*ec2.VpcPeeringConnection, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeVpcPeeringConnectionsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.VpcPeeringConnections == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &ec2.DescribeVpcPeeringConnectionsInput{}
+		}
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.VpcPeeringConnections...)
 
 	}
 
@@ -1686,6 +1686,37 @@ func (c *connector) GetECSClusters(ctx context.Context, input *ecs.DescribeClust
 	return opt, nil
 }
 
+func (c *connector) GetEC2InternetGateways(ctx context.Context, input *ec2.DescribeInternetGatewaysInput) ([]*ec2.InternetGateway, error) {
+	if c.svc.ec2 == nil {
+		c.svc.ec2 = ec2.New(c.svc.session)
+	}
+
+	opt := make([]*ec2.InternetGateway, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeInternetGatewaysWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.InternetGateways == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &ec2.DescribeInternetGatewaysInput{}
+		}
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.InternetGateways...)
+
+	}
+
+	return opt, nil
+}
+
 func (c *connector) GetECSServicesArns(ctx context.Context, input *ecs.ListServicesInput) ([]*string, error) {
 	if c.svc.ecs == nil {
 		c.svc.ecs = ecs.New(c.svc.session)
@@ -1744,37 +1775,6 @@ func (c *connector) GetECSServices(ctx context.Context, input *ecs.DescribeServi
 	return opt, nil
 }
 
-func (c *connector) GetEC2InternetGateways(ctx context.Context, input *ec2.DescribeInternetGatewaysInput) ([]*ec2.InternetGateway, error) {
-	if c.svc.ec2 == nil {
-		c.svc.ec2 = ec2.New(c.svc.session)
-	}
-
-	opt := make([]*ec2.InternetGateway, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.ec2.DescribeInternetGatewaysWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.InternetGateways == nil {
-			hasNextToken = false
-			continue
-		}
-
-		if input == nil {
-			input = &ec2.DescribeInternetGatewaysInput{}
-		}
-		input.NextToken = o.NextToken
-		hasNextToken = o.NextToken != nil
-
-		opt = append(opt, o.InternetGateways...)
-
-	}
-
-	return opt, nil
-}
-
 func (c *connector) GetEFSFileSystems(ctx context.Context, input *efs.DescribeFileSystemsInput) ([]*efs.FileSystemDescription, error) {
 	if c.svc.efs == nil {
 		c.svc.efs = efs.New(c.svc.session)
@@ -1800,6 +1800,33 @@ func (c *connector) GetEFSFileSystems(ctx context.Context, input *efs.DescribeFi
 		hasNextToken = o.NextMarker != nil
 
 		opt = append(opt, o.FileSystems...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetEKSCluster(ctx context.Context, input *eks.DescribeClusterInput) (*eks.Cluster, error) {
+	if c.svc.eks == nil {
+		c.svc.eks = eks.New(c.svc.session)
+	}
+
+	var opt *eks.Cluster
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.eks.DescribeClusterWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.Cluster == nil {
+			hasNextToken = false
+			continue
+		}
+
+		hasNextToken = false
+
+		opt = o.Cluster
 
 	}
 
@@ -1837,33 +1864,6 @@ func (c *connector) GetEKSClusters(ctx context.Context, input *eks.ListClustersI
 	return opt, nil
 }
 
-func (c *connector) GetEKSCluster(ctx context.Context, input *eks.DescribeClusterInput) (*eks.Cluster, error) {
-	if c.svc.eks == nil {
-		c.svc.eks = eks.New(c.svc.session)
-	}
-
-	var opt *eks.Cluster
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.eks.DescribeClusterWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.Cluster == nil {
-			hasNextToken = false
-			continue
-		}
-
-		hasNextToken = false
-
-		opt = o.Cluster
-
-	}
-
-	return opt, nil
-}
-
 func (c *connector) GetElastiCacheClusters(ctx context.Context, input *elasticache.DescribeCacheClustersInput) ([]*elasticache.CacheCluster, error) {
 	if c.svc.elasticache == nil {
 		c.svc.elasticache = elasticache.New(c.svc.session)
@@ -1889,33 +1889,6 @@ func (c *connector) GetElastiCacheClusters(ctx context.Context, input *elasticac
 		hasNextToken = o.Marker != nil
 
 		opt = append(opt, o.CacheClusters...)
-
-	}
-
-	return opt, nil
-}
-
-func (c *connector) GetElastiCacheTags(ctx context.Context, input *elasticache.ListTagsForResourceInput) ([]*elasticache.Tag, error) {
-	if c.svc.elasticache == nil {
-		c.svc.elasticache = elasticache.New(c.svc.session)
-	}
-
-	opt := make([]*elasticache.Tag, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.elasticache.ListTagsForResourceWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.TagList == nil {
-			hasNextToken = false
-			continue
-		}
-
-		hasNextToken = false
-
-		opt = append(opt, o.TagList...)
 
 	}
 
@@ -1953,6 +1926,33 @@ func (c *connector) GetElastiCacheReplicationGroups(ctx context.Context, input *
 	return opt, nil
 }
 
+func (c *connector) GetElastiCacheTags(ctx context.Context, input *elasticache.ListTagsForResourceInput) ([]*elasticache.Tag, error) {
+	if c.svc.elasticache == nil {
+		c.svc.elasticache = elasticache.New(c.svc.session)
+	}
+
+	opt := make([]*elasticache.Tag, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.elasticache.ListTagsForResourceWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.TagList == nil {
+			hasNextToken = false
+			continue
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.TagList...)
+
+	}
+
+	return opt, nil
+}
+
 func (c *connector) GetElasticBeanstalkApplications(ctx context.Context, input *elasticbeanstalk.DescribeApplicationsInput) ([]*elasticbeanstalk.ApplicationDescription, error) {
 	if c.svc.elasticbeanstalk == nil {
 		c.svc.elasticbeanstalk = elasticbeanstalk.New(c.svc.session)
@@ -1974,6 +1974,33 @@ func (c *connector) GetElasticBeanstalkApplications(ctx context.Context, input *
 		hasNextToken = false
 
 		opt = append(opt, o.Applications...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetElasticsearchDomainNames(ctx context.Context, input *elasticsearchservice.ListDomainNamesInput) ([]*elasticsearchservice.DomainInfo, error) {
+	if c.svc.elasticsearchservice == nil {
+		c.svc.elasticsearchservice = elasticsearchservice.New(c.svc.session)
+	}
+
+	opt := make([]*elasticsearchservice.DomainInfo, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.elasticsearchservice.ListDomainNamesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.DomainNames == nil {
+			hasNextToken = false
+			continue
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.DomainNames...)
 
 	}
 
@@ -2007,27 +2034,27 @@ func (c *connector) GetElasticsearchDomains(ctx context.Context, input *elastics
 	return opt, nil
 }
 
-func (c *connector) GetElasticsearchDomainNames(ctx context.Context, input *elasticsearchservice.ListDomainNamesInput) ([]*elasticsearchservice.DomainInfo, error) {
-	if c.svc.elasticsearchservice == nil {
-		c.svc.elasticsearchservice = elasticsearchservice.New(c.svc.session)
+func (c *connector) GetLoadBalancerAttributes(ctx context.Context, input *elb.DescribeLoadBalancerAttributesInput) ([]*elb.AdditionalAttribute, error) {
+	if c.svc.elb == nil {
+		c.svc.elb = elb.New(c.svc.session)
 	}
 
-	opt := make([]*elasticsearchservice.DomainInfo, 0)
+	opt := make([]*elb.AdditionalAttribute, 0)
 
 	hasNextToken := true
 	for hasNextToken {
-		o, err := c.svc.elasticsearchservice.ListDomainNamesWithContext(ctx, input)
+		o, err := c.svc.elb.DescribeLoadBalancerAttributesWithContext(ctx, input)
 		if err != nil {
 			return nil, err
 		}
-		if o.DomainNames == nil {
+		if o.LoadBalancerAttributes == nil {
 			hasNextToken = false
 			continue
 		}
 
 		hasNextToken = false
 
-		opt = append(opt, o.DomainNames...)
+		opt = append(opt, o.LoadBalancerAttributes.AdditionalAttributes...)
 
 	}
 
@@ -2065,6 +2092,33 @@ func (c *connector) GetLoadBalancers(ctx context.Context, input *elb.DescribeLoa
 	return opt, nil
 }
 
+func (c *connector) GetLoadBalancerPolicies(ctx context.Context, input *elb.DescribeLoadBalancerPoliciesInput) ([]*elb.PolicyDescription, error) {
+	if c.svc.elb == nil {
+		c.svc.elb = elb.New(c.svc.session)
+	}
+
+	opt := make([]*elb.PolicyDescription, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.elb.DescribeLoadBalancerPoliciesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.PolicyDescriptions == nil {
+			hasNextToken = false
+			continue
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.PolicyDescriptions...)
+
+	}
+
+	return opt, nil
+}
+
 func (c *connector) GetLoadBalancersTags(ctx context.Context, input *elb.DescribeTagsInput) ([]*elb.TagDescription, error) {
 	if c.svc.elb == nil {
 		c.svc.elb = elb.New(c.svc.session)
@@ -2092,54 +2146,62 @@ func (c *connector) GetLoadBalancersTags(ctx context.Context, input *elb.Describ
 	return opt, nil
 }
 
-func (c *connector) GetLoadBalancerAttributes(ctx context.Context, input *elb.DescribeLoadBalancerAttributesInput) ([]*elb.AdditionalAttribute, error) {
-	if c.svc.elb == nil {
-		c.svc.elb = elb.New(c.svc.session)
+func (c *connector) GetListenerCertificates(ctx context.Context, input *elbv2.DescribeListenerCertificatesInput) ([]*elbv2.Certificate, error) {
+	if c.svc.elbv2 == nil {
+		c.svc.elbv2 = elbv2.New(c.svc.session)
 	}
 
-	opt := make([]*elb.AdditionalAttribute, 0)
+	opt := make([]*elbv2.Certificate, 0)
 
 	hasNextToken := true
 	for hasNextToken {
-		o, err := c.svc.elb.DescribeLoadBalancerAttributesWithContext(ctx, input)
+		o, err := c.svc.elbv2.DescribeListenerCertificatesWithContext(ctx, input)
 		if err != nil {
 			return nil, err
 		}
-		if o.LoadBalancerAttributes == nil {
+		if o.Certificates == nil {
 			hasNextToken = false
 			continue
 		}
 
-		hasNextToken = false
+		if input == nil {
+			input = &elbv2.DescribeListenerCertificatesInput{}
+		}
+		input.Marker = o.NextMarker
+		hasNextToken = o.NextMarker != nil
 
-		opt = append(opt, o.LoadBalancerAttributes.AdditionalAttributes...)
+		opt = append(opt, o.Certificates...)
 
 	}
 
 	return opt, nil
 }
 
-func (c *connector) GetLoadBalancerPolicies(ctx context.Context, input *elb.DescribeLoadBalancerPoliciesInput) ([]*elb.PolicyDescription, error) {
-	if c.svc.elb == nil {
-		c.svc.elb = elb.New(c.svc.session)
+func (c *connector) GetLoadBalancersV2Listeners(ctx context.Context, input *elbv2.DescribeListenersInput) ([]*elbv2.Listener, error) {
+	if c.svc.elbv2 == nil {
+		c.svc.elbv2 = elbv2.New(c.svc.session)
 	}
 
-	opt := make([]*elb.PolicyDescription, 0)
+	opt := make([]*elbv2.Listener, 0)
 
 	hasNextToken := true
 	for hasNextToken {
-		o, err := c.svc.elb.DescribeLoadBalancerPoliciesWithContext(ctx, input)
+		o, err := c.svc.elbv2.DescribeListenersWithContext(ctx, input)
 		if err != nil {
 			return nil, err
 		}
-		if o.PolicyDescriptions == nil {
+		if o.Listeners == nil {
 			hasNextToken = false
 			continue
 		}
 
-		hasNextToken = false
+		if input == nil {
+			input = &elbv2.DescribeListenersInput{}
+		}
+		input.Marker = o.NextMarker
+		hasNextToken = o.NextMarker != nil
 
-		opt = append(opt, o.PolicyDescriptions...)
+		opt = append(opt, o.Listeners...)
 
 	}
 
@@ -2204,31 +2266,27 @@ func (c *connector) GetLoadBalancersV2Tags(ctx context.Context, input *elbv2.Des
 	return opt, nil
 }
 
-func (c *connector) GetLoadBalancersV2Listeners(ctx context.Context, input *elbv2.DescribeListenersInput) ([]*elbv2.Listener, error) {
+func (c *connector) GetLoadBalancersV2TargetGroupAttributes(ctx context.Context, input *elbv2.DescribeTargetGroupAttributesInput) ([]*elbv2.TargetGroupAttribute, error) {
 	if c.svc.elbv2 == nil {
 		c.svc.elbv2 = elbv2.New(c.svc.session)
 	}
 
-	opt := make([]*elbv2.Listener, 0)
+	opt := make([]*elbv2.TargetGroupAttribute, 0)
 
 	hasNextToken := true
 	for hasNextToken {
-		o, err := c.svc.elbv2.DescribeListenersWithContext(ctx, input)
+		o, err := c.svc.elbv2.DescribeTargetGroupAttributesWithContext(ctx, input)
 		if err != nil {
 			return nil, err
 		}
-		if o.Listeners == nil {
+		if o.Attributes == nil {
 			hasNextToken = false
 			continue
 		}
 
-		if input == nil {
-			input = &elbv2.DescribeListenersInput{}
-		}
-		input.Marker = o.NextMarker
-		hasNextToken = o.NextMarker != nil
+		hasNextToken = false
 
-		opt = append(opt, o.Listeners...)
+		opt = append(opt, o.Attributes...)
 
 	}
 
@@ -2293,37 +2351,6 @@ func (c *connector) GetLoadBalancersV2TargetHealth(ctx context.Context, input *e
 	return opt, nil
 }
 
-func (c *connector) GetListenerCertificates(ctx context.Context, input *elbv2.DescribeListenerCertificatesInput) ([]*elbv2.Certificate, error) {
-	if c.svc.elbv2 == nil {
-		c.svc.elbv2 = elbv2.New(c.svc.session)
-	}
-
-	opt := make([]*elbv2.Certificate, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.elbv2.DescribeListenerCertificatesWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.Certificates == nil {
-			hasNextToken = false
-			continue
-		}
-
-		if input == nil {
-			input = &elbv2.DescribeListenerCertificatesInput{}
-		}
-		input.Marker = o.NextMarker
-		hasNextToken = o.NextMarker != nil
-
-		opt = append(opt, o.Certificates...)
-
-	}
-
-	return opt, nil
-}
-
 func (c *connector) GetLoadBalancersV2Rules(ctx context.Context, input *elbv2.DescribeRulesInput) ([]*elbv2.Rule, error) {
 	if c.svc.elbv2 == nil {
 		c.svc.elbv2 = elbv2.New(c.svc.session)
@@ -2349,33 +2376,6 @@ func (c *connector) GetLoadBalancersV2Rules(ctx context.Context, input *elbv2.De
 		hasNextToken = o.NextMarker != nil
 
 		opt = append(opt, o.Rules...)
-
-	}
-
-	return opt, nil
-}
-
-func (c *connector) GetLoadBalancersV2TargetGroupAttributes(ctx context.Context, input *elbv2.DescribeTargetGroupAttributesInput) ([]*elbv2.TargetGroupAttribute, error) {
-	if c.svc.elbv2 == nil {
-		c.svc.elbv2 = elbv2.New(c.svc.session)
-	}
-
-	opt := make([]*elbv2.TargetGroupAttribute, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.elbv2.DescribeTargetGroupAttributesWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.Attributes == nil {
-			hasNextToken = false
-			continue
-		}
-
-		hasNextToken = false
-
-		opt = append(opt, o.Attributes...)
 
 	}
 
@@ -2595,31 +2595,93 @@ func (c *connector) GetAccountPasswordPolicy(ctx context.Context, input *iam.Get
 	return opt, nil
 }
 
-func (c *connector) GetGroups(ctx context.Context, input *iam.ListGroupsInput) ([]*iam.Group, error) {
+func (c *connector) GetAttachedGroupPolicies(ctx context.Context, input *iam.ListAttachedGroupPoliciesInput) ([]*iam.AttachedPolicy, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt := make([]*iam.Group, 0)
+	opt := make([]*iam.AttachedPolicy, 0)
 
 	hasNextToken := true
 	for hasNextToken {
-		o, err := c.svc.iam.ListGroupsWithContext(ctx, input)
+		o, err := c.svc.iam.ListAttachedGroupPoliciesWithContext(ctx, input)
 		if err != nil {
 			return nil, err
 		}
-		if o.Groups == nil {
+		if o.AttachedPolicies == nil {
 			hasNextToken = false
 			continue
 		}
 
 		if input == nil {
-			input = &iam.ListGroupsInput{}
+			input = &iam.ListAttachedGroupPoliciesInput{}
 		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
-		opt = append(opt, o.Groups...)
+		opt = append(opt, o.AttachedPolicies...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetAttachedRolePolicies(ctx context.Context, input *iam.ListAttachedRolePoliciesInput) ([]*iam.AttachedPolicy, error) {
+	if c.svc.iam == nil {
+		c.svc.iam = iam.New(c.svc.session)
+	}
+
+	opt := make([]*iam.AttachedPolicy, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.ListAttachedRolePoliciesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.AttachedPolicies == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &iam.ListAttachedRolePoliciesInput{}
+		}
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.AttachedPolicies...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetAttachedUserPolicies(ctx context.Context, input *iam.ListAttachedUserPoliciesInput) ([]*iam.AttachedPolicy, error) {
+	if c.svc.iam == nil {
+		c.svc.iam = iam.New(c.svc.session)
+	}
+
+	opt := make([]*iam.AttachedPolicy, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.ListAttachedUserPoliciesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.AttachedPolicies == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &iam.ListAttachedUserPoliciesInput{}
+		}
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.AttachedPolicies...)
 
 	}
 
@@ -2688,62 +2750,31 @@ func (c *connector) GetGroupPolicies(ctx context.Context, input *iam.ListGroupPo
 	return opt, nil
 }
 
-func (c *connector) GetAttachedGroupPolicies(ctx context.Context, input *iam.ListAttachedGroupPoliciesInput) ([]*iam.AttachedPolicy, error) {
+func (c *connector) GetGroups(ctx context.Context, input *iam.ListGroupsInput) ([]*iam.Group, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt := make([]*iam.AttachedPolicy, 0)
+	opt := make([]*iam.Group, 0)
 
 	hasNextToken := true
 	for hasNextToken {
-		o, err := c.svc.iam.ListAttachedGroupPoliciesWithContext(ctx, input)
+		o, err := c.svc.iam.ListGroupsWithContext(ctx, input)
 		if err != nil {
 			return nil, err
 		}
-		if o.AttachedPolicies == nil {
+		if o.Groups == nil {
 			hasNextToken = false
 			continue
 		}
 
 		if input == nil {
-			input = &iam.ListAttachedGroupPoliciesInput{}
+			input = &iam.ListGroupsInput{}
 		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
-		opt = append(opt, o.AttachedPolicies...)
-
-	}
-
-	return opt, nil
-}
-
-func (c *connector) GetInstanceProfiles(ctx context.Context, input *iam.ListInstanceProfilesInput) ([]*iam.InstanceProfile, error) {
-	if c.svc.iam == nil {
-		c.svc.iam = iam.New(c.svc.session)
-	}
-
-	opt := make([]*iam.InstanceProfile, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.iam.ListInstanceProfilesWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.InstanceProfiles == nil {
-			hasNextToken = false
-			continue
-		}
-
-		if input == nil {
-			input = &iam.ListInstanceProfilesInput{}
-		}
-		input.Marker = o.Marker
-		hasNextToken = o.Marker != nil
-
-		opt = append(opt, o.InstanceProfiles...)
+		opt = append(opt, o.Groups...)
 
 	}
 
@@ -2775,6 +2806,37 @@ func (c *connector) GetGroupsForUser(ctx context.Context, input *iam.ListGroupsF
 		hasNextToken = o.Marker != nil
 
 		opt = append(opt, o.Groups...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetInstanceProfiles(ctx context.Context, input *iam.ListInstanceProfilesInput) ([]*iam.InstanceProfile, error) {
+	if c.svc.iam == nil {
+		c.svc.iam = iam.New(c.svc.session)
+	}
+
+	opt := make([]*iam.InstanceProfile, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.iam.ListInstanceProfilesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.InstanceProfiles == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &iam.ListInstanceProfilesInput{}
+		}
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.InstanceProfiles...)
 
 	}
 
@@ -2839,37 +2901,6 @@ func (c *connector) GetPolicies(ctx context.Context, input *iam.ListPoliciesInpu
 	return opt, nil
 }
 
-func (c *connector) GetRoles(ctx context.Context, input *iam.ListRolesInput) ([]*iam.Role, error) {
-	if c.svc.iam == nil {
-		c.svc.iam = iam.New(c.svc.session)
-	}
-
-	opt := make([]*iam.Role, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.iam.ListRolesWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.Roles == nil {
-			hasNextToken = false
-			continue
-		}
-
-		if input == nil {
-			input = &iam.ListRolesInput{}
-		}
-		input.Marker = o.Marker
-		hasNextToken = o.Marker != nil
-
-		opt = append(opt, o.Roles...)
-
-	}
-
-	return opt, nil
-}
-
 func (c *connector) GetRolePolicies(ctx context.Context, input *iam.ListRolePoliciesInput) ([]*string, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
@@ -2901,31 +2932,31 @@ func (c *connector) GetRolePolicies(ctx context.Context, input *iam.ListRolePoli
 	return opt, nil
 }
 
-func (c *connector) GetAttachedRolePolicies(ctx context.Context, input *iam.ListAttachedRolePoliciesInput) ([]*iam.AttachedPolicy, error) {
+func (c *connector) GetRoles(ctx context.Context, input *iam.ListRolesInput) ([]*iam.Role, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt := make([]*iam.AttachedPolicy, 0)
+	opt := make([]*iam.Role, 0)
 
 	hasNextToken := true
 	for hasNextToken {
-		o, err := c.svc.iam.ListAttachedRolePoliciesWithContext(ctx, input)
+		o, err := c.svc.iam.ListRolesWithContext(ctx, input)
 		if err != nil {
 			return nil, err
 		}
-		if o.AttachedPolicies == nil {
+		if o.Roles == nil {
 			hasNextToken = false
 			continue
 		}
 
 		if input == nil {
-			input = &iam.ListAttachedRolePoliciesInput{}
+			input = &iam.ListRolesInput{}
 		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
-		opt = append(opt, o.AttachedPolicies...)
+		opt = append(opt, o.Roles...)
 
 	}
 
@@ -2990,31 +3021,31 @@ func (c *connector) GetServerCertificates(ctx context.Context, input *iam.ListSe
 	return opt, nil
 }
 
-func (c *connector) GetUsers(ctx context.Context, input *iam.ListUsersInput) ([]*iam.User, error) {
+func (c *connector) GetSSHPublicKeys(ctx context.Context, input *iam.ListSSHPublicKeysInput) ([]*iam.SSHPublicKeyMetadata, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt := make([]*iam.User, 0)
+	opt := make([]*iam.SSHPublicKeyMetadata, 0)
 
 	hasNextToken := true
 	for hasNextToken {
-		o, err := c.svc.iam.ListUsersWithContext(ctx, input)
+		o, err := c.svc.iam.ListSSHPublicKeysWithContext(ctx, input)
 		if err != nil {
 			return nil, err
 		}
-		if o.Users == nil {
+		if o.SSHPublicKeys == nil {
 			hasNextToken = false
 			continue
 		}
 
 		if input == nil {
-			input = &iam.ListUsersInput{}
+			input = &iam.ListSSHPublicKeysInput{}
 		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
-		opt = append(opt, o.Users...)
+		opt = append(opt, o.SSHPublicKeys...)
 
 	}
 
@@ -3052,62 +3083,31 @@ func (c *connector) GetUserPolicies(ctx context.Context, input *iam.ListUserPoli
 	return opt, nil
 }
 
-func (c *connector) GetAttachedUserPolicies(ctx context.Context, input *iam.ListAttachedUserPoliciesInput) ([]*iam.AttachedPolicy, error) {
+func (c *connector) GetUsers(ctx context.Context, input *iam.ListUsersInput) ([]*iam.User, error) {
 	if c.svc.iam == nil {
 		c.svc.iam = iam.New(c.svc.session)
 	}
 
-	opt := make([]*iam.AttachedPolicy, 0)
+	opt := make([]*iam.User, 0)
 
 	hasNextToken := true
 	for hasNextToken {
-		o, err := c.svc.iam.ListAttachedUserPoliciesWithContext(ctx, input)
+		o, err := c.svc.iam.ListUsersWithContext(ctx, input)
 		if err != nil {
 			return nil, err
 		}
-		if o.AttachedPolicies == nil {
+		if o.Users == nil {
 			hasNextToken = false
 			continue
 		}
 
 		if input == nil {
-			input = &iam.ListAttachedUserPoliciesInput{}
+			input = &iam.ListUsersInput{}
 		}
 		input.Marker = o.Marker
 		hasNextToken = o.Marker != nil
 
-		opt = append(opt, o.AttachedPolicies...)
-
-	}
-
-	return opt, nil
-}
-
-func (c *connector) GetSSHPublicKeys(ctx context.Context, input *iam.ListSSHPublicKeysInput) ([]*iam.SSHPublicKeyMetadata, error) {
-	if c.svc.iam == nil {
-		c.svc.iam = iam.New(c.svc.session)
-	}
-
-	opt := make([]*iam.SSHPublicKeyMetadata, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.iam.ListSSHPublicKeysWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.SSHPublicKeys == nil {
-			hasNextToken = false
-			continue
-		}
-
-		if input == nil {
-			input = &iam.ListSSHPublicKeysInput{}
-		}
-		input.Marker = o.Marker
-		hasNextToken = o.Marker != nil
-
-		opt = append(opt, o.SSHPublicKeys...)
+		opt = append(opt, o.Users...)
 
 	}
 
@@ -3327,37 +3327,6 @@ func (c *connector) GetRDSDBClusters(ctx context.Context, input *rds.DescribeDBC
 	return opt, nil
 }
 
-func (c *connector) GetRDSGlobalClusters(ctx context.Context, input *rds.DescribeGlobalClustersInput) ([]*rds.GlobalCluster, error) {
-	if c.svc.rds == nil {
-		c.svc.rds = rds.New(c.svc.session)
-	}
-
-	opt := make([]*rds.GlobalCluster, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.rds.DescribeGlobalClustersWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.GlobalClusters == nil {
-			hasNextToken = false
-			continue
-		}
-
-		if input == nil {
-			input = &rds.DescribeGlobalClustersInput{}
-		}
-		input.Marker = o.Marker
-		hasNextToken = o.Marker != nil
-
-		opt = append(opt, o.GlobalClusters...)
-
-	}
-
-	return opt, nil
-}
-
 func (c *connector) GetDBInstances(ctx context.Context, input *rds.DescribeDBInstancesInput) ([]*rds.DBInstance, error) {
 	if c.svc.rds == nil {
 		c.svc.rds = rds.New(c.svc.session)
@@ -3383,33 +3352,6 @@ func (c *connector) GetDBInstances(ctx context.Context, input *rds.DescribeDBIns
 		hasNextToken = o.Marker != nil
 
 		opt = append(opt, o.DBInstances...)
-
-	}
-
-	return opt, nil
-}
-
-func (c *connector) GetDBInstancesTags(ctx context.Context, input *rds.ListTagsForResourceInput) ([]*rds.Tag, error) {
-	if c.svc.rds == nil {
-		c.svc.rds = rds.New(c.svc.session)
-	}
-
-	opt := make([]*rds.Tag, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.rds.ListTagsForResourceWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.TagList == nil {
-			hasNextToken = false
-			continue
-		}
-
-		hasNextToken = false
-
-		opt = append(opt, o.TagList...)
 
 	}
 
@@ -3478,6 +3420,64 @@ func (c *connector) GetDBSubnetGroups(ctx context.Context, input *rds.DescribeDB
 	return opt, nil
 }
 
+func (c *connector) GetRDSGlobalClusters(ctx context.Context, input *rds.DescribeGlobalClustersInput) ([]*rds.GlobalCluster, error) {
+	if c.svc.rds == nil {
+		c.svc.rds = rds.New(c.svc.session)
+	}
+
+	opt := make([]*rds.GlobalCluster, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.rds.DescribeGlobalClustersWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.GlobalClusters == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &rds.DescribeGlobalClustersInput{}
+		}
+		input.Marker = o.Marker
+		hasNextToken = o.Marker != nil
+
+		opt = append(opt, o.GlobalClusters...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetDBInstancesTags(ctx context.Context, input *rds.ListTagsForResourceInput) ([]*rds.Tag, error) {
+	if c.svc.rds == nil {
+		c.svc.rds = rds.New(c.svc.session)
+	}
+
+	opt := make([]*rds.Tag, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.rds.ListTagsForResourceWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.TagList == nil {
+			hasNextToken = false
+			continue
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.TagList...)
+
+	}
+
+	return opt, nil
+}
+
 func (c *connector) GetRedshiftClusters(ctx context.Context, input *redshift.DescribeClustersInput) ([]*redshift.Cluster, error) {
 	if c.svc.redshift == nil {
 		c.svc.redshift = redshift.New(c.svc.session)
@@ -3503,68 +3503,6 @@ func (c *connector) GetRedshiftClusters(ctx context.Context, input *redshift.Des
 		hasNextToken = o.Marker != nil
 
 		opt = append(opt, o.Clusters...)
-
-	}
-
-	return opt, nil
-}
-
-func (c *connector) GetReusableDelegationSets(ctx context.Context, input *route53.ListReusableDelegationSetsInput) ([]*route53.DelegationSet, error) {
-	if c.svc.route53 == nil {
-		c.svc.route53 = route53.New(c.svc.session)
-	}
-
-	opt := make([]*route53.DelegationSet, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.route53.ListReusableDelegationSetsWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.DelegationSets == nil {
-			hasNextToken = false
-			continue
-		}
-
-		if input == nil {
-			input = &route53.ListReusableDelegationSetsInput{}
-		}
-		input.Marker = o.NextMarker
-		hasNextToken = o.NextMarker != nil
-
-		opt = append(opt, o.DelegationSets...)
-
-	}
-
-	return opt, nil
-}
-
-func (c *connector) GetHealthChecks(ctx context.Context, input *route53.ListHealthChecksInput) ([]*route53.HealthCheck, error) {
-	if c.svc.route53 == nil {
-		c.svc.route53 = route53.New(c.svc.session)
-	}
-
-	opt := make([]*route53.HealthCheck, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.route53.ListHealthChecksWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.HealthChecks == nil {
-			hasNextToken = false
-			continue
-		}
-
-		if input == nil {
-			input = &route53.ListHealthChecksInput{}
-		}
-		input.Marker = o.NextMarker
-		hasNextToken = o.NextMarker != nil
-
-		opt = append(opt, o.HealthChecks...)
 
 	}
 
@@ -3602,31 +3540,31 @@ func (c *connector) GetQueryLoggingConfigs(ctx context.Context, input *route53.L
 	return opt, nil
 }
 
-func (c *connector) GetResourceRecordSets(ctx context.Context, input *route53.ListResourceRecordSetsInput) ([]*route53.ResourceRecordSet, error) {
+func (c *connector) GetHealthChecks(ctx context.Context, input *route53.ListHealthChecksInput) ([]*route53.HealthCheck, error) {
 	if c.svc.route53 == nil {
 		c.svc.route53 = route53.New(c.svc.session)
 	}
 
-	opt := make([]*route53.ResourceRecordSet, 0)
+	opt := make([]*route53.HealthCheck, 0)
 
 	hasNextToken := true
 	for hasNextToken {
-		o, err := c.svc.route53.ListResourceRecordSetsWithContext(ctx, input)
+		o, err := c.svc.route53.ListHealthChecksWithContext(ctx, input)
 		if err != nil {
 			return nil, err
 		}
-		if o.ResourceRecordSets == nil {
+		if o.HealthChecks == nil {
 			hasNextToken = false
 			continue
 		}
 
 		if input == nil {
-			input = &route53.ListResourceRecordSetsInput{}
+			input = &route53.ListHealthChecksInput{}
 		}
-		input.StartRecordName = o.NextRecordName
-		hasNextToken = o.NextRecordName != nil
+		input.Marker = o.NextMarker
+		hasNextToken = o.NextMarker != nil
 
-		opt = append(opt, o.ResourceRecordSets...)
+		opt = append(opt, o.HealthChecks...)
 
 	}
 
@@ -3658,6 +3596,68 @@ func (c *connector) GetHostedZones(ctx context.Context, input *route53.ListHoste
 		hasNextToken = o.NextMarker != nil
 
 		opt = append(opt, o.HostedZones...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetResourceRecordSets(ctx context.Context, input *route53.ListResourceRecordSetsInput) ([]*route53.ResourceRecordSet, error) {
+	if c.svc.route53 == nil {
+		c.svc.route53 = route53.New(c.svc.session)
+	}
+
+	opt := make([]*route53.ResourceRecordSet, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.route53.ListResourceRecordSetsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.ResourceRecordSets == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &route53.ListResourceRecordSetsInput{}
+		}
+		input.StartRecordName = o.NextRecordName
+		hasNextToken = o.NextRecordName != nil
+
+		opt = append(opt, o.ResourceRecordSets...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetReusableDelegationSets(ctx context.Context, input *route53.ListReusableDelegationSetsInput) ([]*route53.DelegationSet, error) {
+	if c.svc.route53 == nil {
+		c.svc.route53 = route53.New(c.svc.session)
+	}
+
+	opt := make([]*route53.DelegationSet, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.route53.ListReusableDelegationSetsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.DelegationSets == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &route53.ListReusableDelegationSetsInput{}
+		}
+		input.Marker = o.NextMarker
+		hasNextToken = o.NextMarker != nil
+
+		opt = append(opt, o.DelegationSets...)
 
 	}
 
@@ -3726,37 +3726,6 @@ func (c *connector) GetResolverEndpoints(ctx context.Context, input *route53reso
 	return opt, nil
 }
 
-func (c *connector) GetResolverRules(ctx context.Context, input *route53resolver.ListResolverRulesInput) ([]*route53resolver.ResolverRule, error) {
-	if c.svc.route53resolver == nil {
-		c.svc.route53resolver = route53resolver.New(c.svc.session)
-	}
-
-	opt := make([]*route53resolver.ResolverRule, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.route53resolver.ListResolverRulesWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.ResolverRules == nil {
-			hasNextToken = false
-			continue
-		}
-
-		if input == nil {
-			input = &route53resolver.ListResolverRulesInput{}
-		}
-		input.NextToken = o.NextToken
-		hasNextToken = o.NextToken != nil
-
-		opt = append(opt, o.ResolverRules...)
-
-	}
-
-	return opt, nil
-}
-
 func (c *connector) GetResolverRuleAssociations(ctx context.Context, input *route53resolver.ListResolverRuleAssociationsInput) ([]*route53resolver.ResolverRuleAssociation, error) {
 	if c.svc.route53resolver == nil {
 		c.svc.route53resolver = route53resolver.New(c.svc.session)
@@ -3782,6 +3751,37 @@ func (c *connector) GetResolverRuleAssociations(ctx context.Context, input *rout
 		hasNextToken = o.NextToken != nil
 
 		opt = append(opt, o.ResolverRuleAssociations...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetResolverRules(ctx context.Context, input *route53resolver.ListResolverRulesInput) ([]*route53resolver.ResolverRule, error) {
+	if c.svc.route53resolver == nil {
+		c.svc.route53resolver = route53resolver.New(c.svc.session)
+	}
+
+	opt := make([]*route53resolver.ResolverRule, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.route53resolver.ListResolverRulesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.ResolverRules == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &route53resolver.ListResolverRulesInput{}
+		}
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.ResolverRules...)
 
 	}
 
@@ -3927,64 +3927,6 @@ func (c *connector) GetActiveReceiptRulesSet(ctx context.Context, input *ses.Des
 	return opt, nil
 }
 
-func (c *connector) GetIdentities(ctx context.Context, input *ses.ListIdentitiesInput) ([]*string, error) {
-	if c.svc.ses == nil {
-		c.svc.ses = ses.New(c.svc.session)
-	}
-
-	opt := make([]*string, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.ses.ListIdentitiesWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.Identities == nil {
-			hasNextToken = false
-			continue
-		}
-
-		if input == nil {
-			input = &ses.ListIdentitiesInput{}
-		}
-		input.NextToken = o.NextToken
-		hasNextToken = o.NextToken != nil
-
-		opt = append(opt, o.Identities...)
-
-	}
-
-	return opt, nil
-}
-
-func (c *connector) GetReceiptFilters(ctx context.Context, input *ses.ListReceiptFiltersInput) ([]*ses.ReceiptFilter, error) {
-	if c.svc.ses == nil {
-		c.svc.ses = ses.New(c.svc.session)
-	}
-
-	opt := make([]*ses.ReceiptFilter, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.ses.ListReceiptFiltersWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.Filters == nil {
-			hasNextToken = false
-			continue
-		}
-
-		hasNextToken = false
-
-		opt = append(opt, o.Filters...)
-
-	}
-
-	return opt, nil
-}
-
 func (c *connector) GetConfigurationSets(ctx context.Context, input *ses.ListConfigurationSetsInput) ([]*ses.ConfigurationSet, error) {
 	if c.svc.ses == nil {
 		c.svc.ses = ses.New(c.svc.session)
@@ -4016,6 +3958,37 @@ func (c *connector) GetConfigurationSets(ctx context.Context, input *ses.ListCon
 	return opt, nil
 }
 
+func (c *connector) GetIdentities(ctx context.Context, input *ses.ListIdentitiesInput) ([]*string, error) {
+	if c.svc.ses == nil {
+		c.svc.ses = ses.New(c.svc.session)
+	}
+
+	opt := make([]*string, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ses.ListIdentitiesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.Identities == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &ses.ListIdentitiesInput{}
+		}
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.Identities...)
+
+	}
+
+	return opt, nil
+}
+
 func (c *connector) GetIdentityNotificationAttributes(ctx context.Context, input *ses.GetIdentityNotificationAttributesInput) (map[string]*ses.IdentityNotificationAttributes, error) {
 	if c.svc.ses == nil {
 		c.svc.ses = ses.New(c.svc.session)
@@ -4037,6 +4010,33 @@ func (c *connector) GetIdentityNotificationAttributes(ctx context.Context, input
 		hasNextToken = false
 
 		opt = o.NotificationAttributes
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetReceiptFilters(ctx context.Context, input *ses.ListReceiptFiltersInput) ([]*ses.ReceiptFilter, error) {
+	if c.svc.ses == nil {
+		c.svc.ses = ses.New(c.svc.session)
+	}
+
+	opt := make([]*ses.ReceiptFilter, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ses.ListReceiptFiltersWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.Filters == nil {
+			hasNextToken = false
+			continue
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.Filters...)
 
 	}
 
