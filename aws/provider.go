@@ -24,6 +24,7 @@ import (
 var skippableCodes = map[string]struct{}{
 	"InvalidAction":         struct{}{},
 	"AccessDeniedException": struct{}{},
+	"RequestError":          struct{}{},
 }
 
 type aws struct {
@@ -86,7 +87,7 @@ func (a *aws) Resources(ctx context.Context, t string, f *filter.Filter) ([]prov
 	if err != nil {
 		// we filter the error from AWS and return a custom error
 		// type if it's an error that we want to skip
-		if reqErr, ok := err.(awserr.RequestFailure); ok {
+		if reqErr, ok := err.(awserr.Error); ok {
 			if _, ok := skippableCodes[reqErr.Code()]; ok {
 				return nil, fmt.Errorf("%w: %v", errcode.ErrProviderAPI, reqErr)
 			}
