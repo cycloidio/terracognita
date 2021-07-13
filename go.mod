@@ -10,7 +10,7 @@ require (
 	github.com/aws/aws-sdk-go v1.38.37
 	github.com/chr4/pwgen v1.1.0
 	github.com/cycloidio/mxwriter v1.0.2
-	github.com/cycloidio/tfdocs v0.0.0-20201106154358-49ea9e6f45e4
+	github.com/cycloidio/tfdocs v0.0.0-20210713114615-6a7f069f11c3
 	github.com/go-kit/kit v0.9.0
 	github.com/golang/mock v1.4.4
 	github.com/hashicorp/go-azure-helpers v0.15.0
@@ -33,6 +33,7 @@ require (
 	github.com/terraform-providers/terraform-provider-aws v1.60.1-0.20210513231836-489654890359
 	github.com/terraform-providers/terraform-provider-azurerm v1.44.1-0.20201029183808-d721bcc1bb55
 	github.com/zclconf/go-cty v1.8.2
+	golang.org/x/arch v0.0.0-20190312162104-788fe5ffcd8c // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
 	golang.org/x/tools v0.1.4 // indirect
 	google.golang.org/api v0.41.0
