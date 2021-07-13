@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/rds"
 	"github.com/chr4/pwgen"
 	"github.com/cycloidio/terracognita/errcode"
+	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -71,9 +72,9 @@ func GetNameFromTag(key string, srd *schema.ResourceData, fallback string) strin
 		n = name.(string)
 	}
 
-	if isValidResourceName(n) {
+	if isValidResourceName(n) && hclsyntax.ValidIdentifier(n) {
 		return n
-	} else if isValidResourceName(fallback) {
+	} else if isValidResourceName(fallback) && hclsyntax.ValidIdentifier(fallback) {
 		return fallback
 	} else {
 		return pwgen.Alpha(5)
