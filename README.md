@@ -177,16 +177,21 @@ To speed up the testing, you can write a small `provider.tf`file within the same
 
 ```bash
 terraform {
- backend "local" {
-   path = "./$TFSTATE_PATH"
- }
+  backend "local" {
+    path = "./$TFSTATE_PATH"
+  }
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+    }
+  }
+  required_version = ">= 0.13"
 }
 
 provider "aws" {
  access_key = "${var.access_key}"
  secret_key = "${var.secret_key}"
  region     = "${var.region}"
- version    = "2.12.0"
 }
 
 variable "access_key" {}
