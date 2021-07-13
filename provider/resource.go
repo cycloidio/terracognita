@@ -354,7 +354,7 @@ func (r *resource) HCL(w writer.Writer) error {
 
 	tfdoc, err := resourceFunc(r.Type())
 	if err != nil {
-		return errors.New(fmt.Sprintf("provider %s with resource %s is not supported", r.provider.String(), r.Type()))
+		return errors.New(fmt.Sprintf("provider %s with resource %s is not supported on the docs", r.provider.String(), r.Type()))
 	}
 	// This will convert all Category into snake_case
 	cfg[hcl.ResourceCategoryKey] = strings.ToLower(name.Delimit(tfdoc.Category, '_'))

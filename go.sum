@@ -194,6 +194,8 @@ github.com/cycloidio/terraform-provider-azurerm v1.44.1-0.20210517111036-df0beb5
 github.com/cycloidio/terraform-provider-azurerm v1.44.1-0.20210517111036-df0beb5af9c3/go.mod h1:9tqbm977hzJgyYPK+FDs2dMb4Ly3Pdh+ocGhQBbcucU=
 github.com/cycloidio/tfdocs v0.0.0-20201106154358-49ea9e6f45e4 h1:MaRqoSVnOhK9aDUXHbpPlwUXDph4cJEKGkwXbfYuJ0M=
 github.com/cycloidio/tfdocs v0.0.0-20201106154358-49ea9e6f45e4/go.mod h1:FKvkOvkwOg6hl3uyCnNbLiANc6BMD/ljQAU8Nf8/X8E=
+github.com/cycloidio/tfdocs v0.0.0-20210713114615-6a7f069f11c3 h1:nw8uAsH2N88BTa8EowPpOzS4Hz/rfTsywgfh8O7rGAk=
+github.com/cycloidio/tfdocs v0.0.0-20210713114615-6a7f069f11c3/go.mod h1:4zRiWOHuVkhb2vatajIFxV5g/AC4W7Zb/0pMF1G0yyA=
 github.com/davecgh/go-spew v0.0.0-20151105211317-5215b55f46b2/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
@@ -245,6 +247,7 @@ github.com/go-git/go-billy/v5 v5.1.0/go.mod h1:pmpqyWchKfYfrkb/UVH4otLvyi/5gJlGI
 github.com/go-git/go-git-fixtures/v4 v4.0.1/go.mod h1:m+ICp2rF3jDhFgEZ/8yziagdT1C+ZpZcrJjappBCDSw=
 github.com/go-git/go-git-fixtures/v4 v4.0.2-0.20200613231340-f56387b50c12/go.mod h1:m+ICp2rF3jDhFgEZ/8yziagdT1C+ZpZcrJjappBCDSw=
 github.com/go-git/go-git/v5 v5.1.0/go.mod h1:ZKfuPUoY1ZqIG4QG9BDBh3G4gLM5zvPuSJAozQrZuyM=
+github.com/go-git/go-git/v5 v5.2.0/go.mod h1:kh02eMX+wdqqxgNMEyq8YgwlIOsDOa9homkUq1PoTMs=
 github.com/go-git/go-git/v5 v5.3.0 h1:8WKMtJR2j8RntEXR/uvTKagfEt4GYlwQ7mntE4+0GWc=
 github.com/go-git/go-git/v5 v5.3.0/go.mod h1:xdX4bWJ48aOrdhnl2XqHYstHbbp6+LFS4r4X+lNVprw=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
