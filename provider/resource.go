@@ -275,7 +275,7 @@ func (r *resource) Read(f *filter.Filter) error {
 	// so we have to do it manually
 	// it's not all of them though
 	for _, t := range f.Tags {
-		if v, ok := r.data.GetOk(fmt.Sprintf("%s.%s", r.Provider().TagKey(), t.Name)); ok && v.(string) != t.Value {
+		if v, ok := r.data.GetOk(fmt.Sprintf("%s.%s", r.Provider().TagKey(), t.Name)); !ok || v.(string) != t.Value {
 			return errors.WithStack(errcode.ErrProviderResourceDoNotMatchTag)
 		}
 	}
