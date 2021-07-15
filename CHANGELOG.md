@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.7.1] _2021-07-15_
+
 ### Added
 
 - aws resources: `aws_eip`, `aws_dynamodb_global_table`, `aws_dynamodb_table`, `aws_ecs_cluster`, `aws_ecs_service`, `aws_athena_workgroup`, `aws_glue_catalog_database`, `aws_glue_catalog_table`, `aws_fsx_lustre_file_system`, `aws_batch_job_definition`, `aws_dax_cluster`, `aws_directory_service_directory`, `aws_dms_replication_instance`, `aws_dx_gateway`, `aws_efs_file_system`, `aws_eks_cluster`, `aws_elasticache_replication_group`, `aws_elastic_beanstalk_application`, `aws_emr_cluster`, `aws_internet_gateway`, `aws_kinesis_stream`, `aws_lightsail_instance`, `aws_media_store_container`, `aws_mq_broker`, `aws_nat_gateway`, `aws_neptune_cluster`, `aws_rds_cluster`, `aws_rds_global_cluster`, `aws_redshift_cluster`, `aws_sqs_queue`, `aws_storagegateway_gateway`, `aws_vpn_gateway`.
