@@ -12,6 +12,11 @@
 - Updated `tfdocs` to have missing resources that where causing import errors
   ([Issue #199](https://github.com/cycloidio/terracognita/issues/199))
 
+### Fixed
+
+- Skip aws `RequestError` errors generaly caused by service not available in a region
+  ([Issue #171](https://github.com/cycloidio/terracognita/pull/171))
+
 ## [0.7.0] _2021-07-02_
 
 ### Fixed
