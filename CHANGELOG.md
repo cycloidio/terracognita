@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Changed
+
+- Update aws resources regarding missing pagination and filter
+  ([PR #202](https://github.com/cycloidio/terracognita/pull/202))
+
 ## [0.7.1] _2021-07-15_
 
 ### Added
