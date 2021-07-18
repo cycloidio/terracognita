@@ -169,6 +169,10 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetInstances(ctx context.Context, input *ec2.DescribeInstancesInput) ([]*ec2.Instance, error)
 
+	// GetEC2InternetGateways returns the EC2 Internet Gateways on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetEC2InternetGateways(ctx context.Context, input *ec2.DescribeInternetGatewaysInput) ([]*ec2.InternetGateway, error)
+
 	// GetKeyPairs returns all KeyPairs based on the input given.
 	// Returned values are commented in the interface doc comment block.
 	GetKeyPairs(ctx context.Context, input *ec2.DescribeKeyPairsInput) ([]*ec2.KeyPairInfo, error)
@@ -220,10 +224,6 @@ type Reader interface {
 	// GetECSClusters returns the ecs clusters on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetECSClusters(ctx context.Context, input *ecs.DescribeClustersInput) ([]*ecs.Cluster, error)
-
-	// GetEC2InternetGateways returns the EC2 Internet Gateways on the given input
-	// Returned values are commented in the interface doc comment block.
-	GetEC2InternetGateways(ctx context.Context, input *ec2.DescribeInternetGatewaysInput) ([]*ec2.InternetGateway, error)
 
 	// GetECSServicesArns returns the ecs services arns on the given input
 	// Returned values are commented in the interface doc comment block.
@@ -1290,6 +1290,37 @@ func (c *connector) GetInstances(ctx context.Context, input *ec2.DescribeInstanc
 	return opt, nil
 }
 
+func (c *connector) GetEC2InternetGateways(ctx context.Context, input *ec2.DescribeInternetGatewaysInput) ([]*ec2.InternetGateway, error) {
+	if c.svc.ec2 == nil {
+		c.svc.ec2 = ec2.New(c.svc.session)
+	}
+
+	opt := make([]*ec2.InternetGateway, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeInternetGatewaysWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.InternetGateways == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &ec2.DescribeInternetGatewaysInput{}
+		}
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.InternetGateways...)
+
+	}
+
+	return opt, nil
+}
+
 func (c *connector) GetKeyPairs(ctx context.Context, input *ec2.DescribeKeyPairsInput) ([]*ec2.KeyPairInfo, error) {
 	if c.svc.ec2 == nil {
 		c.svc.ec2 = ec2.New(c.svc.session)
@@ -1680,37 +1711,6 @@ func (c *connector) GetECSClusters(ctx context.Context, input *ecs.DescribeClust
 		hasNextToken = false
 
 		opt = append(opt, o.Clusters...)
-
-	}
-
-	return opt, nil
-}
-
-func (c *connector) GetEC2InternetGateways(ctx context.Context, input *ec2.DescribeInternetGatewaysInput) ([]*ec2.InternetGateway, error) {
-	if c.svc.ec2 == nil {
-		c.svc.ec2 = ec2.New(c.svc.session)
-	}
-
-	opt := make([]*ec2.InternetGateway, 0)
-
-	hasNextToken := true
-	for hasNextToken {
-		o, err := c.svc.ec2.DescribeInternetGatewaysWithContext(ctx, input)
-		if err != nil {
-			return nil, err
-		}
-		if o.InternetGateways == nil {
-			hasNextToken = false
-			continue
-		}
-
-		if input == nil {
-			input = &ec2.DescribeInternetGatewaysInput{}
-		}
-		input.NextToken = o.NextToken
-		hasNextToken = o.NextToken != nil
-
-		opt = append(opt, o.InternetGateways...)
 
 	}
 

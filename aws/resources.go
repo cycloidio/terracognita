@@ -8,6 +8,8 @@ import (
 
 	awsSDK "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/apigateway"
+	"github.com/aws/aws-sdk-go/service/autoscaling"
+	"github.com/aws/aws-sdk-go/service/dax"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ecs"
 	"github.com/aws/aws-sdk-go/service/eks"
@@ -16,8 +18,11 @@ import (
 	"github.com/aws/aws-sdk-go/service/elbv2"
 	"github.com/aws/aws-sdk-go/service/glue"
 	"github.com/aws/aws-sdk-go/service/iam"
+	"github.com/aws/aws-sdk-go/service/lambda"
+	"github.com/aws/aws-sdk-go/service/mediastore"
 	"github.com/aws/aws-sdk-go/service/neptune"
 	"github.com/aws/aws-sdk-go/service/rds"
+	"github.com/aws/aws-sdk-go/service/redshift"
 	"github.com/aws/aws-sdk-go/service/route53"
 	"github.com/aws/aws-sdk-go/service/ses"
 	"github.com/aws/aws-sdk-go/service/sqs"
@@ -573,6 +578,7 @@ func apiGatewayDeployments(ctx context.Context, a *aws, resourceType string, fil
 
 		var input = &apigateway.GetDeploymentsInput{
 			RestApiId: awsSDK.String(rapi),
+			Limit:     awsSDK.Int64(500),
 		}
 
 		apiGatewayDeployments, err := a.awsr.GetAPIGatewayDeployments(ctx, input)
@@ -625,6 +631,7 @@ func apiGatewayResources(ctx context.Context, a *aws, resourceType string, filte
 
 		var input = &apigateway.GetResourcesInput{
 			RestApiId: awsSDK.String(rapi),
+			Limit:     awsSDK.Int64(500),
 		}
 
 		apiGatewayResources, err := a.awsr.GetAPIGatewayResources(ctx, input)
@@ -645,7 +652,10 @@ func apiGatewayResources(ctx context.Context, a *aws, resourceType string, filte
 }
 
 func apiGatewayRestApis(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	apiGatewayRestApis, err := a.awsr.GetAPIGatewayRestAPIs(ctx, nil)
+	var input = &apigateway.GetRestApisInput{
+		Limit: awsSDK.Int64(500),
+	}
+	apiGatewayRestApis, err := a.awsr.GetAPIGatewayRestAPIs(ctx, input)
 
 	if err != nil {
 		return nil, err
@@ -722,7 +732,10 @@ func athenaWorkgroups(ctx context.Context, a *aws, resourceType string, filters 
 }
 
 func autoscalingGroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	autoscalingGroups, err := a.awsr.GetAutoScalingGroups(ctx, nil)
+	var input = &autoscaling.DescribeAutoScalingGroupsInput{
+		MaxRecords: awsSDK.Int64(100),
+	}
+	autoscalingGroups, err := a.awsr.GetAutoScalingGroups(ctx, input)
 
 	if err != nil {
 		return nil, err
@@ -743,7 +756,10 @@ func autoscalingGroups(ctx context.Context, a *aws, resourceType string, filters
 }
 
 func autoscalingPolicies(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	autoscalingPolicies, err := a.awsr.GetAutoScalingPolicies(ctx, nil)
+	var input = &autoscaling.DescribePoliciesInput{
+		MaxRecords: awsSDK.Int64(100),
+	}
+	autoscalingPolicies, err := a.awsr.GetAutoScalingPolicies(ctx, input)
 
 	if err != nil {
 		return nil, err
@@ -856,7 +872,10 @@ func cloudwatchMetricAlarms(ctx context.Context, a *aws, resourceType string, fi
 }
 
 func daxClusters(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	daxClusters, err := a.awsr.GetDAXClusters(ctx, nil)
+	var input = &dax.DescribeClustersInput{
+		MaxResults: awsSDK.Int64(100),
+	}
+	daxClusters, err := a.awsr.GetDAXClusters(ctx, input)
 	if err != nil {
 		return nil, err
 	}
@@ -875,7 +894,10 @@ func daxClusters(ctx context.Context, a *aws, resourceType string, filters *filt
 }
 
 func dbInstances(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	dbs, err := a.awsr.GetDBInstances(ctx, nil)
+	var input = &rds.DescribeDBInstancesInput{
+		Filters: toRDSFilters(filters),
+	}
+	dbs, err := a.awsr.GetDBInstances(ctx, input)
 	if err != nil {
 		return nil, err
 	}
@@ -893,7 +915,10 @@ func dbInstances(ctx context.Context, a *aws, resourceType string, filters *filt
 }
 
 func dbParameterGroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	dbParameterGroups, err := a.awsr.GetDBParameterGroups(ctx, nil)
+	var input = &rds.DescribeDBParameterGroupsInput{
+		Filters: toRDSFilters(filters),
+	}
+	dbParameterGroups, err := a.awsr.GetDBParameterGroups(ctx, input)
 	if err != nil {
 		return nil, err
 	}
@@ -913,7 +938,10 @@ func dbParameterGroups(ctx context.Context, a *aws, resourceType string, filters
 }
 
 func dbSubnetGroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	dbSubnetGroups, err := a.awsr.GetDBSubnetGroups(ctx, nil)
+	var input = &rds.DescribeDBSubnetGroupsInput{
+		Filters: toRDSFilters(filters),
+	}
+	dbSubnetGroups, err := a.awsr.GetDBSubnetGroups(ctx, input)
 	if err != nil {
 		return nil, err
 	}
@@ -1206,7 +1234,10 @@ func efsFileSystems(ctx context.Context, a *aws, resourceType string, filters *f
 }
 
 func eips(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	eips, err := a.awsr.GetAddresses(ctx, nil)
+	var input = &ec2.DescribeAddressesInput{
+		Filters: toEC2Filters(filters),
+	}
+	eips, err := a.awsr.GetAddresses(ctx, input)
 	if err != nil {
 		return nil, err
 	}
@@ -1985,7 +2016,8 @@ func iamUserSSHKeys(ctx context.Context, a *aws, resourceType string, filters *f
 
 func instances(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	var input = &ec2.DescribeInstancesInput{
-		Filters: toEC2Filters(filters),
+		Filters:    toEC2Filters(filters),
+		MaxResults: awsSDK.Int64(1000),
 	}
 
 	instances, err := a.awsr.GetInstances(ctx, input)
@@ -2070,7 +2102,11 @@ func kinesisStreams(ctx context.Context, a *aws, resourceType string, filters *f
 }
 
 func lambdaFunctions(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	lambdaFunctions, err := a.awsr.GetLambdaFunctions(ctx, nil)
+	var input = &lambda.ListFunctionsInput{
+		MaxItems: awsSDK.Int64(50),
+	}
+
+	lambdaFunctions, err := a.awsr.GetLambdaFunctions(ctx, input)
 	if err != nil {
 		return nil, err
 	}
@@ -2089,7 +2125,10 @@ func lambdaFunctions(ctx context.Context, a *aws, resourceType string, filters *
 }
 
 func launchConfigurations(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	launchConfigurations, err := a.awsr.GetLaunchConfigurations(ctx, nil)
+	var input = &autoscaling.DescribeLaunchConfigurationsInput{
+		MaxRecords: awsSDK.Int64(100),
+	}
+	launchConfigurations, err := a.awsr.GetLaunchConfigurations(ctx, input)
 	if err != nil {
 		return nil, err
 	}
@@ -2109,7 +2148,8 @@ func launchConfigurations(ctx context.Context, a *aws, resourceType string, filt
 
 func launchTemplates(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	var input = &ec2.DescribeLaunchTemplatesInput{
-		Filters: toEC2Filters(filters),
+		Filters:    toEC2Filters(filters),
+		MaxResults: awsSDK.Int64(200),
 	}
 
 	launchTemplates, err := a.awsr.GetLaunchTemplates(ctx, input)
@@ -2213,7 +2253,10 @@ func lightsailInstances(ctx context.Context, a *aws, resourceType string, filter
 }
 
 func mediaStoreContainers(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	mediaStoreContainers, err := a.awsr.GetMediastoreContainers(ctx, nil)
+	var input = &mediastore.ListContainersInput{
+		MaxResults: awsSDK.Int64(100),
+	}
+	mediaStoreContainers, err := a.awsr.GetMediastoreContainers(ctx, input)
 	if err != nil {
 		return nil, err
 	}
@@ -2252,8 +2295,7 @@ func mqBrokers(ctx context.Context, a *aws, resourceType string, filters *filter
 
 func natGateways(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	var input = &ec2.DescribeNatGatewaysInput{
-		MaxResults: awsSDK.Int64(100),
-		Filter:     toEC2Filters(filters),
+		Filter: toEC2Filters(filters),
 	}
 
 	natGateways, err := a.awsr.GetEC2NatGateways(ctx, input)
@@ -2344,7 +2386,12 @@ func rdsGlobalClusters(ctx context.Context, a *aws, resourceType string, filters
 }
 
 func redshiftClusters(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	redshiftClusters, err := a.awsr.GetRedshiftClusters(ctx, nil)
+	filtersRedshiftTagKey, filtersRedshiftTagValue := toRedshiftTag(filters)
+	var input = &redshift.DescribeClustersInput{
+		TagKeys:   filtersRedshiftTagKey,
+		TagValues: filtersRedshiftTagValue,
+	}
+	redshiftClusters, err := a.awsr.GetRedshiftClusters(ctx, input)
 	if err != nil {
 		return nil, err
 	}
@@ -2627,7 +2674,10 @@ func sesDomainGeneral(ctx context.Context, a *aws, resourceType string, filters 
 }
 
 func sesDomainIdentities(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	sesDomainIdentities, err := a.awsr.GetIdentities(ctx, nil)
+	var input = &ses.ListIdentitiesInput{
+		MaxItems: awsSDK.Int64(1000),
+	}
+	sesDomainIdentities, err := a.awsr.GetIdentities(ctx, input)
 	if err != nil {
 		return nil, err
 	}
@@ -2967,4 +3017,18 @@ func toEC2Filters(filters *filter.Filter) []*ec2.Filter {
 	}
 
 	return filtersEc2
+}
+
+func toRedshiftTag(filters *filter.Filter) ([]*string, []*string) {
+	tags := filters.Tags
+	if len(tags) == 0 {
+		return nil, nil
+	}
+	filtersRedshiftTagKey := make([]*string, 0, len(tags))
+	filtersRedshiftTagValue := make([]*string, 0, len(tags))
+	for _, t := range tags {
+		filtersRedshiftTagKey = append(filtersRedshiftTagKey, &t.Name)
+		filtersRedshiftTagValue = append(filtersRedshiftTagValue, &t.Value)
+	}
+	return filtersRedshiftTagKey, filtersRedshiftTagValue
 }

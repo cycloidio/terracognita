@@ -63,14 +63,12 @@ var (
 
 		// Athena
 		Function{
-			FnName:                     "GetAthenaWorkGroups",
-			Entity:                     "WorkGroups",
-			FnAttributeList:            "WorkGroups",
-			SingularEntity:             "WorkGroupSummary",
-			Prefix:                     "List",
-			Service:                    "athena",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
+			FnName:          "GetAthenaWorkGroups",
+			Entity:          "WorkGroups",
+			FnAttributeList: "WorkGroups",
+			SingularEntity:  "WorkGroupSummary",
+			Prefix:          "List",
+			Service:         "athena",
 			Documentation: `
 			// GetAthenaDataCatalogs returns the Athena worker groups on the given input
 			// Returned values are commented in the interface doc comment block.
@@ -79,12 +77,10 @@ var (
 
 		// autoscaling
 		Function{
-			Entity:                     "AutoScalingGroups",
-			SingularEntity:             "Group",
-			Prefix:                     "Describe",
-			Service:                    "autoscaling",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
+			Entity:         "AutoScalingGroups",
+			SingularEntity: "Group",
+			Prefix:         "Describe",
+			Service:        "autoscaling",
 			Documentation: `
 			// GetAutoScalingGroups returns all AutoScalingGroup belonging to the Account ID based on the input given.
 			// Returned values are commented in the interface doc comment block.
@@ -113,14 +109,12 @@ var (
 
 		// batch
 		Function{
-			FnName:                     "GetBatchJobDefinitions",
-			Entity:                     "JobDefinitions",
-			FnAttributeList:            "JobDefinitions",
-			SingularEntity:             "JobDefinition",
-			Prefix:                     "Describe",
-			Service:                    "batch",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
+			FnName:          "GetBatchJobDefinitions",
+			Entity:          "JobDefinitions",
+			FnAttributeList: "JobDefinitions",
+			SingularEntity:  "JobDefinition",
+			Prefix:          "Describe",
+			Service:         "batch",
 			Documentation: `
 			// GetBatchJobDefinitions returns the batch jobs on the given input
 			// Returned values are commented in the interface doc comment block.
@@ -201,14 +195,12 @@ var (
 
 		// dax
 		Function{
-			FnName:                     "GetDAXClusters",
-			Entity:                     "Clusters",
-			FnAttributeList:            "Clusters",
-			SingularEntity:             "Cluster",
-			Prefix:                     "Describe",
-			Service:                    "dax",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
+			FnName:          "GetDAXClusters",
+			Entity:          "Clusters",
+			FnAttributeList: "Clusters",
+			SingularEntity:  "Cluster",
+			Prefix:          "Describe",
+			Service:         "dax",
 			Documentation: `
 			// GetDAXClusters returns the DAX clusters on the given input
 			// Returned values are commented in the interface doc comment block.
@@ -217,14 +209,12 @@ var (
 
 		// directconnect / dx
 		Function{
-			FnName:                     "GetDirectConnectGateways",
-			Entity:                     "DirectConnectGateways",
-			FnAttributeList:            "DirectConnectGateways",
-			SingularEntity:             "Gateway",
-			Prefix:                     "Describe",
-			Service:                    "directconnect",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
+			FnName:          "GetDirectConnectGateways",
+			Entity:          "DirectConnectGateways",
+			FnAttributeList: "DirectConnectGateways",
+			SingularEntity:  "Gateway",
+			Prefix:          "Describe",
+			Service:         "directconnect",
 			Documentation: `
 			// GetDirectConnectGateways returns the Direct Connect gateways on the given input
 			// Returned values are commented in the interface doc comment block.
@@ -233,14 +223,12 @@ var (
 
 		// directoryservice
 		Function{
-			FnName:                     "GetDirectoryServiceDirectories",
-			Entity:                     "Directories",
-			FnAttributeList:            "DirectoryDescriptions",
-			SingularEntity:             "DirectoryDescription",
-			Prefix:                     "Describe",
-			Service:                    "directoryservice",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
+			FnName:          "GetDirectoryServiceDirectories",
+			Entity:          "Directories",
+			FnAttributeList: "DirectoryDescriptions",
+			SingularEntity:  "DirectoryDescription",
+			Prefix:          "Describe",
+			Service:         "directoryservice",
 			Documentation: `
 			// GetDirectoryServiceDirectories returns the Directory Service directorie on the given input
 			// Returned values are commented in the interface doc comment block.
@@ -274,9 +262,9 @@ var (
 			FnPaginationAttribute:      "LastEvaluatedGlobalTableName",
 			FnInputPaginationAttribute: "ExclusiveStartGlobalTableName",
 			Documentation: `
-					// GetDynamodbGlobalTables returns the dynamodb global tables on the given input
-					// Returned values are commented in the interface doc comment block.
-					`,
+			// GetDynamodbGlobalTables returns the dynamodb global tables on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
 		},
 		Function{
 			FnName:                     "GetDynamodbTables",
@@ -288,9 +276,9 @@ var (
 			FnPaginationAttribute:      "LastEvaluatedTableName",
 			FnInputPaginationAttribute: "ExclusiveStartTableName",
 			Documentation: `
-					// GetDynamodbTables returns the dynamodb talbles on the given input
-					// Returned values are commented in the interface doc comment block.
-					`,
+			// GetDynamodbTables returns the dynamodb talbles on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
 		},
 
 		// ec2
@@ -301,9 +289,9 @@ var (
 			Prefix:           "Describe",
 			Service:          "ec2",
 			Documentation: `
-					// GetAddresses returns all EC2 Addresses based on the input given.
-					// Returned values are commented in the interface doc comment block.
-					`,
+			// GetAddresses returns all EC2 Addresses based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
 		},
 		Function{
 			HasNotPagination: true,
@@ -311,9 +299,9 @@ var (
 			Prefix:           "Describe",
 			Service:          "ec2",
 			Documentation: `
-					// GetImages returns all EC2 AMI based on the input given.
-					// Returned values are commented in the interface doc comment block.
-					`,
+			// GetImages returns all EC2 AMI based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
 		},
 		Function{
 			HasNotPagination: true,
@@ -322,9 +310,9 @@ var (
 			Service:          "ec2",
 			FilterByOwner:    "Owners",
 			Documentation: `
-					// GetOwnImages returns all EC2 AMI belonging to the Account ID based on the input given.
-					// Returned values are commented in the interface doc comment block.
-					`,
+			// GetOwnImages returns all EC2 AMI belonging to the Account ID based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
 		},
 		Function{
 			FnAttributeList: "Reservations#Instances",
@@ -332,9 +320,21 @@ var (
 			Prefix:          "Describe",
 			Service:         "ec2",
 			Documentation: `
-					// GetInstances returns all EC2 instances based on the input given.
-					// Returned values are commented in the interface doc comment block.
-					`,
+			// GetInstances returns all EC2 instances based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:          "GetEC2InternetGateways",
+			Entity:          "InternetGateways",
+			FnAttributeList: "InternetGateways",
+			SingularEntity:  "InternetGateway",
+			Prefix:          "Describe",
+			Service:         "ec2",
+			Documentation: `
+			// GetEC2InternetGateways returns the EC2 Internet Gateways on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
 		},
 		Function{
 			SingularEntity:   "KeyPairInfo",
@@ -343,50 +343,48 @@ var (
 			Prefix:           "Describe",
 			Service:          "ec2",
 			Documentation: `
-					// GetKeyPairs returns all KeyPairs based on the input given.
-					// Returned values are commented in the interface doc comment block.
-					`,
+			// GetKeyPairs returns all KeyPairs based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
 		},
 		Function{
 			Entity:  "LaunchTemplates",
 			Prefix:  "Describe",
 			Service: "ec2",
 			Documentation: `
-					// GetLaunchTemplates returns all LaunchTemplate belonging to the Account ID based on the input given.
-					// Returned values are commented in the interface doc comment block.
-					`,
+			// GetLaunchTemplates returns all LaunchTemplate belonging to the Account ID based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
 		},
 		Function{
-			FnName:                     "GetEC2NatGateways",
-			Entity:                     "NatGateways",
-			FnAttributeList:            "NatGateways",
-			SingularEntity:             "NatGateway",
-			Prefix:                     "Describe",
-			Service:                    "ec2",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
+			FnName:          "GetEC2NatGateways",
+			Entity:          "NatGateways",
+			FnAttributeList: "NatGateways",
+			SingularEntity:  "NatGateway",
+			Prefix:          "Describe",
+			Service:         "ec2",
 			Documentation: `
-				  // GetEC2NatGateways returns the EC2 nat gateways on the given input
-				  // Returned values are commented in the interface doc comment block.
-				  `,
+		  // GetEC2NatGateways returns the EC2 nat gateways on the given input
+		  // Returned values are commented in the interface doc comment block.
+		  `,
 		},
 		Function{
 			Entity:  "SecurityGroups",
 			Prefix:  "Describe",
 			Service: "ec2",
 			Documentation: `
-					// GetSecurityGroups returns all EC2 security groups based on the input given.
-					// Returned values are commented in the interface doc comment block.
-					`,
+			// GetSecurityGroups returns all EC2 security groups based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
 		},
 		Function{
 			Entity:  "Snapshots",
 			Prefix:  "Describe",
 			Service: "ec2",
 			Documentation: `
-					// GetSnapshots returns all snapshots based on the input given.
-					// Returned values are commented in the interface doc comment block.
-					`,
+			// GetSnapshots returns all snapshots based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
 		},
 		Function{
 			Entity:        "Snapshots",
@@ -394,45 +392,45 @@ var (
 			Service:       "ec2",
 			FilterByOwner: "OwnerIds",
 			Documentation: `
-					// GetOwnSnapshots returns all snapshots belonging to the Account ID based on the input given.
-					// Returned values are commented in the interface doc comment block.
-					`,
+			// GetOwnSnapshots returns all snapshots belonging to the Account ID based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
 		},
 		Function{
 			Entity:  "Subnets",
 			Prefix:  "Describe",
 			Service: "ec2",
 			Documentation: `
-					// GetSubnets returns all EC2 subnets based on the input given.
-					// Returned values are commented in the interface doc comment block.
-					`,
+			// GetSubnets returns all EC2 subnets based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
 		},
 		Function{
 			Entity:  "Volumes",
 			Prefix:  "Describe",
 			Service: "ec2",
 			Documentation: `
-					// GetVolumes returns all EC2 volumes based on the input given.
-					// Returned values are commented in the interface doc comment block.
-					`,
+			// GetVolumes returns all EC2 volumes based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
 		},
 		Function{
 			Entity:  "Vpcs",
 			Prefix:  "Describe",
 			Service: "ec2",
 			Documentation: `
-					// GetVpcs returns all EC2 VPCs based on the input given.
-					// Returned values are commented in the interface doc comment block.
-					`,
+			// GetVpcs returns all EC2 VPCs based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
 		},
 		Function{
 			Entity:  "VpcPeeringConnections",
 			Prefix:  "Describe",
 			Service: "ec2",
 			Documentation: `
-					// GetVpcPeeringConnections returns all VpcPeeringConnections based on the input given.
-					// Returned values are commented in the interface doc comment block.
-					`,
+			// GetVpcPeeringConnections returns all VpcPeeringConnections based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
 		},
 		Function{
 			FnName:           "GetVPNGateways",
@@ -450,14 +448,12 @@ var (
 
 		// ECS
 		Function{
-			FnName:                     "GetECSClustersArns",
-			Entity:                     "Clusters",
-			FnAttributeList:            "ClusterArns",
-			FnOutput:                   "string",
-			Prefix:                     "List",
-			Service:                    "ecs",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
+			FnName:          "GetECSClustersArns",
+			Entity:          "Clusters",
+			FnAttributeList: "ClusterArns",
+			FnOutput:        "string",
+			Prefix:          "List",
+			Service:         "ecs",
 			Documentation: `
 			// GetECSClustersArns returns the ecs clusters arns on the given input
 			// Returned values are commented in the interface doc comment block.
@@ -477,28 +473,12 @@ var (
 			`,
 		},
 		Function{
-			FnName:                     "GetEC2InternetGateways",
-			Entity:                     "InternetGateways",
-			FnAttributeList:            "InternetGateways",
-			SingularEntity:             "InternetGateway",
-			Prefix:                     "Describe",
-			Service:                    "ec2",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
-			Documentation: `
-			// GetEC2InternetGateways returns the EC2 Internet Gateways on the given input
-			// Returned values are commented in the interface doc comment block.
-			`,
-		},
-		Function{
-			FnName:                     "GetECSServicesArns",
-			Entity:                     "Services",
-			FnAttributeList:            "ServiceArns",
-			FnOutput:                   "string",
-			Prefix:                     "List",
-			Service:                    "ecs",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
+			FnName:          "GetECSServicesArns",
+			Entity:          "Services",
+			FnAttributeList: "ServiceArns",
+			FnOutput:        "string",
+			Prefix:          "List",
+			Service:         "ecs",
 			Documentation: `
 			// GetECSServicesArns returns the ecs services arns on the given input
 			// Returned values are commented in the interface doc comment block.
@@ -550,14 +530,12 @@ var (
 			`,
 		},
 		Function{
-			FnName:                     "GetEKSClusters",
-			Entity:                     "Clusters",
-			FnAttributeList:            "Clusters",
-			FnOutput:                   "string",
-			Prefix:                     "List",
-			Service:                    "eks",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
+			FnName:          "GetEKSClusters",
+			Entity:          "Clusters",
+			FnAttributeList: "Clusters",
+			FnOutput:        "string",
+			Prefix:          "List",
+			Service:         "eks",
 			Documentation: `
 			// GetEKSClusters returns the EKS Clusters on the given input
 			// Returned values are commented in the interface doc comment block.
@@ -817,14 +795,12 @@ var (
 
 		// fsx
 		Function{
-			FnName:                     "GetFSXFileSystems",
-			Entity:                     "FileSystems",
-			FnAttributeList:            "FileSystems",
-			SingularEntity:             "FileSystem",
-			Prefix:                     "Describe",
-			Service:                    "fsx",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
+			FnName:          "GetFSXFileSystems",
+			Entity:          "FileSystems",
+			FnAttributeList: "FileSystems",
+			SingularEntity:  "FileSystem",
+			Prefix:          "Describe",
+			Service:         "fsx",
 			Documentation: `
 			// GetFSXFileSystems returns the fsx filesystems arns on the given input
 			// Returned values are commented in the interface doc comment block.
@@ -833,28 +809,24 @@ var (
 
 		// Glue
 		Function{
-			FnName:                     "GetGlueDatabases",
-			Entity:                     "Databases",
-			FnAttributeList:            "DatabaseList",
-			SingularEntity:             "Database",
-			Prefix:                     "Get",
-			Service:                    "glue",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
+			FnName:          "GetGlueDatabases",
+			Entity:          "Databases",
+			FnAttributeList: "DatabaseList",
+			SingularEntity:  "Database",
+			Prefix:          "Get",
+			Service:         "glue",
 			Documentation: `
 			// GetGlueDatabases returns the Glue databases on the given input
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
 		Function{
-			FnName:                     "GetGlueTables",
-			Entity:                     "Tables",
-			FnAttributeList:            "TableList",
-			SingularEntity:             "TableData",
-			Prefix:                     "Get",
-			Service:                    "glue",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
+			FnName:          "GetGlueTables",
+			Entity:          "Tables",
+			FnAttributeList: "TableList",
+			SingularEntity:  "TableData",
+			Prefix:          "Get",
+			Service:         "glue",
 			Documentation: `
 			// GetGlueTables returns the Glue Tables on the given input
 			// Returned values are commented in the interface doc comment block.
@@ -1143,14 +1115,12 @@ var (
 
 		// mediastore
 		Function{
-			FnName:                     "GetMediastoreContainers",
-			Entity:                     "Containers",
-			FnAttributeList:            "Containers",
-			SingularEntity:             "Container",
-			Prefix:                     "List",
-			Service:                    "mediastore",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
+			FnName:          "GetMediastoreContainers",
+			Entity:          "Containers",
+			FnAttributeList: "Containers",
+			SingularEntity:  "Container",
+			Prefix:          "List",
+			Service:         "mediastore",
 			Documentation: `
 		  // GetMediastoreContainers returns the Mediastore Containers on the given input
 		  // Returned values are commented in the interface doc comment block.
@@ -1159,21 +1129,19 @@ var (
 
 		// mq
 		Function{
-			FnName:                     "GetMQBrokers",
-			Entity:                     "Brokers",
-			FnAttributeList:            "BrokerSummaries",
-			SingularEntity:             "BrokerSummary",
-			Prefix:                     "List",
-			Service:                    "mq",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
+			FnName:          "GetMQBrokers",
+			Entity:          "Brokers",
+			FnAttributeList: "BrokerSummaries",
+			SingularEntity:  "BrokerSummary",
+			Prefix:          "List",
+			Service:         "mq",
 			Documentation: `
 		  // GetMQBrokers returns the MQ Brokers on the given input
 		  // Returned values are commented in the interface doc comment block.
 		  `,
 		},
 
-		// netptune
+		// neptune
 		Function{
 			FnName:                     "GetNeptuneDBClusters",
 			Entity:                     "DBClusters",
@@ -1514,14 +1482,12 @@ var (
 
 		// sqs
 		Function{
-			FnName:                     "GetSQSQueues",
-			Entity:                     "Queues",
-			FnAttributeList:            "QueueUrls",
-			FnOutput:                   "string",
-			Prefix:                     "List",
-			Service:                    "sqs",
-			FnPaginationAttribute:      "NextToken",
-			FnInputPaginationAttribute: "NextToken",
+			FnName:          "GetSQSQueues",
+			Entity:          "Queues",
+			FnAttributeList: "QueueUrls",
+			FnOutput:        "string",
+			Prefix:          "List",
+			Service:         "sqs",
 			Documentation: `
 			// GetSQSQueues returns the SQS Queues on the given input
 			// Returned values are commented in the interface doc comment block.
