@@ -168,7 +168,7 @@ module "test" {
 	# type_name2_key2 = "value"
 	# type_name2_key3 = []
 	# type_name_key = "value"
-  source = "module-test"
+  source = "./module-test"
 }
 
 variable "type_name2_key" {
@@ -227,7 +227,7 @@ resource "type" "name2" {
 module "test" {
 	# type_name2_key = "value"
 	# type_name_key = "value"
-  source = "module-test"
+  source = "./module-test"
 }
 
 variable "type_name2_key" {

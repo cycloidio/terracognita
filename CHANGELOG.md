@@ -22,7 +22,9 @@
 ### Fixed
 
 - Skip aws `RequestError` errors generaly caused by service not available in a region
-  ([Issue #171](https://github.com/cycloidio/terracognita/pull/171))
+  ([Issue #171](https://github.com/cycloidio/terracognita/issues/171))
+- Module source now is prefixed with `./` as expected
+  ([PR #209](https://github.com/cycloidio/terracognita/pull/209))
 
 ## [0.7.0] _2021-07-02_
 
