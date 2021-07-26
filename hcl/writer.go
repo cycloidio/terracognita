@@ -54,7 +54,7 @@ func NewWriter(w io.Writer, opts *writer.Options) *Writer {
 		cfg[ModuleCategoryKey] = map[string]interface{}{
 			"module": map[string]interface{}{
 				opts.Module: map[string]interface{}{
-					"source": fmt.Sprintf("module-%s", opts.Module),
+					"source": fmt.Sprintf("./module-%s", opts.Module),
 				},
 			},
 		}
