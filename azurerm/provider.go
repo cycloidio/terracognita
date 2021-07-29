@@ -20,6 +20,8 @@ type azurerm struct {
 	tfProvider      *schema.Provider
 	azurer          *AzureReader
 
+	configuraiton map[string]interface{}
+
 	cache cache.Cache
 }
 
@@ -52,6 +54,9 @@ func NewProvider(ctx context.Context, clientID, clientSecret, environment, resou
 		tfProvider:      tfp,
 		azurer:          reader,
 		cache:           cache.New(),
+		configuraiton: map[string]interface{}{
+			"environment": environment,
+		},
 	}, nil
 }
 
@@ -60,10 +65,12 @@ func (a *azurerm) HasResourceType(t string) bool {
 	return err == nil
 }
 
-func (a *azurerm) ResourceGroup() string { return a.azurer.GetResourceGroupName() }
-func (a *azurerm) Region() string        { return a.azurer.GetLocation() }
-func (a *azurerm) String() string        { return "azurerm" }
-func (a *azurerm) TagKey() string        { return "tags" }
+func (a *azurerm) ResourceGroup() string                 { return a.azurer.GetResourceGroupName() }
+func (a *azurerm) Region() string                        { return a.azurer.GetLocation() }
+func (a *azurerm) String() string                        { return "azurerm" }
+func (a *azurerm) TagKey() string                        { return "tags" }
+func (a *azurerm) Source() string                        { return "hashicorp/azurerm" }
+func (a *azurerm) Configuration() map[string]interface{} { return a.configuraiton }
 
 func (a *azurerm) ResourceTypes() []string {
 	return ResourceTypeStrings()
