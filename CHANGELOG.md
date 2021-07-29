@@ -4,6 +4,8 @@
 
 - Update aws resources regarding missing pagination and filter
   ([PR #202](https://github.com/cycloidio/terracognita/pull/202))
+- Resource names now are generated removing invalid characters instead just assigning a random alphanumeric value
+  ([Issue #208](https://github.com/cycloidio/terracognita/issues/208))
 
 ## [0.7.1] _2021-07-15_
 
