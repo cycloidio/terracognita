@@ -77,7 +77,7 @@ var (
 
 			if hclOut != nil {
 				logger.Log("msg", "initializing HCL writer")
-				hclW = hcl.NewWriter(hclOut, options)
+				hclW = hcl.NewWriter(hclOut, azureRMP, options)
 			}
 
 			if stateOut != nil {
