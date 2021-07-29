@@ -8,17 +8,93 @@ import (
 	"github.com/cycloidio/mxwriter"
 	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/hcl"
+	"github.com/cycloidio/terracognita/mock"
 	"github.com/cycloidio/terracognita/writer"
+	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/terraform-providers/terraform-provider-aws/aws"
 )
 
 func TestNewHCLWriter(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
-		hw := hcl.NewWriter(nil, &writer.Options{Interpolate: true})
+		var (
+			ctrl = gomock.NewController(t)
+			p    = mock.NewProvider(ctrl)
+		)
+		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().TFProvider().Return(aws.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"region": "eu-west-1",
+		})
 
-		assert.Equal(t, map[string]map[string]interface{}{}, hw.Config)
+		hw := hcl.NewWriter(nil, p, &writer.Options{})
+		assert.Equal(t, map[string]map[string]interface{}{
+			"hcl": map[string]interface{}{
+				"provider": map[string]interface{}{
+					"aws": map[string]interface{}{
+						"region": "${var.region}",
+					},
+				},
+				"resource": map[string]map[string]interface{}{},
+				"terraform": map[string]interface{}{
+					"required_providers": map[string]interface{}{
+						"=tc=aws": map[string]interface{}{
+							"source": "hashicorp/aws",
+						},
+					},
+					"required_version": ">= 1.0",
+				},
+				"variable": map[string]interface{}{
+					"region": map[string]interface{}{
+						"default": "eu-west-1",
+					},
+				},
+			},
+		}, hw.Config)
+	})
+	t.Run("SuccessWithModule", func(t *testing.T) {
+		var (
+			ctrl = gomock.NewController(t)
+			p    = mock.NewProvider(ctrl)
+		)
+		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().TFProvider().Return(aws.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"region": "eu-west-1",
+		})
+
+		hw := hcl.NewWriter(nil, p, &writer.Options{Module: "my-module"})
+		assert.Equal(t, map[string]map[string]interface{}{
+			"tc_module": map[string]interface{}{
+				"module": map[string]interface{}{
+					"my-module": map[string]interface{}{
+						"source": "./module-my-module",
+					},
+				},
+				"provider": map[string]interface{}{
+					"aws": map[string]interface{}{
+						"region": "${var.region}",
+					},
+				},
+				"terraform": map[string]interface{}{
+					"required_providers": map[string]interface{}{
+						"=tc=aws": map[string]interface{}{
+							"source": "hashicorp/aws",
+						},
+					},
+					"required_version": ">= 1.0",
+				},
+				"variable": map[string]interface{}{
+					"region": map[string]interface{}{
+						"default": "eu-west-1",
+					},
+				},
+			},
+		}, hw.Config)
 	})
 }
 
@@ -26,12 +102,23 @@ func TestHCLWriter_Write(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		var (
 			mw    = mxwriter.NewMux()
-			hw    = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
 			value = map[string]interface{}{
 				"key": "value",
 			}
-			key = "type.name"
+			key  = "type.name"
+			ctrl = gomock.NewController(t)
+			p    = mock.NewProvider(ctrl)
 		)
+		defer ctrl.Finish()
+
+		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().TFProvider().Return(aws.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"region": "eu-west-1",
+		})
+
+		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
 		err := hw.Write(key, value)
 		require.NoError(t, err)
@@ -43,6 +130,24 @@ func TestHCLWriter_Write(t *testing.T) {
 						"name": map[string]interface{}{
 							"key": "value",
 						},
+					},
+				},
+				"provider": map[string]interface{}{
+					"aws": map[string]interface{}{
+						"region": "${var.region}",
+					},
+				},
+				"terraform": map[string]interface{}{
+					"required_providers": map[string]interface{}{
+						"=tc=aws": map[string]interface{}{
+							"source": "hashicorp/aws",
+						},
+					},
+					"required_version": ">= 1.0",
+				},
+				"variable": map[string]interface{}{
+					"region": map[string]interface{}{
+						"default": "eu-west-1",
 					},
 				},
 			},
@@ -57,8 +162,19 @@ func TestHCLWriter_Write(t *testing.T) {
 			assert.False(t, ok)
 
 			t.Run("Empty", func(t *testing.T) {
+				var (
+					ctrl = gomock.NewController(t)
+					p    = mock.NewProvider(ctrl)
+				)
+
+				p.EXPECT().String().Return("aws").Times(3)
+				p.EXPECT().Source().Return("hashicorp/aws")
+				p.EXPECT().TFProvider().Return(aws.Provider())
+				p.EXPECT().Configuration().Return(map[string]interface{}{
+					"region": "eu-west-1",
+				})
 				mw = mxwriter.NewMux()
-				hw = hcl.NewWriter(mw, &writer.Options{Interpolate: true, Module: "s"})
+				hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true, Module: "s"})
 
 				ok, err = hw.Has("type.new")
 				require.NoError(t, err)
@@ -68,27 +184,54 @@ func TestHCLWriter_Write(t *testing.T) {
 	})
 	t.Run("ErrRequiredKey", func(t *testing.T) {
 		var (
-			mw = mxwriter.NewMux()
-			hw = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
+			ctrl = gomock.NewController(t)
+			p    = mock.NewProvider(ctrl)
+			mw   = mxwriter.NewMux()
 		)
+		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().TFProvider().Return(aws.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"region": "eu-west-1",
+		})
+
+		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
 		err := hw.Write("", nil)
 		assert.Equal(t, errcode.ErrWriterRequiredKey, errors.Cause(err))
 	})
 	t.Run("ErrRequiredValue", func(t *testing.T) {
 		var (
-			mw = mxwriter.NewMux()
-			hw = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
+			ctrl = gomock.NewController(t)
+			p    = mock.NewProvider(ctrl)
+			mw   = mxwriter.NewMux()
 		)
+		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().TFProvider().Return(aws.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"region": "eu-west-1",
+		})
+
+		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
 		err := hw.Write("type.name", nil)
 		assert.Equal(t, errcode.ErrWriterRequiredValue, errors.Cause(err))
 	})
 	t.Run("ErrInvalidKey", func(t *testing.T) {
 		var (
-			mw = mxwriter.NewMux()
-			hw = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
+			ctrl = gomock.NewController(t)
+			p    = mock.NewProvider(ctrl)
+			mw   = mxwriter.NewMux()
 		)
+		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().TFProvider().Return(aws.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"region": "eu-west-1",
+		})
+
+		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
 		err := hw.Write("type.name.name", "")
 		assert.Equal(t, errcode.ErrWriterInvalidKey, errors.Cause(err))
@@ -101,9 +244,18 @@ func TestHCLWriter_Write(t *testing.T) {
 	})
 	t.Run("ErrAlreadyExistsKey", func(t *testing.T) {
 		var (
-			mw = mxwriter.NewMux()
-			hw = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
+			ctrl = gomock.NewController(t)
+			p    = mock.NewProvider(ctrl)
+			mw   = mxwriter.NewMux()
 		)
+		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().TFProvider().Return(aws.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"region": "eu-west-1",
+		})
+
+		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
 		err := hw.Write("type.name", map[string]interface{}{})
 		require.NoError(t, err)
@@ -116,18 +268,46 @@ func TestHCLWriter_Write(t *testing.T) {
 func TestHCLWriter_Sync(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		var (
+			ctrl  = gomock.NewController(t)
+			p     = mock.NewProvider(ctrl)
 			mx    = mxwriter.NewMux()
-			hw    = hcl.NewWriter(mx, &writer.Options{Interpolate: true})
 			value = map[string]interface{}{
 				"key":         "value",
 				"tc_category": "some-category",
 			}
-			hcl = `
+			ehcl = `
+provider "aws" {
+	region = var.region
+}
+
+terraform {
+	required_providers {
+		aws = {
+			source = "hashicorp/aws"
+		}
+	}
+	required_version = ">= 1.0"
+}
+
+variable "region" {
+	default = "eu-west-1"
+}
+
 resource "type" "name" {
   key = "value"
 }
+
 `
 		)
+
+		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().TFProvider().Return(aws.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"region": "eu-west-1",
+		})
+
+		hw := hcl.NewWriter(mx, p, &writer.Options{Interpolate: true})
 
 		err := hw.Write("type.name", value)
 		require.NoError(t, err)
@@ -138,12 +318,13 @@ resource "type" "name" {
 		b, err := ioutil.ReadAll(mx)
 		require.NoError(t, err)
 
-		assert.Equal(t, strings.Join(strings.Fields(hcl), " "), strings.Join(strings.Fields(string(b)), " "))
+		assert.Equal(t, strings.Join(strings.Fields(ehcl), " "), strings.Join(strings.Fields(string(b)), " "))
 	})
 	t.Run("Module", func(t *testing.T) {
 		var (
+			ctrl  = gomock.NewController(t)
+			p     = mock.NewProvider(ctrl)
 			mx    = mxwriter.NewMux()
-			hw    = hcl.NewWriter(mx, &writer.Options{Interpolate: true, Module: "test"})
 			value = map[string]interface{}{
 				"key": "value",
 			}
@@ -152,7 +333,7 @@ resource "type" "name" {
 				"key2": "value",
 				"key3": []interface{}{},
 			}
-			hcl = `
+			ehcl = `
 resource "type" "name" {
   key = var.type_name_key
 }
@@ -169,6 +350,23 @@ module "test" {
 	# type_name2_key3 = []
 	# type_name_key = "value"
   source = "./module-test"
+}
+
+provider "aws" {
+	region = var.region
+}
+
+terraform {
+	required_providers {
+		aws = {
+			source = "hashicorp/aws"
+		}
+	}
+	required_version = ">= 1.0"
+}
+
+variable "region" {
+	default = "eu-west-1"
 }
 
 variable "type_name2_key" {
@@ -188,6 +386,14 @@ variable "type_name_key" {
 }
 `
 		)
+		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().TFProvider().Return(aws.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"region": "eu-west-1",
+		})
+
+		hw := hcl.NewWriter(mx, p, &writer.Options{Interpolate: true, Module: "test"})
 
 		err := hw.Write("type.name", value)
 		require.NoError(t, err)
@@ -201,12 +407,13 @@ variable "type_name_key" {
 		b, err := ioutil.ReadAll(mx)
 		require.NoError(t, err)
 
-		assert.Equal(t, strings.Join(strings.Fields(hcl), " "), strings.Join(strings.Fields(string(b)), " "))
+		assert.Equal(t, strings.Join(strings.Fields(ehcl), " "), strings.Join(strings.Fields(string(b)), " "))
 	})
 	t.Run("ModuleVariables", func(t *testing.T) {
 		var (
+			ctrl  = gomock.NewController(t)
+			p     = mock.NewProvider(ctrl)
 			mx    = mxwriter.NewMux()
-			hw    = hcl.NewWriter(mx, &writer.Options{Interpolate: true, Module: "test", ModuleVariables: map[string]struct{}{"type.key": struct{}{}}})
 			value = map[string]interface{}{
 				"key": "value",
 			}
@@ -214,7 +421,7 @@ variable "type_name_key" {
 				"key":  "value",
 				"key2": "value",
 			}
-			hcl = `
+			ehcl = `
 resource "type" "name" {
   key = var.type_name_key
 }
@@ -230,6 +437,23 @@ module "test" {
   source = "./module-test"
 }
 
+provider "aws" {
+	region = var.region
+}
+
+terraform {
+	required_providers {
+		aws = {
+			source = "hashicorp/aws"
+		}
+	}
+	required_version = ">= 1.0"
+}
+
+variable "region" {
+	default = "eu-west-1"
+}
+
 variable "type_name2_key" {
 	default = "value"
 }
@@ -239,6 +463,14 @@ variable "type_name_key" {
 }
 `
 		)
+		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().TFProvider().Return(aws.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"region": "eu-west-1",
+		})
+
+		hw := hcl.NewWriter(mx, p, &writer.Options{Interpolate: true, Module: "test", ModuleVariables: map[string]struct{}{"type.key": struct{}{}}})
 
 		err := hw.Write("type.name", value)
 		require.NoError(t, err)
@@ -252,12 +484,13 @@ variable "type_name_key" {
 		b, err := ioutil.ReadAll(mx)
 		require.NoError(t, err)
 
-		assert.Equal(t, strings.Join(strings.Fields(hcl), " "), strings.Join(strings.Fields(string(b)), " "))
+		assert.Equal(t, strings.Join(strings.Fields(ehcl), " "), strings.Join(strings.Fields(string(b)), " "))
 	})
 	t.Run("Slice", func(t *testing.T) {
 		var (
+			ctrl  = gomock.NewController(t)
+			p     = mock.NewProvider(ctrl)
 			mw    = mxwriter.NewMux()
-			hw    = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
 			value = map[string]interface{}{
 				"ingress": []map[string]interface{}{
 					{
@@ -270,7 +503,11 @@ variable "type_name_key" {
 					},
 				},
 			}
-			hcl = `
+			ehcl = `
+provider "aws" {
+	region = var.region
+}
+
 resource "type" "name" {
   ingress {
 		cidr_blocks = ["0.0.0.0/0"]
@@ -282,8 +519,29 @@ resource "type" "name" {
 		from_port = 81
 	}
 }
+
+terraform {
+	required_providers {
+		aws = {
+			source = "hashicorp/aws"
+		}
+	}
+	required_version = ">= 1.0"
+}
+
+variable "region" {
+	default = "eu-west-1"
+}
 `
 		)
+		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().TFProvider().Return(aws.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"region": "eu-west-1",
+		})
+
+		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
 		err := hw.Write("type.name", value)
 		require.NoError(t, err)
@@ -294,12 +552,13 @@ resource "type" "name" {
 		b, err := ioutil.ReadAll(mw)
 		require.NoError(t, err)
 
-		assert.Equal(t, strings.Join(strings.Fields(hcl), " "), strings.Join(strings.Fields(string(b)), " "))
+		assert.Equal(t, strings.Join(strings.Fields(ehcl), " "), strings.Join(strings.Fields(string(b)), " "))
 	})
 	t.Run("EmptySlice", func(t *testing.T) {
 		var (
+			ctrl  = gomock.NewController(t)
+			p     = mock.NewProvider(ctrl)
 			mw    = mxwriter.NewMux()
-			hw    = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
 			value = map[string]interface{}{
 				"ingress": []map[string]interface{}{
 					{
@@ -308,15 +567,40 @@ resource "type" "name" {
 					},
 				},
 			}
-			hcl = `
+			ehcl = `
+provider "aws" {
+	region = var.region
+}
+
 resource "type" "name" {
   ingress {
 		cidr_blocks = []
 		from_port = 80
 	}
 }
+
+terraform {
+	required_providers {
+		aws = {
+			source = "hashicorp/aws"
+		}
+	}
+	required_version = ">= 1.0"
+}
+
+variable "region" {
+	default = "eu-west-1"
+}
 `
 		)
+		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().TFProvider().Return(aws.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"region": "eu-west-1",
+		})
+
+		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
 		err := hw.Write("type.name", value)
 		require.NoError(t, err)
@@ -327,12 +611,13 @@ resource "type" "name" {
 		b, err := ioutil.ReadAll(mw)
 		require.NoError(t, err)
 
-		assert.Equal(t, strings.Join(strings.Fields(hcl), " "), strings.Join(strings.Fields(string(b)), " "))
+		assert.Equal(t, strings.Join(strings.Fields(ehcl), " "), strings.Join(strings.Fields(string(b)), " "))
 	})
 	t.Run("NestedMap", func(t *testing.T) {
 		var (
+			ctrl  = gomock.NewController(t)
+			p     = mock.NewProvider(ctrl)
 			mw    = mxwriter.NewMux()
-			hw    = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
 			value = map[string]interface{}{
 				"ingress": []map[string]interface{}{
 					{
@@ -344,7 +629,11 @@ resource "type" "name" {
 					},
 				},
 			}
-			hcl = `
+			ehcl = `
+provider "aws" {
+	region = var.region
+}
+
 resource "type" "name" {
   ingress {
 		cidr_blocks = []
@@ -354,8 +643,29 @@ resource "type" "name" {
 		}
 	}
 }
+
+terraform {
+	required_providers {
+		aws = {
+			source = "hashicorp/aws"
+		}
+	}
+	required_version = ">= 1.0"
+}
+
+variable "region" {
+	default = "eu-west-1"
+}
 `
 		)
+		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().TFProvider().Return(aws.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"region": "eu-west-1",
+		})
+
+		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
 		err := hw.Write("type.name", value)
 		require.NoError(t, err)
@@ -366,7 +676,7 @@ resource "type" "name" {
 		b, err := ioutil.ReadAll(mw)
 		require.NoError(t, err)
 
-		assert.Equal(t, strings.Join(strings.Fields(hcl), " "), strings.Join(strings.Fields(string(b)), " "))
+		assert.Equal(t, strings.Join(strings.Fields(ehcl), " "), strings.Join(strings.Fields(string(b)), " "))
 	})
 }
 
@@ -374,7 +684,8 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		var (
 			mw    = mxwriter.NewMux()
-			hw    = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
+			ctrl  = gomock.NewController(t)
+			p     = mock.NewProvider(ctrl)
 			value = map[string]interface{}{
 				"network": "to-be-interpolated",
 			}
@@ -383,6 +694,14 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 			}
 			i = make(map[string]string)
 		)
+		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().TFProvider().Return(aws.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"region": "eu-west-1",
+		})
+
+		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 		i["to-be-interpolated"] = "${aType.aName.id}"
 		hw.Write("type.name", value)
 		hw.Write("aType.aName", network)
@@ -400,7 +719,8 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 	t.Run("SuccessAvoidInterpolaception", func(t *testing.T) {
 		var (
 			mw    = mxwriter.NewMux()
-			hw    = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
+			ctrl  = gomock.NewController(t)
+			p     = mock.NewProvider(ctrl)
 			value = map[string]interface{}{
 				"network": "to-be-interpolated",
 			}
@@ -410,6 +730,14 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 			}
 			i = make(map[string]string)
 		)
+		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().TFProvider().Return(aws.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"region": "eu-west-1",
+		})
+
+		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 		i["to-be-interpolated"] = "${aType.aName.id}"
 		hw.Write("type.name", value)
 		hw.Write("aType.aName", network)
@@ -427,7 +755,8 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 	t.Run("SuccessMutualInterpolation", func(t *testing.T) {
 		var (
 			mw       = mxwriter.NewMux()
-			hw       = hcl.NewWriter(mw, &writer.Options{Interpolate: true})
+			ctrl     = gomock.NewController(t)
+			p        = mock.NewProvider(ctrl)
 			instance = map[string]interface{}{
 				"subnet_id": "1234",
 			}
@@ -437,6 +766,14 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 			}
 			i = make(map[string]string)
 		)
+		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().TFProvider().Return(aws.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"region": "eu-west-1",
+		})
+
+		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 		i["a-zone"] = "${aws_instance.instance.availability_zone}"
 		i["1234"] = "${aws_subnet.subnet.id}"
 		hw.Write("aws_subnet.subnet", subnet)
@@ -457,7 +794,8 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 	t.Run("SuccessNoInterpolation", func(t *testing.T) {
 		var (
 			mw    = mxwriter.NewMux()
-			hw    = hcl.NewWriter(mw, &writer.Options{Interpolate: false})
+			ctrl  = gomock.NewController(t)
+			p     = mock.NewProvider(ctrl)
 			value = map[string]interface{}{
 				"network": "should-not-be-interpolated",
 			}
@@ -467,6 +805,14 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 			}
 			i = make(map[string]string)
 		)
+		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().TFProvider().Return(aws.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"region": "eu-west-1",
+		})
+
+		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: false})
 		i["should-not-be-interpolated"] = "${aType.aName.id}"
 		hw.Write("type.name", value)
 		hw.Write("aType.aName", network)

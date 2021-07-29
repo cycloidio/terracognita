@@ -14,6 +14,7 @@ import (
 	"github.com/cycloidio/mxwriter"
 	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/log"
+	"github.com/cycloidio/terracognita/provider"
 	"github.com/cycloidio/terracognita/writer"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/pkg/errors"
@@ -22,15 +23,6 @@ import (
 )
 
 const (
-	// ResourceCategoryKey is an internal key used to specify the category of
-	// a resource when writing, it'll be used to select in which file
-	// will be written
-	ResourceCategoryKey = "tc_category"
-
-	// ModuleCategoryKey is the category used to identify
-	// the Module
-	ModuleCategoryKey = "tc_module"
-
 	defaultCategory      = "hcl"
 	variablesCategoryKey = "variables"
 )
@@ -45,26 +37,58 @@ type Writer struct {
 	categories []string
 	writer     io.Writer
 	opts       *writer.Options
+	provider   provider.Provider
 }
 
 // NewWriter rerturns an Writer initialization
-func NewWriter(w io.Writer, opts *writer.Options) *Writer {
+func NewWriter(w io.Writer, pv provider.Provider, opts *writer.Options) *Writer {
 	cfg := make(map[string]map[string]interface{})
+
+	wr := &Writer{
+		Config:   cfg,
+		writer:   w,
+		opts:     opts,
+		provider: pv,
+	}
+
+	tfcfg := map[string]interface{}{
+		"required_version": ">= 1.0",
+		"required_providers": map[string]interface{}{
+			// We use the =tc= prefix as we want this to be an
+			// object attribute and not a block. By default
+			// on the formater we have we replace all the '= {` for
+			// just '{' so this would be included too and it would
+			// be invalid configuration
+			fmt.Sprintf("=tc=%s", pv.String()): map[string]interface{}{
+				"source": pv.Source(),
+			},
+		},
+	}
+	pvcfg := map[string]interface{}{
+		pv.String(): make(map[string]interface{}),
+	}
+	var cat string
 	if opts.HasModule() {
-		cfg[ModuleCategoryKey] = map[string]interface{}{
+		cat = writer.ModuleCategoryKey
+		wr.Config[cat] = map[string]interface{}{
 			"module": map[string]interface{}{
 				opts.Module: map[string]interface{}{
 					"source": fmt.Sprintf("./module-%s", opts.Module),
 				},
 			},
 		}
+	} else {
+		cat = defaultCategory
+		wr.Config[cat] = make(map[string]interface{})
+		wr.Config[cat]["resource"] = make(map[string]map[string]interface{})
+		wr.categories = append(wr.categories, cat)
 	}
+	wr.Config[cat]["terraform"] = tfcfg
+	wr.Config[cat]["provider"] = pvcfg
 
-	return &Writer{
-		Config: cfg,
-		writer: w,
-		opts:   opts,
-	}
+	wr.setProviderConfig(cat)
+
+	return wr
 }
 
 // Write expects a key similar to "aws_instance.your_name"
@@ -94,7 +118,7 @@ func (w *Writer) Write(key string, value interface{}) error {
 	}
 
 	var category string
-	ic, ok := m[ResourceCategoryKey]
+	ic, ok := m[writer.ResourceCategoryKey]
 	if !ok {
 		category = defaultCategory
 	} else {
@@ -133,7 +157,7 @@ func (w *Writer) Has(key string) (bool, error) {
 	name := strings.Join(keys[1:], "")
 
 	for k, v := range w.Config {
-		if k == ModuleCategoryKey || k == variablesCategoryKey {
+		if k == writer.ModuleCategoryKey || k == variablesCategoryKey {
 			continue
 		}
 		if _, ok := v["resource"].(map[string]map[string]interface{})[keys[0]][name]; ok {
@@ -152,7 +176,7 @@ func (w *Writer) Sync() error {
 
 	categories := w.categories
 	if w.opts.HasModule() {
-		categories = append(categories, []string{ModuleCategoryKey, variablesCategoryKey}...)
+		categories = append(categories, []string{writer.ModuleCategoryKey, variablesCategoryKey}...)
 		w.setVariables()
 	}
 
@@ -179,21 +203,55 @@ func (w *Writer) Sync() error {
 		}
 
 		blockKeys := getValueKeys(v)
+		if len(blockKeys) == 0 {
+			continue
+		}
 		blockMap := v.AsValueMap()
-		// blockType can be "resource", "variable" or "output"
+		// blockType can be "resource", "variable", "output", "provider" etc
 		for _, blockType := range blockKeys {
 			blockValue := blockMap[blockType]
+			if blockType == "terraform" {
+				block := hclwrite.NewBlock(blockType, nil)
+				bbody := block.Body()
+
+				attrKeys := getValueKeys(blockValue)
+				if len(attrKeys) == 0 {
+					// This will allow to declare empty blocks like
+					// empty variable definitions
+					body.AppendBlock(block)
+					body.AppendNewline()
+					continue
+				}
+				attrMap := blockValue.AsValueMap()
+				for _, attr := range attrKeys {
+					bbody.SetAttributeValue(attr, attrMap[attr])
+				}
+
+				body.AppendBlock(block)
+				body.AppendNewline()
+				continue
+			}
 
 			resourceKeys := getValueKeys(blockValue)
+			if len(resourceKeys) == 0 {
+				continue
+			}
 			resourceMap := blockValue.AsValueMap()
 			// resourceType is the type of the resource (e.g: `aws_security_groups`)
 			for _, resourceType := range resourceKeys {
 				resources := resourceMap[resourceType]
-				if blockType == "variable" || blockType == "module" {
+				if blockType == "variable" || blockType == "module" || blockType == "provider" {
 					block := hclwrite.NewBlock(blockType, []string{resourceType})
 					bbody := block.Body()
 
 					attrKeys := getValueKeys(resources)
+					if len(attrKeys) == 0 {
+						// This will allow to declare empty blocks like
+						// empty variable definitions
+						body.AppendBlock(block)
+						body.AppendNewline()
+						continue
+					}
 					attrMap := resources.AsValueMap()
 					for _, attr := range attrKeys {
 						bbody.SetAttributeValue(attr, attrMap[attr])
@@ -201,37 +259,43 @@ func (w *Writer) Sync() error {
 
 					body.AppendBlock(block)
 					body.AppendNewline()
-				} else {
-					resourceKeys := getValueKeys(resources)
-					resourceMap := resources.AsValueMap()
-					for _, name := range resourceKeys {
-						resource := resourceMap[name]
-						block := hclwrite.NewBlock(blockType, []string{resourceType, name})
-						bbody := block.Body()
+					continue
+				}
+				resourceKeys := getValueKeys(resources)
+				if len(resourceKeys) == 0 {
+					continue
+				}
+				resourceMap := resources.AsValueMap()
+				for _, name := range resourceKeys {
+					resource := resourceMap[name]
+					block := hclwrite.NewBlock(blockType, []string{resourceType, name})
+					bbody := block.Body()
 
-						attrKeys := getValueKeys(resource)
-						attrMap := resource.AsValueMap()
-						for _, attr := range attrKeys {
-							// We do not want to print on the HCL the
-							// resource category as it's just for
-							// internal usage
-							if attr == ResourceCategoryKey {
-								continue
-							}
-							value := attrMap[attr]
-							// in JSON representation, we can have a list of object
-							// e.g with ingress:[{ingress1}, {ingress2}, ... {ingressN}]
-							// we need to add a dedicated block for each object instead of having
-							// one block for the whole list
-							if value.Type().IsTupleType() {
-								writeTuple(body, bbody, attr, value)
-							} else {
-								bbody.SetAttributeValue(attr, value)
-							}
-						}
-						body.AppendBlock(block)
-						body.AppendNewline()
+					attrKeys := getValueKeys(resource)
+					if len(attrKeys) == 0 {
+						continue
 					}
+					attrMap := resource.AsValueMap()
+					for _, attr := range attrKeys {
+						// We do not want to print on the HCL the
+						// resource category as it's just for
+						// internal usage
+						if attr == writer.ResourceCategoryKey {
+							continue
+						}
+						value := attrMap[attr]
+						// in JSON representation, we can have a list of object
+						// e.g with ingress:[{ingress1}, {ingress2}, ... {ingressN}]
+						// we need to add a dedicated block for each object instead of having
+						// one block for the whole list
+						if value.Type().IsTupleType() {
+							writeTuple(body, bbody, attr, value)
+						} else {
+							bbody.SetAttributeValue(attr, value)
+						}
+					}
+					body.AppendBlock(block)
+					body.AppendNewline()
 				}
 			}
 		}
@@ -251,6 +315,9 @@ func (w *Writer) Sync() error {
 // with random order which messes the output and would generate
 // diffs between generations that are not true
 func getValueKeys(val cty.Value) []string {
+	if !val.CanIterateElements() {
+		return nil
+	}
 	keys := make([]string, 0, val.LengthInt())
 	for it := val.ElementIterator(); it.Next(); {
 		k, _ := it.Element()
@@ -267,7 +334,7 @@ func getValueKeys(val cty.Value) []string {
 func (w *Writer) setVariables() {
 	variables := make(map[string]interface{})
 	for c, cfg := range w.Config {
-		if c == ModuleCategoryKey || c == variablesCategoryKey {
+		if c == writer.ModuleCategoryKey || c == variablesCategoryKey {
 			continue
 		}
 		for k, v := range cfg["resource"].(map[string]map[string]interface{}) {
@@ -279,9 +346,8 @@ func (w *Writer) setVariables() {
 	}
 
 	for k, v := range variables {
-		w.Config[ModuleCategoryKey]["module"].(map[string]interface{})[w.opts.Module].(map[string]interface{})[fmt.Sprintf("# %s", k)] = v.(map[string]interface{})["default"]
+		w.Config[writer.ModuleCategoryKey]["module"].(map[string]interface{})[w.opts.Module].(map[string]interface{})[fmt.Sprintf("# %s", k)] = v.(map[string]interface{})["default"]
 	}
-	// TODO: Also add those to the Module
 }
 
 // walkVariables will walk the cfg until it reached the last elements, the k is the current key (as it's recursive can be aws_lb.ingress.from_port)
@@ -405,7 +471,7 @@ func (w *Writer) Interpolate(i map[string]string) {
 		return
 	}
 	for k, v := range w.Config {
-		if k == ModuleCategoryKey || k == variablesCategoryKey {
+		if k == writer.ModuleCategoryKey || k == variablesCategoryKey {
 			continue
 		}
 		resources := v["resource"]
@@ -513,4 +579,23 @@ func extractResourceTypeAndName(value string) (string, string) {
 	match := res.FindStringSubmatch(value)
 	return match[1], match[2]
 
+}
+
+// setProviderConfig will set the required fields to the provider configuration
+// under the given category
+func (w *Writer) setProviderConfig(cat string) {
+	pcfg := w.provider.Configuration()
+	for k, v := range w.provider.TFProvider().Schema {
+		if v.Required {
+			if _, ok := w.Config[cat]["variable"]; !ok {
+				w.Config[cat]["variable"] = make(map[string]interface{})
+			}
+			varVal := map[string]interface{}{}
+			if v, ok := pcfg[k]; ok {
+				varVal["default"] = v
+			}
+			w.Config[cat]["variable"].(map[string]interface{})[k] = varVal
+			w.Config[cat]["provider"].(map[string]interface{})[w.provider.String()].(map[string]interface{})[k] = fmt.Sprintf("${var.%s}", k)
+		}
+	}
 }
