@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Added
+
+- `provider` and `terraform` blocks to the HCL generation
+  ([Issue #136](https://github.com/cycloidio/terracognita/issues/136))
+
 ### Changed
 
 - Update aws resources regarding missing pagination and filter
