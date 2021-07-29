@@ -42,4 +42,14 @@ type Provider interface {
 	// TagKey returns the different name used to identify
 	// tags on the cloud provider
 	TagKey() string
+
+	// Source is the source of the Provider used
+	// to declare on the HCL
+	Source() string
+
+	// Configuration returns the Provider configuraiton
+	// that may be interpolated with HCL when declaring
+	// the provider. The keys have to be the Provider
+	// attributes as defined on the TF Schema
+	Configuration() map[string]interface{}
 }
