@@ -179,33 +179,7 @@ The local version can be used the same way as docker. You simply need to be buil
 
 ### To test
 
-To speed up the testing, you can write a small `provider.tf`file within the same folder you imported your resources & tfstate:
-
-```bash
-terraform {
-  backend "local" {
-    path = "./$TFSTATE_PATH"
-  }
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-    }
-  }
-  required_version = ">= 0.13"
-}
-
-provider "aws" {
- access_key = "${var.access_key}"
- secret_key = "${var.secret_key}"
- region     = "${var.region}"
-}
-
-variable "access_key" {}
-variable "secret_key" {}
-variable "region" {}
-```
-
-Then run the terraform init & plan commands:
+On the same folder you imported you can run the terraform init & plan commands:
 
 ```bash
 terraform init
