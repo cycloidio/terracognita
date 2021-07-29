@@ -2,6 +2,17 @@ package writer
 
 //go:generate mockgen -destination=../mock/writer.go -mock_names=Writer=Writer -package mock github.com/cycloidio/terracognita/writer Writer
 
+const (
+	// ResourceCategoryKey is an internal key used to specify the category of
+	// a resource when writing, it'll be used to select in which file
+	// will be written
+	ResourceCategoryKey = "tc_category"
+
+	// ModuleCategoryKey is the category used to identify
+	// the Module
+	ModuleCategoryKey = "tc_module"
+)
+
 // Writer it's an interface used to abstract the logic
 // of writing results to a Key Value without having to
 // deal with types or internal structures
