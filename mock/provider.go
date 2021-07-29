@@ -37,6 +37,20 @@ func (m *Provider) EXPECT() *ProviderMockRecorder {
 	return m.recorder
 }
 
+// Configuration mocks base method
+func (m *Provider) Configuration() map[string]interface{} {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Configuration")
+	ret0, _ := ret[0].(map[string]interface{})
+	return ret0
+}
+
+// Configuration indicates an expected call of Configuration
+func (mr *ProviderMockRecorder) Configuration() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Configuration", reflect.TypeOf((*Provider)(nil).Configuration))
+}
+
 // HasResourceType mocks base method
 func (m *Provider) HasResourceType(arg0 string) bool {
 	m.ctrl.T.Helper()
@@ -92,6 +106,20 @@ func (m *Provider) Resources(arg0 context.Context, arg1 string, arg2 *filter.Fil
 func (mr *ProviderMockRecorder) Resources(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Resources", reflect.TypeOf((*Provider)(nil).Resources), arg0, arg1, arg2)
+}
+
+// Source mocks base method
+func (m *Provider) Source() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Source")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// Source indicates an expected call of Source
+func (mr *ProviderMockRecorder) Source() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Source", reflect.TypeOf((*Provider)(nil).Source))
 }
 
 // String mocks base method
