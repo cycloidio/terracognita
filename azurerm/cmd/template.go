@@ -2,6 +2,7 @@ package main
 
 import (
 	"io"
+	"strings"
 	"text/template"
 
 	"github.com/gertd/go-pluralize"
@@ -26,7 +27,7 @@ const (
 
 	// functionTmpl it's the implementation of a reader function
 	functionTmpl = `
-	// List{{ .PluralName }} returns a list of {{ .PluralName }} within a subscription {{ if .Location }}and a location {{ end }}{{ if .ResourceGroup }}and a resource group {{ end }}
+	// {{ .FunctionName }} returns a list of {{ .PluralName }} within a subscription {{ if .Location }}and a location {{ end }}{{ if .ResourceGroup }}and a resource group {{ end }}
 	func (ar *AzureReader) {{ .FunctionName }}(ctx context.Context{{ range .ExtraArgs }},{{ .Name }} {{ .Type }} {{ end }}) ([]{{ .API }}.{{ .ResourceName }}, error) {
 		client := {{ .API }}.New{{ .PluralName }}Client(ar.config.SubscriptionID)
 		client.Authorizer = ar.authorizer
@@ -35,7 +36,10 @@ const (
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list {{ .API }}.{{ .ResourceName }} from Azure APIs")
 		}
+		{{ if .ReturnsList }}
+			return *output.Value, nil
 
+		{{else}}
 		resources := make([]{{ .API }}.{{ .ResourceName }}, 0)
 		for output.NotDone() {
 			{{ if .ReturnsIterator }}
@@ -51,6 +55,7 @@ const (
 			}
 		}
 		return resources, nil
+		{{end}}
 	}
 	`
 )
@@ -98,6 +103,9 @@ type AzureAPI struct {
 	// functionality
 	// https://docs.microsoft.com/en-us/azure/search/search-api-preview
 	IsPreview bool
+
+	//if api is a database type then FunctionName = "List" + API + PluralName (to avoid equal names of functions in database apis. e.g: sql, )
+	IsDatabase bool
 }
 
 // Function is the definition of one of the functions
@@ -134,6 +142,9 @@ type Function struct {
 	// ReturnsIterator should be true is the ListFunction returns an Iterator and not a Page
 	ReturnsIterator bool
 
+	// ReturnsList should be true if the ListFunction returns a List and not an Iterator or Page
+	ReturnsList bool
+
 	// ExtraArgs should be specified if extra arguments are required for the list function
 	ExtraArgs []Arg
 }
@@ -151,8 +162,14 @@ func (f Function) Execute(w io.Writer) error {
 	}
 	// Determine the FunctionName to give in the template, if not set
 	// By default -> FunctionName = List + PluralName
+	// if api iIsDatabase = true -> FunctionName = List + API + PluralName(to avoid equal names of functions for database resources apis)
 	if len(f.FunctionName) == 0 {
 		f.FunctionName = "List" + f.PluralName
+		for _, api := range azureAPIs {
+			if api.API == f.API && api.IsDatabase {
+				f.FunctionName = "List" + strings.Title(f.API) + f.PluralName
+			}
+		}
 	}
 
 	if err := fnTmpl.Execute(w, f); err != nil {

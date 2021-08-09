@@ -16,6 +16,11 @@ var azureAPIs = []AzureAPI{
 	{API: "desktopvirtualization", APIVersion: "2019-12-10", IsPreview: true},
 	{API: "logic", APIVersion: "2019-05-01"},
 	{API: "containerregistry", APIVersion: "2019-05-01"},
+	{API: "storage", APIVersion: "2021-02-01", IsDatabase: true},
+	{API: "mariadb", APIVersion: "2020-01-01", IsDatabase: true},
+	{API: "mysql", APIVersion: "2020-01-01", IsDatabase: true},
+	{API: "postgresql", APIVersion: "2020-01-01", IsDatabase: true},
+	{API: "sql", APIVersion: "2014-04-01", IsDatabase: true},
 }
 
 var functions = []Function{
@@ -138,6 +143,171 @@ var functions = []Function{
 			Type: "string",
 		},
 	}},
+	//Storage Resources
+	{ResourceName: "Account", API: "storage", ResourceGroup: false},
+	{ResourceName: "ListContainerItem", PluralName: "BlobContainers", API: "storage", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "accountName",
+			Type: "string",
+		},
+		{
+			Name: "maxpagesize",
+			Type: "string",
+		},
+		{
+			Name: "filter",
+			Type: "string",
+		},
+		{
+			Name: "include",
+			Type: "storage.ListContainersInclude",
+		},
+	}},
+	{ResourceName: "ListQueue", API: "storage", PluralName: "Queue", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "accountName",
+			Type: "string",
+		},
+		{
+			Name: "maxpagesize",
+			Type: "string",
+		},
+		{
+			Name: "filter",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "FileShareItem", PluralName: "FileShares", API: "storage", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "accountName",
+			Type: "string",
+		},
+		{
+			Name: "maxpagesize",
+			Type: "string",
+		},
+		{
+			Name: "filter",
+			Type: "string",
+		},
+		{
+			Name: "expand",
+			Type: "storage.ListSharesExpand",
+		},
+	}},
+	{ResourceName: "Table", API: "storage", PluralName: "Table", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "accountName",
+			Type: "string",
+		},
+	}},
+	//Database Resources
+	//mariadb
+	{ResourceName: "Configuration", API: "mariadb", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ReturnsList: true, ExtraArgs: []Arg{
+		{
+			Name: "serverName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "Database", API: "mariadb", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ReturnsList: true, ExtraArgs: []Arg{
+		{
+			Name: "serverName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "FirewallRule", API: "mariadb", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ReturnsList: true, ExtraArgs: []Arg{
+		{
+			Name: "serverName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "Server", API: "mariadb", ReturnsList: true, ResourceGroup: false},
+	{ResourceName: "VirtualNetworkRule", API: "mariadb", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ExtraArgs: []Arg{
+		{
+			Name: "serverName",
+			Type: "string",
+		},
+	}},
+	//mysql
+	{ResourceName: "Configuration", API: "mysql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ReturnsList: true, ExtraArgs: []Arg{
+		{
+			Name: "serverName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "Database", API: "mysql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ReturnsList: true, ExtraArgs: []Arg{
+		{
+			Name: "serverName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "FirewallRule", API: "mysql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ReturnsList: true, ExtraArgs: []Arg{
+		{
+			Name: "serverName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "Server", API: "mysql", ReturnsList: true, ResourceGroup: false},
+	{ResourceName: "VirtualNetworkRule", API: "mysql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ExtraArgs: []Arg{
+		{
+			Name: "serverName",
+			Type: "string",
+		},
+	}},
+	//postgresql
+	{ResourceName: "Configuration", API: "postgresql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ReturnsList: true, ExtraArgs: []Arg{
+		{
+			Name: "serverName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "Database", API: "postgresql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ReturnsList: true, ExtraArgs: []Arg{
+		{
+			Name: "serverName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "FirewallRule", API: "postgresql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ReturnsList: true, ExtraArgs: []Arg{
+		{
+			Name: "serverName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "Server", API: "postgresql", ReturnsList: true, ResourceGroup: false},
+	{ResourceName: "VirtualNetworkRule", API: "postgresql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ExtraArgs: []Arg{
+		{
+			Name: "serverName",
+			Type: "string",
+		},
+	}},
+	//sql
+	{ResourceName: "Database", API: "sql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ReturnsList: true, ExtraArgs: []Arg{
+		{
+			Name: "serverName",
+			Type: "string",
+		},
+		{
+			Name: "expand",
+			Type: "string",
+		},
+		{
+			Name: "filter",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "ElasticPool", API: "sql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ReturnsList: true, ExtraArgs: []Arg{
+		{
+			Name: "serverName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "FirewallRule", API: "sql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ReturnsList: true, ExtraArgs: []Arg{
+		{
+			Name: "serverName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "Server", API: "sql", ReturnsList: true, ResourceGroup: false},
 }
 
 func main() {
