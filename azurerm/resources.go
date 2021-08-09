@@ -16,37 +16,91 @@ type ResourceType int
 //go:generate enumer -type ResourceType -addprefix azurerm_ -transform snake -linecomment
 const (
 	ResourceGroup ResourceType = iota
-	Subnet
-	VirtualDesktopHostPool
-	VirtualDesktopApplicationGroup
-	LogicAppTriggerCustom
-	LogicAppActionCustom
-	LogicAppWorkflow
-	NetworkInterface
-	NetworkSecurityGroup
+	//Compute Resources
 	VirtualMachine
 	VirtualMachineExtension
 	VirtualMachineScaleSet
 	VirtualNetwork
+	AvailabilitySet
+	Image
+	//Network Resources
+	Subnet
+	NetworkInterface
+	NetworkSecurityGroup
+	ApplicationGateway
+	ApplicationSecurityGroup
+	DdosProtectionPlan
+	AzureFirewall
+	LocalNetworkGateway
+	NatGateway
+	Profile
+	SecurityRule
+	PublicIPAddress
+	PublicIPPrefix
+	Route
+	RouteTable
+	VirtualNetworkGateway
+	VirtualNetworkGatewayConnection
+	VirtualNetworkPeering
+	WebApplicationFirewallPolicy
+	//Desktop Resources
+	VirtualDesktopHostPool
+	VirtualDesktopApplicationGroup
+	//Logic Resources
+	LogicAppWorkflow
+	LogicAppTriggerCustom
+	LogicAppActionCustom
+	//Container Registry Resources
+	ContainerRegistry
+	ContainerRegistryWebhook
+	//Storage Resources
+	StorageAccount
+	StorageQueue
+	StorageFileShare
+	StorageTable
 )
 
 type rtFn func(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error)
 
 var (
 	resources = map[ResourceType]rtFn{
-		ResourceGroup:                  resourceGroup,
-		VirtualMachine:                 virtualMachines,
-		VirtualMachineExtension:        virtualMachineExtensions,
-		VirtualNetwork:                 cacheVirtualNetworks,
-		Subnet:                         subnets,
-		LogicAppTriggerCustom:          logicAppTriggerCustoms,
-		LogicAppActionCustom:           logicAppActionCustoms,
-		LogicAppWorkflow:               logicAppWorkflows,
-		NetworkInterface:               networkInterfaces,
-		NetworkSecurityGroup:           networkSecurityGroups,
-		VirtualMachineScaleSet:         virtualMachineScaleSets,
+		//Compute Resources
+		VirtualMachine:          virtualMachines,
+		VirtualMachineExtension: virtualMachineExtensions,
+		VirtualNetwork:          cacheVirtualNetworks,
+		VirtualMachineScaleSet:  virtualMachineScaleSets,
+		AvailabilitySet:         availabilitySets,
+		Image:                   images,
+		//Network Resources
+		Subnet:                          subnets,
+		NetworkInterface:                networkInterfaces,
+		NetworkSecurityGroup:            networkSecurityGroups,
+		ApplicationGateway:              applicationGateways,
+		ApplicationSecurityGroup:        applicationSecurityGroups,
+		DdosProtectionPlan:              ddosProtectionPlans,
+		AzureFirewall:                   azureFirewalls,
+		LocalNetworkGateway:             localNetworkGateways,
+		NatGateway:                      natGateways,
+		Profile:                         profiles,
+		SecurityRule:                    securityRules,
+		PublicIPAddress:                 publicIPAddresses,
+		PublicIPPrefix:                  publicIPPrefixes,
+		Route:                           routes,
+		RouteTable:                      routeTables,
+		VirtualNetworkGateway:           virtualNetworkGateways,
+		VirtualNetworkGatewayConnection: virtualNetworkGatewayConnections,
+		VirtualNetworkPeering:           virtualNetworkPeerings,
+		WebApplicationFirewallPolicy:    webApplicationFirewallPolicies,
+		//Desktop Resources
 		VirtualDesktopApplicationGroup: virtualApplicationGroups,
 		VirtualDesktopHostPool:         virtualDesktopHostPools,
+		//Logic Resources
+		LogicAppActionCustom:  logicAppActionCustoms,
+		LogicAppWorkflow:      logicAppWorkflows,
+		LogicAppTriggerCustom: logicAppTriggerCustoms,
+		//Container Registry Resources
+		ContainerRegistry:        containerRegistries,
+		ContainerRegistryWebhook: containerRegistryWebhooks,
 	}
 )
 
@@ -57,6 +111,7 @@ func resourceGroup(ctx context.Context, a *azurerm, resourceType string, filters
 	return resources, nil
 }
 
+//Compute Resources
 func virtualMachines(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	virtualMachines, err := a.azurer.ListVirtualMachines(ctx)
 	if err != nil {
@@ -65,6 +120,8 @@ func virtualMachines(ctx context.Context, a *azurerm, resourceType string, filte
 	resources := make([]provider.Resource, 0, len(virtualMachines))
 	for _, virtualMachine := range virtualMachines {
 		r := provider.NewResource(*virtualMachine.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
 		if err := r.Data().Set("name", *virtualMachine.Name); err != nil {
 			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the virtual machine '%s'", *virtualMachine.Name)
 		}
@@ -73,6 +130,71 @@ func virtualMachines(ctx context.Context, a *azurerm, resourceType string, filte
 	return resources, nil
 }
 
+func virtualMachineScaleSets(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	virtualMachineScaleSets, err := a.azurer.ListVirtualMachineScaleSets(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list virtual machines scale sets from reader")
+	}
+	resources := make([]provider.Resource, 0, len(virtualMachineScaleSets))
+	for _, virtualMachineScaleSet := range virtualMachineScaleSets {
+		r := provider.NewResource(*virtualMachineScaleSet.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func virtualMachineExtensions(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	virtualMachineNames, err := getVirtualMachineNames(ctx, a, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list virtual machines from reader")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, virtualMachineName := range virtualMachineNames {
+		extensions, err := a.azurer.ListVirtualMachineExtensions(ctx, virtualMachineName, "")
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list virtual machine extensions from reader")
+		}
+		for _, extension := range extensions {
+			r := provider.NewResource(*extension.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func availabilitySets(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	availabilitySets, err := a.azurer.ListAvailabilitySets(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list availability sets from reader")
+	}
+	resources := make([]provider.Resource, 0, len(availabilitySets))
+	for _, availabilitySet := range availabilitySets {
+		r := provider.NewResource(*availabilitySet.ID, resourceType, a)
+		if err := r.Data().Set("name", *availabilitySet.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the availability set '%s'", *availabilitySet.Name)
+		}
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func images(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	images, err := a.azurer.ListImages(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list availability sets from reader")
+	}
+	resources := make([]provider.Resource, 0, len(images))
+	for _, image := range images {
+		r := provider.NewResource(*image.ID, resourceType, a)
+		if err := r.Data().Set("name", *image.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the IMAGE '%s'", *image.Name)
+		}
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+//Network Resources
 func virtualNetworks(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	virtualNetworks, err := a.azurer.ListVirtualNetworks(ctx)
 	if err != nil {
@@ -136,19 +258,251 @@ func networkSecurityGroups(ctx context.Context, a *azurerm, resourceType string,
 	return resources, nil
 }
 
-func virtualMachineScaleSets(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	virtualMachineScaleSets, err := a.azurer.ListVirtualMachineScaleSets(ctx)
+func applicationGateways(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	applicationGateways, err := a.azurer.ListApplicationGateways(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to list virtual machines scale sets from reader")
+		return nil, errors.Wrap(err, "unable to list network application gateways from reader")
 	}
-	resources := make([]provider.Resource, 0, len(virtualMachineScaleSets))
-	for _, virtualMachineScaleSet := range virtualMachineScaleSets {
-		r := provider.NewResource(*virtualMachineScaleSet.ID, resourceType, a)
+	resources := make([]provider.Resource, 0, len(applicationGateways))
+	for _, applicationGateway := range applicationGateways {
+		r := provider.NewResource(*applicationGateway.ID, resourceType, a)
 		resources = append(resources, r)
 	}
 	return resources, nil
 }
 
+func applicationSecurityGroups(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	applicationSecurityGroups, err := a.azurer.ListApplicationSecurityGroups(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list network application security groups from reader")
+	}
+	resources := make([]provider.Resource, 0, len(applicationSecurityGroups))
+	for _, applicationSecurityGroup := range applicationSecurityGroups {
+		r := provider.NewResource(*applicationSecurityGroup.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func ddosProtectionPlans(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	ddosProtectionPlans, err := a.azurer.ListDdosProtectionPlans(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list network ddos protection plans from reader")
+	}
+	resources := make([]provider.Resource, 0, len(ddosProtectionPlans))
+	for _, ddosProtectionPlan := range ddosProtectionPlans {
+		r := provider.NewResource(*ddosProtectionPlan.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func azureFirewalls(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	azureFirewalls, err := a.azurer.ListAzureFirewalls(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list azure network firewall from reader")
+	}
+	resources := make([]provider.Resource, 0, len(azureFirewalls))
+	for _, azureFirewall := range azureFirewalls {
+		r := provider.NewResource(*azureFirewall.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func localNetworkGateways(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	localNetworkGateways, err := a.azurer.ListLocalNetworkGateways(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list local network gateways from reader")
+	}
+	resources := make([]provider.Resource, 0, len(localNetworkGateways))
+	for _, localNetworkGateway := range localNetworkGateways {
+		r := provider.NewResource(*localNetworkGateway.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func natGateways(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	natGateways, err := a.azurer.ListNatGateways(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list local network gateways from reader")
+	}
+	resources := make([]provider.Resource, 0, len(natGateways))
+	for _, natGateway := range natGateways {
+		r := provider.NewResource(*natGateway.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func profiles(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	profiles, err := a.azurer.ListProfiles(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list profiles from reader")
+	}
+	resources := make([]provider.Resource, 0, len(profiles))
+	for _, profile := range profiles {
+		r := provider.NewResource(*profile.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func securityRules(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	securityGroupNames, err := getSecurityGroups(ctx, a, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list security Groups from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, securityGroupName := range securityGroupNames {
+		securityRule, err := a.azurer.ListSecurityRules(ctx, securityGroupName)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list security rules from reader")
+		}
+		for _, securityRule := range securityRule {
+			r := provider.NewResource(*securityRule.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func publicIPAddresses(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	publicIpAddresses, err := a.azurer.ListPublicIPAddresses(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list public IP addresses from reader")
+	}
+	resources := make([]provider.Resource, 0, len(publicIpAddresses))
+	for _, publicIpAddress := range publicIpAddresses {
+		r := provider.NewResource(*publicIpAddress.ID, resourceType, a)
+		if err := r.Data().Set("name", *publicIpAddress.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the public Ip adress '%s'", *publicIpAddress.Name)
+		}
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func publicIPPrefixes(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	publicIpPrefixes, err := a.azurer.ListPublicIPPrefixes(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list public IP addresses from reader")
+	}
+	resources := make([]provider.Resource, 0, len(publicIpPrefixes))
+	for _, publicIpPrefix := range publicIpPrefixes {
+		r := provider.NewResource(*publicIpPrefix.ID, resourceType, a)
+		if err := r.Data().Set("name", *publicIpPrefix.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the public IP prefix '%s'", *publicIpPrefix.Name)
+		}
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func routeTables(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	routeTables, err := a.azurer.ListRouteTables(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list route tables from reader")
+	}
+	resources := make([]provider.Resource, 0, len(routeTables))
+	for _, routeTable := range routeTables {
+		r := provider.NewResource(*routeTable.ID, resourceType, a)
+		if err := r.Data().Set("name", *routeTable.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the routeTable '%s'", *routeTable.Name)
+		}
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func routes(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	routeTablesNames, err := getRouteTables(ctx, a, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list route Tables from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, routeTableName := range routeTablesNames {
+		routes, err := a.azurer.ListRoutes(ctx, routeTableName)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list routes from reader")
+		}
+		for _, route := range routes {
+			r := provider.NewResource(*route.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func virtualNetworkGateways(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	virtualNetworkGateways, err := a.azurer.ListVirtualNetworkGateways(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list Virtual Network Gateways from reader")
+	}
+	resources := make([]provider.Resource, 0, len(virtualNetworkGateways))
+	for _, virtualNetworkGateway := range virtualNetworkGateways {
+		r := provider.NewResource(*virtualNetworkGateway.ID, resourceType, a)
+		if err := r.Data().Set("name", *virtualNetworkGateway.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the virtual Network Gateway '%s'", *virtualNetworkGateway.Name)
+		}
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func virtualNetworkGatewayConnections(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	virtualNetworkGatewayConnections, err := a.azurer.ListVirtualNetworkGatewayConnections(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list virtual network gateway connections from reader")
+	}
+	resources := make([]provider.Resource, 0, len(virtualNetworkGatewayConnections))
+	for _, virtualNetworkGatewayConnection := range virtualNetworkGatewayConnections {
+		r := provider.NewResource(*virtualNetworkGatewayConnection.ID, resourceType, a)
+		if err := r.Data().Set("name", *virtualNetworkGatewayConnection.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the virtual Network Gateway connection '%s'", *virtualNetworkGatewayConnection.Name)
+		}
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func virtualNetworkPeerings(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	virtualNetworkNames, err := getVirtualNetworkNames(ctx, a, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list virtual network names from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, virtualNetworkName := range virtualNetworkNames {
+		virtualNetworkPeerings, err := a.azurer.ListVirtualNetworkPeerings(ctx, virtualNetworkName)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list virtual network peerings from reader")
+		}
+		for _, virtualNetworkPeering := range virtualNetworkPeerings {
+			r := provider.NewResource(*virtualNetworkPeering.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func webApplicationFirewallPolicies(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	webApplicationFirewallPolicies, err := a.azurer.ListWebApplicationFirewallPolicies(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list web application firewall policies from reader")
+	}
+	resources := make([]provider.Resource, 0, len(webApplicationFirewallPolicies))
+	for _, webApplicationFirewallPolicy := range webApplicationFirewallPolicies {
+		r := provider.NewResource(*webApplicationFirewallPolicy.ID, resourceType, a)
+		if err := r.Data().Set("name", *webApplicationFirewallPolicy.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the web application firewall policy '%s'", *webApplicationFirewallPolicy.Name)
+		}
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+//Desktop Resources
 func virtualDesktopHostPools(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	pools, err := a.azurer.ListHostPools(ctx)
 	if err != nil {
@@ -177,6 +531,7 @@ func virtualApplicationGroups(ctx context.Context, a *azurerm, resourceType stri
 	return resources, nil
 }
 
+//Logic Resources
 func logicAppWorkflows(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	appWorkflows, err := a.azurer.ListWorkflows(ctx, nil, "")
 	if err != nil {
@@ -242,21 +597,36 @@ func logicAppActionCustoms(ctx context.Context, a *azurerm, resourceType string,
 	return resources, nil
 }
 
-func virtualMachineExtensions(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	virtualMachineNames, err := getVirtualMachineNames(ctx, a, resourceType, filters)
+//Container Registry Resources
+func containerRegistries(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	containerRegistries, err := a.azurer.ListContainerRegistries(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to list virtual machines from reader")
+		return nil, errors.Wrap(err, "unable to list logic app workflows from reader")
 	}
-
-	resources := make([]provider.Resource, 0)
-	for _, virtualMachineName := range virtualMachineNames {
-		extensions, err := a.azurer.ListVirtualMachineExtensions(ctx, virtualMachineName, "")
-		if err != nil {
-			return nil, errors.Wrap(err, "unable to list virtual machine extensions from reader")
+	resources := make([]provider.Resource, 0, len(containerRegistries))
+	for _, containerRegistry := range containerRegistries {
+		r := provider.NewResource(*containerRegistry.ID, resourceType, a)
+		if err := r.Data().Set("name", *containerRegistry.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the container Registry'%s'", *containerRegistry.Name)
 		}
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
 
-		for _, extension := range extensions {
-			r := provider.NewResource(*extension.ID, resourceType, a)
+func containerRegistryWebhooks(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	containerRegistriesNames, err := getContainerRegistries(ctx, a, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list container Registries from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, containerRegistryName := range containerRegistriesNames {
+		containerRegistryWebhooks, err := a.azurer.ListContainerRegistryWebhooks(ctx, containerRegistryName)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list container registry webhooks from reader")
+		}
+		for _, containerRegistryWebhook := range containerRegistryWebhooks {
+			r := provider.NewResource(*containerRegistryWebhook.ID, resourceType, a)
 			resources = append(resources, r)
 		}
 	}

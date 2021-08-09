@@ -4,6 +4,7 @@ import (
 	"io"
 	"text/template"
 
+	"github.com/gertd/go-pluralize"
 	"github.com/pkg/errors"
 )
 
@@ -25,18 +26,19 @@ const (
 
 	// functionTmpl it's the implementation of a reader function
 	functionTmpl = `
-	// List{{ .Name }} returns a list of {{ .Name }} within a subscription {{ if .Location }}and a location {{ end }}{{ if .ResourceGroup }}and a resource group {{ end }}
-	func (ar *AzureReader) List{{ .Name }}(ctx context.Context{{ range .ExtraArgs }},{{ .Name }} {{ .Type }} {{ end }}) ([]{{ .API }}.{{ .Resource }}, error) {
-		client := {{ .API }}.New{{ .Resource }}sClient(ar.config.SubscriptionID)
+	// List{{ .PluralName }} returns a list of {{ .PluralName }} within a subscription {{ if .Location }}and a location {{ end }}{{ if .ResourceGroup }}and a resource group {{ end }}
+	func (ar *AzureReader) {{ .FunctionName }}(ctx context.Context{{ range .ExtraArgs }},{{ .Name }} {{ .Type }} {{ end }}) ([]{{ .API }}.{{ .ResourceName }}, error) {
+		client := {{ .API }}.New{{ .PluralName }}Client(ar.config.SubscriptionID)
 		client.Authorizer = ar.authorizer
 
-		output, err := client.{{ .ListFunction }}(ctx{{ if .Location }}, ar.GetLocation(){{ end }}{{ if .ResourceGroup }}, ar.GetResourceGroupName(){{ end }}{{ range .ExtraArgs }},{{ .Name }}{{ end }})
+		output, err := client.{{ .AzureSDKListFunction }}(ctx{{ if .Location }}, ar.GetLocation(){{ end }}{{ if .ResourceGroup }}, ar.GetResourceGroupName(){{ end }}{{ range .ExtraArgs }},{{ .Name }}{{ end }})
 		if err != nil {
-			return nil, errors.Wrap(err, "unable to list {{ .API }}.{{ .Resource }} from Azure APIs")
+			return nil, errors.Wrap(err, "unable to list {{ .API }}.{{ .ResourceName }} from Azure APIs")
 		}
-		resources := make([]{{ .API }}.{{ .Resource }}, 0)
+
+		resources := make([]{{ .API }}.{{ .ResourceName }}, 0)
 		for output.NotDone() {
-			{{ if .Iterator }}
+			{{ if .ReturnsIterator }}
 			res = output.Value()
 			resources = append(resources, res)
 			{{ else }}
@@ -102,13 +104,18 @@ type AzureAPI struct {
 type Function struct {
 	// Resource is the Azure name of the entity, like
 	// VirtualMachine, VirtualNetwork, etc.
-	Resource string
+	ResourceName string
 
-	// Name is the function name to be generated
+	// To specify special cases for the function names
 	// it can be useful if you `Resource` is `SslCertificate`, which is not `go`
 	// compliant, `Name` will be `SSLCertificate`, your Function name will be
 	// `ListSSLCertificates`
-	Name string
+	FunctionName string
+
+	// PluralName corresponds to the plural of the resource to identify the irregular plural cases or non-existant plural
+	// e.g.: ends in s or x change plural to es instead of s
+	// Most cases determined automatically, no need to specify
+	PluralName string
 
 	// API is used to determine the
 	// Azure API to use
@@ -121,11 +128,11 @@ type Function struct {
 	// ResourceGroup is used to determine whether the resource should be filtered by Azure Resource Group or not
 	ResourceGroup bool
 
-	// ListFunction is the Azure SKP list function to use
-	ListFunction string
+	// AzureSDKListFunction is the Azure SKP list function to use
+	AzureSDKListFunction string
 
-	// Iterator should be true is the ListFunction returns an Iterator and not a Page
-	Iterator bool
+	// ReturnsIterator should be true is the ListFunction returns an Iterator and not a Page
+	ReturnsIterator bool
 
 	// ExtraArgs should be specified if extra arguments are required for the list function
 	ExtraArgs []Arg
@@ -134,12 +141,20 @@ type Function struct {
 // Execute uses the fnTmpl to interpolate f
 // and write the result to w
 func (f Function) Execute(w io.Writer) error {
-	if len(f.Name) == 0 {
-		f.Name = f.Resource + "s"
+	// If Plural not set determine automatically
+	if len(f.PluralName) == 0 {
+		f.PluralName = pluralize.NewClient().Plural(f.ResourceName)
 	}
-	if len(f.ListFunction) == 0 {
-		f.ListFunction = "List"
+	//If no list name defined takes list by default
+	if len(f.AzureSDKListFunction) == 0 {
+		f.AzureSDKListFunction = "List"
 	}
+	// Determine the FunctionName to give in the template, if not set
+	// By default -> FunctionName = List + PluralName
+	if len(f.FunctionName) == 0 {
+		f.FunctionName = "List" + f.PluralName
+	}
+
 	if err := fnTmpl.Execute(w, f); err != nil {
 		return errors.Wrapf(err, "failed to Execute with Function %+v", f)
 	}

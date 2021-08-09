@@ -1,6 +1,23 @@
 ## [Unreleased]
 
+### Added
+
+- azure resources (compute): `azurerm_availability_set`,`azurerm_image`, 
+- azure resources (container): `azurerm_container_registry`, `azurerm_container_registry_webhook`
+- azure resources (network): `azurerm_application_gateway`,	`azurerm_application_security_group`, `azurerm_network_ddos_protection_plan`,
+`azurerm_firewall`, `azurerm_local_network_gateway` , `azurerm_nat_gateway`,  `azurerm_network_profile`, ` azurerm_network_security_rule`, `azurerm_public_ip`,  ` azurerm_public_ip_prefix`, `azurerm_route`, `azurerm_route_table`, `azurerm_virtual_network_gateway`, `azurerm_virtual_network_gateway_connection`, `azurerm_virtual_network_peering`, `azurerm_web_application_firewall_policy`
+- azure resources (storage): `azurerm_storage_account`, `azurerm_storage_blob`, `azurerm_storage_management_policy`, `azurerm_storage_queue`, `azurerm_storage_share`, `azurerm_storage_table`
+- azure resources (database): `azurerm_mariadb_configuration`, `azurerm_mariadb_database`, `azurerm_mariadb_firewall_rule`, `azurerm_mariadb_server`, `azurerm_mariadb_virtual_network_rule`,  `azurerm_mysql_configuration`, `azurerm_mysql_database`, `azurerm_mysql_firewall_rule`, `azurerm_mysql_server`, `azurerm_mysql_virtual_network_rule`, `azurerm_postgresql_configuration`, `azurerm_postgresql_database`, `azurerm_postgresql_firewall_rule`, `azurerm_postgresql_server`, `azurerm_postgresql_virtual_network_rule`, `azurerm_sql_database`, `azurerm_sql_elasticpool`, `azurerm_sql_firewall_rule`,`azurerm_sql_server`, 
+
 ### Changed
+
+- Added more modularity in the templating of azure resources, allowing to cover more use cases by the templating of Azure resources.  
+- Changed some variables names in the template Functions for Azure to make code more easily interpreted: Resource -> ResourceName , Name -> FunctioName or AzureSDKListFunction or PluralName, Iterator -> ReturnsIterator
+- Added new supported case of when the AzureSDKListFunction returns items list instead of page or iterator (previously suported cases), using the variable ReturnsList in Function struct
+- Added automatically plural calculation, to cover cases where plural not the typical -s, using the variable PluralName in Function struct. The variable also can be specified in cases where there's no object plural
+- Deleted file list_virtual_machine_extensions.go, expection not required anymore since case now covered by new modular templating
+- Added variable IsDatabase in AzureAPI to allow to change FunctionName of database resources, e.g sql or postgresql, from ListFunction+PluralName to List+API+PluralName
+
 
 - Update aws resources regarding missing pagination and filter
   ([PR #202](https://github.com/cycloidio/terracognita/pull/202))

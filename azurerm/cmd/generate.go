@@ -1,5 +1,6 @@
 package main
 
+//This file generates list methods for the defined resources in azurerm/reader_generated.go file using the templates defined in template.go
 import (
 	"bytes"
 	"io"
@@ -10,84 +11,130 @@ import (
 )
 
 var azureAPIs = []AzureAPI{
-	AzureAPI{API: "compute", APIVersion: "2019-07-01"},
-	AzureAPI{API: "network", APIVersion: "2019-06-01"},
-	AzureAPI{API: "desktopvirtualization", APIVersion: "2019-12-10", IsPreview: true},
-	AzureAPI{API: "logic", APIVersion: "2019-05-01"},
+	{API: "compute", APIVersion: "2019-07-01"},
+	{API: "network", APIVersion: "2019-06-01"},
+	{API: "desktopvirtualization", APIVersion: "2019-12-10", IsPreview: true},
+	{API: "logic", APIVersion: "2019-05-01"},
+	{API: "containerregistry", APIVersion: "2019-05-01"},
 }
 
 var functions = []Function{
-	Function{Resource: "VirtualMachine", API: "compute", ResourceGroup: true},
-	Function{Resource: "VirtualNetwork", API: "network", ResourceGroup: true},
-	Function{Resource: "Subnet", API: "network", ResourceGroup: true, ExtraArgs: []Arg{
-		Arg{
+	//Compute API Resources
+	{ResourceName: "VirtualMachine", API: "compute", ResourceGroup: true},
+	{ResourceName: "VirtualMachineScaleSet", API: "compute", ResourceGroup: true},
+	{ResourceName: "AvailabilitySet", API: "compute", ResourceGroup: true},
+	{ResourceName: "Image", API: "compute", ResourceGroup: false},
+	//Network API Resources
+	{ResourceName: "VirtualNetwork", API: "network", ResourceGroup: true},
+	{ResourceName: "Subnet", API: "network", ResourceGroup: true, ExtraArgs: []Arg{
+		{
 			Name: "virtualNetworkName",
 			Type: "string",
 		},
 	}},
-	Function{Resource: "Interface", API: "network", ResourceGroup: true},
-	Function{Resource: "SecurityGroup", API: "network", ResourceGroup: true},
-	Function{Resource: "VirtualMachineScaleSet", API: "compute", ResourceGroup: true},
-	Function{Resource: "HostPool", ListFunction: "ListByResourceGroup", API: "desktopvirtualization", ResourceGroup: true},
-	Function{Resource: "ApplicationGroup", ListFunction: "ListByResourceGroup", API: "desktopvirtualization", ResourceGroup: true, ExtraArgs: []Arg{
-		Arg{
+	{ResourceName: "Interface", API: "network", ResourceGroup: true},
+	{ResourceName: "SecurityGroup", API: "network", ResourceGroup: true},
+	{ResourceName: "ApplicationGateway", API: "network", ResourceGroup: true},
+	{ResourceName: "ApplicationSecurityGroup", API: "network", ResourceGroup: true},
+	{ResourceName: "DdosProtectionPlan", API: "network", ResourceGroup: false},
+	{ResourceName: "AzureFirewall", API: "network", ResourceGroup: true},
+	{ResourceName: "LocalNetworkGateway", API: "network", ResourceGroup: true},
+	{ResourceName: "NatGateway", API: "network", ResourceGroup: true},
+	{ResourceName: "Profile", API: "network", ResourceGroup: true},
+	{ResourceName: "SecurityRule", API: "network", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "networkSecurityGroupName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "PublicIPAddress", API: "network", ResourceGroup: true},
+	{ResourceName: "PublicIPPrefix", API: "network", ResourceGroup: true},
+	{ResourceName: "Route", API: "network", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "routeTableName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "RouteTable", API: "network", ResourceGroup: true},
+	{ResourceName: "VirtualNetworkGateway", API: "network", ResourceGroup: true},
+	{ResourceName: "VirtualNetworkGatewayConnection", API: "network", ResourceGroup: true},
+	{ResourceName: "VirtualNetworkPeering", API: "network", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "virtualNetworkName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "WebApplicationFirewallPolicy", API: "network", ResourceGroup: true},
+	//Desktop API Resources
+	{ResourceName: "HostPool", AzureSDKListFunction: "ListByResourceGroup", API: "desktopvirtualization", ResourceGroup: true},
+	{ResourceName: "ApplicationGroup", AzureSDKListFunction: "ListByResourceGroup", API: "desktopvirtualization", ResourceGroup: true, ExtraArgs: []Arg{
+		{
 			Name: "filter",
 			Type: "string",
 		},
 	}},
-	Function{Resource: "Workflow", ListFunction: "ListByResourceGroup", API: "logic", ResourceGroup: true, ExtraArgs: []Arg{
-		Arg{
+	//Logic API Resources
+	{ResourceName: "Workflow", AzureSDKListFunction: "ListByResourceGroup", API: "logic", ResourceGroup: true, ExtraArgs: []Arg{
+		{
 			Name: "top",
 			Type: "*int32",
 		},
-		Arg{
+		{
 			Name: "filter",
 			Type: "string",
 		},
 	}},
-	Function{Resource: "WorkflowTrigger", API: "logic", ResourceGroup: true, ExtraArgs: []Arg{
-		Arg{
+	{ResourceName: "WorkflowTrigger", API: "logic", ResourceGroup: true, ExtraArgs: []Arg{
+		{
 			Name: "workflowName",
 			Type: "string",
 		},
-		Arg{
+		{
 			Name: "top",
 			Type: "*int32",
 		},
-		Arg{
+		{
 			Name: "filter",
 			Type: "string",
 		},
 	}},
-	Function{Resource: "WorkflowRun", API: "logic", ResourceGroup: true, ExtraArgs: []Arg{
-		Arg{
+	{ResourceName: "WorkflowRun", API: "logic", ResourceGroup: true, ExtraArgs: []Arg{
+		{
 			Name: "workflowName",
 			Type: "string",
 		},
-		Arg{
+		{
 			Name: "top",
 			Type: "*int32",
 		},
-		Arg{
+		{
 			Name: "filter",
 			Type: "string",
 		},
 	}},
-	Function{Resource: "WorkflowRunAction", API: "logic", ResourceGroup: true, ExtraArgs: []Arg{
-		Arg{
+	{ResourceName: "WorkflowRunAction", API: "logic", ResourceGroup: true, ExtraArgs: []Arg{
+		{
 			Name: "workflowName",
 			Type: "string",
 		},
-		Arg{
+		{
 			Name: "runName",
 			Type: "string",
 		},
-		Arg{
+		{
 			Name: "top",
 			Type: "*int32",
 		},
-		Arg{
+		{
 			Name: "filter",
+			Type: "string",
+		},
+	}},
+	//Container Registry Resources
+	{ResourceName: "Registry", API: "containerregistry", FunctionName: "ListContainerRegistries", ResourceGroup: false},
+	{ResourceName: "Webhook", API: "containerregistry", FunctionName: "ListContainerRegistryWebhooks", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "registryName",
 			Type: "string",
 		},
 	}},
@@ -114,7 +161,7 @@ func generate(opt io.Writer, azureAPIs []AzureAPI, fns []Function) error {
 
 	for _, function := range fns {
 		if err := function.Execute(&fnBuff); err != nil {
-			return errors.Wrapf(err, "unable to execute function template for: %s", function.Resource)
+			return errors.Wrapf(err, "unable to execute function template for: %s", function.ResourceName)
 		}
 	}
 
