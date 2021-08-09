@@ -818,8 +818,8 @@ func (ar *AzureReader) ListContainerRegistryWebhooks(ctx context.Context, regist
 
 }
 
-// ListStorageAccounts returns a list of Accounts within a subscription
-func (ar *AzureReader) ListStorageAccounts(ctx context.Context) ([]storage.Account, error) {
+// ListSTORAGEAccounts returns a list of Accounts within a subscription
+func (ar *AzureReader) ListSTORAGEAccounts(ctx context.Context) ([]storage.Account, error) {
 	client := storage.NewAccountsClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -843,8 +843,8 @@ func (ar *AzureReader) ListStorageAccounts(ctx context.Context) ([]storage.Accou
 
 }
 
-// ListStorageBlobContainers returns a list of BlobContainers within a subscription and a resource group
-func (ar *AzureReader) ListStorageBlobContainers(ctx context.Context, accountName string, maxpagesize string, filter string, include storage.ListContainersInclude) ([]storage.ListContainerItem, error) {
+// ListSTORAGEBlobContainers returns a list of BlobContainers within a subscription and a resource group
+func (ar *AzureReader) ListSTORAGEBlobContainers(ctx context.Context, accountName string, maxpagesize string, filter string, include storage.ListContainersInclude) ([]storage.ListContainerItem, error) {
 	client := storage.NewBlobContainersClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -868,8 +868,8 @@ func (ar *AzureReader) ListStorageBlobContainers(ctx context.Context, accountNam
 
 }
 
-// ListStorageQueue returns a list of Queue within a subscription and a resource group
-func (ar *AzureReader) ListStorageQueue(ctx context.Context, accountName string, maxpagesize string, filter string) ([]storage.ListQueue, error) {
+// ListSTORAGEQueue returns a list of Queue within a subscription and a resource group
+func (ar *AzureReader) ListSTORAGEQueue(ctx context.Context, accountName string, maxpagesize string, filter string) ([]storage.ListQueue, error) {
 	client := storage.NewQueueClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -893,8 +893,8 @@ func (ar *AzureReader) ListStorageQueue(ctx context.Context, accountName string,
 
 }
 
-// ListStorageFileShares returns a list of FileShares within a subscription and a resource group
-func (ar *AzureReader) ListStorageFileShares(ctx context.Context, accountName string, maxpagesize string, filter string, expand storage.ListSharesExpand) ([]storage.FileShareItem, error) {
+// ListSTORAGEFileShares returns a list of FileShares within a subscription and a resource group
+func (ar *AzureReader) ListSTORAGEFileShares(ctx context.Context, accountName string, maxpagesize string, filter string, expand storage.ListSharesExpand) ([]storage.FileShareItem, error) {
 	client := storage.NewFileSharesClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -918,8 +918,8 @@ func (ar *AzureReader) ListStorageFileShares(ctx context.Context, accountName st
 
 }
 
-// ListStorageTable returns a list of Table within a subscription and a resource group
-func (ar *AzureReader) ListStorageTable(ctx context.Context, accountName string) ([]storage.Table, error) {
+// ListSTORAGETable returns a list of Table within a subscription and a resource group
+func (ar *AzureReader) ListSTORAGETable(ctx context.Context, accountName string) ([]storage.Table, error) {
 	client := storage.NewTableClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -943,8 +943,8 @@ func (ar *AzureReader) ListStorageTable(ctx context.Context, accountName string)
 
 }
 
-// ListMariadbConfigurations returns a list of Configurations within a subscription and a resource group
-func (ar *AzureReader) ListMariadbConfigurations(ctx context.Context, serverName string) ([]mariadb.Configuration, error) {
+// ListMARIADBConfigurations returns a list of Configurations within a subscription and a resource group
+func (ar *AzureReader) ListMARIADBConfigurations(ctx context.Context, serverName string) ([]mariadb.Configuration, error) {
 	client := mariadb.NewConfigurationsClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -957,8 +957,8 @@ func (ar *AzureReader) ListMariadbConfigurations(ctx context.Context, serverName
 
 }
 
-// ListMariadbDatabases returns a list of Databases within a subscription and a resource group
-func (ar *AzureReader) ListMariadbDatabases(ctx context.Context, serverName string) ([]mariadb.Database, error) {
+// ListMARIADBDatabases returns a list of Databases within a subscription and a resource group
+func (ar *AzureReader) ListMARIADBDatabases(ctx context.Context, serverName string) ([]mariadb.Database, error) {
 	client := mariadb.NewDatabasesClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -971,8 +971,8 @@ func (ar *AzureReader) ListMariadbDatabases(ctx context.Context, serverName stri
 
 }
 
-// ListMariadbFirewallRules returns a list of FirewallRules within a subscription and a resource group
-func (ar *AzureReader) ListMariadbFirewallRules(ctx context.Context, serverName string) ([]mariadb.FirewallRule, error) {
+// ListMARIADBFirewallRules returns a list of FirewallRules within a subscription and a resource group
+func (ar *AzureReader) ListMARIADBFirewallRules(ctx context.Context, serverName string) ([]mariadb.FirewallRule, error) {
 	client := mariadb.NewFirewallRulesClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -985,8 +985,8 @@ func (ar *AzureReader) ListMariadbFirewallRules(ctx context.Context, serverName 
 
 }
 
-// ListMariadbServers returns a list of Servers within a subscription
-func (ar *AzureReader) ListMariadbServers(ctx context.Context) ([]mariadb.Server, error) {
+// ListMARIADBServers returns a list of Servers within a subscription
+func (ar *AzureReader) ListMARIADBServers(ctx context.Context) ([]mariadb.Server, error) {
 	client := mariadb.NewServersClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -999,8 +999,8 @@ func (ar *AzureReader) ListMariadbServers(ctx context.Context) ([]mariadb.Server
 
 }
 
-// ListMariadbVirtualNetworkRules returns a list of VirtualNetworkRules within a subscription and a resource group
-func (ar *AzureReader) ListMariadbVirtualNetworkRules(ctx context.Context, serverName string) ([]mariadb.VirtualNetworkRule, error) {
+// ListMARIADBVirtualNetworkRules returns a list of VirtualNetworkRules within a subscription and a resource group
+func (ar *AzureReader) ListMARIADBVirtualNetworkRules(ctx context.Context, serverName string) ([]mariadb.VirtualNetworkRule, error) {
 	client := mariadb.NewVirtualNetworkRulesClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -1024,8 +1024,8 @@ func (ar *AzureReader) ListMariadbVirtualNetworkRules(ctx context.Context, serve
 
 }
 
-// ListMysqlConfigurations returns a list of Configurations within a subscription and a resource group
-func (ar *AzureReader) ListMysqlConfigurations(ctx context.Context, serverName string) ([]mysql.Configuration, error) {
+// ListMYSQLConfigurations returns a list of Configurations within a subscription and a resource group
+func (ar *AzureReader) ListMYSQLConfigurations(ctx context.Context, serverName string) ([]mysql.Configuration, error) {
 	client := mysql.NewConfigurationsClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -1038,8 +1038,8 @@ func (ar *AzureReader) ListMysqlConfigurations(ctx context.Context, serverName s
 
 }
 
-// ListMysqlDatabases returns a list of Databases within a subscription and a resource group
-func (ar *AzureReader) ListMysqlDatabases(ctx context.Context, serverName string) ([]mysql.Database, error) {
+// ListMYSQLDatabases returns a list of Databases within a subscription and a resource group
+func (ar *AzureReader) ListMYSQLDatabases(ctx context.Context, serverName string) ([]mysql.Database, error) {
 	client := mysql.NewDatabasesClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -1052,8 +1052,8 @@ func (ar *AzureReader) ListMysqlDatabases(ctx context.Context, serverName string
 
 }
 
-// ListMysqlFirewallRules returns a list of FirewallRules within a subscription and a resource group
-func (ar *AzureReader) ListMysqlFirewallRules(ctx context.Context, serverName string) ([]mysql.FirewallRule, error) {
+// ListMYSQLFirewallRules returns a list of FirewallRules within a subscription and a resource group
+func (ar *AzureReader) ListMYSQLFirewallRules(ctx context.Context, serverName string) ([]mysql.FirewallRule, error) {
 	client := mysql.NewFirewallRulesClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -1066,8 +1066,8 @@ func (ar *AzureReader) ListMysqlFirewallRules(ctx context.Context, serverName st
 
 }
 
-// ListMysqlServers returns a list of Servers within a subscription
-func (ar *AzureReader) ListMysqlServers(ctx context.Context) ([]mysql.Server, error) {
+// ListMYSQLServers returns a list of Servers within a subscription
+func (ar *AzureReader) ListMYSQLServers(ctx context.Context) ([]mysql.Server, error) {
 	client := mysql.NewServersClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -1080,8 +1080,8 @@ func (ar *AzureReader) ListMysqlServers(ctx context.Context) ([]mysql.Server, er
 
 }
 
-// ListMysqlVirtualNetworkRules returns a list of VirtualNetworkRules within a subscription and a resource group
-func (ar *AzureReader) ListMysqlVirtualNetworkRules(ctx context.Context, serverName string) ([]mysql.VirtualNetworkRule, error) {
+// ListMYSQLVirtualNetworkRules returns a list of VirtualNetworkRules within a subscription and a resource group
+func (ar *AzureReader) ListMYSQLVirtualNetworkRules(ctx context.Context, serverName string) ([]mysql.VirtualNetworkRule, error) {
 	client := mysql.NewVirtualNetworkRulesClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -1105,8 +1105,8 @@ func (ar *AzureReader) ListMysqlVirtualNetworkRules(ctx context.Context, serverN
 
 }
 
-// ListPostgresqlConfigurations returns a list of Configurations within a subscription and a resource group
-func (ar *AzureReader) ListPostgresqlConfigurations(ctx context.Context, serverName string) ([]postgresql.Configuration, error) {
+// ListPOSTGRESQLConfigurations returns a list of Configurations within a subscription and a resource group
+func (ar *AzureReader) ListPOSTGRESQLConfigurations(ctx context.Context, serverName string) ([]postgresql.Configuration, error) {
 	client := postgresql.NewConfigurationsClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -1119,8 +1119,8 @@ func (ar *AzureReader) ListPostgresqlConfigurations(ctx context.Context, serverN
 
 }
 
-// ListPostgresqlDatabases returns a list of Databases within a subscription and a resource group
-func (ar *AzureReader) ListPostgresqlDatabases(ctx context.Context, serverName string) ([]postgresql.Database, error) {
+// ListPOSTGRESQLDatabases returns a list of Databases within a subscription and a resource group
+func (ar *AzureReader) ListPOSTGRESQLDatabases(ctx context.Context, serverName string) ([]postgresql.Database, error) {
 	client := postgresql.NewDatabasesClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -1133,8 +1133,8 @@ func (ar *AzureReader) ListPostgresqlDatabases(ctx context.Context, serverName s
 
 }
 
-// ListPostgresqlFirewallRules returns a list of FirewallRules within a subscription and a resource group
-func (ar *AzureReader) ListPostgresqlFirewallRules(ctx context.Context, serverName string) ([]postgresql.FirewallRule, error) {
+// ListPOSTGRESQLFirewallRules returns a list of FirewallRules within a subscription and a resource group
+func (ar *AzureReader) ListPOSTGRESQLFirewallRules(ctx context.Context, serverName string) ([]postgresql.FirewallRule, error) {
 	client := postgresql.NewFirewallRulesClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -1147,8 +1147,8 @@ func (ar *AzureReader) ListPostgresqlFirewallRules(ctx context.Context, serverNa
 
 }
 
-// ListPostgresqlServers returns a list of Servers within a subscription
-func (ar *AzureReader) ListPostgresqlServers(ctx context.Context) ([]postgresql.Server, error) {
+// ListPOSTGRESQLServers returns a list of Servers within a subscription
+func (ar *AzureReader) ListPOSTGRESQLServers(ctx context.Context) ([]postgresql.Server, error) {
 	client := postgresql.NewServersClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -1161,8 +1161,8 @@ func (ar *AzureReader) ListPostgresqlServers(ctx context.Context) ([]postgresql.
 
 }
 
-// ListPostgresqlVirtualNetworkRules returns a list of VirtualNetworkRules within a subscription and a resource group
-func (ar *AzureReader) ListPostgresqlVirtualNetworkRules(ctx context.Context, serverName string) ([]postgresql.VirtualNetworkRule, error) {
+// ListPOSTGRESQLVirtualNetworkRules returns a list of VirtualNetworkRules within a subscription and a resource group
+func (ar *AzureReader) ListPOSTGRESQLVirtualNetworkRules(ctx context.Context, serverName string) ([]postgresql.VirtualNetworkRule, error) {
 	client := postgresql.NewVirtualNetworkRulesClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -1186,8 +1186,8 @@ func (ar *AzureReader) ListPostgresqlVirtualNetworkRules(ctx context.Context, se
 
 }
 
-// ListSqlDatabases returns a list of Databases within a subscription and a resource group
-func (ar *AzureReader) ListSqlDatabases(ctx context.Context, serverName string, expand string, filter string) ([]sql.Database, error) {
+// ListSQLDatabases returns a list of Databases within a subscription and a resource group
+func (ar *AzureReader) ListSQLDatabases(ctx context.Context, serverName string, expand string, filter string) ([]sql.Database, error) {
 	client := sql.NewDatabasesClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -1200,8 +1200,8 @@ func (ar *AzureReader) ListSqlDatabases(ctx context.Context, serverName string, 
 
 }
 
-// ListSqlElasticPools returns a list of ElasticPools within a subscription and a resource group
-func (ar *AzureReader) ListSqlElasticPools(ctx context.Context, serverName string) ([]sql.ElasticPool, error) {
+// ListSQLElasticPools returns a list of ElasticPools within a subscription and a resource group
+func (ar *AzureReader) ListSQLElasticPools(ctx context.Context, serverName string) ([]sql.ElasticPool, error) {
 	client := sql.NewElasticPoolsClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -1214,8 +1214,8 @@ func (ar *AzureReader) ListSqlElasticPools(ctx context.Context, serverName strin
 
 }
 
-// ListSqlFirewallRules returns a list of FirewallRules within a subscription and a resource group
-func (ar *AzureReader) ListSqlFirewallRules(ctx context.Context, serverName string) ([]sql.FirewallRule, error) {
+// ListSQLFirewallRules returns a list of FirewallRules within a subscription and a resource group
+func (ar *AzureReader) ListSQLFirewallRules(ctx context.Context, serverName string) ([]sql.FirewallRule, error) {
 	client := sql.NewFirewallRulesClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -1228,8 +1228,8 @@ func (ar *AzureReader) ListSqlFirewallRules(ctx context.Context, serverName stri
 
 }
 
-// ListSqlServers returns a list of Servers within a subscription
-func (ar *AzureReader) ListSqlServers(ctx context.Context) ([]sql.Server, error) {
+// ListSQLServers returns a list of Servers within a subscription
+func (ar *AzureReader) ListSQLServers(ctx context.Context) ([]sql.Server, error) {
 	client := sql.NewServersClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 

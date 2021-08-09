@@ -104,8 +104,8 @@ type AzureAPI struct {
 	// https://docs.microsoft.com/en-us/azure/search/search-api-preview
 	IsPreview bool
 
-	//if api is a database type then FunctionName = "List" + API + PluralName (to avoid equal names of functions in database apis. e.g: sql, )
-	IsDatabase bool
+	//if api as AddSuffix = true then FunctionName = "List" + API + PluralName instead of "List" + PluralName
+	AddAPISufix bool
 }
 
 // Function is the definition of one of the functions
@@ -162,12 +162,12 @@ func (f Function) Execute(w io.Writer) error {
 	}
 	// Determine the FunctionName to give in the template, if not set
 	// By default -> FunctionName = List + PluralName
-	// if api iIsDatabase = true -> FunctionName = List + API + PluralName(to avoid equal names of functions for database resources apis)
+	// if api AddApiSufix = true -> FunctionName = List + API + PluralName(to avoid equal names of functions)
 	if len(f.FunctionName) == 0 {
 		f.FunctionName = "List" + f.PluralName
 		for _, api := range azureAPIs {
-			if api.API == f.API && api.IsDatabase {
-				f.FunctionName = "List" + strings.Title(f.API) + f.PluralName
+			if api.API == f.API && api.AddAPISufix {
+				f.FunctionName = "List" + strings.ToUpper(f.API) + f.PluralName
 			}
 		}
 	}

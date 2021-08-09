@@ -36,7 +36,7 @@ require (
 	github.com/zclconf/go-cty v1.8.2
 	golang.org/x/arch v0.0.0-20190312162104-788fe5ffcd8c // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
-	golang.org/x/tools v0.1.4 // indirect
+	golang.org/x/tools v0.1.5 // indirect
 	google.golang.org/api v0.41.0
 	google.golang.org/grpc v1.36.0
 	gopkg.in/yaml.v2 v2.4.0

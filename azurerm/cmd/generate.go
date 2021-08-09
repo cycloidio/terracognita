@@ -16,11 +16,11 @@ var azureAPIs = []AzureAPI{
 	{API: "desktopvirtualization", APIVersion: "2019-12-10", IsPreview: true},
 	{API: "logic", APIVersion: "2019-05-01"},
 	{API: "containerregistry", APIVersion: "2019-05-01"},
-	{API: "storage", APIVersion: "2021-02-01", IsDatabase: true},
-	{API: "mariadb", APIVersion: "2020-01-01", IsDatabase: true},
-	{API: "mysql", APIVersion: "2020-01-01", IsDatabase: true},
-	{API: "postgresql", APIVersion: "2020-01-01", IsDatabase: true},
-	{API: "sql", APIVersion: "2014-04-01", IsDatabase: true},
+	{API: "storage", APIVersion: "2021-02-01", AddAPISufix: true},
+	{API: "mariadb", APIVersion: "2020-01-01", AddAPISufix: true},
+	{API: "mysql", APIVersion: "2020-01-01", AddAPISufix: true},
+	{API: "postgresql", APIVersion: "2020-01-01", AddAPISufix: true},
+	{API: "sql", APIVersion: "2014-04-01", AddAPISufix: true},
 }
 
 var functions = []Function{
