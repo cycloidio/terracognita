@@ -7,6 +7,11 @@
 - Resource names now are generated removing invalid characters instead just assigning a random alphanumeric value
   ([Issue #208](https://github.com/cycloidio/terracognita/issues/208))
 
+### Fixed
+
+- Import with `aws_alb_target_group_attachment` now validates if the needed values are present
+  ([Issue #213](https://github.com/cycloidio/terracognita/issues/213))
+
 ## [0.7.1] _2021-07-15_
 
 ### Added
