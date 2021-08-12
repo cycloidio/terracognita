@@ -6,7 +6,7 @@
 - azure resources (container): `azurerm_container_registry`, `azurerm_container_registry_webhook`
 - azure resources (network): `azurerm_application_gateway`,	`azurerm_application_security_group`, `azurerm_network_ddos_protection_plan`,
 `azurerm_firewall`, `azurerm_local_network_gateway` , `azurerm_nat_gateway`,  `azurerm_network_profile`, ` azurerm_network_security_rule`, `azurerm_public_ip`,  ` azurerm_public_ip_prefix`, `azurerm_route`, `azurerm_route_table`, `azurerm_virtual_network_gateway`, `azurerm_virtual_network_gateway_connection`, `azurerm_virtual_network_peering`, `azurerm_web_application_firewall_policy`
-- azure resources (storage): `azurerm_storage_account`, `azurerm_storage_blob`, `azurerm_storage_management_policy`, `azurerm_storage_queue`, `azurerm_storage_share`, `azurerm_storage_table`
+- azure resources (storage): `azurerm_storage_account`, `azurerm_storage_blob`, `azurerm_storage_queue`, `azurerm_storage_share`, `azurerm_storage_table`
 - azure resources (database): `azurerm_mariadb_configuration`, `azurerm_mariadb_database`, `azurerm_mariadb_firewall_rule`, `azurerm_mariadb_server`, `azurerm_mariadb_virtual_network_rule`,  `azurerm_mysql_configuration`, `azurerm_mysql_database`, `azurerm_mysql_firewall_rule`, `azurerm_mysql_server`, `azurerm_mysql_virtual_network_rule`, `azurerm_postgresql_configuration`, `azurerm_postgresql_database`, `azurerm_postgresql_firewall_rule`, `azurerm_postgresql_server`, `azurerm_postgresql_virtual_network_rule`, `azurerm_sql_database`, `azurerm_sql_elasticpool`, `azurerm_sql_firewall_rule`,`azurerm_sql_server`
 ([Issue #100](https://github.com/cycloidio/terracognita/issues/100)
 - `provider` and `terraform` blocks to the HCL generation

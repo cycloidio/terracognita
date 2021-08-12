@@ -4,13 +4,14 @@ package azurerm
 
 import (
 	"fmt"
+	"strings"
 )
 
-const _ResourceTypeName = "azurerm_resource_groupazurerm_virtual_machineazurerm_virtual_machine_extensionazurerm_virtual_machine_scale_setazurerm_virtual_networkazurerm_availability_setazurerm_imageazurerm_subnetazurerm_network_interfaceazurerm_network_security_groupazurerm_application_gatewayazurerm_application_security_groupazurerm_ddos_protection_planazurerm_azure_firewallazurerm_local_network_gatewayazurerm_nat_gatewayazurerm_profileazurerm_security_ruleazurerm_public_ip_addressazurerm_public_ip_prefixazurerm_routeazurerm_route_tableazurerm_virtual_network_gatewayazurerm_virtual_network_gateway_connectionazurerm_virtual_network_peeringazurerm_web_application_firewall_policyazurerm_virtual_desktop_host_poolazurerm_virtual_desktop_application_groupazurerm_logic_app_workflowazurerm_logic_app_trigger_customazurerm_logic_app_action_customazurerm_container_registryazurerm_container_registry_webhookazurerm_storage_accountazurerm_storage_queueazurerm_storage_file_shareazurerm_storage_tableazurerm_mariadb_configurationazurerm_mariadb_databaseazurerm_mariadb_firewall_ruleazurerm_mariadb_serverazurerm_mariadb_virtual_network_ruleazurerm_mysql_configurationazurerm_mysql_databaseazurerm_mysql_firewall_ruleazurerm_mysql_serverazurerm_mysql_virtual_network_ruleazurerm_postgresql_configurationazurerm_postgresql_databaseazurerm_postgresql_firewall_ruleazurerm_postgresql_serverazurerm_postgresql_virtual_network_ruleazurerm_sql_elastic_poolazurerm_sql_databaseazurerm_sql_firewall_ruleazurerm_sql_server"
+const _ResourceTypeName = "azurerm_resource_groupazurerm_virtual_machineazurerm_virtual_machine_extensionazurerm_virtual_machine_scale_setazurerm_virtual_networkazurerm_availability_setazurerm_imageazurerm_subnetazurerm_network_interfaceazurerm_network_security_groupazurerm_application_gatewayazurerm_application_security_groupazurerm_network_ddos_protection_planazurerm_firewallazurerm_local_network_gatewayazurerm_nat_gatewayazurerm_network_profileazurerm_network_security_ruleazurerm_public_ipazurerm_public_ip_prefixazurerm_routeazurerm_route_tableazurerm_virtual_network_gatewayazurerm_virtual_network_gateway_connectionazurerm_virtual_network_peeringazurerm_web_application_firewall_policyazurerm_virtual_desktop_host_poolazurerm_virtual_desktop_application_groupazurerm_logic_app_workflowazurerm_logic_app_trigger_customazurerm_logic_app_action_customazurerm_container_registryazurerm_container_registry_webhookazurerm_storage_accountazurerm_storage_queueazurerm_storage_shareazurerm_storage_tableazurerm_storage_blobazurerm_mariadb_configurationazurerm_mariadb_databaseazurerm_mariadb_firewall_ruleazurerm_mariadb_serverazurerm_mariadb_virtual_network_ruleazurerm_mysql_configurationazurerm_mysql_databaseazurerm_mysql_firewall_ruleazurerm_mysql_serverazurerm_mysql_virtual_network_ruleazurerm_postgresql_configurationazurerm_postgresql_databaseazurerm_postgresql_firewall_ruleazurerm_postgresql_serverazurerm_postgresql_virtual_network_ruleazurerm_sql_elastic_poolazurerm_sql_databaseazurerm_sql_firewall_ruleazurerm_sql_server"
 
-var _ResourceTypeIndex = [...]uint16{0, 22, 45, 78, 111, 134, 158, 171, 185, 210, 240, 267, 301, 329, 351, 380, 399, 414, 435, 460, 484, 497, 516, 547, 589, 620, 659, 692, 733, 759, 791, 822, 848, 882, 905, 926, 952, 973, 1002, 1026, 1055, 1077, 1113, 1140, 1162, 1189, 1209, 1243, 1275, 1302, 1334, 1359, 1398, 1422, 1442, 1467, 1485}
+var _ResourceTypeIndex = [...]uint16{0, 22, 45, 78, 111, 134, 158, 171, 185, 210, 240, 267, 301, 337, 353, 382, 401, 424, 453, 470, 494, 507, 526, 557, 599, 630, 669, 702, 743, 769, 801, 832, 858, 892, 915, 936, 957, 978, 998, 1027, 1051, 1080, 1102, 1138, 1165, 1187, 1214, 1234, 1268, 1300, 1327, 1359, 1384, 1423, 1447, 1467, 1492, 1510}
 
-const _ResourceTypeLowerName = "azurerm_resource_groupazurerm_virtual_machineazurerm_virtual_machine_extensionazurerm_virtual_machine_scale_setazurerm_virtual_networkazurerm_availability_setazurerm_imageazurerm_subnetazurerm_network_interfaceazurerm_network_security_groupazurerm_application_gatewayazurerm_application_security_groupazurerm_ddos_protection_planazurerm_azure_firewallazurerm_local_network_gatewayazurerm_nat_gatewayazurerm_profileazurerm_security_ruleazurerm_public_ip_addressazurerm_public_ip_prefixazurerm_routeazurerm_route_tableazurerm_virtual_network_gatewayazurerm_virtual_network_gateway_connectionazurerm_virtual_network_peeringazurerm_web_application_firewall_policyazurerm_virtual_desktop_host_poolazurerm_virtual_desktop_application_groupazurerm_logic_app_workflowazurerm_logic_app_trigger_customazurerm_logic_app_action_customazurerm_container_registryazurerm_container_registry_webhookazurerm_storage_accountazurerm_storage_queueazurerm_storage_file_shareazurerm_storage_tableazurerm_mariadb_configurationazurerm_mariadb_databaseazurerm_mariadb_firewall_ruleazurerm_mariadb_serverazurerm_mariadb_virtual_network_ruleazurerm_mysql_configurationazurerm_mysql_databaseazurerm_mysql_firewall_ruleazurerm_mysql_serverazurerm_mysql_virtual_network_ruleazurerm_postgresql_configurationazurerm_postgresql_databaseazurerm_postgresql_firewall_ruleazurerm_postgresql_serverazurerm_postgresql_virtual_network_ruleazurerm_sql_elastic_poolazurerm_sql_databaseazurerm_sql_firewall_ruleazurerm_sql_server"
+const _ResourceTypeLowerName = "azurerm_resource_groupazurerm_virtual_machineazurerm_virtual_machine_extensionazurerm_virtual_machine_scale_setazurerm_virtual_networkazurerm_availability_setazurerm_imageazurerm_subnetazurerm_network_interfaceazurerm_network_security_groupazurerm_application_gatewayazurerm_application_security_groupazurerm_network_ddos_protection_planazurerm_firewallazurerm_local_network_gatewayazurerm_nat_gatewayazurerm_network_profileazurerm_network_security_ruleazurerm_public_ipazurerm_public_ip_prefixazurerm_routeazurerm_route_tableazurerm_virtual_network_gatewayazurerm_virtual_network_gateway_connectionazurerm_virtual_network_peeringazurerm_web_application_firewall_policyazurerm_virtual_desktop_host_poolazurerm_virtual_desktop_application_groupazurerm_logic_app_workflowazurerm_logic_app_trigger_customazurerm_logic_app_action_customazurerm_container_registryazurerm_container_registry_webhookazurerm_storage_accountazurerm_storage_queueazurerm_storage_shareazurerm_storage_tableazurerm_storage_blobazurerm_mariadb_configurationazurerm_mariadb_databaseazurerm_mariadb_firewall_ruleazurerm_mariadb_serverazurerm_mariadb_virtual_network_ruleazurerm_mysql_configurationazurerm_mysql_databaseazurerm_mysql_firewall_ruleazurerm_mysql_serverazurerm_mysql_virtual_network_ruleazurerm_postgresql_configurationazurerm_postgresql_databaseazurerm_postgresql_firewall_ruleazurerm_postgresql_serverazurerm_postgresql_virtual_network_ruleazurerm_sql_elastic_poolazurerm_sql_databaseazurerm_sql_firewall_ruleazurerm_sql_server"
 
 func (i ResourceType) String() string {
 	if i < 0 || i >= ResourceType(len(_ResourceTypeIndex)-1) {
@@ -35,13 +36,13 @@ func _ResourceTypeNoOp() {
 	_ = x[NetworkSecurityGroup-(9)]
 	_ = x[ApplicationGateway-(10)]
 	_ = x[ApplicationSecurityGroup-(11)]
-	_ = x[DdosProtectionPlan-(12)]
-	_ = x[AzureFirewall-(13)]
+	_ = x[NetworkDdosProtectionPlan-(12)]
+	_ = x[Firewall-(13)]
 	_ = x[LocalNetworkGateway-(14)]
 	_ = x[NatGateway-(15)]
-	_ = x[Profile-(16)]
-	_ = x[SecurityRule-(17)]
-	_ = x[PublicIPAddress-(18)]
+	_ = x[NetworkProfile-(16)]
+	_ = x[NetworkSecurityRule-(17)]
+	_ = x[PublicIP-(18)]
 	_ = x[PublicIPPrefix-(19)]
 	_ = x[Route-(20)]
 	_ = x[RouteTable-(21)]
@@ -58,30 +59,31 @@ func _ResourceTypeNoOp() {
 	_ = x[ContainerRegistryWebhook-(32)]
 	_ = x[StorageAccount-(33)]
 	_ = x[StorageQueue-(34)]
-	_ = x[StorageFileShare-(35)]
+	_ = x[StorageShare-(35)]
 	_ = x[StorageTable-(36)]
-	_ = x[MariadbConfiguration-(37)]
-	_ = x[MariadbDatabase-(38)]
-	_ = x[MariadbFirewallRule-(39)]
-	_ = x[MariadbServer-(40)]
-	_ = x[MariadbVirtualNetworkRule-(41)]
-	_ = x[MysqlConfiguration-(42)]
-	_ = x[MysqlDatabase-(43)]
-	_ = x[MysqlFirewallRule-(44)]
-	_ = x[MysqlServer-(45)]
-	_ = x[MysqlVirtualNetworkRule-(46)]
-	_ = x[PostgresqlConfiguration-(47)]
-	_ = x[PostgresqlDatabase-(48)]
-	_ = x[PostgresqlFirewallRule-(49)]
-	_ = x[PostgresqlServer-(50)]
-	_ = x[PostgresqlVirtualNetworkRule-(51)]
-	_ = x[SQLElasticPool-(52)]
-	_ = x[SQLDatabase-(53)]
-	_ = x[SQLFirewallRule-(54)]
-	_ = x[SQLServer-(55)]
+	_ = x[StorageBlob-(37)]
+	_ = x[MariadbConfiguration-(38)]
+	_ = x[MariadbDatabase-(39)]
+	_ = x[MariadbFirewallRule-(40)]
+	_ = x[MariadbServer-(41)]
+	_ = x[MariadbVirtualNetworkRule-(42)]
+	_ = x[MysqlConfiguration-(43)]
+	_ = x[MysqlDatabase-(44)]
+	_ = x[MysqlFirewallRule-(45)]
+	_ = x[MysqlServer-(46)]
+	_ = x[MysqlVirtualNetworkRule-(47)]
+	_ = x[PostgresqlConfiguration-(48)]
+	_ = x[PostgresqlDatabase-(49)]
+	_ = x[PostgresqlFirewallRule-(50)]
+	_ = x[PostgresqlServer-(51)]
+	_ = x[PostgresqlVirtualNetworkRule-(52)]
+	_ = x[SqlElasticPool-(53)]
+	_ = x[SqlDatabase-(54)]
+	_ = x[SqlFirewallRule-(55)]
+	_ = x[SqlServer-(56)]
 }
 
-var _ResourceTypeValues = []ResourceType{ResourceGroup, VirtualMachine, VirtualMachineExtension, VirtualMachineScaleSet, VirtualNetwork, AvailabilitySet, Image, Subnet, NetworkInterface, NetworkSecurityGroup, ApplicationGateway, ApplicationSecurityGroup, DdosProtectionPlan, AzureFirewall, LocalNetworkGateway, NatGateway, Profile, SecurityRule, PublicIPAddress, PublicIPPrefix, Route, RouteTable, VirtualNetworkGateway, VirtualNetworkGatewayConnection, VirtualNetworkPeering, WebApplicationFirewallPolicy, VirtualDesktopHostPool, VirtualDesktopApplicationGroup, LogicAppWorkflow, LogicAppTriggerCustom, LogicAppActionCustom, ContainerRegistry, ContainerRegistryWebhook, StorageAccount, StorageQueue, StorageFileShare, StorageTable, MariadbConfiguration, MariadbDatabase, MariadbFirewallRule, MariadbServer, MariadbVirtualNetworkRule, MysqlConfiguration, MysqlDatabase, MysqlFirewallRule, MysqlServer, MysqlVirtualNetworkRule, PostgresqlConfiguration, PostgresqlDatabase, PostgresqlFirewallRule, PostgresqlServer, PostgresqlVirtualNetworkRule, SQLElasticPool, SQLDatabase, SQLFirewallRule, SQLServer}
+var _ResourceTypeValues = []ResourceType{ResourceGroup, VirtualMachine, VirtualMachineExtension, VirtualMachineScaleSet, VirtualNetwork, AvailabilitySet, Image, Subnet, NetworkInterface, NetworkSecurityGroup, ApplicationGateway, ApplicationSecurityGroup, NetworkDdosProtectionPlan, Firewall, LocalNetworkGateway, NatGateway, NetworkProfile, NetworkSecurityRule, PublicIP, PublicIPPrefix, Route, RouteTable, VirtualNetworkGateway, VirtualNetworkGatewayConnection, VirtualNetworkPeering, WebApplicationFirewallPolicy, VirtualDesktopHostPool, VirtualDesktopApplicationGroup, LogicAppWorkflow, LogicAppTriggerCustom, LogicAppActionCustom, ContainerRegistry, ContainerRegistryWebhook, StorageAccount, StorageQueue, StorageShare, StorageTable, StorageBlob, MariadbConfiguration, MariadbDatabase, MariadbFirewallRule, MariadbServer, MariadbVirtualNetworkRule, MysqlConfiguration, MysqlDatabase, MysqlFirewallRule, MysqlServer, MysqlVirtualNetworkRule, PostgresqlConfiguration, PostgresqlDatabase, PostgresqlFirewallRule, PostgresqlServer, PostgresqlVirtualNetworkRule, SqlElasticPool, SqlDatabase, SqlFirewallRule, SqlServer}
 
 var _ResourceTypeNameToValueMap = map[string]ResourceType{
 	_ResourceTypeName[0:22]:           ResourceGroup,
@@ -108,94 +110,96 @@ var _ResourceTypeNameToValueMap = map[string]ResourceType{
 	_ResourceTypeLowerName[240:267]:   ApplicationGateway,
 	_ResourceTypeName[267:301]:        ApplicationSecurityGroup,
 	_ResourceTypeLowerName[267:301]:   ApplicationSecurityGroup,
-	_ResourceTypeName[301:329]:        DdosProtectionPlan,
-	_ResourceTypeLowerName[301:329]:   DdosProtectionPlan,
-	_ResourceTypeName[329:351]:        AzureFirewall,
-	_ResourceTypeLowerName[329:351]:   AzureFirewall,
-	_ResourceTypeName[351:380]:        LocalNetworkGateway,
-	_ResourceTypeLowerName[351:380]:   LocalNetworkGateway,
-	_ResourceTypeName[380:399]:        NatGateway,
-	_ResourceTypeLowerName[380:399]:   NatGateway,
-	_ResourceTypeName[399:414]:        Profile,
-	_ResourceTypeLowerName[399:414]:   Profile,
-	_ResourceTypeName[414:435]:        SecurityRule,
-	_ResourceTypeLowerName[414:435]:   SecurityRule,
-	_ResourceTypeName[435:460]:        PublicIPAddress,
-	_ResourceTypeLowerName[435:460]:   PublicIPAddress,
-	_ResourceTypeName[460:484]:        PublicIPPrefix,
-	_ResourceTypeLowerName[460:484]:   PublicIPPrefix,
-	_ResourceTypeName[484:497]:        Route,
-	_ResourceTypeLowerName[484:497]:   Route,
-	_ResourceTypeName[497:516]:        RouteTable,
-	_ResourceTypeLowerName[497:516]:   RouteTable,
-	_ResourceTypeName[516:547]:        VirtualNetworkGateway,
-	_ResourceTypeLowerName[516:547]:   VirtualNetworkGateway,
-	_ResourceTypeName[547:589]:        VirtualNetworkGatewayConnection,
-	_ResourceTypeLowerName[547:589]:   VirtualNetworkGatewayConnection,
-	_ResourceTypeName[589:620]:        VirtualNetworkPeering,
-	_ResourceTypeLowerName[589:620]:   VirtualNetworkPeering,
-	_ResourceTypeName[620:659]:        WebApplicationFirewallPolicy,
-	_ResourceTypeLowerName[620:659]:   WebApplicationFirewallPolicy,
-	_ResourceTypeName[659:692]:        VirtualDesktopHostPool,
-	_ResourceTypeLowerName[659:692]:   VirtualDesktopHostPool,
-	_ResourceTypeName[692:733]:        VirtualDesktopApplicationGroup,
-	_ResourceTypeLowerName[692:733]:   VirtualDesktopApplicationGroup,
-	_ResourceTypeName[733:759]:        LogicAppWorkflow,
-	_ResourceTypeLowerName[733:759]:   LogicAppWorkflow,
-	_ResourceTypeName[759:791]:        LogicAppTriggerCustom,
-	_ResourceTypeLowerName[759:791]:   LogicAppTriggerCustom,
-	_ResourceTypeName[791:822]:        LogicAppActionCustom,
-	_ResourceTypeLowerName[791:822]:   LogicAppActionCustom,
-	_ResourceTypeName[822:848]:        ContainerRegistry,
-	_ResourceTypeLowerName[822:848]:   ContainerRegistry,
-	_ResourceTypeName[848:882]:        ContainerRegistryWebhook,
-	_ResourceTypeLowerName[848:882]:   ContainerRegistryWebhook,
-	_ResourceTypeName[882:905]:        StorageAccount,
-	_ResourceTypeLowerName[882:905]:   StorageAccount,
-	_ResourceTypeName[905:926]:        StorageQueue,
-	_ResourceTypeLowerName[905:926]:   StorageQueue,
-	_ResourceTypeName[926:952]:        StorageFileShare,
-	_ResourceTypeLowerName[926:952]:   StorageFileShare,
-	_ResourceTypeName[952:973]:        StorageTable,
-	_ResourceTypeLowerName[952:973]:   StorageTable,
-	_ResourceTypeName[973:1002]:       MariadbConfiguration,
-	_ResourceTypeLowerName[973:1002]:  MariadbConfiguration,
-	_ResourceTypeName[1002:1026]:      MariadbDatabase,
-	_ResourceTypeLowerName[1002:1026]: MariadbDatabase,
-	_ResourceTypeName[1026:1055]:      MariadbFirewallRule,
-	_ResourceTypeLowerName[1026:1055]: MariadbFirewallRule,
-	_ResourceTypeName[1055:1077]:      MariadbServer,
-	_ResourceTypeLowerName[1055:1077]: MariadbServer,
-	_ResourceTypeName[1077:1113]:      MariadbVirtualNetworkRule,
-	_ResourceTypeLowerName[1077:1113]: MariadbVirtualNetworkRule,
-	_ResourceTypeName[1113:1140]:      MysqlConfiguration,
-	_ResourceTypeLowerName[1113:1140]: MysqlConfiguration,
-	_ResourceTypeName[1140:1162]:      MysqlDatabase,
-	_ResourceTypeLowerName[1140:1162]: MysqlDatabase,
-	_ResourceTypeName[1162:1189]:      MysqlFirewallRule,
-	_ResourceTypeLowerName[1162:1189]: MysqlFirewallRule,
-	_ResourceTypeName[1189:1209]:      MysqlServer,
-	_ResourceTypeLowerName[1189:1209]: MysqlServer,
-	_ResourceTypeName[1209:1243]:      MysqlVirtualNetworkRule,
-	_ResourceTypeLowerName[1209:1243]: MysqlVirtualNetworkRule,
-	_ResourceTypeName[1243:1275]:      PostgresqlConfiguration,
-	_ResourceTypeLowerName[1243:1275]: PostgresqlConfiguration,
-	_ResourceTypeName[1275:1302]:      PostgresqlDatabase,
-	_ResourceTypeLowerName[1275:1302]: PostgresqlDatabase,
-	_ResourceTypeName[1302:1334]:      PostgresqlFirewallRule,
-	_ResourceTypeLowerName[1302:1334]: PostgresqlFirewallRule,
-	_ResourceTypeName[1334:1359]:      PostgresqlServer,
-	_ResourceTypeLowerName[1334:1359]: PostgresqlServer,
-	_ResourceTypeName[1359:1398]:      PostgresqlVirtualNetworkRule,
-	_ResourceTypeLowerName[1359:1398]: PostgresqlVirtualNetworkRule,
-	_ResourceTypeName[1398:1422]:      SQLElasticPool,
-	_ResourceTypeLowerName[1398:1422]: SQLElasticPool,
-	_ResourceTypeName[1422:1442]:      SQLDatabase,
-	_ResourceTypeLowerName[1422:1442]: SQLDatabase,
-	_ResourceTypeName[1442:1467]:      SQLFirewallRule,
-	_ResourceTypeLowerName[1442:1467]: SQLFirewallRule,
-	_ResourceTypeName[1467:1485]:      SQLServer,
-	_ResourceTypeLowerName[1467:1485]: SQLServer,
+	_ResourceTypeName[301:337]:        NetworkDdosProtectionPlan,
+	_ResourceTypeLowerName[301:337]:   NetworkDdosProtectionPlan,
+	_ResourceTypeName[337:353]:        Firewall,
+	_ResourceTypeLowerName[337:353]:   Firewall,
+	_ResourceTypeName[353:382]:        LocalNetworkGateway,
+	_ResourceTypeLowerName[353:382]:   LocalNetworkGateway,
+	_ResourceTypeName[382:401]:        NatGateway,
+	_ResourceTypeLowerName[382:401]:   NatGateway,
+	_ResourceTypeName[401:424]:        NetworkProfile,
+	_ResourceTypeLowerName[401:424]:   NetworkProfile,
+	_ResourceTypeName[424:453]:        NetworkSecurityRule,
+	_ResourceTypeLowerName[424:453]:   NetworkSecurityRule,
+	_ResourceTypeName[453:470]:        PublicIP,
+	_ResourceTypeLowerName[453:470]:   PublicIP,
+	_ResourceTypeName[470:494]:        PublicIPPrefix,
+	_ResourceTypeLowerName[470:494]:   PublicIPPrefix,
+	_ResourceTypeName[494:507]:        Route,
+	_ResourceTypeLowerName[494:507]:   Route,
+	_ResourceTypeName[507:526]:        RouteTable,
+	_ResourceTypeLowerName[507:526]:   RouteTable,
+	_ResourceTypeName[526:557]:        VirtualNetworkGateway,
+	_ResourceTypeLowerName[526:557]:   VirtualNetworkGateway,
+	_ResourceTypeName[557:599]:        VirtualNetworkGatewayConnection,
+	_ResourceTypeLowerName[557:599]:   VirtualNetworkGatewayConnection,
+	_ResourceTypeName[599:630]:        VirtualNetworkPeering,
+	_ResourceTypeLowerName[599:630]:   VirtualNetworkPeering,
+	_ResourceTypeName[630:669]:        WebApplicationFirewallPolicy,
+	_ResourceTypeLowerName[630:669]:   WebApplicationFirewallPolicy,
+	_ResourceTypeName[669:702]:        VirtualDesktopHostPool,
+	_ResourceTypeLowerName[669:702]:   VirtualDesktopHostPool,
+	_ResourceTypeName[702:743]:        VirtualDesktopApplicationGroup,
+	_ResourceTypeLowerName[702:743]:   VirtualDesktopApplicationGroup,
+	_ResourceTypeName[743:769]:        LogicAppWorkflow,
+	_ResourceTypeLowerName[743:769]:   LogicAppWorkflow,
+	_ResourceTypeName[769:801]:        LogicAppTriggerCustom,
+	_ResourceTypeLowerName[769:801]:   LogicAppTriggerCustom,
+	_ResourceTypeName[801:832]:        LogicAppActionCustom,
+	_ResourceTypeLowerName[801:832]:   LogicAppActionCustom,
+	_ResourceTypeName[832:858]:        ContainerRegistry,
+	_ResourceTypeLowerName[832:858]:   ContainerRegistry,
+	_ResourceTypeName[858:892]:        ContainerRegistryWebhook,
+	_ResourceTypeLowerName[858:892]:   ContainerRegistryWebhook,
+	_ResourceTypeName[892:915]:        StorageAccount,
+	_ResourceTypeLowerName[892:915]:   StorageAccount,
+	_ResourceTypeName[915:936]:        StorageQueue,
+	_ResourceTypeLowerName[915:936]:   StorageQueue,
+	_ResourceTypeName[936:957]:        StorageShare,
+	_ResourceTypeLowerName[936:957]:   StorageShare,
+	_ResourceTypeName[957:978]:        StorageTable,
+	_ResourceTypeLowerName[957:978]:   StorageTable,
+	_ResourceTypeName[978:998]:        StorageBlob,
+	_ResourceTypeLowerName[978:998]:   StorageBlob,
+	_ResourceTypeName[998:1027]:       MariadbConfiguration,
+	_ResourceTypeLowerName[998:1027]:  MariadbConfiguration,
+	_ResourceTypeName[1027:1051]:      MariadbDatabase,
+	_ResourceTypeLowerName[1027:1051]: MariadbDatabase,
+	_ResourceTypeName[1051:1080]:      MariadbFirewallRule,
+	_ResourceTypeLowerName[1051:1080]: MariadbFirewallRule,
+	_ResourceTypeName[1080:1102]:      MariadbServer,
+	_ResourceTypeLowerName[1080:1102]: MariadbServer,
+	_ResourceTypeName[1102:1138]:      MariadbVirtualNetworkRule,
+	_ResourceTypeLowerName[1102:1138]: MariadbVirtualNetworkRule,
+	_ResourceTypeName[1138:1165]:      MysqlConfiguration,
+	_ResourceTypeLowerName[1138:1165]: MysqlConfiguration,
+	_ResourceTypeName[1165:1187]:      MysqlDatabase,
+	_ResourceTypeLowerName[1165:1187]: MysqlDatabase,
+	_ResourceTypeName[1187:1214]:      MysqlFirewallRule,
+	_ResourceTypeLowerName[1187:1214]: MysqlFirewallRule,
+	_ResourceTypeName[1214:1234]:      MysqlServer,
+	_ResourceTypeLowerName[1214:1234]: MysqlServer,
+	_ResourceTypeName[1234:1268]:      MysqlVirtualNetworkRule,
+	_ResourceTypeLowerName[1234:1268]: MysqlVirtualNetworkRule,
+	_ResourceTypeName[1268:1300]:      PostgresqlConfiguration,
+	_ResourceTypeLowerName[1268:1300]: PostgresqlConfiguration,
+	_ResourceTypeName[1300:1327]:      PostgresqlDatabase,
+	_ResourceTypeLowerName[1300:1327]: PostgresqlDatabase,
+	_ResourceTypeName[1327:1359]:      PostgresqlFirewallRule,
+	_ResourceTypeLowerName[1327:1359]: PostgresqlFirewallRule,
+	_ResourceTypeName[1359:1384]:      PostgresqlServer,
+	_ResourceTypeLowerName[1359:1384]: PostgresqlServer,
+	_ResourceTypeName[1384:1423]:      PostgresqlVirtualNetworkRule,
+	_ResourceTypeLowerName[1384:1423]: PostgresqlVirtualNetworkRule,
+	_ResourceTypeName[1423:1447]:      SqlElasticPool,
+	_ResourceTypeLowerName[1423:1447]: SqlElasticPool,
+	_ResourceTypeName[1447:1467]:      SqlDatabase,
+	_ResourceTypeLowerName[1447:1467]: SqlDatabase,
+	_ResourceTypeName[1467:1492]:      SqlFirewallRule,
+	_ResourceTypeLowerName[1467:1492]: SqlFirewallRule,
+	_ResourceTypeName[1492:1510]:      SqlServer,
+	_ResourceTypeLowerName[1492:1510]: SqlServer,
 }
 
 var _ResourceTypeNames = []string{
@@ -211,50 +215,51 @@ var _ResourceTypeNames = []string{
 	_ResourceTypeName[210:240],
 	_ResourceTypeName[240:267],
 	_ResourceTypeName[267:301],
-	_ResourceTypeName[301:329],
-	_ResourceTypeName[329:351],
-	_ResourceTypeName[351:380],
-	_ResourceTypeName[380:399],
-	_ResourceTypeName[399:414],
-	_ResourceTypeName[414:435],
-	_ResourceTypeName[435:460],
-	_ResourceTypeName[460:484],
-	_ResourceTypeName[484:497],
-	_ResourceTypeName[497:516],
-	_ResourceTypeName[516:547],
-	_ResourceTypeName[547:589],
-	_ResourceTypeName[589:620],
-	_ResourceTypeName[620:659],
-	_ResourceTypeName[659:692],
-	_ResourceTypeName[692:733],
-	_ResourceTypeName[733:759],
-	_ResourceTypeName[759:791],
-	_ResourceTypeName[791:822],
-	_ResourceTypeName[822:848],
-	_ResourceTypeName[848:882],
-	_ResourceTypeName[882:905],
-	_ResourceTypeName[905:926],
-	_ResourceTypeName[926:952],
-	_ResourceTypeName[952:973],
-	_ResourceTypeName[973:1002],
-	_ResourceTypeName[1002:1026],
-	_ResourceTypeName[1026:1055],
-	_ResourceTypeName[1055:1077],
-	_ResourceTypeName[1077:1113],
-	_ResourceTypeName[1113:1140],
-	_ResourceTypeName[1140:1162],
-	_ResourceTypeName[1162:1189],
-	_ResourceTypeName[1189:1209],
-	_ResourceTypeName[1209:1243],
-	_ResourceTypeName[1243:1275],
-	_ResourceTypeName[1275:1302],
-	_ResourceTypeName[1302:1334],
-	_ResourceTypeName[1334:1359],
-	_ResourceTypeName[1359:1398],
-	_ResourceTypeName[1398:1422],
-	_ResourceTypeName[1422:1442],
-	_ResourceTypeName[1442:1467],
-	_ResourceTypeName[1467:1485],
+	_ResourceTypeName[301:337],
+	_ResourceTypeName[337:353],
+	_ResourceTypeName[353:382],
+	_ResourceTypeName[382:401],
+	_ResourceTypeName[401:424],
+	_ResourceTypeName[424:453],
+	_ResourceTypeName[453:470],
+	_ResourceTypeName[470:494],
+	_ResourceTypeName[494:507],
+	_ResourceTypeName[507:526],
+	_ResourceTypeName[526:557],
+	_ResourceTypeName[557:599],
+	_ResourceTypeName[599:630],
+	_ResourceTypeName[630:669],
+	_ResourceTypeName[669:702],
+	_ResourceTypeName[702:743],
+	_ResourceTypeName[743:769],
+	_ResourceTypeName[769:801],
+	_ResourceTypeName[801:832],
+	_ResourceTypeName[832:858],
+	_ResourceTypeName[858:892],
+	_ResourceTypeName[892:915],
+	_ResourceTypeName[915:936],
+	_ResourceTypeName[936:957],
+	_ResourceTypeName[957:978],
+	_ResourceTypeName[978:998],
+	_ResourceTypeName[998:1027],
+	_ResourceTypeName[1027:1051],
+	_ResourceTypeName[1051:1080],
+	_ResourceTypeName[1080:1102],
+	_ResourceTypeName[1102:1138],
+	_ResourceTypeName[1138:1165],
+	_ResourceTypeName[1165:1187],
+	_ResourceTypeName[1187:1214],
+	_ResourceTypeName[1214:1234],
+	_ResourceTypeName[1234:1268],
+	_ResourceTypeName[1268:1300],
+	_ResourceTypeName[1300:1327],
+	_ResourceTypeName[1327:1359],
+	_ResourceTypeName[1359:1384],
+	_ResourceTypeName[1384:1423],
+	_ResourceTypeName[1423:1447],
+	_ResourceTypeName[1447:1467],
+	_ResourceTypeName[1467:1492],
+	_ResourceTypeName[1492:1510],
 }
 
 // ResourceTypeString retrieves an enum value from the enum constants string name.
@@ -264,6 +269,9 @@ func ResourceTypeString(s string) (ResourceType, error) {
 		return val, nil
 	}
 
+	if val, ok := _ResourceTypeNameToValueMap[strings.ToLower(s)]; ok {
+		return val, nil
+	}
 	return 0, fmt.Errorf("%s does not belong to ResourceType values", s)
 }
 

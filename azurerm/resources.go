@@ -29,13 +29,13 @@ const (
 	NetworkSecurityGroup
 	ApplicationGateway
 	ApplicationSecurityGroup
-	DdosProtectionPlan
-	AzureFirewall
+	NetworkDdosProtectionPlan
+	Firewall
 	LocalNetworkGateway
 	NatGateway
-	Profile
-	SecurityRule
-	PublicIPAddress
+	NetworkProfile
+	NetworkSecurityRule
+	PublicIP
 	PublicIPPrefix
 	Route
 	RouteTable
@@ -56,8 +56,9 @@ const (
 	// Storage Resources
 	StorageAccount
 	StorageQueue
-	StorageFileShare
+	StorageShare
 	StorageTable
+	StorageBlob
 	// Database Resources- mariadb
 	MariadbConfiguration
 	MariadbDatabase
@@ -77,10 +78,10 @@ const (
 	PostgresqlServer
 	PostgresqlVirtualNetworkRule
 	// Database Resources- sql
-	SQLElasticPool
-	SQLDatabase
-	SQLFirewallRule
-	SQLServer
+	SqlElasticPool
+	SqlDatabase
+	SqlFirewallRule
+	SqlServer
 )
 
 type rtFn func(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error)
@@ -100,13 +101,13 @@ var (
 		NetworkSecurityGroup:            networkSecurityGroups,
 		ApplicationGateway:              applicationGateways,
 		ApplicationSecurityGroup:        applicationSecurityGroups,
-		DdosProtectionPlan:              ddosProtectionPlans,
-		AzureFirewall:                   azureFirewalls,
+		NetworkDdosProtectionPlan:       networkddosProtectionPlans,
+		Firewall:                        firewalls,
 		LocalNetworkGateway:             localNetworkGateways,
 		NatGateway:                      natGateways,
-		Profile:                         profiles,
-		SecurityRule:                    securityRules,
-		PublicIPAddress:                 publicIPAddresses,
+		NetworkProfile:                  networkProfiles,
+		NetworkSecurityRule:             networkSecurityRules,
+		PublicIP:                        publicIP,
 		PublicIPPrefix:                  publicIPPrefixes,
 		Route:                           routes,
 		RouteTable:                      routeTables,
@@ -125,10 +126,11 @@ var (
 		ContainerRegistry:        containerRegistries,
 		ContainerRegistryWebhook: containerRegistryWebhooks,
 		// Storage Resources
-		StorageAccount:   storageAccounts,
-		StorageQueue:     storageQueues,
-		StorageFileShare: storageFileShares,
-		StorageTable:     storageTables,
+		StorageAccount: storageAccounts,
+		StorageQueue:   storageQueues,
+		StorageShare:   storageShares,
+		StorageTable:   storageTables,
+		StorageBlob:    storageBlobs,
 		// Database Resources- mariadb
 		MariadbConfiguration:      mariadbConfigurations,
 		MariadbDatabase:           mariadbDatabases,
@@ -148,10 +150,10 @@ var (
 		PostgresqlServer:             postgresqlServers,
 		PostgresqlVirtualNetworkRule: postgresqlVirtualNetworkRules,
 		// Database Resources- sql
-		SQLElasticPool:  sqlElasticPools,
-		SQLDatabase:     sqlDatabases,
-		SQLFirewallRule: sqlFirewallRules,
-		SQLServer:       sqlServers,
+		SqlElasticPool:  sqlElasticPools,
+		SqlDatabase:     sqlDatabases,
+		SqlFirewallRule: sqlFirewallRules,
+		SqlServer:       sqlServers,
 	}
 )
 
@@ -337,7 +339,7 @@ func applicationSecurityGroups(ctx context.Context, a *azurerm, resourceType str
 	return resources, nil
 }
 
-func ddosProtectionPlans(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+func networkddosProtectionPlans(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	ddosProtectionPlans, err := a.azurer.ListDdosProtectionPlans(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list network ddos protection plans from reader")
@@ -350,7 +352,7 @@ func ddosProtectionPlans(ctx context.Context, a *azurerm, resourceType string, f
 	return resources, nil
 }
 
-func azureFirewalls(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+func firewalls(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	azureFirewalls, err := a.azurer.ListAzureFirewalls(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list azure network firewall from reader")
@@ -389,7 +391,7 @@ func natGateways(ctx context.Context, a *azurerm, resourceType string, filters *
 	return resources, nil
 }
 
-func profiles(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+func networkProfiles(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	profiles, err := a.azurer.ListProfiles(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list profiles from reader")
@@ -402,7 +404,7 @@ func profiles(ctx context.Context, a *azurerm, resourceType string, filters *fil
 	return resources, nil
 }
 
-func securityRules(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+func networkSecurityRules(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	securityGroupNames, err := getSecurityGroups(ctx, a, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list security Groups from cache")
@@ -421,7 +423,7 @@ func securityRules(ctx context.Context, a *azurerm, resourceType string, filters
 	return resources, nil
 }
 
-func publicIPAddresses(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+func publicIP(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	publicIPAddresses, err := a.azurer.ListPublicIPAddresses(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list public IP addresses from reader")
@@ -730,7 +732,7 @@ func storageQueues(ctx context.Context, a *azurerm, resourceType string, filters
 	return resources, nil
 }
 
-func storageFileShares(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+func storageShares(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	storageAccountNames, err := getStorageAccounts(ctx, a, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list storage Accounts from cache")
@@ -748,6 +750,30 @@ func storageFileShares(ctx context.Context, a *azurerm, resourceType string, fil
 		}
 		for _, storageFileShare := range storageFileShares {
 			r := provider.NewResource(*storageFileShare.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func storageBlobs(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	storageAccountNames, err := getStorageAccounts(ctx, a, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list storage Accounts from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, storageAccountName := range storageAccountNames {
+		// last 3 args of list function "" because they're optional
+		// https://github.com/Azure/azure-sdk-for-go/blob/main/services/storage/mgmt/2021-04-01/storage/blobcontainers.go#:~:text=//%20List-,lists,-all%20containers%20and
+		// maxpagesize - optional, a maximum number of queues that should be included in a list queue response
+		// filter - optional, When specified, only the queues with a name starting with the given filter will be
+		// expand - optional, used to expand the properties within share's properties.
+		storageBlobs, err := a.azurer.ListSTORAGEBlobContainers(ctx, storageAccountName, "", "", "")
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list storage blobs from reader")
+		}
+		for _, storageBlob := range storageBlobs {
+			r := provider.NewResource(*storageBlob.ID, resourceType, a)
 			resources = append(resources, r)
 		}
 	}
