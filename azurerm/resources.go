@@ -78,7 +78,7 @@ const (
 	PostgresqlServer
 	PostgresqlVirtualNetworkRule
 	// Database Resources- sql
-	SQLElasticPool
+	SQLElasticPool // sql_elasticpool
 	SQLDatabase
 	SQLFirewallRule
 	SQLServer
