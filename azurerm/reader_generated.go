@@ -68,6 +68,20 @@ func (ar *AzureReader) ListVirtualMachineScaleSets(ctx context.Context) ([]compu
 
 }
 
+// ListVirtualMachineExtensions returns a list of VirtualMachineExtensions within a subscription and a resource group
+func (ar *AzureReader) ListVirtualMachineExtensions(ctx context.Context, VMName string, expand string) ([]compute.VirtualMachineExtension, error) {
+	client := compute.NewVirtualMachineExtensionsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, ar.GetResourceGroupName(), VMName, expand)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list compute.VirtualMachineExtension from Azure APIs")
+	}
+
+	return *output.Value, nil
+
+}
+
 // ListAvailabilitySets returns a list of AvailabilitySets within a subscription and a resource group
 func (ar *AzureReader) ListAvailabilitySets(ctx context.Context) ([]compute.AvailabilitySet, error) {
 	client := compute.NewAvailabilitySetsClient(ar.config.SubscriptionID)

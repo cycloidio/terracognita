@@ -9,12 +9,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Caches resources, that may be needed for other ones
-// 1 - add cache method
-// 2 - declare method to get the cached resources
-
-//Caching VirtualNetworks
-
 func cacheVirtualNetworks(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
 	if err != nil {
@@ -48,8 +42,6 @@ func getVirtualNetworkNames(ctx context.Context, a *azurerm, rt string, filters 
 
 	return names, nil
 }
-
-//Caching Virtual Machines
 
 func cacheVirtualMachines(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
@@ -85,8 +77,6 @@ func getVirtualMachineNames(ctx context.Context, a *azurerm, rt string, filters 
 	return names, nil
 }
 
-////Caching Workflows
-
 func cacheWorkflows(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
 	if err != nil {
@@ -120,8 +110,6 @@ func getWorkflowNames(ctx context.Context, a *azurerm, rt string, filters *filte
 
 	return names, nil
 }
-
-// Caching Security Group
 
 func cacheSecurityGroups(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
@@ -157,8 +145,6 @@ func getSecurityGroups(ctx context.Context, a *azurerm, rt string, filters *filt
 	return names, nil
 }
 
-// Caching routeTables
-
 func cacheRouteTables(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
 	if err != nil {
@@ -192,8 +178,6 @@ func getRouteTables(ctx context.Context, a *azurerm, rt string, filters *filter.
 
 	return names, nil
 }
-
-// Caching container registries
 
 func cacheContainerRegistries(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
@@ -229,8 +213,6 @@ func getContainerRegistries(ctx context.Context, a *azurerm, rt string, filters 
 	return names, nil
 }
 
-// Caching Storage Account Name
-
 func cacheStorageAccounts(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
 	if err != nil {
@@ -264,8 +246,6 @@ func getStorageAccounts(ctx context.Context, a *azurerm, rt string, filters *fil
 
 	return names, nil
 }
-
-// Caching MariaDB Server
 
 func cacheMariadbServers(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
@@ -301,8 +281,6 @@ func getMariadbServers(ctx context.Context, a *azurerm, rt string, filters *filt
 	return names, nil
 }
 
-// Caching MySQL Server
-
 func cacheMysqlServers(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
 	if err != nil {
@@ -337,8 +315,6 @@ func getMysqlServers(ctx context.Context, a *azurerm, rt string, filters *filter
 	return names, nil
 }
 
-// Caching  PostgreSQL Server
-
 func cachePostgresqlServers(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
 	if err != nil {
@@ -372,8 +348,6 @@ func getPostgresqlServers(ctx context.Context, a *azurerm, rt string, filters *f
 
 	return names, nil
 }
-
-// Caching  SQL Server
 
 func cacheSQLServers(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)

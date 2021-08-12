@@ -16,14 +16,14 @@ type ResourceType int
 //go:generate enumer -type ResourceType -addprefix azurerm_ -transform snake -linecomment
 const (
 	ResourceGroup ResourceType = iota
-	//Compute Resources
+	// Compute Resources
 	VirtualMachine
 	VirtualMachineExtension
 	VirtualMachineScaleSet
 	VirtualNetwork
 	AvailabilitySet
 	Image
-	//Network Resources
+	// Network Resources
 	Subnet
 	NetworkInterface
 	NetworkSecurityGroup
@@ -43,40 +43,40 @@ const (
 	VirtualNetworkGatewayConnection
 	VirtualNetworkPeering
 	WebApplicationFirewallPolicy
-	//Desktop Resources
+	// Desktop Resources
 	VirtualDesktopHostPool
 	VirtualDesktopApplicationGroup
-	//Logic Resources
+	// Logic Resources
 	LogicAppWorkflow
 	LogicAppTriggerCustom
 	LogicAppActionCustom
-	//Container Registry Resources
+	// Container Registry Resources
 	ContainerRegistry
 	ContainerRegistryWebhook
-	//Storage Resources
+	// Storage Resources
 	StorageAccount
 	StorageQueue
 	StorageFileShare
 	StorageTable
-	//Database Resources- mariadb
+	// Database Resources- mariadb
 	MariadbConfiguration
 	MariadbDatabase
 	MariadbFirewallRule
 	MariadbServer
 	MariadbVirtualNetworkRule
-	//Database Resources - mysql
+	// Database Resources - mysql
 	MysqlConfiguration
 	MysqlDatabase
 	MysqlFirewallRule
 	MysqlServer
 	MysqlVirtualNetworkRule
-	//Database Resources - postgresql
+	// Database Resources - postgresql
 	PostgresqlConfiguration
 	PostgresqlDatabase
 	PostgresqlFirewallRule
 	PostgresqlServer
 	PostgresqlVirtualNetworkRule
-	//Database Resources- sql
+	// Database Resources- sql
 	SQLElasticPool
 	SQLDatabase
 	SQLFirewallRule
@@ -87,14 +87,14 @@ type rtFn func(ctx context.Context, a *azurerm, resourceType string, filters *fi
 
 var (
 	resources = map[ResourceType]rtFn{
-		//Compute Resources
+		// Compute Resources
 		VirtualMachine:          virtualMachines,
 		VirtualMachineExtension: virtualMachineExtensions,
 		VirtualNetwork:          cacheVirtualNetworks,
 		VirtualMachineScaleSet:  virtualMachineScaleSets,
 		AvailabilitySet:         availabilitySets,
 		Image:                   images,
-		//Network Resources
+		// Network Resources
 		Subnet:                          subnets,
 		NetworkInterface:                networkInterfaces,
 		NetworkSecurityGroup:            networkSecurityGroups,
@@ -114,40 +114,40 @@ var (
 		VirtualNetworkGatewayConnection: virtualNetworkGatewayConnections,
 		VirtualNetworkPeering:           virtualNetworkPeerings,
 		WebApplicationFirewallPolicy:    webApplicationFirewallPolicies,
-		//Desktop Resources
+		// Desktop Resources
 		VirtualDesktopApplicationGroup: virtualApplicationGroups,
 		VirtualDesktopHostPool:         virtualDesktopHostPools,
-		//Logic Resources
+		// Logic Resources
 		LogicAppActionCustom:  logicAppActionCustoms,
 		LogicAppWorkflow:      logicAppWorkflows,
 		LogicAppTriggerCustom: logicAppTriggerCustoms,
-		//Container Registry Resources
+		// Container Registry Resources
 		ContainerRegistry:        containerRegistries,
 		ContainerRegistryWebhook: containerRegistryWebhooks,
-		//Storage Resources
+		// Storage Resources
 		StorageAccount:   storageAccounts,
 		StorageQueue:     storageQueues,
 		StorageFileShare: storageFileShares,
 		StorageTable:     storageTables,
-		//Database Resources- mariadb
+		// Database Resources- mariadb
 		MariadbConfiguration:      mariadbConfigurations,
 		MariadbDatabase:           mariadbDatabases,
 		MariadbFirewallRule:       mariadbFirewallRules,
 		MariadbServer:             mariadbServers,
 		MariadbVirtualNetworkRule: mariadbVirtualNetworkRules,
-		//Database Resources - mysql
+		// Database Resources - mysql
 		MysqlConfiguration:      mysqlConfigurations,
 		MysqlDatabase:           mysqlDatabases,
 		MysqlFirewallRule:       mysqlFirewallRules,
 		MysqlServer:             mysqlServers,
 		MysqlVirtualNetworkRule: mysqlVirtualNetworkRules,
-		//Database Resources - postgresql
+		// Database Resources - postgresql
 		PostgresqlConfiguration:      postgresqlConfigurations,
 		PostgresqlDatabase:           postgresqlDatabases,
 		PostgresqlFirewallRule:       postgresqlFirewallRules,
 		PostgresqlServer:             postgresqlServers,
 		PostgresqlVirtualNetworkRule: postgresqlVirtualNetworkRules,
-		//Database Resources- sql
+		// Database Resources- sql
 		SQLElasticPool:  sqlElasticPools,
 		SQLDatabase:     sqlDatabases,
 		SQLFirewallRule: sqlFirewallRules,
@@ -162,7 +162,7 @@ func resourceGroup(ctx context.Context, a *azurerm, resourceType string, filters
 	return resources, nil
 }
 
-//Compute Resources
+// Compute Resources
 
 func virtualMachines(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	virtualMachines, err := a.azurer.ListVirtualMachines(ctx)
@@ -246,7 +246,7 @@ func images(ctx context.Context, a *azurerm, resourceType string, filters *filte
 	return resources, nil
 }
 
-//Network Resources
+// Network Resources
 
 func virtualNetworks(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	virtualNetworks, err := a.azurer.ListVirtualNetworks(ctx)
@@ -555,7 +555,7 @@ func webApplicationFirewallPolicies(ctx context.Context, a *azurerm, resourceTyp
 	return resources, nil
 }
 
-//Desktop Resources
+// Desktop Resources
 
 func virtualDesktopHostPools(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	pools, err := a.azurer.ListHostPools(ctx)
@@ -585,7 +585,7 @@ func virtualApplicationGroups(ctx context.Context, a *azurerm, resourceType stri
 	return resources, nil
 }
 
-//Logic Resources
+// Logic Resources
 
 func logicAppWorkflows(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	appWorkflows, err := a.azurer.ListWorkflows(ctx, nil, "")
@@ -652,7 +652,7 @@ func logicAppActionCustoms(ctx context.Context, a *azurerm, resourceType string,
 	return resources, nil
 }
 
-//Container Registry Resources
+// Container Registry Resources
 
 func containerRegistries(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	containerRegistries, err := a.azurer.ListContainerRegistries(ctx)
@@ -689,7 +689,7 @@ func containerRegistryWebhooks(ctx context.Context, a *azurerm, resourceType str
 	return resources, nil
 }
 
-//Storage Resources
+// Storage Resources
 
 func storageAccounts(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	storageAccounts, err := a.azurer.ListSTORAGEAccounts(ctx)
@@ -773,7 +773,7 @@ func storageTables(ctx context.Context, a *azurerm, resourceType string, filters
 	return resources, nil
 }
 
-//Database Resources- mariadb
+// Database Resources- mariadb
 
 func mariadbServers(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	mariadbServers, err := a.azurer.ListMARIADBServers(ctx)
@@ -867,7 +867,7 @@ func mariadbVirtualNetworkRules(ctx context.Context, a *azurerm, resourceType st
 	return resources, nil
 }
 
-//Database Resources- mysql
+// Database Resources- mysql
 
 func mysqlServers(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	mysqlServers, err := a.azurer.ListMYSQLServers(ctx)
@@ -961,7 +961,7 @@ func mysqlVirtualNetworkRules(ctx context.Context, a *azurerm, resourceType stri
 	return resources, nil
 }
 
-//Database Resources- PostgreSQL
+// Database Resources- PostgreSQL
 
 func postgresqlServers(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	postgresqlServers, err := a.azurer.ListPOSTGRESQLServers(ctx)
@@ -1055,7 +1055,7 @@ func postgresqlVirtualNetworkRules(ctx context.Context, a *azurerm, resourceType
 	return resources, nil
 }
 
-//Database Resources- SQL
+// Database Resources- SQL
 
 func sqlServers(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	sqlServers, err := a.azurer.ListSQLServers(ctx)

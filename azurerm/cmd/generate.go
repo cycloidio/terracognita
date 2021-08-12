@@ -1,6 +1,5 @@
 package main
 
-//This file generates list methods for the defined resources in azurerm/reader_generated.go file using the templates defined in template.go
 import (
 	"bytes"
 	"io"
@@ -24,12 +23,22 @@ var azureAPIs = []AzureAPI{
 }
 
 var functions = []Function{
-	//Compute API Resources
+	// Compute API Resources
 	{ResourceName: "VirtualMachine", API: "compute", ResourceGroup: true},
 	{ResourceName: "VirtualMachineScaleSet", API: "compute", ResourceGroup: true},
+	{ResourceName: "VirtualMachineExtension", API: "compute", ResourceGroup: true, ReturnsList: true, ExtraArgs: []Arg{
+		{
+			Name: "VMName",
+			Type: "string",
+		},
+		{
+			Name: "expand",
+			Type: "string",
+		},
+	}},
 	{ResourceName: "AvailabilitySet", API: "compute", ResourceGroup: true},
 	{ResourceName: "Image", API: "compute", ResourceGroup: false},
-	//Network API Resources
+	// Network API Resources
 	{ResourceName: "VirtualNetwork", API: "network", ResourceGroup: true},
 	{ResourceName: "Subnet", API: "network", ResourceGroup: true, ExtraArgs: []Arg{
 		{
@@ -70,7 +79,7 @@ var functions = []Function{
 		},
 	}},
 	{ResourceName: "WebApplicationFirewallPolicy", API: "network", ResourceGroup: true},
-	//Desktop API Resources
+	// Desktop API Resources
 	{ResourceName: "HostPool", AzureSDKListFunction: "ListByResourceGroup", API: "desktopvirtualization", ResourceGroup: true},
 	{ResourceName: "ApplicationGroup", AzureSDKListFunction: "ListByResourceGroup", API: "desktopvirtualization", ResourceGroup: true, ExtraArgs: []Arg{
 		{
@@ -78,7 +87,7 @@ var functions = []Function{
 			Type: "string",
 		},
 	}},
-	//Logic API Resources
+	// Logic API Resources
 	{ResourceName: "Workflow", AzureSDKListFunction: "ListByResourceGroup", API: "logic", ResourceGroup: true, ExtraArgs: []Arg{
 		{
 			Name: "top",
@@ -135,7 +144,7 @@ var functions = []Function{
 			Type: "string",
 		},
 	}},
-	//Container Registry Resources
+	// Container Registry Resources
 	{ResourceName: "Registry", API: "containerregistry", FunctionName: "ListContainerRegistries", ResourceGroup: false},
 	{ResourceName: "Webhook", API: "containerregistry", FunctionName: "ListContainerRegistryWebhooks", ResourceGroup: true, ExtraArgs: []Arg{
 		{
@@ -143,7 +152,7 @@ var functions = []Function{
 			Type: "string",
 		},
 	}},
-	//Storage Resources
+	// Storage Resources
 	{ResourceName: "Account", API: "storage", ResourceGroup: false},
 	{ResourceName: "ListContainerItem", PluralName: "BlobContainers", API: "storage", ResourceGroup: true, ExtraArgs: []Arg{
 		{
@@ -201,8 +210,8 @@ var functions = []Function{
 			Type: "string",
 		},
 	}},
-	//Database Resources
-	//mariadb
+	// Database Resources
+	// mariadb
 	{ResourceName: "Configuration", API: "mariadb", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ReturnsList: true, ExtraArgs: []Arg{
 		{
 			Name: "serverName",
@@ -228,7 +237,7 @@ var functions = []Function{
 			Type: "string",
 		},
 	}},
-	//mysql
+	// mysql
 	{ResourceName: "Configuration", API: "mysql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ReturnsList: true, ExtraArgs: []Arg{
 		{
 			Name: "serverName",
@@ -254,7 +263,7 @@ var functions = []Function{
 			Type: "string",
 		},
 	}},
-	//postgresql
+	// postgresql
 	{ResourceName: "Configuration", API: "postgresql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ReturnsList: true, ExtraArgs: []Arg{
 		{
 			Name: "serverName",
@@ -280,7 +289,7 @@ var functions = []Function{
 			Type: "string",
 		},
 	}},
-	//sql
+	// sql
 	{ResourceName: "Database", API: "sql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ReturnsList: true, ExtraArgs: []Arg{
 		{
 			Name: "serverName",

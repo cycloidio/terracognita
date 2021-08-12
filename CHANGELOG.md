@@ -11,12 +11,6 @@
 
 ### Changed
 
-- Added more modularity in the templating of azure resources, allowing to cover more use cases by the templating of Azure resources.  
-- Changed some variables names in the template Functions for Azure to make code more easily interpreted: Resource -> ResourceName , Name -> FunctioName or AzureSDKListFunction or PluralName, Iterator -> ReturnsIterator
-- Added automatically plural calculation, to cover cases where plural not the typical -s, using the variable PluralName in Function struct. The variable also can be specified in cases where there's no object plural
-- Added case of when the List Function returns items list and not page or iterator (previously suported cases), using the variable ReturnsList in Function struct
-- Deleted file list_virtual_machine_extensions.go, expection not required anymore since case now covered by new modular templating
-- Added variable AddAPPISufix in AzureAPI to allow to change FunctionName of database resources, e.g sql or postgresql, from "List"+PluralName to "List"+API+PluralName
 - Update aws resources regarding missing pagination and filter
   ([PR #202](https://github.com/cycloidio/terracognita/pull/202))
 
