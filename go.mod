@@ -11,6 +11,7 @@ require (
 	github.com/chr4/pwgen v1.1.0
 	github.com/cycloidio/mxwriter v1.0.2
 	github.com/cycloidio/tfdocs v0.0.0-20210713114615-6a7f069f11c3
+	github.com/gertd/go-pluralize v0.1.7
 	github.com/go-kit/kit v0.9.0
 	github.com/golang/mock v1.4.4
 	github.com/hashicorp/go-azure-helpers v0.15.0
