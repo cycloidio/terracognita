@@ -78,10 +78,10 @@ const (
 	PostgresqlServer
 	PostgresqlVirtualNetworkRule
 	// Database Resources- sql
-	SqlElasticPool
-	SqlDatabase
-	SqlFirewallRule
-	SqlServer
+	SQLElasticPool
+	SQLDatabase
+	SQLFirewallRule
+	SQLServer
 )
 
 type rtFn func(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error)
@@ -150,10 +150,10 @@ var (
 		PostgresqlServer:             postgresqlServers,
 		PostgresqlVirtualNetworkRule: postgresqlVirtualNetworkRules,
 		// Database Resources- sql
-		SqlElasticPool:  sqlElasticPools,
-		SqlDatabase:     sqlDatabases,
-		SqlFirewallRule: sqlFirewallRules,
-		SqlServer:       sqlServers,
+		SQLElasticPool:  sqlElasticPools,
+		SQLDatabase:     sqlDatabases,
+		SQLFirewallRule: sqlFirewallRules,
+		SQLServer:       sqlServers,
 	}
 )
 

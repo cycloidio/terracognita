@@ -77,13 +77,13 @@ func _ResourceTypeNoOp() {
 	_ = x[PostgresqlFirewallRule-(50)]
 	_ = x[PostgresqlServer-(51)]
 	_ = x[PostgresqlVirtualNetworkRule-(52)]
-	_ = x[SqlElasticPool-(53)]
-	_ = x[SqlDatabase-(54)]
-	_ = x[SqlFirewallRule-(55)]
-	_ = x[SqlServer-(56)]
+	_ = x[SQLElasticPool-(53)]
+	_ = x[SQLDatabase-(54)]
+	_ = x[SQLFirewallRule-(55)]
+	_ = x[SQLServer-(56)]
 }
 
-var _ResourceTypeValues = []ResourceType{ResourceGroup, VirtualMachine, VirtualMachineExtension, VirtualMachineScaleSet, VirtualNetwork, AvailabilitySet, Image, Subnet, NetworkInterface, NetworkSecurityGroup, ApplicationGateway, ApplicationSecurityGroup, NetworkDdosProtectionPlan, Firewall, LocalNetworkGateway, NatGateway, NetworkProfile, NetworkSecurityRule, PublicIP, PublicIPPrefix, Route, RouteTable, VirtualNetworkGateway, VirtualNetworkGatewayConnection, VirtualNetworkPeering, WebApplicationFirewallPolicy, VirtualDesktopHostPool, VirtualDesktopApplicationGroup, LogicAppWorkflow, LogicAppTriggerCustom, LogicAppActionCustom, ContainerRegistry, ContainerRegistryWebhook, StorageAccount, StorageQueue, StorageShare, StorageTable, StorageBlob, MariadbConfiguration, MariadbDatabase, MariadbFirewallRule, MariadbServer, MariadbVirtualNetworkRule, MysqlConfiguration, MysqlDatabase, MysqlFirewallRule, MysqlServer, MysqlVirtualNetworkRule, PostgresqlConfiguration, PostgresqlDatabase, PostgresqlFirewallRule, PostgresqlServer, PostgresqlVirtualNetworkRule, SqlElasticPool, SqlDatabase, SqlFirewallRule, SqlServer}
+var _ResourceTypeValues = []ResourceType{ResourceGroup, VirtualMachine, VirtualMachineExtension, VirtualMachineScaleSet, VirtualNetwork, AvailabilitySet, Image, Subnet, NetworkInterface, NetworkSecurityGroup, ApplicationGateway, ApplicationSecurityGroup, NetworkDdosProtectionPlan, Firewall, LocalNetworkGateway, NatGateway, NetworkProfile, NetworkSecurityRule, PublicIP, PublicIPPrefix, Route, RouteTable, VirtualNetworkGateway, VirtualNetworkGatewayConnection, VirtualNetworkPeering, WebApplicationFirewallPolicy, VirtualDesktopHostPool, VirtualDesktopApplicationGroup, LogicAppWorkflow, LogicAppTriggerCustom, LogicAppActionCustom, ContainerRegistry, ContainerRegistryWebhook, StorageAccount, StorageQueue, StorageShare, StorageTable, StorageBlob, MariadbConfiguration, MariadbDatabase, MariadbFirewallRule, MariadbServer, MariadbVirtualNetworkRule, MysqlConfiguration, MysqlDatabase, MysqlFirewallRule, MysqlServer, MysqlVirtualNetworkRule, PostgresqlConfiguration, PostgresqlDatabase, PostgresqlFirewallRule, PostgresqlServer, PostgresqlVirtualNetworkRule, SQLElasticPool, SQLDatabase, SQLFirewallRule, SQLServer}
 
 var _ResourceTypeNameToValueMap = map[string]ResourceType{
 	_ResourceTypeName[0:22]:           ResourceGroup,
@@ -192,14 +192,14 @@ var _ResourceTypeNameToValueMap = map[string]ResourceType{
 	_ResourceTypeLowerName[1359:1384]: PostgresqlServer,
 	_ResourceTypeName[1384:1423]:      PostgresqlVirtualNetworkRule,
 	_ResourceTypeLowerName[1384:1423]: PostgresqlVirtualNetworkRule,
-	_ResourceTypeName[1423:1447]:      SqlElasticPool,
-	_ResourceTypeLowerName[1423:1447]: SqlElasticPool,
-	_ResourceTypeName[1447:1467]:      SqlDatabase,
-	_ResourceTypeLowerName[1447:1467]: SqlDatabase,
-	_ResourceTypeName[1467:1492]:      SqlFirewallRule,
-	_ResourceTypeLowerName[1467:1492]: SqlFirewallRule,
-	_ResourceTypeName[1492:1510]:      SqlServer,
-	_ResourceTypeLowerName[1492:1510]: SqlServer,
+	_ResourceTypeName[1423:1447]:      SQLElasticPool,
+	_ResourceTypeLowerName[1423:1447]: SQLElasticPool,
+	_ResourceTypeName[1447:1467]:      SQLDatabase,
+	_ResourceTypeLowerName[1447:1467]: SQLDatabase,
+	_ResourceTypeName[1467:1492]:      SQLFirewallRule,
+	_ResourceTypeLowerName[1467:1492]: SQLFirewallRule,
+	_ResourceTypeName[1492:1510]:      SQLServer,
+	_ResourceTypeLowerName[1492:1510]: SQLServer,
 }
 
 var _ResourceTypeNames = []string{
