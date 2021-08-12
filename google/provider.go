@@ -54,10 +54,12 @@ func (g *google) HasResourceType(t string) bool {
 	return err == nil
 }
 
-func (g *google) Region() string  { return g.tfGoogleClient.(*tfgoogle.Config).Region }
-func (g *google) Project() string { return g.tfGoogleClient.(*tfgoogle.Config).Project }
-func (g *google) String() string  { return "google" }
-func (g *google) TagKey() string  { return "labels" }
+func (g *google) Region() string                        { return g.tfGoogleClient.(*tfgoogle.Config).Region }
+func (g *google) Project() string                       { return g.tfGoogleClient.(*tfgoogle.Config).Project }
+func (g *google) String() string                        { return "google" }
+func (g *google) TagKey() string                        { return "labels" }
+func (g *google) Source() string                        { return "hashicorp/google" }
+func (g *google) Configuration() map[string]interface{} { return make(map[string]interface{}) }
 
 func (g *google) ResourceTypes() []string {
 	return ResourceTypeStrings()

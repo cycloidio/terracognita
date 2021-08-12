@@ -18,6 +18,7 @@ import (
 // nameRegexp is the new regexp used to validate the names
 // of the resources on TF (defined on configs/configschema/internal_validate.go)
 var nameRegexp = regexp.MustCompile(`^[a-z0-9_]+$`)
+var invalidNameRegexp = regexp.MustCompile(`[^a-z0-9_]`)
 
 // Tag it's an easy representation of
 // a ec2.Filter for tags
@@ -72,10 +73,17 @@ func GetNameFromTag(key string, srd *schema.ResourceData, fallback string) strin
 		n = name.(string)
 	}
 
+	forcedN := forceResourceName(n)
+	forcedFallback := forceResourceName(fallback)
+
 	if isValidResourceName(n) && hclsyntax.ValidIdentifier(n) {
 		return n
+	} else if isValidResourceName(forcedN) && hclsyntax.ValidIdentifier(forcedN) && forcedN != "___" {
+		return forcedN
 	} else if isValidResourceName(fallback) && hclsyntax.ValidIdentifier(fallback) {
 		return fallback
+	} else if isValidResourceName(forcedFallback) && hclsyntax.ValidIdentifier(forcedFallback) && forcedFallback != "___" {
+		return forcedFallback
 	} else {
 		return pwgen.Alpha(5)
 	}
@@ -85,4 +93,10 @@ func GetNameFromTag(key string, srd *schema.ResourceData, fallback string) strin
 // for names to validate if it's valid
 func isValidResourceName(name string) bool {
 	return nameRegexp.MatchString(name)
+}
+
+// forceResourceName will try to replace all the
+// invalid characters of the name for _
+func forceResourceName(name string) string {
+	return invalidNameRegexp.ReplaceAllString(name, "_")
 }

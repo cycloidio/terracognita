@@ -95,7 +95,7 @@ var (
 
 			if hclOut != nil {
 				logger.Log("msg", "initializing HCL writer")
-				hclW = hcl.NewWriter(hclOut, options)
+				hclW = hcl.NewWriter(hclOut, awsP, options)
 			}
 
 			if stateOut != nil {

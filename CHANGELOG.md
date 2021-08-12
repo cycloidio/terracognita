@@ -1,6 +1,7 @@
 ## [Unreleased]
 
 ### Added
+
 - azure resources (compute): `azurerm_availability_set`,`azurerm_image`, 
 - azure resources (container): `azurerm_container_registry`, `azurerm_container_registry_webhook`
 - azure resources (network): `azurerm_application_gateway`,	`azurerm_application_security_group`, `azurerm_network_ddos_protection_plan`,
@@ -8,11 +9,21 @@
 - azure resources (storage): `azurerm_storage_account`, `azurerm_storage_blob`, `azurerm_storage_management_policy`, `azurerm_storage_queue`, `azurerm_storage_share`, `azurerm_storage_table`
 - azure resources (database): `azurerm_mariadb_configuration`, `azurerm_mariadb_database`, `azurerm_mariadb_firewall_rule`, `azurerm_mariadb_server`, `azurerm_mariadb_virtual_network_rule`,  `azurerm_mysql_configuration`, `azurerm_mysql_database`, `azurerm_mysql_firewall_rule`, `azurerm_mysql_server`, `azurerm_mysql_virtual_network_rule`, `azurerm_postgresql_configuration`, `azurerm_postgresql_database`, `azurerm_postgresql_firewall_rule`, `azurerm_postgresql_server`, `azurerm_postgresql_virtual_network_rule`, `azurerm_sql_database`, `azurerm_sql_elasticpool`, `azurerm_sql_firewall_rule`,`azurerm_sql_server`
 ([Issue #100](https://github.com/cycloidio/terracognita/issues/100)
+- `provider` and `terraform` blocks to the HCL generation
+  ([Issue #136](https://github.com/cycloidio/terracognita/issues/136))
+
 
 ### Changed
 
 - Update aws resources regarding missing pagination and filter
   ([PR #202](https://github.com/cycloidio/terracognita/pull/202))
+- Resource names now are generated removing invalid characters instead just assigning a random alphanumeric value
+  ([Issue #208](https://github.com/cycloidio/terracognita/issues/208))
+
+### Fixed
+
+- Import with `aws_alb_target_group_attachment` now validates if the needed values are present
+  ([Issue #213](https://github.com/cycloidio/terracognita/issues/213))
 
 ## [0.7.1] _2021-07-15_
 

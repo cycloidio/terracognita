@@ -4,7 +4,6 @@ package google
 
 import (
 	"fmt"
-	"strings"
 )
 
 const _ResourceTypeName = "google_compute_instancegoogle_compute_firewallgoogle_compute_networkgoogle_compute_health_checkgoogle_compute_instance_groupgoogle_compute_instance_iam_policygoogle_compute_backend_bucketgoogle_compute_backend_servicegoogle_compute_ssl_certificategoogle_compute_target_http_proxygoogle_compute_target_https_proxygoogle_compute_url_mapgoogle_compute_global_forwarding_rulegoogle_compute_forwarding_rulegoogle_compute_diskgoogle_dns_managed_zonegoogle_dns_record_setgoogle_project_iam_custom_rolegoogle_storage_bucketgoogle_storage_bucket_iam_policygoogle_sql_database_instance"
@@ -125,9 +124,6 @@ func ResourceTypeString(s string) (ResourceType, error) {
 		return val, nil
 	}
 
-	if val, ok := _ResourceTypeNameToValueMap[strings.ToLower(s)]; ok {
-		return val, nil
-	}
 	return 0, fmt.Errorf("%s does not belong to ResourceType values", s)
 }
 

@@ -13,7 +13,6 @@ import (
 
 	"github.com/adrg/xdg"
 	"github.com/cycloidio/mxwriter"
-	"github.com/cycloidio/terracognita/hcl"
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/writer"
 	"github.com/spf13/cobra"
@@ -200,7 +199,7 @@ func postRunEOutput(cmd *cobra.Command, args []string) error {
 			var (
 				filep string
 			)
-			if k == hcl.ModuleCategoryKey {
+			if k == writer.ModuleCategoryKey {
 				filep = filepath.Join(m, "module.tf")
 			} else {
 				filep = filepath.Join(m, mdir, fmt.Sprintf("%s.tf", k))

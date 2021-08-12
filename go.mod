@@ -34,7 +34,6 @@ require (
 	github.com/terraform-providers/terraform-provider-aws v1.60.1-0.20210513231836-489654890359
 	github.com/terraform-providers/terraform-provider-azurerm v1.44.1-0.20201029183808-d721bcc1bb55
 	github.com/zclconf/go-cty v1.8.2
-	golang.org/x/arch v0.0.0-20190312162104-788fe5ffcd8c // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
 	golang.org/x/tools v0.1.5 // indirect
 	google.golang.org/api v0.41.0

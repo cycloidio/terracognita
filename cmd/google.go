@@ -84,7 +84,7 @@ var (
 
 			if hclOut != nil {
 				logger.Log("msg", "initializing HCL writer")
-				hclW = hcl.NewWriter(hclOut, options)
+				hclW = hcl.NewWriter(hclOut, googleP, options)
 			}
 
 			if stateOut != nil {

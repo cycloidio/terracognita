@@ -10,7 +10,6 @@ import (
 	"github.com/chr4/pwgen"
 	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/filter"
-	"github.com/cycloidio/terracognita/hcl"
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/tag"
 	"github.com/cycloidio/terracognita/util"
@@ -357,7 +356,7 @@ func (r *resource) HCL(w writer.Writer) error {
 		return errors.New(fmt.Sprintf("provider %s with resource %s is not supported on the docs", r.provider.String(), r.Type()))
 	}
 	// This will convert all Category into snake_case
-	cfg[hcl.ResourceCategoryKey] = strings.ToLower(name.Delimit(tfdoc.Category, '_'))
+	cfg[writer.ResourceCategoryKey] = strings.ToLower(name.Delimit(tfdoc.Category, '_'))
 
 	// If it does not have any configName we will generate one
 	// and store it, so net time it'll use that one on any config

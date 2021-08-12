@@ -33,6 +33,8 @@ type aws struct {
 	tfAWSClient interface{}
 	tfProvider  *schema.Provider
 
+	configuration map[string]interface{}
+
 	cache cache.Cache
 }
 
@@ -65,6 +67,9 @@ func NewProvider(ctx context.Context, accessKey, secretKey, region, sessionToken
 		tfAWSClient: awsClient,
 		tfProvider:  tfp,
 		cache:       cache.New(),
+		configuration: map[string]interface{}{
+			"region": region,
+		},
 	}, nil
 }
 
@@ -114,3 +119,5 @@ func (a *aws) HasResourceType(t string) bool {
 	_, err := ResourceTypeString(t)
 	return err == nil
 }
+func (a *aws) Source() string                        { return "hashicorp/aws" }
+func (a *aws) Configuration() map[string]interface{} { return a.configuration }
