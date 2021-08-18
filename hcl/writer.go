@@ -465,9 +465,21 @@ func writeTuple(pbody, body *hclwrite.Body, attr string, value cty.Value) {
 }
 
 // Interpolate replaces the hardcoded resources link
-// with TF interpolation
+// with TF interpolation.
+// It has the following format:
+// * VALUE => ${aws_instance.name.attribute}
+// So then each value matching the VALUE will
+// be replaced with the reference
 func (w *Writer) Interpolate(i map[string]string) {
-	if !w.opts.Interpolate {
+	// If Interpolation is disabled or
+	// a module without specific attributes to
+	// create as variables (so all are variables),
+	// we ignore the Interpolation as this may happend and is invalid
+	// variable "aws_ses_identity_notification_topic_XoqJb_identity" {
+	//   default = aws_ses_domain_mail_from.SSWXE.id
+	// }
+	if !w.opts.Interpolate ||
+		(w.opts.HasModule() && len(w.opts.ModuleVariables) == 0) {
 		return
 	}
 	for k, v := range w.Config {
@@ -490,7 +502,7 @@ func (w *Writer) Interpolate(i map[string]string) {
 				dest := reflect.New(src.Type()).Elem()
 
 				// walk through the resources to interpolate the good values
-				walkInterpolation(dest, src, i, name, rt, &relations)
+				w.walkInterpolation(dest, src, i, name, "", rt, &relations)
 
 				// remove reflect.Value wrapper from dest
 				resources.(map[string]map[string]interface{})[rt][name] = dest.Interface()
@@ -501,7 +513,7 @@ func (w *Writer) Interpolate(i map[string]string) {
 
 // walkInterpolation through a resource block. it's easier since we do not know how the block is made
 // `dest` will be the new "block" with the values interpolated from `interpolate`
-func walkInterpolation(dest, src reflect.Value, interpolate map[string]string, name string, resourceType string, relations *map[string]struct{}) {
+func (w *Writer) walkInterpolation(dest, src reflect.Value, interpolate map[string]string, name, key string, resourceType string, relations *map[string]struct{}) {
 	switch src.Kind() {
 	// it's an interface, so we basically need
 	// to extract the elem and walk through it
@@ -509,7 +521,7 @@ func walkInterpolation(dest, src reflect.Value, interpolate map[string]string, n
 	case reflect.Interface:
 		srcValue := src.Elem()
 		destValue := reflect.New(srcValue.Type()).Elem()
-		walkInterpolation(destValue, srcValue, interpolate, name, resourceType, relations)
+		w.walkInterpolation(destValue, srcValue, interpolate, name, key, resourceType, relations)
 		dest.Set(destValue)
 
 	// if the current `src` is a slice
@@ -517,7 +529,7 @@ func walkInterpolation(dest, src reflect.Value, interpolate map[string]string, n
 	case reflect.Array, reflect.Slice:
 		dest.Set(reflect.MakeSlice(src.Type(), src.Len(), src.Cap()))
 		for i := 0; i < src.Len(); i++ {
-			walkInterpolation(dest.Index(i), src.Index(i), interpolate, name, resourceType, relations)
+			w.walkInterpolation(dest.Index(i), src.Index(i), interpolate, name, key, resourceType, relations)
 		}
 
 	// it's a map
@@ -527,7 +539,11 @@ func walkInterpolation(dest, src reflect.Value, interpolate map[string]string, n
 		for iter.Next() {
 			// New gives us a pointer, but again we want the value
 			destValue := reflect.New(iter.Value().Type()).Elem()
-			walkInterpolation(destValue, iter.Value(), interpolate, name, resourceType, relations)
+			nk := iter.Key().String()
+			if key != "" {
+				nk = fmt.Sprintf("%s.%s", key, iter.Key())
+			}
+			w.walkInterpolation(destValue, iter.Value(), interpolate, name, nk, resourceType, relations)
 			dest.SetMapIndex(iter.Key(), destValue)
 		}
 
@@ -541,6 +557,13 @@ func walkInterpolation(dest, src reflect.Value, interpolate map[string]string, n
 			irt, in := extractResourceTypeAndName(interpolatedValue)
 			target := fmt.Sprintf("%s.%s", irt, in)
 			source := fmt.Sprintf("%s.%s", resourceType, name)
+			if w.opts.HasModule() && len(w.opts.ModuleVariables) != 0 {
+				// If the current value is part of the ModulesVariables do not try to interpolate it
+				if _, ok := w.opts.ModuleVariables[fmt.Sprintf("%s.%s", resourceType, key)]; ok {
+					dest.Set(src)
+					return
+				}
+			}
 			// avoid to interpolate a resource by "itself" (interpolaception) and avoid to interpolate a resource type with resource
 			// of the same type (cyclic interpolation)
 			// we also check for mutual interpolation
