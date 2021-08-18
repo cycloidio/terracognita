@@ -716,6 +716,111 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 
 		assert.Contains(t, string(b), "network = aType.aName.id")
 	})
+	t.Run("SuccessWithModule", func(t *testing.T) {
+		var (
+			mw    = mxwriter.NewMux()
+			ctrl  = gomock.NewController(t)
+			p     = mock.NewProvider(ctrl)
+			value = map[string]interface{}{
+				"network": "to-be-interpolated",
+			}
+			network = map[string]interface{}{
+				"id": "interpolated",
+			}
+			i = make(map[string]string)
+		)
+		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().TFProvider().Return(aws.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"region": "eu-west-1",
+		})
+
+		hw := hcl.NewWriter(mw, p, &writer.Options{Module: "test", Interpolate: true})
+		i["to-be-interpolated"] = "${aType.aName.id}"
+		hw.Write("type.name", value)
+		hw.Write("aType.aName", network)
+
+		hw.Interpolate(i)
+
+		err := hw.Sync()
+		require.NoError(t, err)
+
+		b, err := ioutil.ReadAll(mw)
+		require.NoError(t, err)
+
+		assert.NotContains(t, string(b), "network = aType.aName.id")
+	})
+	t.Run("SuccessWithModuleVariablesNotSelected", func(t *testing.T) {
+		var (
+			mw    = mxwriter.NewMux()
+			ctrl  = gomock.NewController(t)
+			p     = mock.NewProvider(ctrl)
+			value = map[string]interface{}{
+				"network": "to-be-interpolated",
+			}
+			network = map[string]interface{}{
+				"id": "interpolated",
+			}
+			i = make(map[string]string)
+		)
+		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().TFProvider().Return(aws.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"region": "eu-west-1",
+		})
+
+		hw := hcl.NewWriter(mw, p, &writer.Options{Module: "test", ModuleVariables: map[string]struct{}{"type.name": struct{}{}}, Interpolate: true})
+		i["to-be-interpolated"] = "${aType.aName.id}"
+		hw.Write("type.name", value)
+		hw.Write("aType.aName", network)
+
+		hw.Interpolate(i)
+
+		err := hw.Sync()
+		require.NoError(t, err)
+
+		b, err := ioutil.ReadAll(mw)
+		require.NoError(t, err)
+
+		assert.Contains(t, string(b), "network = aType.aName.id")
+	})
+	t.Run("SuccessWithModuleVariablesSelected", func(t *testing.T) {
+		var (
+			mw    = mxwriter.NewMux()
+			ctrl  = gomock.NewController(t)
+			p     = mock.NewProvider(ctrl)
+			value = map[string]interface{}{
+				"network": "to-be-interpolated",
+			}
+			network = map[string]interface{}{
+				"id": "interpolated",
+			}
+			i = make(map[string]string)
+		)
+		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().TFProvider().Return(aws.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"region": "eu-west-1",
+		})
+
+		hw := hcl.NewWriter(mw, p, &writer.Options{Module: "test", ModuleVariables: map[string]struct{}{"type.network": struct{}{}}, Interpolate: true})
+		i["to-be-interpolated"] = "${aType.aName.id}"
+		hw.Write("type.name", value)
+		hw.Write("aType.aName", network)
+
+		hw.Interpolate(i)
+
+		err := hw.Sync()
+		require.NoError(t, err)
+
+		b, err := ioutil.ReadAll(mw)
+		require.NoError(t, err)
+
+		assert.NotContains(t, string(b), "network = aType.aName.id")
+	})
 	t.Run("SuccessAvoidInterpolaception", func(t *testing.T) {
 		var (
 			mw    = mxwriter.NewMux()

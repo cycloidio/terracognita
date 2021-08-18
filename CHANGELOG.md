@@ -10,6 +10,11 @@
 - Support filter with `tag` attribute used by AWS on `aws_autoscaling_group` resource
   ([Issue #223](https://github.com/cycloidio/terracognita/issues/223))
 
+### Fixed
+
+- Integration between Interpolation and Modules has been changed to not generate invalid HCL references
+  ([Issue #219](https://github.com/cycloidio/terracognita/issues/219)
+
 ## [0.7.2] _2021-08-13_
 
 ### Added
