@@ -65,6 +65,7 @@ const (
 	AthenaWorkgroup
 	AutoscalingGroup
 	AutoscalingPolicy
+	AutoscalingSchedule
 	BatchJobDefinition
 	CloudfrontDistribution
 	CloudfrontOriginAccessIdentity
@@ -190,6 +191,7 @@ var (
 		AthenaWorkgroup:                athenaWorkgroups,
 		AutoscalingGroup:               autoscalingGroups,
 		AutoscalingPolicy:              autoscalingPolicies,
+		AutoscalingSchedule:            autoscalingSchedules,
 		BatchJobDefinition:             batchJobDefinitions,
 		CloudfrontDistribution:         cloudfrontDistributions,
 		CloudfrontOriginAccessIdentity: cloudfrontOriginAccessIdentities,
@@ -772,6 +774,30 @@ func autoscalingPolicies(ctx context.Context, a *aws, resourceType string, filte
 	for _, i := range autoscalingPolicies {
 
 		r, err := initializeResource(a, *i.AutoScalingGroupName+"/"+*i.PolicyName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func autoscalingSchedules(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	var input = &autoscaling.DescribeScheduledActionsInput{
+		MaxRecords: awsSDK.Int64(100),
+	}
+	autoscalingSchedules, err := a.awsr.GetAutoScalingScheduledActions(ctx, input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range autoscalingSchedules {
+
+		r, err := initializeResource(a, *i.AutoScalingGroupName+"/"+*i.ScheduledActionName, resourceType)
 		if err != nil {
 			return nil, err
 		}

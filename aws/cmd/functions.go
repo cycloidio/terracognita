@@ -106,6 +106,18 @@ var (
 		  // Returned values are commented in the interface doc comment block.
 		  `,
 		},
+		Function{
+			FnName:          "GetAutoScalingScheduledActions",
+			Entity:          "ScheduledActions",
+			FnAttributeList: "ScheduledUpdateGroupActions",
+			SingularEntity:  "ScheduledUpdateGroupAction",
+			Prefix:          "Describe",
+			Service:         "autoscaling",
+			Documentation: `
+		  // GetAutoScalingScheduledActions returns all ScheduledActions based on the input given.
+		  // Returned values are commented in the interface doc comment block.
+		  `,
+		},
 
 		// batch
 		Function{
