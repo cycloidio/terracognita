@@ -102,6 +102,10 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetAutoScalingPolicies(ctx context.Context, input *autoscaling.DescribePoliciesInput) ([]*autoscaling.ScalingPolicy, error)
 
+	// GetAutoScalingScheduledActions returns all ScheduledActions based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetAutoScalingScheduledActions(ctx context.Context, input *autoscaling.DescribeScheduledActionsInput) ([]*autoscaling.ScheduledUpdateGroupAction, error)
+
 	// GetBatchJobDefinitions returns the batch jobs on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetBatchJobDefinitions(ctx context.Context, input *batch.DescribeJobDefinitionsInput) ([]*batch.JobDefinition, error)
@@ -793,6 +797,37 @@ func (c *connector) GetAutoScalingPolicies(ctx context.Context, input *autoscali
 		hasNextToken = o.NextToken != nil
 
 		opt = append(opt, o.ScalingPolicies...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetAutoScalingScheduledActions(ctx context.Context, input *autoscaling.DescribeScheduledActionsInput) ([]*autoscaling.ScheduledUpdateGroupAction, error) {
+	if c.svc.autoscaling == nil {
+		c.svc.autoscaling = autoscaling.New(c.svc.session)
+	}
+
+	opt := make([]*autoscaling.ScheduledUpdateGroupAction, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.autoscaling.DescribeScheduledActionsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.ScheduledUpdateGroupActions == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &autoscaling.DescribeScheduledActionsInput{}
+		}
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.ScheduledUpdateGroupActions...)
 
 	}
 
