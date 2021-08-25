@@ -9,6 +9,9 @@
 
 - Support filter with `tag` attribute used by AWS on `aws_autoscaling_group` resource
   ([Issue #223](https://github.com/cycloidio/terracognita/issues/223))
+- Resource name improved by low casing all the options
+  ([Issue #225](https://github.com/cycloidio/terracognita/issues/225))
+
 
 ## [0.7.2] _2021-08-13_
 

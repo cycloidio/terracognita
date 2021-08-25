@@ -68,9 +68,11 @@ func (t Tag) ToNeptuneFilter() *neptune.Filter {
 // Also validates that the 'tags.Name' and fallback are valid, if not it
 // generates a random one
 func GetNameFromTag(key string, srd *schema.ResourceData, fallback string) string {
+	fallback = strings.ToLower(fallback)
+
 	var n string
 	if name, ok := srd.GetOk(fmt.Sprintf("%s.Name", key)); ok {
-		n = name.(string)
+		n = strings.ToLower(name.(string))
 	}
 
 	forcedN := forceResourceName(n)
