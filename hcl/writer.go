@@ -15,6 +15,7 @@ import (
 	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/provider"
+	"github.com/cycloidio/terracognita/util"
 	"github.com/cycloidio/terracognita/writer"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/pkg/errors"
@@ -362,7 +363,7 @@ func walkVariables(cfg map[string]interface{}, validVariables map[string]struct{
 		case []interface{}:
 			if len(v) == 0 {
 				if hasKey(validVariables, currentKey) {
-					varName := strings.ReplaceAll(currentKey, ".", "_")
+					varName := util.NormalizeName(strings.ReplaceAll(currentKey, ".", "_"))
 					variables[varName] = map[string]interface{}{
 						"default": cfg[key],
 					}
@@ -378,7 +379,7 @@ func walkVariables(cfg map[string]interface{}, validVariables map[string]struct{
 				}
 			} else {
 				if hasKey(validVariables, currentKey) {
-					varName := strings.ReplaceAll(currentKey, ".", "_")
+					varName := util.NormalizeName(strings.ReplaceAll(currentKey, ".", "_"))
 					variables[varName] = map[string]interface{}{
 						"default": cfg[key],
 					}
@@ -389,7 +390,7 @@ func walkVariables(cfg map[string]interface{}, validVariables map[string]struct{
 			// This means is a "simple" value so we can
 			// directly replace it with the variable
 			if hasKey(validVariables, currentKey) {
-				varName := strings.ReplaceAll(currentKey, ".", "_")
+				varName := util.NormalizeName(strings.ReplaceAll(currentKey, ".", "_"))
 				variables[varName] = map[string]interface{}{
 					"default": cfg[key],
 				}

@@ -332,6 +332,9 @@ resource "type" "name" {
 				"key":  "value",
 				"key2": "value",
 				"key3": []interface{}{},
+				"key4": map[string]interface{}{
+					"nested:key:4": "value4",
+				},
 			}
 			ehcl = `
 resource "type" "name" {
@@ -342,12 +345,16 @@ resource "type" "name2" {
   key = var.type_name2_key
 	key2 = var.type_name2_key2
 	key3 = var.type_name2_key3
+	key4 {
+		"nested:key:4" = var.type_name2_key4_nested_key_4
+	}
 }
 
 module "test" {
 	# type_name2_key = "value"
 	# type_name2_key2 = "value"
 	# type_name2_key3 = []
+	# type_name2_key4_nested_key_4 = "value4"
 	# type_name_key = "value"
   source = "./module-test"
 }
@@ -379,6 +386,10 @@ variable "type_name2_key2" {
 
 variable "type_name2_key3" {
 	default = []
+}
+
+variable "type_name2_key4_nested_key_4" {
+	default = "value4"
 }
 
 variable "type_name_key" {
