@@ -18,6 +18,11 @@
 - Integration between Interpolation and Modules has been changed to not generate invalid HCL references
   ([Issue #219](https://github.com/cycloidio/terracognita/issues/219)
 
+### Fixed
+
+- Variables names will now be normalized to be valid HCL
+  ([PUll #219](https://github.com/cycloidio/terracognita/pull/227)
+
 ## [0.7.2] _2021-08-13_
 
 ### Added
