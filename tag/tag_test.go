@@ -101,6 +101,13 @@ func TestGetNameFromTag(t *testing.T) {
 			Result:   "res",
 		},
 		{
+			Name:     "WithTagsUpper",
+			Key:      "tags",
+			SRD:      createSRD(t, "tags", tagKey, "Res"),
+			Fallback: "fallback",
+			Result:   "res",
+		},
+		{
 			Name:     "WithTagsButInvalidNameAndEmptyForced",
 			Key:      "tags",
 			SRD:      createSRD(t, "tags", tagKey, "res.res.res"),
@@ -119,6 +126,13 @@ func TestGetNameFromTag(t *testing.T) {
 			Key:      "tags",
 			SRD:      createSRD(t, "tags", "notName", "res"),
 			Fallback: "fallback",
+			Result:   "fallback",
+		},
+		{
+			Name:     "WithTagsButNo'Name'Upper",
+			Key:      "tags",
+			SRD:      createSRD(t, "tags", "notName", "res"),
+			Fallback: "Fallback",
 			Result:   "fallback",
 		},
 		{
