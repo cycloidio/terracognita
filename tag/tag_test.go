@@ -184,3 +184,100 @@ func createSRD(t *testing.T, schemaKey, tagKey, tagValue string) *schema.Resourc
 
 	return rd
 }
+
+// createSRDOtherTags creates a schema.ResourceData with a
+// 'schemaKey' of Set with a 'Key=tagKey' with 'Value=tagValue'
+// https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_group#tag-and-tags
+// https://github.com/hashicorp/terraform-plugin-sk/blob/main/helper/schema/set.go#L50
+func createSRDOtherTags(t *testing.T, schemaKey, tagKey, tagValue string) *schema.ResourceData {
+	r := &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			schemaKey: &schema.Schema{
+				Type:     schema.TypeSet,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"key": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"value": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
+						},
+						"propagate_at_launch": &schema.Schema{
+							Type:     schema.TypeBool,
+							Optional: true,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	rd := r.Data(nil)
+
+	listTag := []interface{}{
+		map[string]interface{}{
+			"key":                 tagKey,
+			"value":               tagValue,
+			"propagate_at_launch": true,
+		},
+		map[string]interface{}{
+			"key":                 "fakeOtkerKey",
+			"value":               "fakeOtkerValue",
+			"propagate_at_launch": true,
+		},
+	}
+
+	err := rd.Set(schemaKey, listTag)
+	require.NoError(t, err)
+
+	return rd
+}
+
+func TestGetOtherTags(t *testing.T) {
+	var filterTagKey = "TagName"
+	var filterTagValue = "TagValue"
+	tests := []struct {
+		Name      string
+		Provider  string
+		FilterTag tag.Tag
+		SRD       *schema.ResourceData
+		Match     bool
+		Result    string
+	}{
+		{
+			Name:      "WithoutTagButTags",
+			Provider:  "aws",
+			FilterTag: tag.Tag{Name: filterTagKey, Value: filterTagValue},
+			SRD:       createSRD(t, "tags", filterTagKey, filterTagValue),
+			Match:     false,
+			Result:    "",
+		},
+		{
+			Name:      "WithTagNoMatch",
+			Provider:  "aws",
+			FilterTag: tag.Tag{Name: filterTagKey, Value: filterTagValue},
+			SRD:       createSRDOtherTags(t, "tag", "TagNameNoMatch", filterTagValue),
+			Match:     false,
+			Result:    "",
+		},
+		{
+			Name:      "WithTagAndMatch",
+			Provider:  "aws",
+			FilterTag: tag.Tag{Name: filterTagKey, Value: filterTagValue},
+			SRD:       createSRDOtherTags(t, "tag", filterTagKey, filterTagValue),
+			Match:     true,
+			Result:    filterTagValue,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
+			value, match := tag.GetOtherTags(tt.Provider, tt.SRD, tt.FilterTag)
+			assert.Equal(t, tt.Match, match)
+			assert.Equal(t, tt.Result, value)
+		})
+	}
+}

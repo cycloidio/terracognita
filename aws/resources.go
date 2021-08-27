@@ -20,8 +20,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/mediastore"
-	"github.com/aws/aws-sdk-go/service/neptune"
-	"github.com/aws/aws-sdk-go/service/rds"
 	"github.com/aws/aws-sdk-go/service/redshift"
 	"github.com/aws/aws-sdk-go/service/route53"
 	"github.com/aws/aws-sdk-go/service/ses"
@@ -67,6 +65,7 @@ const (
 	AthenaWorkgroup
 	AutoscalingGroup
 	AutoscalingPolicy
+	AutoscalingSchedule
 	BatchJobDefinition
 	CloudfrontDistribution
 	CloudfrontOriginAccessIdentity
@@ -192,6 +191,7 @@ var (
 		AthenaWorkgroup:                athenaWorkgroups,
 		AutoscalingGroup:               autoscalingGroups,
 		AutoscalingPolicy:              autoscalingPolicies,
+		AutoscalingSchedule:            autoscalingSchedules,
 		BatchJobDefinition:             batchJobDefinitions,
 		CloudfrontDistribution:         cloudfrontDistributions,
 		CloudfrontOriginAccessIdentity: cloudfrontOriginAccessIdentities,
@@ -784,6 +784,30 @@ func autoscalingPolicies(ctx context.Context, a *aws, resourceType string, filte
 	return resources, nil
 }
 
+func autoscalingSchedules(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	var input = &autoscaling.DescribeScheduledActionsInput{
+		MaxRecords: awsSDK.Int64(100),
+	}
+	autoscalingSchedules, err := a.awsr.GetAutoScalingScheduledActions(ctx, input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range autoscalingSchedules {
+
+		r, err := initializeResource(a, *i.AutoScalingGroupName+"/"+*i.ScheduledActionName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
 func batchJobDefinitions(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	batchJobDefinitions, err := a.awsr.GetBatchJobDefinitions(ctx, nil)
 	if err != nil {
@@ -899,10 +923,7 @@ func daxClusters(ctx context.Context, a *aws, resourceType string, filters *filt
 }
 
 func dbInstances(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	var input = &rds.DescribeDBInstancesInput{
-		Filters: toRDSFilters(filters),
-	}
-	dbs, err := a.awsr.GetDBInstances(ctx, input)
+	dbs, err := a.awsr.GetDBInstances(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -920,10 +941,7 @@ func dbInstances(ctx context.Context, a *aws, resourceType string, filters *filt
 }
 
 func dbParameterGroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	var input = &rds.DescribeDBParameterGroupsInput{
-		Filters: toRDSFilters(filters),
-	}
-	dbParameterGroups, err := a.awsr.GetDBParameterGroups(ctx, input)
+	dbParameterGroups, err := a.awsr.GetDBParameterGroups(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -943,10 +961,7 @@ func dbParameterGroups(ctx context.Context, a *aws, resourceType string, filters
 }
 
 func dbSubnetGroups(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	var input = &rds.DescribeDBSubnetGroupsInput{
-		Filters: toRDSFilters(filters),
-	}
-	dbSubnetGroups, err := a.awsr.GetDBSubnetGroups(ctx, input)
+	dbSubnetGroups, err := a.awsr.GetDBSubnetGroups(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -2322,11 +2337,7 @@ func natGateways(ctx context.Context, a *aws, resourceType string, filters *filt
 }
 
 func neptuneClusters(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	var input = &neptune.DescribeDBClustersInput{
-		Filters: toNeptuneFilters(filters),
-	}
-
-	neptuneClusters, err := a.awsr.GetNeptuneDBClusters(ctx, input)
+	neptuneClusters, err := a.awsr.GetNeptuneDBClusters(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -2345,11 +2356,7 @@ func neptuneClusters(ctx context.Context, a *aws, resourceType string, filters *
 }
 
 func rdsClusters(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	var input = &rds.DescribeDBClustersInput{
-		Filters: toRDSFilters(filters),
-	}
-
-	rdsClusters, err := a.awsr.GetRDSDBClusters(ctx, input)
+	rdsClusters, err := a.awsr.GetRDSDBClusters(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -2368,11 +2375,7 @@ func rdsClusters(ctx context.Context, a *aws, resourceType string, filters *filt
 }
 
 func rdsGlobalClusters(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	var input = &rds.DescribeGlobalClustersInput{
-		Filters: toRDSFilters(filters),
-	}
-
-	rdsGlobalClusters, err := a.awsr.GetRDSGlobalClusters(ctx, input)
+	rdsGlobalClusters, err := a.awsr.GetRDSGlobalClusters(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -2980,34 +2983,6 @@ func vpnGateways(ctx context.Context, a *aws, resourceType string, filters *filt
 	}
 
 	return resources, nil
-}
-
-func toNeptuneFilters(filters *filter.Filter) []*neptune.Filter {
-	tags := filters.Tags
-	if len(tags) == 0 {
-		return nil
-	}
-	filtersNeptune := make([]*neptune.Filter, 0, len(tags))
-
-	for _, t := range tags {
-		filtersNeptune = append(filtersNeptune, t.ToNeptuneFilter())
-	}
-
-	return filtersNeptune
-}
-
-func toRDSFilters(filters *filter.Filter) []*rds.Filter {
-	tags := filters.Tags
-	if len(tags) == 0 {
-		return nil
-	}
-	filtersRds := make([]*rds.Filter, 0, len(tags))
-
-	for _, t := range tags {
-		filtersRds = append(filtersRds, t.ToRDSFilter())
-	}
-
-	return filtersRds
 }
 
 func toEC2Filters(filters *filter.Filter) []*ec2.Filter {

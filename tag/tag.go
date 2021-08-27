@@ -100,3 +100,37 @@ func isValidResourceName(name string) bool {
 func forceResourceName(name string) string {
 	return invalidNameRegexp.ReplaceAllString(name, "_")
 }
+
+// GetOtherTags used to check other possible tag attributes on resources
+func GetOtherTags(provider string, srd *schema.ResourceData, filterTag Tag) (string, bool) {
+	// keep the same logic as r.data.GetOk
+	otherTagsMap := make(map[string]string)
+
+	// Special Tag attribute
+	if provider == "aws" {
+		// Some resource like aws_autoscaling_group do not have tags map but tag schema.Set
+		// https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_group#tag
+		// Structure is not the same as "basic tags" and need specific code to validates
+		// https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_group#tag-and-tags
+		v, _ := srd.GetOk("tag")
+		// Get Set to List tag
+		tag, okset := v.(*schema.Set)
+		if okset {
+			// convert list to map
+			for _, i := range tag.List() {
+				// Cast to get tag key and value
+				m, okmap := i.(map[string]interface{})
+				if okmap {
+					otherTagsMap[m["key"].(string)] = m["value"].(string)
+				}
+			}
+		}
+	}
+
+	// return the tag value if key (tag name) found
+	if val, ok := otherTagsMap[filterTag.Name]; ok {
+		return val, true
+	}
+
+	return "", false
+}
