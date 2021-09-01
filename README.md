@@ -42,7 +42,7 @@ sudo mv terracognita-linux-amd64 /usr/local/bin/terracognita
 
 ### Development
 
-You can build and install with the latest sources, you will enjoy the new features and bug fixes. It uses Go Modules, so GO 1.16+ is required.
+You can build and install with the latest sources, you will enjoy the new features and bug fixes. It uses Go Modules, so GO 1.17+ is required.
 
 ```shell
 git clone https://github.com/cycloidio/terracognita
