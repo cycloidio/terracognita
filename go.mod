@@ -30,7 +30,7 @@ require (
 	github.com/btubbs/datetime v0.1.0 // indirect
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
 	github.com/chr4/pwgen v1.1.0
-	github.com/cycloidio/mxwriter v1.0.2
+	github.com/cycloidio/mxwriter v1.0.4
 	github.com/cycloidio/tfdocs v0.0.0-20210713114615-6a7f069f11c3
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dimchansky/utfbom v1.1.1 // indirect

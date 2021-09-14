@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Changed
+
+- Updated mxwriter to v1.0.4 that fixes an internal bug
+  ([PR #236](https://github.com/cycloidio/terracognita/issues/236))
+
 ## [0.7.3] _2021-08-30_
 
 ### Added
