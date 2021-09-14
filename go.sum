@@ -186,8 +186,8 @@ github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f/go.mod h1:E3G3o1h8I7cfc
 github.com/cpuguy83/go-md2man/v2 v2.0.0/go.mod h1:maD7wRr/U5Z6m/iR4s+kqSMx2CaBsrgA7czyZG/E6dU=
 github.com/creachadair/staticfile v0.1.2/go.mod h1:a3qySzCIXEprDGxk6tSxSI+dBBdLzqeBOMhZ+o2d3pM=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
-github.com/cycloidio/mxwriter v1.0.2 h1:TJ5PjSe1nNix1hASiIJLKrAR00mQTT9zhLZFIQ7+ilg=
-github.com/cycloidio/mxwriter v1.0.2/go.mod h1:yHFuNbzFz0DE9Jy9jiVhhlJ1HxxwiQO08m3L7sfcOFk=
+github.com/cycloidio/mxwriter v1.0.4 h1:U1+9dasZLJUWiagf91zEU2i0nIeM45qrrqt6LiN/YRY=
+github.com/cycloidio/mxwriter v1.0.4/go.mod h1:yHFuNbzFz0DE9Jy9jiVhhlJ1HxxwiQO08m3L7sfcOFk=
 github.com/cycloidio/terraform v0.13.5-cy h1:SFRumRQiIQ83RmA5e52q8PJ3VjSBzk+ZVtyVypBaxDs=
 github.com/cycloidio/terraform v0.13.5-cy/go.mod h1:1H1qcnppNc/bBGc7poOfnmmBeQMlF0stEN3haY3emCU=
 github.com/cycloidio/terraform-provider-azurerm v1.44.1-0.20210517111036-df0beb5af9c3 h1:936OFCtEMZgrw/6SR7LWUmK+lRYY0c1EJEXOJSi0sRo=
