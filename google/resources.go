@@ -42,6 +42,8 @@ const (
 	StorageBucket
 	StorageBucketIAMPolicy
 	SQLDatabaseInstance
+
+	noFilter = ""
 )
 
 type rtFn func(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error)
@@ -98,8 +100,7 @@ func computeInstance(ctx context.Context, g *google, resourceType string, filter
 }
 
 func computeFirewall(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	f := initializeFilter(filters)
-	firewalls, err := g.gcpr.ListFirewalls(ctx, f)
+	firewalls, err := g.gcpr.ListFirewalls(ctx, noFilter)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list firewalls from reader")
 	}
@@ -112,8 +113,7 @@ func computeFirewall(ctx context.Context, g *google, resourceType string, filter
 }
 
 func computeNetwork(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	f := initializeFilter(filters)
-	networks, err := g.gcpr.ListNetworks(ctx, f)
+	networks, err := g.gcpr.ListNetworks(ctx, noFilter)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list networks from reader")
 	}
@@ -126,8 +126,7 @@ func computeNetwork(ctx context.Context, g *google, resourceType string, filters
 }
 
 func computeHealthCheck(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	f := initializeFilter(filters)
-	checks, err := g.gcpr.ListHealthChecks(ctx, f)
+	checks, err := g.gcpr.ListHealthChecks(ctx, noFilter)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list health checks from reader")
 	}
@@ -140,8 +139,7 @@ func computeHealthCheck(ctx context.Context, g *google, resourceType string, fil
 }
 
 func computeInstanceGroup(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	f := initializeFilter(filters)
-	instanceGroups, err := g.gcpr.ListInstanceGroups(ctx, f)
+	instanceGroups, err := g.gcpr.ListInstanceGroups(ctx, noFilter)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list instance groups from reader")
 	}
@@ -156,8 +154,7 @@ func computeInstanceGroup(ctx context.Context, g *google, resourceType string, f
 }
 
 func computeBackendService(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	f := initializeFilter(filters)
-	backends, err := g.gcpr.ListBackendServices(ctx, f)
+	backends, err := g.gcpr.ListBackendServices(ctx, noFilter)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list backend services from reader")
 	}
@@ -170,8 +167,7 @@ func computeBackendService(ctx context.Context, g *google, resourceType string, 
 }
 
 func computeURLMap(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	f := initializeFilter(filters)
-	maps, err := g.gcpr.ListURLMaps(ctx, f)
+	maps, err := g.gcpr.ListURLMaps(ctx, noFilter)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list URL maps from reader")
 	}
@@ -184,8 +180,7 @@ func computeURLMap(ctx context.Context, g *google, resourceType string, filters 
 }
 
 func computeTargetHTTPProxy(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	f := initializeFilter(filters)
-	targets, err := g.gcpr.ListTargetHTTPProxies(ctx, f)
+	targets, err := g.gcpr.ListTargetHTTPProxies(ctx, noFilter)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list target http proxies from reader")
 	}
@@ -198,8 +193,7 @@ func computeTargetHTTPProxy(ctx context.Context, g *google, resourceType string,
 }
 
 func computeTargetHTTPSProxy(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	f := initializeFilter(filters)
-	targets, err := g.gcpr.ListTargetHTTPSProxies(ctx, f)
+	targets, err := g.gcpr.ListTargetHTTPSProxies(ctx, noFilter)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list target https proxies from reader")
 	}
@@ -212,8 +206,7 @@ func computeTargetHTTPSProxy(ctx context.Context, g *google, resourceType string
 }
 
 func computeSSLCertificate(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	f := initializeFilter(filters)
-	certs, err := g.gcpr.ListSSLCertificates(ctx, f)
+	certs, err := g.gcpr.ListSSLCertificates(ctx, noFilter)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list SSL certificates from reader")
 	}
@@ -283,8 +276,7 @@ func storageBucket(ctx context.Context, g *google, resourceType string, filters 
 }
 
 func sqlDatabaseInstance(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	f := initializeFilter(filters)
-	instances, err := g.gcpr.ListStorageInstances(ctx, f)
+	instances, err := g.gcpr.ListStorageInstances(ctx, noFilter)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list sql storage instances rules from reader")
 	}
@@ -333,8 +325,7 @@ func recordSetDNS(ctx context.Context, g *google, resourceType string, filters *
 }
 
 func computeBackendBucket(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	f := initializeFilter(filters)
-	backends, err := g.gcpr.ListBackendBuckets(ctx, f)
+	backends, err := g.gcpr.ListBackendBuckets(ctx, noFilter)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list backend buckets from reader")
 	}

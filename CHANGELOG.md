@@ -5,6 +5,11 @@
 - Updated mxwriter to v1.0.4 that fixes an internal bug
   ([PR #236](https://github.com/cycloidio/terracognita/issues/236))
 
+### Fixed
+
+- Google resources that do not support Labels are no longer filtered by it
+  ([PR #236](https://github.com/cycloidio/terracognita/issues/237))
+
 ## [0.7.3] _2021-08-30_
 
 ### Added
