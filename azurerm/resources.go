@@ -88,6 +88,7 @@ type rtFn func(ctx context.Context, a *azurerm, resourceType string, filters *fi
 
 var (
 	resources = map[ResourceType]rtFn{
+		ResourceGroup: resourceGroup,
 		// Compute Resources
 		VirtualMachine:          virtualMachines,
 		VirtualMachineExtension: virtualMachineExtensions,
