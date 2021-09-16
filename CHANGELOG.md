@@ -9,6 +9,9 @@
 
 - Google resources that do not support Labels are no longer filtered by it
   ([PR #236](https://github.com/cycloidio/terracognita/issues/237))
+- Fix error to enable support for azurerm_resource_group
+  ([Issue #232](https://github.com/cycloidio/terracognita/issues/232))
+
 
 ## [0.7.3] _2021-08-30_
 
