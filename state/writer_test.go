@@ -175,7 +175,86 @@ func TestSync(t *testing.T) {
          ],
          "mode":"managed",
          "name":"name",
-      	 "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+         "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+         "type":"aws_iam_user"
+      }
+   ],
+   "serial":0,
+   "terraform_version":"0.13.5",
+   "version":4
+}`
+		)
+
+		defer ctrl.Finish()
+
+		tpt, err := util.HashicorpToZclonfType(aws.Provider().ResourcesMap[tp].CoreConfigSchema().ImpliedType())
+		require.NoError(t, err)
+
+		s, err := hcl2shim.HCL2ValueFromFlatmap(map[string]string{"name": "Pepito"}, tpt)
+		require.NoError(t, err)
+
+		res.EXPECT().Type().Return(tp)
+		res.EXPECT().Provider().Return(prv)
+		res.EXPECT().TFResource().Return(aws.Provider().ResourcesMap[tp])
+		res.EXPECT().ImpliedType().Return(aws.Provider().ResourcesMap[tp].CoreConfigSchema().ImpliedType())
+		res.EXPECT().ResourceInstanceObject().Return(providers.ImportedResource{
+			TypeName: tp,
+			State:    s,
+		}.AsInstanceObject())
+
+		prv.EXPECT().String().Return("aws")
+
+		err = sw.Write("aws_iam_user.name", res)
+		require.NoError(t, err)
+
+		err = sw.Sync()
+		require.NoError(t, err)
+
+		var st map[string]interface{}
+		err = json.Unmarshal(b.Bytes(), &st)
+		require.NoError(t, err)
+
+		st["lineage"] = "lineage"
+
+		var est map[string]interface{}
+		err = json.Unmarshal([]byte(state), &est)
+		require.NoError(t, err)
+
+		assert.Equal(t, est, st)
+	})
+	t.Run("SuccessWithModule", func(t *testing.T) {
+		var (
+			ctrl  = gomock.NewController(t)
+			b     = &bytes.Buffer{}
+			sw    = state.NewWriter(b, &writer.Options{Interpolate: true, Module: "cycloid"})
+			prv   = mock.NewProvider(ctrl)
+			res   = mock.NewResource(ctrl)
+			tp    = "aws_iam_user"
+			state = `{
+   "lineage":"lineage",
+   "outputs":{},
+   "resources":[
+      {
+         "instances":[
+            {
+               "attributes":{
+                  "arn":null,
+                  "force_destroy":null,
+                  "id":null,
+                  "name":"Pepito",
+                  "path":null,
+                  "permissions_boundary":null,
+                  "tags":null,
+                  "tags_all":null,
+                  "unique_id":null
+               },
+               "schema_version":0
+            }
+         ],
+         "mode":"managed",
+         "name":"name",
+         "module": "module.cycloid",
+         "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
          "type":"aws_iam_user"
       }
    ],
@@ -296,6 +375,151 @@ func TestDependencies(t *testing.T) {
           },
           "dependencies": [
             "aws_security_group.sg"
+          ]
+        }
+      ]
+    }
+  ]
+}`
+		)
+
+		defer ctrl.Finish()
+
+		sgt, err := util.HashicorpToZclonfType(aws.Provider().ResourcesMap[sg].CoreConfigSchema().ImpliedType())
+		require.NoError(t, err)
+		sgrt, err := util.HashicorpToZclonfType(aws.Provider().ResourcesMap[sgr].CoreConfigSchema().ImpliedType())
+		require.NoError(t, err)
+
+		stateSG, err := hcl2shim.HCL2ValueFromFlatmap(map[string]string{"id": "sg-1234", "name": "sg"}, sgt)
+		stateSGR, err := hcl2shim.HCL2ValueFromFlatmap(map[string]string{"security_group_id": "sg-1234", "id": "sgrule-1234"}, sgrt)
+
+		require.NoError(t, err)
+
+		resSG.EXPECT().Type().Return(sg)
+		resSG.EXPECT().Provider().Return(prv)
+		resSG.EXPECT().TFResource().Return(aws.Provider().ResourcesMap[sg])
+		resSG.EXPECT().ImpliedType().Return(aws.Provider().ResourcesMap[sg].CoreConfigSchema().ImpliedType())
+		resSG.EXPECT().ResourceInstanceObject().Return(providers.ImportedResource{
+			TypeName: sg,
+			State:    stateSG,
+		}.AsInstanceObject())
+		attrsSG := make(map[string]string)
+		resSG.EXPECT().InstanceState().Return(&terraform.InstanceState{
+			Attributes: attrsSG,
+		})
+
+		prv.EXPECT().String().Return("aws").AnyTimes()
+
+		resSGR.EXPECT().Type().Return(sgr).AnyTimes()
+		resSGR.EXPECT().Provider().Return(prv)
+		resSGR.EXPECT().TFResource().Return(aws.Provider().ResourcesMap[sgr])
+		resSGR.EXPECT().ImpliedType().Return(aws.Provider().ResourcesMap[sgr].CoreConfigSchema().ImpliedType())
+		resSGR.EXPECT().ResourceInstanceObject().Return(providers.ImportedResource{
+			TypeName: sgr,
+			State:    stateSGR,
+		}.AsInstanceObject())
+		attrsSGR := make(map[string]string)
+		attrsSGR["security-group-id"] = "sg-1234"
+		resSGR.EXPECT().InstanceState().Return(&terraform.InstanceState{
+			Attributes: attrsSGR,
+		})
+
+		err = sw.Write("aws_security_group.sg", resSG)
+		require.NoError(t, err)
+		err = sw.Write("aws_security_group_rule.sgrule", resSGR)
+		require.NoError(t, err)
+
+		i["sg-1234"] = "${aws_security_group.sg.id}"
+		sw.Interpolate(i)
+
+		err = sw.Sync()
+		require.NoError(t, err)
+
+		var st map[string]interface{}
+		err = json.Unmarshal(b.Bytes(), &st)
+		require.NoError(t, err)
+
+		st["lineage"] = "lineage"
+
+		var est map[string]interface{}
+		err = json.Unmarshal([]byte(state), &est)
+		require.NoError(t, err)
+
+		assert.Equal(t, est, st)
+	})
+	t.Run("SuccessWitmModules", func(t *testing.T) {
+		var (
+			i      = make(map[string]string)
+			ctrl   = gomock.NewController(t)
+			b      = &bytes.Buffer{}
+			sw     = state.NewWriter(b, &writer.Options{Interpolate: true, Module: "cycloid"})
+			prv    = mock.NewProvider(ctrl)
+			resSG  = mock.NewResource(ctrl)
+			resSGR = mock.NewResource(ctrl)
+			sg     = "aws_security_group"
+			sgr    = "aws_security_group_rule"
+			state  = `{
+  "version": 4,
+  "terraform_version": "0.13.5",
+  "serial": 0,
+  "lineage": "lineage",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "module": "module.cycloid",
+      "type": "aws_security_group",
+      "name": "sg",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "id": "sg-1234",
+            "name": "sg",
+            "description": null,
+            "egress": null,
+            "ingress": null,
+            "name_prefix": null,
+            "arn": null,
+            "owner_id": null,
+            "revoke_rules_on_delete": null,
+            "timeouts": {
+              "create": null,
+              "delete": null
+            },
+            "tags": null,
+            "tags_all": null,
+            "vpc_id": null
+          }
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "module": "module.cycloid",
+      "type": "aws_security_group_rule",
+      "name": "sgrule",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 2,
+          "attributes": {
+            "id": "sgrule-1234",
+            "security_group_id": "sg-1234",
+            "cidr_blocks": null,
+            "description": null,
+            "from_port": null,
+            "ipv6_cidr_blocks": null,
+            "prefix_list_ids": null,
+            "protocol": null,
+            "self": null,
+            "source_security_group_id": null,
+            "to_port": null,
+            "type": null
+          },
+          "dependencies": [
+            "module.cycloid.aws_security_group.sg"
           ]
         }
       ]

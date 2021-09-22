@@ -64,8 +64,17 @@ func (w *Writer) Write(key string, value interface{}) error {
 		return errors.Wrapf(errcode.ErrWriterInvalidTypeValue, "expected provider.Resource, found %T", value)
 	}
 
+	var md []addrs.ModuleInstanceStep = nil
+	if w.opts.HasModule() {
+		md = []addrs.ModuleInstanceStep{
+			addrs.ModuleInstanceStep{
+				Name: w.opts.Module,
+			},
+		}
+	}
+
 	absAddr := addrs.AbsResourceInstance{
-		Module: nil,
+		Module: md,
 		Resource: addrs.ResourceInstance{
 			Resource: addrs.Resource{
 				Mode: addrs.ManagedResourceMode,
@@ -175,8 +184,12 @@ func (w *Writer) Interpolate(i map[string]string) {
 					s := strings.Split(dependency, ".")
 					rt := s[0]
 					rn := s[1]
+					var md []string = nil
+					if w.opts.HasModule() {
+						md = []string{w.opts.Module}
+					}
 					instance.Current.Dependencies = append(instance.Current.Dependencies, addrs.ConfigResource{
-						Module: nil,
+						Module: md,
 						Resource: addrs.Resource{
 							Mode: addrs.ManagedResourceMode,
 							Type: rt,

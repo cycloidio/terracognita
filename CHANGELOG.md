@@ -11,6 +11,8 @@
   ([PR #236](https://github.com/cycloidio/terracognita/issues/237))
 - Fix error to enable support for azurerm_resource_group
   ([Issue #232](https://github.com/cycloidio/terracognita/issues/232))
+- TFState when generating modules now has the module on it too
+  ([Issue #240](https://github.com/cycloidio/terracognita/issues/240))
 
 
 ## [0.7.3] _2021-08-30_
