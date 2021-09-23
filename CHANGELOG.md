@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.7.3] _2021-09-23_
+
 ### Changed
 
 - Updated mxwriter to v1.0.4 that fixes an internal bug
