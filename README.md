@@ -196,31 +196,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Meet Cycloid
 
-## About Cycloid
-<p align="center">
-  <img src="https://user-images.githubusercontent.com/393324/65147266-0b010100-da1e-11e9-9a49-d27e5035c4c4.png">
-</p>
+[Cycloid](https://www.cycloid.io/) is a hybrid cloud DevOps collaboration platform providing end-to-end frameworks to accelerate and industrialize software delivery.
 
-[Cycloid](https://www.cycloid.io/our-culture) is a European fully-remote company, building a product to **simplify**, **accelerate** and **optimize your DevOps and Cloud adoption**.
+As of now, we have three open-source tools:
 
-We built [Cycloid, your DevOps framework](https://www.cycloid.io/devops-framework) to encourage Developers and Ops to work together with the respect of best practices. We want to provide a tool that eliminates the silo effect in a company and allows to share the same level of informations within all professions.
+* [TerraCognita](https://github.com/cycloidio/terracognita): Read from your existing cloud providers and generate IaC in Terraform 
+* [InfraMap](https://github.com/cycloidio/inframap): Reads .tfstate or HCL to generate a graph specific for each provider
+* [TerraCost](https://github.com/cycloidio/terracost): Cloud cost estimation for Terraform in the CLI
 
-[Cycloid](https://www.cycloid.io/devops-framework) supports you to factorize your application in a reproducible way, to deploy a new environment in one click. This is what we call a stack.
-
-A stack is composed of 3 pillars:
-
-1. the pipeline ([Concourse](https://concourse-ci.org/))
-2. infrastructure layer ([Terraform](https://www.terraform.io/))
-3. applicative layer ([Ansible](https://www.ansible.com/))
-
-Thanks to the flexible pipeline, all the steps and technologies are configurable.
-
-To make it easier to create a stack, we build an Infrastructure designer named **StackCraft** that allows you to drag & drop Terraform resources and generate your Terraform files for you.
-
-Terracognita is a brick that will help us to import an existing infrastructure into a stack to easily adopt Cycloid product.
-
-The product comes also with an Open Source service catalog ([all our public stacks are on Github](https://github.com/cycloid-community-catalog)) to deploy applications seamlessly.
-To manage the whole life cycle of an application, it also integrates the diagram of the infrastructure and the application, a cost management control to centralize Cloud billing, the monitoring, logs and events centralized with Prometheus, Grafana, ELK.
-
-[Don't hesitate to contact us, we'll be happy to meet you !](https://www.cycloid.io/contact-us)
+...and the functionality of each is also embedded in our DevOps solution, which you can find out more about [here](https://www.cycloid.io/hybrid-cloud-devops-platform).
