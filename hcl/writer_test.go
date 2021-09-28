@@ -30,7 +30,7 @@ func TestNewHCLWriter(t *testing.T) {
 			"region": "eu-west-1",
 		})
 
-		hw := hcl.NewWriter(nil, p, &writer.Options{})
+		hw := hcl.NewWriter(nil, p, &writer.Options{HCLProviderBlock: true})
 		assert.Equal(t, map[string]map[string]interface{}{
 			"hcl": map[string]interface{}{
 				"provider": map[string]interface{}{
@@ -55,17 +55,36 @@ func TestNewHCLWriter(t *testing.T) {
 			},
 		}, hw.Config)
 	})
+	t.Run("SuccessWithoutProviderBLock", func(t *testing.T) {
+		var (
+			ctrl = gomock.NewController(t)
+			p    = mock.NewProvider(ctrl)
+		)
+		p.EXPECT().String().Return("aws")
+		p.EXPECT().Source().Return("hashicorp/aws")
+
+		hw := hcl.NewWriter(nil, p, &writer.Options{})
+		assert.Equal(t, map[string]map[string]interface{}{
+			"hcl": map[string]interface{}{
+				"resource": map[string]map[string]interface{}{},
+				"terraform": map[string]interface{}{
+					"required_providers": map[string]interface{}{
+						"=tc=aws": map[string]interface{}{
+							"source": "hashicorp/aws",
+						},
+					},
+					"required_version": ">= 1.0",
+				},
+			},
+		}, hw.Config)
+	})
 	t.Run("SuccessWithModule", func(t *testing.T) {
 		var (
 			ctrl = gomock.NewController(t)
 			p    = mock.NewProvider(ctrl)
 		)
-		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
-		p.EXPECT().TFProvider().Return(aws.Provider())
-		p.EXPECT().Configuration().Return(map[string]interface{}{
-			"region": "eu-west-1",
-		})
 
 		hw := hcl.NewWriter(nil, p, &writer.Options{Module: "my-module"})
 		assert.Equal(t, map[string]map[string]interface{}{
@@ -75,11 +94,6 @@ func TestNewHCLWriter(t *testing.T) {
 						"source": "./module-my-module",
 					},
 				},
-				"provider": map[string]interface{}{
-					"aws": map[string]interface{}{
-						"region": "${var.region}",
-					},
-				},
 				"terraform": map[string]interface{}{
 					"required_providers": map[string]interface{}{
 						"=tc=aws": map[string]interface{}{
@@ -87,11 +101,6 @@ func TestNewHCLWriter(t *testing.T) {
 						},
 					},
 					"required_version": ">= 1.0",
-				},
-				"variable": map[string]interface{}{
-					"region": map[string]interface{}{
-						"default": "eu-west-1",
-					},
 				},
 			},
 		}, hw.Config)
@@ -111,12 +120,8 @@ func TestHCLWriter_Write(t *testing.T) {
 		)
 		defer ctrl.Finish()
 
-		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
-		p.EXPECT().TFProvider().Return(aws.Provider())
-		p.EXPECT().Configuration().Return(map[string]interface{}{
-			"region": "eu-west-1",
-		})
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
@@ -132,11 +137,6 @@ func TestHCLWriter_Write(t *testing.T) {
 						},
 					},
 				},
-				"provider": map[string]interface{}{
-					"aws": map[string]interface{}{
-						"region": "${var.region}",
-					},
-				},
 				"terraform": map[string]interface{}{
 					"required_providers": map[string]interface{}{
 						"=tc=aws": map[string]interface{}{
@@ -144,11 +144,6 @@ func TestHCLWriter_Write(t *testing.T) {
 						},
 					},
 					"required_version": ">= 1.0",
-				},
-				"variable": map[string]interface{}{
-					"region": map[string]interface{}{
-						"default": "eu-west-1",
-					},
 				},
 			},
 		}, hw.Config)
@@ -167,12 +162,9 @@ func TestHCLWriter_Write(t *testing.T) {
 					p    = mock.NewProvider(ctrl)
 				)
 
-				p.EXPECT().String().Return("aws").Times(3)
+				p.EXPECT().String().Return("aws")
 				p.EXPECT().Source().Return("hashicorp/aws")
-				p.EXPECT().TFProvider().Return(aws.Provider())
-				p.EXPECT().Configuration().Return(map[string]interface{}{
-					"region": "eu-west-1",
-				})
+
 				mw = mxwriter.NewMux()
 				hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true, Module: "s"})
 
@@ -188,12 +180,8 @@ func TestHCLWriter_Write(t *testing.T) {
 			p    = mock.NewProvider(ctrl)
 			mw   = mxwriter.NewMux()
 		)
-		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
-		p.EXPECT().TFProvider().Return(aws.Provider())
-		p.EXPECT().Configuration().Return(map[string]interface{}{
-			"region": "eu-west-1",
-		})
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
@@ -206,12 +194,8 @@ func TestHCLWriter_Write(t *testing.T) {
 			p    = mock.NewProvider(ctrl)
 			mw   = mxwriter.NewMux()
 		)
-		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
-		p.EXPECT().TFProvider().Return(aws.Provider())
-		p.EXPECT().Configuration().Return(map[string]interface{}{
-			"region": "eu-west-1",
-		})
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
@@ -224,12 +208,8 @@ func TestHCLWriter_Write(t *testing.T) {
 			p    = mock.NewProvider(ctrl)
 			mw   = mxwriter.NewMux()
 		)
-		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
-		p.EXPECT().TFProvider().Return(aws.Provider())
-		p.EXPECT().Configuration().Return(map[string]interface{}{
-			"region": "eu-west-1",
-		})
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
@@ -248,12 +228,8 @@ func TestHCLWriter_Write(t *testing.T) {
 			p    = mock.NewProvider(ctrl)
 			mw   = mxwriter.NewMux()
 		)
-		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
-		p.EXPECT().TFProvider().Return(aws.Provider())
-		p.EXPECT().Configuration().Return(map[string]interface{}{
-			"region": "eu-west-1",
-		})
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
@@ -306,6 +282,48 @@ resource "type" "name" {
 		p.EXPECT().Configuration().Return(map[string]interface{}{
 			"region": "eu-west-1",
 		})
+
+		hw := hcl.NewWriter(mx, p, &writer.Options{HCLProviderBlock: true, Interpolate: true})
+
+		err := hw.Write("type.name", value)
+		require.NoError(t, err)
+
+		err = hw.Sync()
+		require.NoError(t, err)
+
+		b, err := ioutil.ReadAll(mx)
+		require.NoError(t, err)
+
+		assert.Equal(t, strings.Join(strings.Fields(ehcl), " "), strings.Join(strings.Fields(string(b)), " "))
+	})
+	t.Run("SuccessWithoutProviderBlock", func(t *testing.T) {
+		var (
+			ctrl  = gomock.NewController(t)
+			p     = mock.NewProvider(ctrl)
+			mx    = mxwriter.NewMux()
+			value = map[string]interface{}{
+				"key":         "value",
+				"tc_category": "some-category",
+			}
+			ehcl = `
+terraform {
+	required_providers {
+		aws = {
+			source = "hashicorp/aws"
+		}
+	}
+	required_version = ">= 1.0"
+}
+
+resource "type" "name" {
+  key = "value"
+}
+
+`
+		)
+
+		p.EXPECT().String().Return("aws")
+		p.EXPECT().Source().Return("hashicorp/aws")
 
 		hw := hcl.NewWriter(mx, p, &writer.Options{Interpolate: true})
 
@@ -404,7 +422,7 @@ variable "type_name_key" {
 			"region": "eu-west-1",
 		})
 
-		hw := hcl.NewWriter(mx, p, &writer.Options{Interpolate: true, Module: "test"})
+		hw := hcl.NewWriter(mx, p, &writer.Options{Interpolate: true, HCLProviderBlock: true, Module: "test"})
 
 		err := hw.Write("type.name", value)
 		require.NoError(t, err)
@@ -481,7 +499,7 @@ variable "type_name_key" {
 			"region": "eu-west-1",
 		})
 
-		hw := hcl.NewWriter(mx, p, &writer.Options{Interpolate: true, Module: "test", ModuleVariables: map[string]struct{}{"type.key": struct{}{}}})
+		hw := hcl.NewWriter(mx, p, &writer.Options{Interpolate: true, HCLProviderBlock: true, Module: "test", ModuleVariables: map[string]struct{}{"type.key": struct{}{}}})
 
 		err := hw.Write("type.name", value)
 		require.NoError(t, err)
@@ -515,10 +533,6 @@ variable "type_name_key" {
 				},
 			}
 			ehcl = `
-provider "aws" {
-	region = var.region
-}
-
 resource "type" "name" {
   ingress {
 		cidr_blocks = ["0.0.0.0/0"]
@@ -539,18 +553,10 @@ terraform {
 	}
 	required_version = ">= 1.0"
 }
-
-variable "region" {
-	default = "eu-west-1"
-}
 `
 		)
-		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
-		p.EXPECT().TFProvider().Return(aws.Provider())
-		p.EXPECT().Configuration().Return(map[string]interface{}{
-			"region": "eu-west-1",
-		})
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
@@ -579,10 +585,6 @@ variable "region" {
 				},
 			}
 			ehcl = `
-provider "aws" {
-	region = var.region
-}
-
 resource "type" "name" {
   ingress {
 		cidr_blocks = []
@@ -598,18 +600,10 @@ terraform {
 	}
 	required_version = ">= 1.0"
 }
-
-variable "region" {
-	default = "eu-west-1"
-}
 `
 		)
-		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
-		p.EXPECT().TFProvider().Return(aws.Provider())
-		p.EXPECT().Configuration().Return(map[string]interface{}{
-			"region": "eu-west-1",
-		})
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
@@ -641,10 +635,6 @@ variable "region" {
 				},
 			}
 			ehcl = `
-provider "aws" {
-	region = var.region
-}
-
 resource "type" "name" {
   ingress {
 		cidr_blocks = []
@@ -663,18 +653,10 @@ terraform {
 	}
 	required_version = ">= 1.0"
 }
-
-variable "region" {
-	default = "eu-west-1"
-}
 `
 		)
-		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
-		p.EXPECT().TFProvider().Return(aws.Provider())
-		p.EXPECT().Configuration().Return(map[string]interface{}{
-			"region": "eu-west-1",
-		})
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
@@ -705,12 +687,8 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 			}
 			i = make(map[string]string)
 		)
-		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
-		p.EXPECT().TFProvider().Return(aws.Provider())
-		p.EXPECT().Configuration().Return(map[string]interface{}{
-			"region": "eu-west-1",
-		})
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 		i["to-be-interpolated"] = "${aType.aName.id}"
@@ -740,12 +718,8 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 			}
 			i = make(map[string]string)
 		)
-		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
-		p.EXPECT().TFProvider().Return(aws.Provider())
-		p.EXPECT().Configuration().Return(map[string]interface{}{
-			"region": "eu-west-1",
-		})
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Module: "test", Interpolate: true})
 		i["to-be-interpolated"] = "${aType.aName.id}"
@@ -775,12 +749,8 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 			}
 			i = make(map[string]string)
 		)
-		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
-		p.EXPECT().TFProvider().Return(aws.Provider())
-		p.EXPECT().Configuration().Return(map[string]interface{}{
-			"region": "eu-west-1",
-		})
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Module: "test", ModuleVariables: map[string]struct{}{"type.name": struct{}{}}, Interpolate: true})
 		i["to-be-interpolated"] = "${aType.aName.id}"
@@ -810,12 +780,8 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 			}
 			i = make(map[string]string)
 		)
-		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
-		p.EXPECT().TFProvider().Return(aws.Provider())
-		p.EXPECT().Configuration().Return(map[string]interface{}{
-			"region": "eu-west-1",
-		})
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Module: "test", ModuleVariables: map[string]struct{}{"type.network": struct{}{}}, Interpolate: true})
 		i["to-be-interpolated"] = "${aType.aName.id}"
@@ -846,12 +812,8 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 			}
 			i = make(map[string]string)
 		)
-		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
-		p.EXPECT().TFProvider().Return(aws.Provider())
-		p.EXPECT().Configuration().Return(map[string]interface{}{
-			"region": "eu-west-1",
-		})
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 		i["to-be-interpolated"] = "${aType.aName.id}"
@@ -882,12 +844,8 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 			}
 			i = make(map[string]string)
 		)
-		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
-		p.EXPECT().TFProvider().Return(aws.Provider())
-		p.EXPECT().Configuration().Return(map[string]interface{}{
-			"region": "eu-west-1",
-		})
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 		i["a-zone"] = "${aws_instance.instance.availability_zone}"
@@ -921,12 +879,8 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 			}
 			i = make(map[string]string)
 		)
-		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
-		p.EXPECT().TFProvider().Return(aws.Provider())
-		p.EXPECT().Configuration().Return(map[string]interface{}{
-			"region": "eu-west-1",
-		})
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: false})
 		i["should-not-be-interpolated"] = "${aType.aName.id}"

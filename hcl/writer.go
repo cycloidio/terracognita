@@ -65,9 +65,6 @@ func NewWriter(w io.Writer, pv provider.Provider, opts *writer.Options) *Writer 
 			},
 		},
 	}
-	pvcfg := map[string]interface{}{
-		pv.String(): make(map[string]interface{}),
-	}
 	var cat string
 	if opts.HasModule() {
 		cat = writer.ModuleCategoryKey
@@ -85,9 +82,13 @@ func NewWriter(w io.Writer, pv provider.Provider, opts *writer.Options) *Writer 
 		wr.categories = append(wr.categories, cat)
 	}
 	wr.Config[cat]["terraform"] = tfcfg
-	wr.Config[cat]["provider"] = pvcfg
-
-	wr.setProviderConfig(cat)
+	if opts.HCLProviderBlock {
+		pvcfg := map[string]interface{}{
+			pv.String(): make(map[string]interface{}),
+		}
+		wr.Config[cat]["provider"] = pvcfg
+		wr.setProviderConfig(cat)
+	}
 
 	return wr
 }
