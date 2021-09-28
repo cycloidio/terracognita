@@ -279,9 +279,10 @@ func getWriterOptions() (*writer.Options, error) {
 	}
 
 	return &writer.Options{
-		Interpolate:     viper.GetBool("interpolate"),
-		Module:          module,
-		ModuleVariables: mv,
+		Interpolate:      viper.GetBool("interpolate"),
+		Module:           module,
+		ModuleVariables:  mv,
+		HCLProviderBlock: viper.GetBool("hcl-provider-block"),
 	}, nil
 }
 
@@ -324,6 +325,9 @@ func init() {
 
 	RootCmd.PersistentFlags().BoolP("interpolate", "", true, "Activate the interpolation for the HCL and the dependencies building for the State file")
 	_ = viper.BindPFlag("interpolate", RootCmd.PersistentFlags().Lookup("interpolate"))
+
+	RootCmd.PersistentFlags().BoolP("hcl-provider-block", "", true, "Generate or not the 'provider {}' block for the imported provider")
+	_ = viper.BindPFlag("hcl-provider-block", RootCmd.PersistentFlags().Lookup("hcl-provider-block"))
 }
 
 func initViper() {

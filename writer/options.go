@@ -16,6 +16,10 @@ type Options struct {
 	// to use as variables when writing. If empty
 	// means use all attributes as variables
 	ModuleVariables map[string]struct{}
+
+	// HCLProviderBlock make the HCL generate or not the
+	// 'provider "" {}' block
+	HCLProviderBlock bool
 }
 
 // HasModule will check if the Module is empty or not
