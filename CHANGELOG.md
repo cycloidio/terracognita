@@ -2,6 +2,8 @@
 
 ### Added
 
+- aws resources: `aws_vpc_endpoint`
+  ([Issue #254](https://github.com/cycloidio/terracognita/issues/254))
 - New flag `--hcl-provider-block` to be able to opt out of the `provider "" {}` on HCL
   ([Issue #250](https://github.com/cycloidio/terracognita/issues/250))
 
