@@ -427,6 +427,15 @@ var (
 			`,
 		},
 		Function{
+			Entity:  "VpcEndpoints",
+			Prefix:  "Describe",
+			Service: "ec2",
+			Documentation: `
+			// GetVpcEndpoints returns the ec2 VPC Endpoints on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
 			Entity:  "Vpcs",
 			Prefix:  "Describe",
 			Service: "ec2",
