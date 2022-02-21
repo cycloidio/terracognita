@@ -3,6 +3,7 @@ package azurerm
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	azureResourcesAPI "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-05-01/resources"
 	"github.com/Azure/go-autorest/autorest"
@@ -60,18 +61,27 @@ func NewAzureReader(ctx context.Context, clientID, clientSecret, environment, re
 		return nil, fmt.Errorf("could not initialize 'azure/autorest.Authorizer.' because: %s", err)
 	}
 
-	// Resource Group
-	client := azureResourcesAPI.NewGroupsClient(cfg.SubscriptionID)
-	client.Authorizer = auth
-	resourceGroup, err := client.Get(ctx, resourceGroupName)
-	if err != nil {
-		return nil, fmt.Errorf("could not 'azure/resources.GroupsClient.Get' the resource group because: %s", err)
+	var rg azureResourcesAPI.Group
+	rgParts := strings.Split(resourceGroupName, ":")
+	if len(rgParts) > 1 {
+		rg = azureResourcesAPI.Group{
+			Name:     &rgParts[0],
+			Location: &rgParts[1],
+		}
+	} else {
+		// Resource Group
+		client := azureResourcesAPI.NewGroupsClient(cfg.SubscriptionID)
+		client.Authorizer = auth
+		rg, err = client.Get(ctx, resourceGroupName)
+		if err != nil {
+			return nil, fmt.Errorf("could not 'azure/resources.GroupsClient.Get' the resource group because: %s", err)
+		}
 	}
 
 	return &AzureReader{
 		config:        *cfg,
 		authorizer:    auth,
-		resourceGroup: resourceGroup,
+		resourceGroup: rg,
 	}, nil
 }
 
