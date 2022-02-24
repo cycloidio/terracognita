@@ -5,6 +5,11 @@
 - New flag `--hcl-provider-block` to be able to opt out of the `provider "" {}` on HCL
   ([Issue #250](https://github.com/cycloidio/terracognita/issues/250))
 
+### Fixed
+
+- Issue with importing `google_storage_bucket_iam_policy`
+  ([Issue #258](https://github.com/cycloidio/terracognita/issues/258))
+
 ## [0.7.3] _2021-09-23_
 
 ### Changed
