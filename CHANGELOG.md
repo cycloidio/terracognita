@@ -19,6 +19,10 @@
 
 ### Fixed
 
+- Fix usage of `yaml` extension with `--module-variables`
+  ([PR #257](https://github.com/cycloidio/terracognita/pull/257))
+- Do not stop when service not enable with Azure and Google
+  ([Issue #247](https://github.com/cycloidio/terracognita/issues/247))
 - Google resources that do not support Labels are no longer filtered by it
   ([PR #236](https://github.com/cycloidio/terracognita/issues/237))
 - Fix error to enable support for azurerm_resource_group

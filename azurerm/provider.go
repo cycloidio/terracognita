@@ -4,16 +4,27 @@ import (
 	"context"
 	"fmt"
 
+	autorestAzure "github.com/Azure/go-autorest/autorest/azure"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/pkg/errors"
 	tfazurerm "github.com/terraform-providers/terraform-provider-azurerm/azurerm"
 
 	"github.com/cycloidio/terracognita/cache"
+	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/filter"
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/provider"
 )
+
+// skippableCodes is a list of codes
+// which won't make Terracognita failed
+// but they will be printed on the output
+// they are based on the err.Code() content
+// of the Azure error
+var skippableCodes = map[string]struct{}{
+	"ParentResourceNotFound": struct{}{},
+}
 
 type azurerm struct {
 	tfAzureRMClient interface{}
@@ -89,6 +100,19 @@ func (a *azurerm) Resources(ctx context.Context, t string, f *filter.Filter) ([]
 
 	resources, err := rfn(ctx, a, t, f)
 	if err != nil {
+		// we filter the error from Azure and return a custom error
+		// type if it's an error that we want to skip
+		// Remove all wrap layer to get the right type
+		unwrapErr := err
+		for errors.Unwrap(unwrapErr) != nil {
+			unwrapErr = errors.Unwrap(unwrapErr)
+		}
+		if reqErr, ok := unwrapErr.(*autorestAzure.RequestError); ok {
+			if _, ok := skippableCodes[reqErr.ServiceError.Code]; ok {
+				return nil, fmt.Errorf("%w: %v", errcode.ErrProviderAPI, reqErr)
+			}
+		}
+
 		return nil, errors.Wrapf(err, "error while reading from resource %q", t)
 	}
 
