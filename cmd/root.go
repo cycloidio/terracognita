@@ -256,7 +256,7 @@ func getWriterOptions() (*writer.Options, error) {
 
 			var values map[string][]string
 			switch filepath.Ext(pmv) {
-			case ".yml", "yaml":
+			case ".yml", ".yaml":
 				err := yaml.Unmarshal(b, &values)
 				if err != nil {
 					return nil, fmt.Errorf("invalid YAML on module-variables file %s: %w", pmv, err)
