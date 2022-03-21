@@ -209,6 +209,10 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetVolumes(ctx context.Context, input *ec2.DescribeVolumesInput) ([]*ec2.Volume, error)
 
+	// GetVpcEndpoints returns the ec2 VPC Endpoints on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetVpcEndpoints(ctx context.Context, input *ec2.DescribeVpcEndpointsInput) ([]*ec2.VpcEndpoint, error)
+
 	// GetVpcs returns all EC2 VPCs based on the input given.
 	// Returned values are commented in the interface doc comment block.
 	GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) ([]*ec2.Vpc, error)
@@ -1599,6 +1603,37 @@ func (c *connector) GetVolumes(ctx context.Context, input *ec2.DescribeVolumesIn
 		hasNextToken = o.NextToken != nil
 
 		opt = append(opt, o.Volumes...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetVpcEndpoints(ctx context.Context, input *ec2.DescribeVpcEndpointsInput) ([]*ec2.VpcEndpoint, error) {
+	if c.svc.ec2 == nil {
+		c.svc.ec2 = ec2.New(c.svc.session)
+	}
+
+	opt := make([]*ec2.VpcEndpoint, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeVpcEndpointsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.VpcEndpoints == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &ec2.DescribeVpcEndpointsInput{}
+		}
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.VpcEndpoints...)
 
 	}
 

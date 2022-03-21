@@ -169,6 +169,7 @@ const (
 	Subnet
 	VolumeAttachment
 	VPC
+	VPCEndpoint
 	VPCPeeringConnection
 	VPNGateway
 )
@@ -292,6 +293,7 @@ var (
 		VolumeAttachment:             volumeAttachments,
 		VPCPeeringConnection:         vpcPeeringConnections,
 		VPC:                          vpcs,
+		VPCEndpoint:                  vpcEndpoints,
 		VPNGateway:                   vpnGateways,
 	}
 )
@@ -2954,6 +2956,29 @@ func vpcs(ctx context.Context, a *aws, resourceType string, filters *filter.Filt
 	resources := make([]provider.Resource, 0)
 	for _, v := range vpcs {
 		r, err := initializeResource(a, *v.VpcId, resourceType)
+		if err != nil {
+			return nil, err
+		}
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func vpcEndpoints(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	var input = &ec2.DescribeVpcEndpointsInput{
+		Filters:    toEC2Filters(filters),
+		MaxResults: awsSDK.Int64(1000),
+	}
+
+	vpcsedp, err := a.awsr.GetVpcEndpoints(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, v := range vpcsedp {
+		r, err := initializeResource(a, *v.VpcEndpointId, resourceType)
 		if err != nil {
 			return nil, err
 		}
