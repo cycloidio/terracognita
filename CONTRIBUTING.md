@@ -336,6 +336,31 @@ $ make test
 
 Don't forget to update the `CHANGELOG.md`.
 
+###### How to update terraform-provider-azurerm
+
+> Only if azurerm provider need to updated
+
+Since terraform-provider-azurerm moved, source code under `internal`, Terracognita use a fork including a commit to create [azurerm/provider.go](https://github.com/cycloidio/terraform-provider-azurerm/commit/e3be7857050579e69bea178b83bcae25fb1d4e3f) file.
+The process to update terraform-provider-azurerm is the following
+
+```
+git clone git@github.com:cycloidio/terraform-provider-azurerm.git
+cd terraform-provider-azurerm
+git remote add upstream https://github.com/hashicorp/terraform-provider-azurerm.git
+git fetch upstream
+git checkout cycloid
+git rebase upstream/main
+git push -f origin cycloid
+LASTCOMMIT=$(git rev-parse --short HEAD)
+```
+
+Make sure tu update go.mod to Terracognita
+
+```
+go mod edit -replace github.com/hashicorp/terraform-provider-azurerm=github.com/cycloidio/terraform-provider-azurerm@$LASTCOMMIT
+go mod tidy
+```
+
 ##### GCP Middleware layer
 
 In `reader.go`, you can add your middleware function `ListInstances`. You will need to be equipped with this [documentation](https://godoc.org/google.golang.org/api/compute/v1). Google SDK is pretty standard, APIs are most of the time used in a similar way.

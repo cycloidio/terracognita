@@ -55,7 +55,7 @@ func NewAzureReader(ctx context.Context, clientID, clientSecret, environment, re
 
 	azureSender := sender.BuildSender("AzureRM")
 
-	auth, err := cfg.GetAuthorizationToken(azureSender, oauthConfig, env.ResourceManagerEndpoint)
+	auth, err := cfg.GetADALToken(ctx, azureSender, oauthConfig, env.ResourceManagerEndpoint)
 	if err != nil {
 		return nil, fmt.Errorf("could not initialize 'azure/autorest.Authorizer.' because: %s", err)
 	}

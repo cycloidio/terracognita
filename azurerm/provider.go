@@ -7,8 +7,8 @@ import (
 	autorestAzure "github.com/Azure/go-autorest/autorest/azure"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	tfazurerm "github.com/hashicorp/terraform-provider-azurerm/azurerm"
 	"github.com/pkg/errors"
-	tfazurerm "github.com/terraform-providers/terraform-provider-azurerm/azurerm"
 
 	"github.com/cycloidio/terracognita/cache"
 	"github.com/cycloidio/terracognita/errcode"

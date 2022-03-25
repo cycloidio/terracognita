@@ -7,6 +7,11 @@
 - New flag `--hcl-provider-block` to be able to opt out of the `provider "" {}` on HCL
   ([Issue #250](https://github.com/cycloidio/terracognita/issues/250))
 
+### Changed
+
+- Update terraform-provider-azurerm from v1.44.0 to v2.99.0
+  ([PR #263](https://github.com/cycloidio/terracognita/pull/263))
+
 ### Fixed
 
 - Issue with importing `google_storage_bucket_iam_policy`
