@@ -354,7 +354,7 @@ git push -f origin cycloid
 LASTCOMMIT=$(git rev-parse --short HEAD)
 ```
 
-Make sure tu update go.mod to Terracognita
+Make sure to update go.mod and the [README](https://github.com/cycloidio/terracognita#cloud-providers) from Terracognita.
 
 ```
 go mod edit -replace github.com/hashicorp/terraform-provider-azurerm=github.com/cycloidio/terraform-provider-azurerm@$LASTCOMMIT
