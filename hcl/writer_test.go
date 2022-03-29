@@ -12,10 +12,10 @@ import (
 	"github.com/cycloidio/terracognita/writer"
 	"github.com/golang/mock/gomock"
 	"github.com/hashicorp/terraform-provider-azurerm/azurerm"
+	"github.com/hashicorp/terraform-provider-aws/aws"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/terraform-providers/terraform-provider-aws/aws"
 )
 
 func TestNewHCLWriter(t *testing.T) {
