@@ -67,10 +67,10 @@ import (
 // See:
 //  * https://docs.aws.amazon.com/AWSEC2/latest/APIReference/errors-overview.html#CommonErrors
 //  * https://docs.aws.amazon.com/STS/latest/APIReference/CommonErrors.html
-func New(ctx context.Context, accessKey string, secretKey string, region string, sessionToken string, config *aws.Config) (Reader, error) {
+func New(ctx context.Context, accessKey, secretKey, region, sessionToken string, config *aws.Config) (Reader, error) {
 	var c = connector{}
 
-	creds, ec2s, sts, err := configureAWS(accessKey, secretKey, sessionToken)
+	creds, ec2s, sts, err := configureAWS(accessKey, secretKey, region, sessionToken)
 	if err != nil {
 		return nil, err
 	}
@@ -154,20 +154,24 @@ type serviceConnector struct {
 	storagegateway           storagegatewayiface.StorageGatewayAPI
 }
 
+/* The default region is only used to (1) get the list of region and
+ * (2) get the account ID associated with the credentials.
+ *
+ * It is not used as a default region for services, therefore if no
+ * region is specified when instantiating the connector, then it will
+ * not try to establish any connections with AWS services.
+ */
+const defaultRegion string = "eu-west-1"
+
 // configureAWS creates a new static credential with the passed accessKey and
 // secretKey and with it, a sessions which is used to create a EC2 client and
 // a Security Token Service client.
 // The only AWS error code that this function return is
 // * EmptyStaticCreds
-func configureAWS(accessKey, secretKey, token string) (*credentials.Credentials, ec2iface.EC2API, stsiface.STSAPI, error) {
-	/* The default region is only used to (1) get the list of region and
-	 * (2) get the account ID associated with the credentials.
-	 *
-	 * It is not used as a default region for services, therefore if no
-	 * region is specified when instantiating the connector, then it will
-	 * not try to establish any connections with AWS services.
-	 */
-	const defaultRegion string = "eu-west-1"
+func configureAWS(accessKey, secretKey, region, token string) (*credentials.Credentials, ec2iface.EC2API, stsiface.STSAPI, error) {
+	if region == "" {
+		region = defaultRegion
+	}
 
 	creds := credentials.NewStaticCredentials(accessKey, secretKey, token)
 	_, err := creds.Get()
@@ -176,7 +180,7 @@ func configureAWS(accessKey, secretKey, token string) (*credentials.Credentials,
 	}
 	sess := session.Must(
 		session.NewSession(&aws.Config{
-			Region:      aws.String(defaultRegion),
+			Region:      aws.String(region),
 			DisableSSL:  aws.Bool(false),
 			MaxRetries:  aws.Int(3),
 			Credentials: creds,
