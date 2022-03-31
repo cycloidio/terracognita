@@ -9,6 +9,10 @@
 
 ### Changed
 
+- Update terraform-provider-google from v3.67.0 to v4.9.0
+  ([PR #263](https://github.com/cycloidio/terracognita/pull/264))
+- Update terraform-provider-aws from v3.40.0 to v4.8.0
+  ([PR #263](https://github.com/cycloidio/terracognita/pull/264))
 - Update terraform-provider-azurerm from v1.44.0 to v2.99.0
   ([PR #263](https://github.com/cycloidio/terracognita/pull/263))
 - AzureRM now supports multiple Resource Group Names
