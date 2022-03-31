@@ -242,6 +242,17 @@ $ make test
 
 Don't forget to update the `CHANGELOG.md`
 
+###### How to update terraform-provider-aws
+
+> Only if aws provider need to updated
+
+Since terraform-provider-azurerm moved, source code under `internal`, Terracognita use a fork including a commit to create [aws/provider.go](https://github.com/cycloidio/terraform-provider-azurerm/commit/e3be7857050579e69bea178b83bcae25fb1d4e3f) file.
+The process to update terraform-provider-azurerm is the following
+
+```
+PROVIDER=aws make update-terraform-provider
+```
+
 ##### AzureRM Middleware layer
 
 We have an `azurerm/cmd` that generates the `azurerm/reader_generated.go` methods used to get the resources from the Azure SDK. To add a new call you have to add a new Function to the list in `aws/cmd/generate.go` (and the corresponding AzureAPI if necessary) and run `make generate`, you'll have the code fully generated for that function.
@@ -344,21 +355,7 @@ Since terraform-provider-azurerm moved, source code under `internal`, Terracogni
 The process to update terraform-provider-azurerm is the following
 
 ```
-git clone git@github.com:cycloidio/terraform-provider-azurerm.git
-cd terraform-provider-azurerm
-git remote add upstream https://github.com/hashicorp/terraform-provider-azurerm.git
-git fetch upstream
-git checkout cycloid
-git rebase upstream/main
-git push -f origin cycloid
-LASTCOMMIT=$(git rev-parse --short HEAD)
-```
-
-Make sure to update go.mod and the [README](https://github.com/cycloidio/terracognita#cloud-providers) from Terracognita.
-
-```
-go mod edit -replace github.com/hashicorp/terraform-provider-azurerm=github.com/cycloidio/terraform-provider-azurerm@$LASTCOMMIT
-go mod tidy
+PROVIDER=azurerm make update-terraform-provider
 ```
 
 ##### GCP Middleware layer
