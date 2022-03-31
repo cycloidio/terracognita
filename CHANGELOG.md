@@ -16,6 +16,8 @@
 
 - Issue with importing `google_storage_bucket_iam_policy`
   ([Issue #258](https://github.com/cycloidio/terracognita/issues/258))
+- Removed default region used on AWS initialization now uses the one specified by the user
+  ([Issue #253](https://github.com/cycloidio/terracognita/issues/253))
 
 ## [0.7.3] _2021-09-23_
 
