@@ -2,6 +2,7 @@ package azurerm
 
 import (
 	"context"
+	"strings"
 
 	"github.com/pkg/errors"
 
@@ -18,10 +19,15 @@ const (
 	ResourceGroup ResourceType = iota
 	// Compute Resources
 	VirtualMachine
+	WindowsVirtualMachine
+	LinuxVirtualMachine
 	VirtualMachineExtension
-	VirtualMachineScaleSet
+	WindowsVirtualMachineScaleSet
+	LinuxVirtualMachineScaleSet
+	VirtualMachineScaleSetExtension
 	VirtualNetwork
 	AvailabilitySet
+	ManagedDisk
 	Image
 	// Network Resources
 	Subnet
@@ -43,6 +49,20 @@ const (
 	VirtualNetworkGatewayConnection
 	VirtualNetworkPeering
 	WebApplicationFirewallPolicy
+	VirtualHub
+	VirtualHubBgpConnection
+	VirtualHubConnection
+	VirtualHubIP
+	VirtualHubRouteTable
+	VirtualHubSecurityPartnerProvider
+	// Load Balancer
+	Lb
+	LbBackendAddressPool
+	LbRule
+	LbOutboundRule
+	LbNatRule
+	LbNatPool
+	LbProbe
 	// Desktop Resources
 	VirtualDesktopHostPool
 	VirtualDesktopApplicationGroup
@@ -53,6 +73,9 @@ const (
 	// Container Registry Resources
 	ContainerRegistry
 	ContainerRegistryWebhook
+	// Container Service Resources - k8s services
+	KubernetesCluster
+	KubernetesClusterNodePool
 	// Storage Resources
 	StorageAccount
 	StorageQueue
@@ -77,11 +100,62 @@ const (
 	PostgresqlFirewallRule
 	PostgresqlServer
 	PostgresqlVirtualNetworkRule
-	// Database Resources- sql
-	SQLElasticPool // sql_elasticpool
-	SQLDatabase
-	SQLFirewallRule
-	SQLServer
+	// Database Resources- mssql
+	MssqlElasticPool
+	MssqlDatabase
+	MssqlFirewallRule
+	MssqlServer
+	MssqlServerSecurityAlertPolicy
+	MssqlServerVulnerabilityAssessment
+	MssqlVirtualMachine
+	MssqlVirtualNetworkRule
+	// Redis
+	RedisCache
+	RedisFirewallRule
+	// DNS
+	DNSZone
+	DNSARecord //dns_a_record
+	DNSAaaRecord
+	DNSCaaRecord
+	DNSCnameRecord
+	DNSMxRecord
+	DNSNsRecord
+	DNSPtrRecord
+	DNSSrvRecord
+	DNSTxtRecord
+	// Private DNS
+	PrivateDNSZone
+	PrivateDNSARecord //private_dns_a_record
+	PrivateDNSAaaRecord
+	PrivateDNSCnameRecord
+	PrivateDNSMxRecord
+	PrivateDNSPtrRecord
+	PrivateDNSSrvRecord
+	PrivateDNSTxtRecord
+	PrivateDNSZoneVirtualNetworkLink
+	// Policy
+	PolicyDefinition
+	PolicyRemediation
+	PolicySetDefinition
+	// Vault
+	KeyVault
+	KeyVaultAccessPolicy
+	// Application Insigths
+	ApplicationInsights
+	ApplicationInsightsAPIKey
+	ApplicationInsightsAnalyticsItem
+	//ApplicationInsightsWebTest
+	// Log Analytics
+	LogAnalyticsWorkspace
+	LogAnalyticsLinkedService
+	LogAnalyticsDatasourceWindowsPerformanceCounter
+	LogAnalyticsDatasourceWindowsEvent
+	// Monitor
+	MonitorActionGroup
+	MonitorActivityLogAlert
+	MonitorAutoscaleSetting
+	MonitorLogProfile
+	MonitorMetricAlert
 )
 
 type rtFn func(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error)
@@ -90,32 +164,51 @@ var (
 	resources = map[ResourceType]rtFn{
 		ResourceGroup: resourceGroup,
 		// Compute Resources
-		VirtualMachine:          virtualMachines,
-		VirtualMachineExtension: virtualMachineExtensions,
-		VirtualNetwork:          cacheVirtualNetworks,
-		VirtualMachineScaleSet:  virtualMachineScaleSets,
-		AvailabilitySet:         availabilitySets,
-		Image:                   images,
+		VirtualMachine:                  virtualMachines,
+		WindowsVirtualMachine:           virtualMachines,
+		LinuxVirtualMachine:             virtualMachines,
+		VirtualMachineExtension:         virtualMachineExtensions,
+		VirtualNetwork:                  virtualNetworks,
+		WindowsVirtualMachineScaleSet:   virtualMachineScaleSets,
+		LinuxVirtualMachineScaleSet:     virtualMachineScaleSets,
+		VirtualMachineScaleSetExtension: virtualMachineScaleSetExtensions,
+		AvailabilitySet:                 availabilitySets,
+		ManagedDisk:                     disks,
+		Image:                           images,
 		// Network Resources
-		Subnet:                          subnets,
-		NetworkInterface:                networkInterfaces,
-		NetworkSecurityGroup:            networkSecurityGroups,
-		ApplicationGateway:              applicationGateways,
-		ApplicationSecurityGroup:        applicationSecurityGroups,
-		NetworkDdosProtectionPlan:       networkddosProtectionPlans,
-		Firewall:                        firewalls,
-		LocalNetworkGateway:             localNetworkGateways,
-		NatGateway:                      natGateways,
-		NetworkProfile:                  networkProfiles,
-		NetworkSecurityRule:             networkSecurityRules,
-		PublicIP:                        publicIP,
-		PublicIPPrefix:                  publicIPPrefixes,
-		Route:                           routes,
-		RouteTable:                      routeTables,
-		VirtualNetworkGateway:           virtualNetworkGateways,
-		VirtualNetworkGatewayConnection: virtualNetworkGatewayConnections,
-		VirtualNetworkPeering:           virtualNetworkPeerings,
-		WebApplicationFirewallPolicy:    webApplicationFirewallPolicies,
+		Subnet:                            subnets,
+		NetworkInterface:                  networkInterfaces,
+		NetworkSecurityGroup:              networkSecurityGroups,
+		ApplicationGateway:                applicationGateways,
+		ApplicationSecurityGroup:          applicationSecurityGroups,
+		NetworkDdosProtectionPlan:         networkddosProtectionPlans,
+		Firewall:                          firewalls,
+		LocalNetworkGateway:               localNetworkGateways,
+		NatGateway:                        natGateways,
+		NetworkProfile:                    networkProfiles,
+		NetworkSecurityRule:               networkSecurityRules,
+		PublicIP:                          publicIP,
+		PublicIPPrefix:                    publicIPPrefixes,
+		Route:                             routes,
+		RouteTable:                        routeTables,
+		VirtualNetworkGateway:             virtualNetworkGateways,
+		VirtualNetworkGatewayConnection:   virtualNetworkGatewayConnections,
+		VirtualNetworkPeering:             virtualNetworkPeerings,
+		WebApplicationFirewallPolicy:      webApplicationFirewallPolicies,
+		VirtualHub:                        virtualHubs,
+		VirtualHubBgpConnection:           virtualHubBgpConnection,
+		VirtualHubConnection:              virtualHubConnection,
+		VirtualHubIP:                      virtualHubIP,
+		VirtualHubRouteTable:              virtualHubRouteTable,
+		VirtualHubSecurityPartnerProvider: virtualHubSecurityPartnerProvider,
+		// Load Balancer
+		Lb:                   lbs,
+		LbBackendAddressPool: lbBackendAddressPools,
+		LbRule:               lbProperties,
+		LbOutboundRule:       lbProperties,
+		LbNatRule:            lbProperties,
+		LbNatPool:            lbProperties,
+		LbProbe:              lbProperties,
 		// Desktop Resources
 		VirtualDesktopApplicationGroup: virtualApplicationGroups,
 		VirtualDesktopHostPool:         virtualDesktopHostPools,
@@ -126,6 +219,9 @@ var (
 		// Container Registry Resources
 		ContainerRegistry:        containerRegistries,
 		ContainerRegistryWebhook: containerRegistryWebhooks,
+		// Container Service Resources
+		KubernetesCluster:         kubernetesClusters,
+		KubernetesClusterNodePool: kubernetesClustersNodePools,
 		// Storage Resources
 		StorageAccount: storageAccounts,
 		StorageQueue:   storageQueues,
@@ -150,11 +246,62 @@ var (
 		PostgresqlFirewallRule:       postgresqlFirewallRules,
 		PostgresqlServer:             postgresqlServers,
 		PostgresqlVirtualNetworkRule: postgresqlVirtualNetworkRules,
-		// Database Resources- sql
-		SQLElasticPool:  sqlElasticPools,
-		SQLDatabase:     sqlDatabases,
-		SQLFirewallRule: sqlFirewallRules,
-		SQLServer:       sqlServers,
+		// Database Resources- mssql
+		MssqlElasticPool:                   mssqlElasticPools,
+		MssqlDatabase:                      mssqlDatabases,
+		MssqlFirewallRule:                  mssqlFirewallRules,
+		MssqlServer:                        mssqlServers,
+		MssqlServerSecurityAlertPolicy:     mssqlServerSecurityAlertPolicies,
+		MssqlServerVulnerabilityAssessment: mssqlServerVulnerabilityAssessments,
+		MssqlVirtualMachine:                mssqlVirtualMachines,
+		MssqlVirtualNetworkRule:            mssqlVirtualNetworkRules,
+		// Redis
+		RedisCache:        redisCaches,
+		RedisFirewallRule: redisFirewallRules,
+		// 	Dns
+		DNSZone:        dnsZones,
+		DNSARecord:     dnsRecordSets,
+		DNSAaaRecord:   dnsRecordSets,
+		DNSCaaRecord:   dnsRecordSets,
+		DNSCnameRecord: dnsRecordSets,
+		DNSMxRecord:    dnsRecordSets,
+		DNSNsRecord:    dnsRecordSets,
+		DNSPtrRecord:   dnsRecordSets,
+		DNSSrvRecord:   dnsRecordSets,
+		DNSTxtRecord:   dnsRecordSets,
+		// Private DNS
+		PrivateDNSZone:                   privateDNSZones,
+		PrivateDNSARecord:                privateDNSRecordSets,
+		PrivateDNSAaaRecord:              privateDNSRecordSets,
+		PrivateDNSCnameRecord:            privateDNSRecordSets,
+		PrivateDNSMxRecord:               privateDNSRecordSets,
+		PrivateDNSPtrRecord:              privateDNSRecordSets,
+		PrivateDNSSrvRecord:              privateDNSRecordSets,
+		PrivateDNSTxtRecord:              privateDNSRecordSets,
+		PrivateDNSZoneVirtualNetworkLink: privateDNSVirtualNetworkLinks,
+		// Policy
+		PolicyDefinition:    policyDefinitions,
+		PolicyRemediation:   policyRemediations,
+		PolicySetDefinition: policySetDefinitions,
+		// Vault
+		KeyVault:             keyVaults,
+		KeyVaultAccessPolicy: keyVaultProperties,
+		// Application Insigths
+		ApplicationInsights:              applicationInsights,
+		ApplicationInsightsAPIKey:        applicationInsightsAPIKeys,
+		ApplicationInsightsAnalyticsItem: applicationInsightsAnalyticsItems,
+		//ApplicationInsightsWebTest:       applicationInsightsWebTests,
+		// Log Analytics
+		LogAnalyticsWorkspace:                           logAnalyticsWorkspaces,
+		LogAnalyticsLinkedService:                       logAnalyticsLinkedServices,
+		LogAnalyticsDatasourceWindowsPerformanceCounter: logAnalyticsDatasources,
+		LogAnalyticsDatasourceWindowsEvent:              logAnalyticsDatasources,
+		// Monitor
+		MonitorActionGroup:      monitorActionGroups,
+		MonitorActivityLogAlert: monitorActivityLogAlerts,
+		MonitorAutoscaleSetting: monitorAutoscaleSettings,
+		MonitorLogProfile:       monitorLogProfiles,
+		MonitorMetricAlert:      monitorMetricAlerts,
 	}
 )
 
@@ -168,12 +315,50 @@ func resourceGroup(ctx context.Context, a *azurerm, ar *AzureReader, resourceTyp
 // Compute Resources
 
 func virtualMachines(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	virtualMachines, err := ar.ListVirtualMachines(ctx)
+	virtualMachines, err := ar.ListVirtualMachines(ctx, "")
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual machines from reader")
 	}
-	resources := make([]provider.Resource, 0, len(virtualMachines))
+	resources := make([]provider.Resource, 0)
 	for _, virtualMachine := range virtualMachines {
+
+		// To avoid having the same vm for different resources (azurerm_virtual_machine and azurerm_windows_virtual_machine or azurerm_linux_virtual_machine)
+		// Check VM OS (based on the criteria to create specific os type vm resources)
+		// then based on the result we check if the vm should be added to the list for the specific resource_type or not
+		// checks the storageProfile OS disk, check thats unmanaged disks are not used (mandatory for the resource) and also that the osProfile is attached with the OS configuration
+		// for more info about the implentation: https://github.com/hashicorp/terraform-provider-azurerm/blob/main/internal/services/compute/virtual_machine_import.go
+		vmOS := ""
+
+		if storageProfile := virtualMachine.VirtualMachineProperties.StorageProfile; storageProfile != nil && storageProfile.OsDisk.Vhd == nil {
+			// type windows
+			if storageProfile.OsDisk.OsType == "Windows" {
+				if osProfile := virtualMachine.VirtualMachineProperties.OsProfile; osProfile != nil && osProfile.WindowsConfiguration != nil {
+					vmOS = "windows"
+				}
+
+				//type linux
+			} else if storageProfile.OsDisk.OsType == "Linux" {
+				if osProfile := virtualMachine.VirtualMachineProperties.OsProfile; osProfile != nil && osProfile.LinuxConfiguration != nil {
+					vmOS = "linux"
+				}
+			}
+		}
+
+		// if resource_type is azurerm_virtual_machine
+		// and vmOS was retrived (not null)
+		// and the corresponding os vm resource is included
+		// then dont import vm
+		if resourceType == "azurerm_virtual_machine" && vmOS != "" && filters.IsIncluded("azurerm_virtual_machine", "azurerm_"+vmOS+"_virtual_machine") {
+			continue
+
+			// if resource_type is azurerm_linux|windows_virtual_machine
+			// and a vmOS was retrieved (not null)
+			// and the resource_type doesn't contain contain the vmOS
+			// then don't import vm
+		} else if (resourceType == "azurerm_linux_virtual_machine" || resourceType == "azurerm_windows_virtual_machine") && vmOS != "" && !strings.Contains(resourceType, vmOS) {
+			continue
+		}
+
 		r := provider.NewResource(*virtualMachine.ID, resourceType, a)
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
@@ -190,9 +375,75 @@ func virtualMachineScaleSets(ctx context.Context, a *azurerm, ar *AzureReader, r
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual machines scale sets from reader")
 	}
-	resources := make([]provider.Resource, 0, len(virtualMachineScaleSets))
+	resources := make([]provider.Resource, 0)
 	for _, virtualMachineScaleSet := range virtualMachineScaleSets {
+
+		// if resource_type is one of the elements of vm and not a caching method
+		if resourceType == "azurerm_linux_virtual_machine_scale_set" || resourceType == "azurerm_windows_virtual_machine_scale_set" {
+
+			//check scale set VM OS (based on the criteria to create specific os type vm resources)
+			// then based on the result we check if the vm should be added to the list for the specific resource_type or not
+			// to avoid having the same vm for different resources (azurerm_virtual_machine_scale_set and azurerm_windows_virtual_machine_scale_set or azurerm_linux_virtual_machine_scale_set)
+			// for more info about the implentation: https://github.com/hashicorp/terraform-provider-azurerm/blob/main/internal/services/compute/virtual_machine_scale_set_import.go
+
+			vmOS := ""
+
+			if osProfile := virtualMachineScaleSet.VirtualMachineScaleSetProperties.VirtualMachineProfile.OsProfile; osProfile != nil {
+				// type windows
+				if osProfile.WindowsConfiguration != nil {
+					vmOS = "windows"
+
+					//type linux
+				} else if osProfile.LinuxConfiguration != nil {
+					vmOS = "linux"
+				}
+			}
+
+			// ifthe resource_type doesn't contain the vmOS
+			// then don't import vm
+			if !strings.Contains(resourceType, vmOS) {
+				continue
+			}
+		}
+
 		r := provider.NewResource(*virtualMachineScaleSet.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
+		if err := r.Data().Set("name", *virtualMachineScaleSet.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the virtual machine '%s'", *virtualMachineScaleSet.Name)
+		}
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func virtualMachineScaleSetExtensions(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	scaleSetNames, err := getVirtualMachineScaleSetNames(ctx, a, ar, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list virtual machines scale sets from reader")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, scaleSetNames := range scaleSetNames {
+		extensions, err := ar.ListVirtualMachineScaleSetExtensions(ctx, scaleSetNames)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list list virtual machines scale set extensions from reader")
+		}
+		for _, extension := range extensions {
+			r := provider.NewResource(*extension.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func disks(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	disks, err := ar.ListDisks(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list disks from reader")
+	}
+	resources := make([]provider.Resource, 0, len(disks))
+	for _, disk := range disks {
+		r := provider.NewResource(*disk.ID, resourceType, a)
 		resources = append(resources, r)
 	}
 	return resources, nil
@@ -225,9 +476,6 @@ func availabilitySets(ctx context.Context, a *azurerm, ar *AzureReader, resource
 	resources := make([]provider.Resource, 0, len(availabilitySets))
 	for _, availabilitySet := range availabilitySets {
 		r := provider.NewResource(*availabilitySet.ID, resourceType, a)
-		if err := r.Data().Set("name", *availabilitySet.Name); err != nil {
-			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the availability set '%s'", *availabilitySet.Name)
-		}
 		resources = append(resources, r)
 	}
 	return resources, nil
@@ -241,9 +489,6 @@ func images(ctx context.Context, a *azurerm, ar *AzureReader, resourceType strin
 	resources := make([]provider.Resource, 0, len(images))
 	for _, image := range images {
 		r := provider.NewResource(*image.ID, resourceType, a)
-		if err := r.Data().Set("name", *image.Name); err != nil {
-			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the IMAGE '%s'", *image.Name)
-		}
 		resources = append(resources, r)
 	}
 	return resources, nil
@@ -309,6 +554,11 @@ func networkSecurityGroups(ctx context.Context, a *azurerm, ar *AzureReader, res
 	resources := make([]provider.Resource, 0, len(securityGroups))
 	for _, securityGroup := range securityGroups {
 		r := provider.NewResource(*securityGroup.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
+		if err := r.Data().Set("name", *securityGroup.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the virtual machine '%s'", *securityGroup.Name)
+		}
 		resources = append(resources, r)
 	}
 	return resources, nil
@@ -412,11 +662,11 @@ func networkSecurityRules(ctx context.Context, a *azurerm, ar *AzureReader, reso
 	}
 	resources := make([]provider.Resource, 0)
 	for _, securityGroupName := range securityGroupNames {
-		securityRule, err := ar.ListSecurityRules(ctx, securityGroupName)
+		securityRules, err := ar.ListSecurityRules(ctx, securityGroupName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list security rules from reader")
 		}
-		for _, securityRule := range securityRule {
+		for _, securityRule := range securityRules {
 			r := provider.NewResource(*securityRule.ID, resourceType, a)
 			resources = append(resources, r)
 		}
@@ -432,9 +682,6 @@ func publicIP(ctx context.Context, a *azurerm, ar *AzureReader, resourceType str
 	resources := make([]provider.Resource, 0, len(publicIPAddresses))
 	for _, publicIPAddress := range publicIPAddresses {
 		r := provider.NewResource(*publicIPAddress.ID, resourceType, a)
-		if err := r.Data().Set("name", *publicIPAddress.Name); err != nil {
-			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the public IP address '%s'", *publicIPAddress.Name)
-		}
 		resources = append(resources, r)
 	}
 	return resources, nil
@@ -448,9 +695,6 @@ func publicIPPrefixes(ctx context.Context, a *azurerm, ar *AzureReader, resource
 	resources := make([]provider.Resource, 0, len(publicIPPrefixes))
 	for _, publicIPPrefix := range publicIPPrefixes {
 		r := provider.NewResource(*publicIPPrefix.ID, resourceType, a)
-		if err := r.Data().Set("name", *publicIPPrefix.Name); err != nil {
-			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the public IP prefix '%s'", *publicIPPrefix.Name)
-		}
 		resources = append(resources, r)
 	}
 	return resources, nil
@@ -464,6 +708,8 @@ func routeTables(ctx context.Context, a *azurerm, ar *AzureReader, resourceType 
 	resources := make([]provider.Resource, 0, len(routeTables))
 	for _, routeTable := range routeTables {
 		r := provider.NewResource(*routeTable.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
 		if err := r.Data().Set("name", *routeTable.Name); err != nil {
 			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the routeTable '%s'", *routeTable.Name)
 		}
@@ -499,9 +745,6 @@ func virtualNetworkGateways(ctx context.Context, a *azurerm, ar *AzureReader, re
 	resources := make([]provider.Resource, 0, len(virtualNetworkGateways))
 	for _, virtualNetworkGateway := range virtualNetworkGateways {
 		r := provider.NewResource(*virtualNetworkGateway.ID, resourceType, a)
-		if err := r.Data().Set("name", *virtualNetworkGateway.Name); err != nil {
-			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the virtual Network Gateway '%s'", *virtualNetworkGateway.Name)
-		}
 		resources = append(resources, r)
 	}
 	return resources, nil
@@ -515,9 +758,6 @@ func virtualNetworkGatewayConnections(ctx context.Context, a *azurerm, ar *Azure
 	resources := make([]provider.Resource, 0, len(virtualNetworkGatewayConnections))
 	for _, virtualNetworkGatewayConnection := range virtualNetworkGatewayConnections {
 		r := provider.NewResource(*virtualNetworkGatewayConnection.ID, resourceType, a)
-		if err := r.Data().Set("name", *virtualNetworkGatewayConnection.Name); err != nil {
-			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the virtual Network Gateway connection '%s'", *virtualNetworkGatewayConnection.Name)
-		}
 		resources = append(resources, r)
 	}
 	return resources, nil
@@ -550,10 +790,196 @@ func webApplicationFirewallPolicies(ctx context.Context, a *azurerm, ar *AzureRe
 	resources := make([]provider.Resource, 0, len(webApplicationFirewallPolicies))
 	for _, webApplicationFirewallPolicy := range webApplicationFirewallPolicies {
 		r := provider.NewResource(*webApplicationFirewallPolicy.ID, resourceType, a)
-		if err := r.Data().Set("name", *webApplicationFirewallPolicy.Name); err != nil {
-			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the web application firewall policy '%s'", *webApplicationFirewallPolicy.Name)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func virtualHubs(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	virtualHubs, err := ar.ListVirtualHubs(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list Virtual Hubs from reader")
+	}
+	resources := make([]provider.Resource, 0, len(virtualHubs))
+	for _, virtualHub := range virtualHubs {
+		r := provider.NewResource(*virtualHub.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
+		if err := r.Data().Set("name", *virtualHub.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the virtual Hub '%s'", *virtualHub.Name)
 		}
 		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func virtualHubBgpConnection(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	virtualHubNames, err := getVirtualHub(ctx, a, ar, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list virtual hubs from reader")
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, virtualHubName := range virtualHubNames {
+		virtualHubBgpConnections, err := ar.ListVirtualHubBgpConnections(ctx, virtualHubName)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list virtual hub BGP connections from reader")
+		}
+		for _, virtualHubBgpConnection := range virtualHubBgpConnections {
+			r := provider.NewResource(*virtualHubBgpConnection.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func virtualHubConnection(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	virtualHubNames, err := getVirtualHub(ctx, a, ar, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list virtual hubs from reader")
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, virtualHubName := range virtualHubNames {
+		virtualHubConnections, err := ar.ListHubVirtualNetworkConnections(ctx, virtualHubName)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list virtual hub connections from reader")
+		}
+		for _, virtualHubConnection := range virtualHubConnections {
+			r := provider.NewResource(*virtualHubConnection.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func virtualHubIP(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	virtualHubNames, err := getVirtualHub(ctx, a, ar, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list virtual hubs from reader")
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, virtualHubName := range virtualHubNames {
+		virtualHubIPs, err := ar.ListVirtualHubIPConfiguration(ctx, virtualHubName)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list virtual hub IPs from reader")
+		}
+		for _, virtualHubIP := range virtualHubIPs {
+			r := provider.NewResource(*virtualHubIP.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func virtualHubRouteTable(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	virtualHubNames, err := getVirtualHub(ctx, a, ar, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list virtual hubs from reader")
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, virtualHubName := range virtualHubNames {
+		virtualHubRouteTables, err := ar.ListHubRouteTables(ctx, virtualHubName)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list virtual hub route tables from reader")
+		}
+		for _, virtualHubRouteTable := range virtualHubRouteTables {
+			r := provider.NewResource(*virtualHubRouteTable.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func virtualHubSecurityPartnerProvider(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	virtualHubSecurityPartnerProviders, err := ar.ListSecurityPartnerProviders(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list Virtual Hubs security partner provider from reader")
+	}
+	resources := make([]provider.Resource, 0, len(virtualHubSecurityPartnerProviders))
+	for _, virtualHubSecurityPartnerProvider := range virtualHubSecurityPartnerProviders {
+		r := provider.NewResource(*virtualHubSecurityPartnerProvider.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+// Load Balancer
+func lbs(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	lbs, err := ar.ListLoadBalancers(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list Load Balancer from reader")
+	}
+	resources := make([]provider.Resource, 0, len(lbs))
+	for _, lb := range lbs {
+		r := provider.NewResource(*lb.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
+		if err := r.Data().Set("name", *lb.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the load balancer '%s'", *lb.Name)
+		}
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func lbBackendAddressPools(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	lbNames, err := getLbs(ctx, a, ar, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list load balancers from reader")
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, lbName := range lbNames {
+		lbBackendAddressPools, err := ar.ListLoadBalancerBackendAddressPools(ctx, lbName)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list lb backend address pools from reader")
+		}
+		for _, lbBackendAddressPool := range lbBackendAddressPools {
+			r := provider.NewResource(*lbBackendAddressPool.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func lbProperties(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	lbs, err := ar.ListLoadBalancers(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list Load Balancer from reader")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, lb := range lbs {
+		if lbProperties := lb.LoadBalancerPropertiesFormat; lbProperties != nil {
+			if resourceType == "azurerm_lb_rule" && lbProperties.LoadBalancingRules != nil {
+				for _, lbRule := range *lbProperties.LoadBalancingRules {
+					r := provider.NewResource(*lbRule.ID, resourceType, a)
+					resources = append(resources, r)
+				}
+			} else if resourceType == "azurerm_lb_outbound_rule" && lbProperties.OutboundRules != nil {
+				for _, outboundRule := range *lbProperties.OutboundRules {
+					r := provider.NewResource(*outboundRule.ID, resourceType, a)
+					resources = append(resources, r)
+				}
+			} else if resourceType == "azurerm_lb_nat_rule" && lbProperties.InboundNatRules != nil {
+				for _, natRule := range *lbProperties.InboundNatRules {
+					r := provider.NewResource(*natRule.ID, resourceType, a)
+					resources = append(resources, r)
+				}
+			} else if resourceType == "azurerm_lb_nat_pool" && lbProperties.InboundNatPools != nil {
+				for _, natPool := range *lbProperties.InboundNatPools {
+					r := provider.NewResource(*natPool.ID, resourceType, a)
+					resources = append(resources, r)
+				}
+			} else if resourceType == "azurerm_lb_probe" && lbProperties.Probes != nil {
+				for _, probe := range *lbProperties.Probes {
+					r := provider.NewResource(*probe.ID, resourceType, a)
+					resources = append(resources, r)
+				}
+			}
+		}
 	}
 	return resources, nil
 }
@@ -660,11 +1086,13 @@ func logicAppActionCustoms(ctx context.Context, a *azurerm, ar *AzureReader, res
 func containerRegistries(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	containerRegistries, err := ar.ListContainerRegistries(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to list logic app workflows from reader")
+		return nil, errors.Wrap(err, "unable to list container registries from reader")
 	}
 	resources := make([]provider.Resource, 0, len(containerRegistries))
 	for _, containerRegistry := range containerRegistries {
 		r := provider.NewResource(*containerRegistry.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
 		if err := r.Data().Set("name", *containerRegistry.Name); err != nil {
 			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the container Registry'%s'", *containerRegistry.Name)
 		}
@@ -692,6 +1120,45 @@ func containerRegistryWebhooks(ctx context.Context, a *azurerm, ar *AzureReader,
 	return resources, nil
 }
 
+// Container Service Resources
+
+func kubernetesClusters(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	kubernetesClusters, err := ar.ListKubernetesClusters(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list kubernetes clusters from reader")
+	}
+	resources := make([]provider.Resource, 0, len(kubernetesClusters))
+	for _, kubernetesCluster := range kubernetesClusters {
+		r := provider.NewResource(*kubernetesCluster.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
+		if err := r.Data().Set("name", *kubernetesCluster.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the kubernetes cluster'%s'", *kubernetesCluster.Name)
+		}
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func kubernetesClustersNodePools(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	kubernetesClusters, err := getKubernetesClusters(ctx, a, ar, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list kubernetes clusters from reader")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, kubernetesCluster := range kubernetesClusters {
+		kubernetesClustersNodePools, err := ar.ListKubernetesClusterNodes(ctx, kubernetesCluster)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list kubernetes clusters node pools from reader")
+		}
+		for _, kubernetesClustersNodePool := range kubernetesClustersNodePools {
+			r := provider.NewResource(*kubernetesClustersNodePool.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
 // Storage Resources
 
 func storageAccounts(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
@@ -702,6 +1169,8 @@ func storageAccounts(ctx context.Context, a *azurerm, ar *AzureReader, resourceT
 	resources := make([]provider.Resource, 0, len(storageAccounts))
 	for _, storageAccount := range storageAccounts {
 		r := provider.NewResource(*storageAccount.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
 		if err := r.Data().Set("name", *storageAccount.Name); err != nil {
 			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the storage accounts '%s'", *storageAccount.Name)
 		}
@@ -810,6 +1279,8 @@ func mariadbServers(ctx context.Context, a *azurerm, ar *AzureReader, resourceTy
 	resources := make([]provider.Resource, 0, len(mariadbServers))
 	for _, mariadbServer := range mariadbServers {
 		r := provider.NewResource(*mariadbServer.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
 		if err := r.Data().Set("name", *mariadbServer.Name); err != nil {
 			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the MariaDB Server '%s'", *mariadbServer.Name)
 		}
@@ -904,6 +1375,8 @@ func mysqlServers(ctx context.Context, a *azurerm, ar *AzureReader, resourceType
 	resources := make([]provider.Resource, 0, len(mysqlServers))
 	for _, mysqlServer := range mysqlServers {
 		r := provider.NewResource(*mysqlServer.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
 		if err := r.Data().Set("name", *mysqlServer.Name); err != nil {
 			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the MySQL Server '%s'", *mysqlServer.Name)
 		}
@@ -998,6 +1471,8 @@ func postgresqlServers(ctx context.Context, a *azurerm, ar *AzureReader, resourc
 	resources := make([]provider.Resource, 0, len(postgresqlServers))
 	for _, postgresqlServer := range postgresqlServers {
 		r := provider.NewResource(*postgresqlServer.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
 		if err := r.Data().Set("name", *postgresqlServer.Name); err != nil {
 			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the PostgreSQL Server '%s'", *postgresqlServer.Name)
 		}
@@ -1082,16 +1557,18 @@ func postgresqlVirtualNetworkRules(ctx context.Context, a *azurerm, ar *AzureRea
 	return resources, nil
 }
 
-// Database Resources- SQL
+// Database Resources- mssql
 
-func sqlServers(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	sqlServers, err := ar.ListSQLServers(ctx)
+func mssqlServers(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	sqlServers, err := ar.ListSQLServers(ctx, "")
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list SQL Servers from reader")
 	}
 	resources := make([]provider.Resource, 0, len(sqlServers))
 	for _, sqlServer := range sqlServers {
 		r := provider.NewResource(*sqlServer.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
 		if err := r.Data().Set("name", *sqlServer.Name); err != nil {
 			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the SQL Server '%s'", *sqlServer.Name)
 		}
@@ -1100,14 +1577,14 @@ func sqlServers(ctx context.Context, a *azurerm, ar *AzureReader, resourceType s
 	return resources, nil
 }
 
-func sqlElasticPools(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	sqlServerNames, err := getSQLServers(ctx, a, ar, resourceType, filters)
+func mssqlElasticPools(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	sqlServerNames, err := getMsSQLServers(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list SQL Servers from cache")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, sqlServerName := range sqlServerNames {
-		sqlElasticPools, err := ar.ListSQLElasticPools(ctx, sqlServerName)
+		sqlElasticPools, err := ar.ListSQLElasticPools(ctx, sqlServerName, nil)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list SQL Elastic Pools from reader")
 		}
@@ -1119,8 +1596,8 @@ func sqlElasticPools(ctx context.Context, a *azurerm, ar *AzureReader, resourceT
 	return resources, nil
 }
 
-func sqlDatabases(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	sqlServerNames, err := getSQLServers(ctx, a, ar, resourceType, filters)
+func mssqlDatabases(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	sqlServerNames, err := getMsSQLServers(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list SQL Servers from cache")
 	}
@@ -1130,7 +1607,7 @@ func sqlDatabases(ctx context.Context, a *azurerm, ar *AzureReader, resourceType
 		// https://github.com/Azure/azure-sdk-for-go/blob/main/services/sql/mgmt/2014-04-01/sql/databases.go#:~:text=func%20(client%20DatabasesClient)-,ListByServer,-(ctx%20context.Context
 		// expand - expand - a comma separated list of child objects to expand in the response.
 		// filter - an OData filter expression that describes a subset of databases to return.
-		sqlDatabases, err := ar.ListSQLDatabases(ctx, sqlServerName, "", "")
+		sqlDatabases, err := ar.ListSQLDatabases(ctx, sqlServerName, "")
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list SQL databases from reader")
 		}
@@ -1142,8 +1619,8 @@ func sqlDatabases(ctx context.Context, a *azurerm, ar *AzureReader, resourceType
 	return resources, nil
 }
 
-func sqlFirewallRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	sqlServerNames, err := getSQLServers(ctx, a, ar, resourceType, filters)
+func mssqlFirewallRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	sqlServerNames, err := getMsSQLServers(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list SQL Servers from cache")
 	}
@@ -1157,6 +1634,533 @@ func sqlFirewallRules(ctx context.Context, a *azurerm, ar *AzureReader, resource
 			r := provider.NewResource(*sqlFirewallRule.ID, resourceType, a)
 			resources = append(resources, r)
 		}
+	}
+	return resources, nil
+}
+
+func mssqlServerSecurityAlertPolicies(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	sqlServerNames, err := getMsSQLServers(ctx, a, ar, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list SQL Servers from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, sqlServerName := range sqlServerNames {
+		sqlServerSecurityAlertPolicies, err := ar.ListSQLServerSecurityAlertPolicies(ctx, sqlServerName)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list SQL server security alert policies from reader")
+		}
+		for _, sqlServerSecurityAlertPolicy := range sqlServerSecurityAlertPolicies {
+			r := provider.NewResource(*sqlServerSecurityAlertPolicy.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func mssqlServerVulnerabilityAssessments(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	sqlServerNames, err := getMsSQLServers(ctx, a, ar, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list SQL Servers from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, sqlServerName := range sqlServerNames {
+		sqlServerVulnerabilityAssessments, err := ar.ListSQLServerVulnerabilityAssessments(ctx, sqlServerName)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list SQL server vulnerability assessments from reader")
+		}
+		for _, sqlServerVulnerabilityAssessment := range sqlServerVulnerabilityAssessments {
+			r := provider.NewResource(*sqlServerVulnerabilityAssessment.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func mssqlVirtualMachines(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	sqlVirtualMachines, err := ar.ListSQLVirtualMachines(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list SQL Virtual Machines from reader")
+	}
+	resources := make([]provider.Resource, 0, len(sqlVirtualMachines))
+	for _, sqlVirtualMachine := range sqlVirtualMachines {
+		r := provider.NewResource(*sqlVirtualMachine.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func mssqlVirtualNetworkRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	sqlServerNames, err := getMsSQLServers(ctx, a, ar, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list SQL Servers from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, sqlServerName := range sqlServerNames {
+		sqlVirtualNetworkRules, err := ar.ListSQLVirtualNetworkRules(ctx, sqlServerName)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list SQL virtual network rules from reader")
+		}
+		for _, sqlVirtualNetworkRule := range sqlVirtualNetworkRules {
+			r := provider.NewResource(*sqlVirtualNetworkRule.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+// Redis
+
+func redisCaches(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	redisCaches, err := ar.ListRedisCaches(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list Redis Caches from reader")
+	}
+	resources := make([]provider.Resource, 0, len(redisCaches))
+	for _, redisCache := range redisCaches {
+		r := provider.NewResource(*redisCache.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
+		if err := r.Data().Set("name", *redisCache.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the Redis Cache '%s'", *redisCache.Name)
+		}
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func redisFirewallRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	redisCachesNames, err := getRedisCaches(ctx, a, ar, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list Redis Caches from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, redisCachesName := range redisCachesNames {
+		redisFirewallRules, err := ar.ListREDISFirewallRules(ctx, redisCachesName)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list redis firewall rules from reader")
+		}
+		for _, redisFirewallRule := range redisFirewallRules {
+			r := provider.NewResource(*redisFirewallRule.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+// DNS
+func dnsZones(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	// by default maximum number of DNS zones to return is 100 zones
+	dnsZones, err := ar.ListDNSZones(ctx, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list DNS Zones from reader")
+	}
+	resources := make([]provider.Resource, 0, len(dnsZones))
+	for _, dnsZone := range dnsZones {
+		r := provider.NewResource(*dnsZone.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
+		if err := r.Data().Set("name", *dnsZone.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the DNS Zone '%s'", *dnsZone.Name)
+		}
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func dnsRecordSets(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	dnsZones, err := getDNSZones(ctx, a, ar, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list DNS Zones from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, dnsZone := range dnsZones {
+		// by default maximum number of DNS records to return is 100
+		// recordSetNameSuffix corresponds to the suffix label of record set name
+		dnsRecordSets, err := ar.ListDNSRecordSets(ctx, dnsZone, nil, "")
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list DNS Record set from reader")
+		}
+		for _, dnsRecordSet := range dnsRecordSets {
+			//adds record if the correspondent properties are set
+			if resourceType == "azurerm_dns_a_record" && dnsRecordSet.RecordSetProperties.ARecords == nil {
+				continue
+			} else if resourceType == "azurerm_dns_aaaa_record" && dnsRecordSet.RecordSetProperties.AaaaRecords == nil {
+				continue
+			} else if resourceType == "azurerm_dns_caa_record" && dnsRecordSet.RecordSetProperties.CaaRecords == nil {
+				continue
+			} else if resourceType == "azurerm_dns_cname_record" && dnsRecordSet.RecordSetProperties.CnameRecord == nil {
+				continue
+			} else if resourceType == "azurerm_dns_mx_record" && dnsRecordSet.RecordSetProperties.MxRecords == nil {
+				continue
+			} else if resourceType == "azurerm_dns_ns_record" && dnsRecordSet.RecordSetProperties.NsRecords == nil {
+				continue
+			} else if resourceType == "azurerm_dns_ptr_record" && dnsRecordSet.RecordSetProperties.PtrRecords == nil {
+				continue
+			} else if resourceType == "azurerm_dns_srv_record" && dnsRecordSet.RecordSetProperties.SrvRecords == nil {
+				continue
+			} else if resourceType == "azurerm_dns_txt_record" && dnsRecordSet.RecordSetProperties.TxtRecords == nil {
+				continue
+			}
+
+			r := provider.NewResource(*dnsRecordSet.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+// Private DNS
+func privateDNSZones(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	// by default maximum number of DNS zones to return is 100 zones
+	privateDNSZones, err := ar.ListPRIVATEDNSPrivateZones(ctx, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list Private DNS Zones from reader")
+	}
+	resources := make([]provider.Resource, 0, len(privateDNSZones))
+	for _, privateDNSZone := range privateDNSZones {
+		r := provider.NewResource(*privateDNSZone.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
+		if err := r.Data().Set("name", *privateDNSZone.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the Private DNS Zone '%s'", *privateDNSZone.Name)
+		}
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func privateDNSRecordSets(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	privateDNSZones, err := getPrivateDNSZones(ctx, a, ar, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list Private DNS Zones from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, privateDNSZone := range privateDNSZones {
+		// by default maximum number of DNS records to return is 100
+		// recordSetNameSuffix corresponds to the suffix label of record set name
+		privateDNSRecordSets, err := ar.ListPRIVATEDNSRecordSets(ctx, privateDNSZone, nil, "")
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list Private DNS Record set from reader")
+		}
+		for _, privateDNSRecordSet := range privateDNSRecordSets {
+			//adds record if the correspondent properties are set
+			if resourceType == "azurerm_dns_a_record" && privateDNSRecordSet.RecordSetProperties.ARecords == nil {
+				continue
+			} else if resourceType == "azurerm_dns_aaaa_record" && privateDNSRecordSet.RecordSetProperties.AaaaRecords == nil {
+				continue
+			} else if resourceType == "azurerm_dns_cname_record" && privateDNSRecordSet.RecordSetProperties.CnameRecord == nil {
+				continue
+			} else if resourceType == "azurerm_dns_mx_record" && privateDNSRecordSet.RecordSetProperties.MxRecords == nil {
+				continue
+			} else if resourceType == "azurerm_dns_ptr_record" && privateDNSRecordSet.RecordSetProperties.PtrRecords == nil {
+				continue
+			} else if resourceType == "azurerm_dns_srv_record" && privateDNSRecordSet.RecordSetProperties.SrvRecords == nil {
+				continue
+			} else if resourceType == "azurerm_dns_txt_record" && privateDNSRecordSet.RecordSetProperties.TxtRecords == nil {
+				continue
+			}
+
+			r := provider.NewResource(*privateDNSRecordSet.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func privateDNSVirtualNetworkLinks(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	privateDNSZones, err := getPrivateDNSZones(ctx, a, ar, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list Private DNS Zones from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, privateDNSZone := range privateDNSZones {
+		// by default maximum number of DNS records to return is 100
+		privateDNSVirtualNetworkLinks, err := ar.ListPRIVATEDNSVirtualNetworkLinks(ctx, privateDNSZone, nil)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list Private DNS Record set from reader")
+		}
+		for _, privateDNSVirtualNetworkLink := range privateDNSVirtualNetworkLinks {
+
+			r := provider.NewResource(*privateDNSVirtualNetworkLink.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+// Policy
+
+func policyDefinitions(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	policyDefinitions, err := ar.ListPOLICYDefinitions(ctx, "", nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list Policy Definitions from reader")
+	}
+	resources := make([]provider.Resource, 0, len(policyDefinitions))
+	for _, policyDefinition := range policyDefinitions {
+		r := provider.NewResource(*policyDefinition.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func policyRemediations(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	policyRemediations, err := ar.ListPOLICYINSIGHTSRemediations(ctx, nil, "")
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list Policy Remediations from reader")
+	}
+	resources := make([]provider.Resource, 0, len(policyRemediations))
+	for _, policyRemediation := range policyRemediations {
+		r := provider.NewResource(*policyRemediation.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func policySetDefinitions(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	policySetDefinitions, err := ar.ListPOLICYSetDefinitions(ctx, "", nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list Policy Set Definitions from reader")
+	}
+	resources := make([]provider.Resource, 0, len(policySetDefinitions))
+	for _, policySetDefinition := range policySetDefinitions {
+		r := provider.NewResource(*policySetDefinition.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+// KeyVault
+func keyVaults(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	keyVaults, err := ar.ListKeyVaults(ctx, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list key vault from reader")
+	}
+	resources := make([]provider.Resource, 0, len(keyVaults))
+	for _, keyVault := range keyVaults {
+		r := provider.NewResource(*keyVault.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func keyVaultProperties(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	keyVaults, err := ar.ListKeyVaults(ctx, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list key vault from reader")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, keyVault := range keyVaults {
+		if vaultProps := keyVault.Properties; vaultProps == nil {
+			if resourceType == "azurerm_key_vault_access_policy" && vaultProps.AccessPolicies != nil {
+				for _, vaultAcessPolicy := range *vaultProps.AccessPolicies {
+					r := provider.NewResource(*vaultAcessPolicy.ObjectID, resourceType, a)
+					resources = append(resources, r)
+				}
+			}
+		}
+	}
+	return resources, nil
+}
+
+// Application Insigths
+func applicationInsights(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	applicationInsights, err := ar.ListINSIGHTSComponents(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list application insights components from reader")
+	}
+	resources := make([]provider.Resource, 0, len(applicationInsights))
+	for _, applicationInsight := range applicationInsights {
+		r := provider.NewResource(*applicationInsight.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
+		if err := r.Data().Set("name", *applicationInsight.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the Application Insights components '%s'", *applicationInsight.Name)
+		}
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func applicationInsightsAPIKeys(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	applicationInsightsNames, err := getApplicationInsightsComponents(ctx, a, ar, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list Application Insights components from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, applicationInsightsName := range applicationInsightsNames {
+		applicationInsightsAPIKeys, err := ar.ListINSIGHTSAPIKeys(ctx, applicationInsightsName)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list application insigths api keys set from reader")
+		}
+		for _, applicationInsightsAPIKey := range applicationInsightsAPIKeys {
+
+			r := provider.NewResource(*applicationInsightsAPIKey.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func applicationInsightsAnalyticsItems(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	applicationInsightsNames, err := getApplicationInsightsComponents(ctx, a, ar, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list Application Insights components from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, applicationInsightsName := range applicationInsightsNames {
+		applicationInsightsAnalyticsItems, err := ar.ListINSIGHTSAnalyticsItems(ctx, applicationInsightsName, "", "", "", nil)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list application insigths api keys set from reader")
+		}
+		for _, applicationInsightsAnalyticsItem := range applicationInsightsAnalyticsItems {
+
+			r := provider.NewResource(*applicationInsightsAnalyticsItem.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+//issue import Error = 'json: cannot unmarshal array into Go value of type insights.WebTestListResult' JSON
+//follow-up at https://github.com/Azure/azure-rest-api-specs/issues/9463
+func applicationInsightsWebTests(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	insightsWebTests, err := ar.ListINSIGHTSWebTests(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list application insights web tests from reader")
+	}
+	resources := make([]provider.Resource, 0, len(insightsWebTests))
+	for _, insightsWebTest := range insightsWebTests {
+		r := provider.NewResource(*insightsWebTest.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+// Log Analytics
+func logAnalyticsWorkspaces(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	workspaces, err := ar.ListLogAnalyticsWorkspaces(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list log analytics workspaces from reader")
+	}
+	resources := make([]provider.Resource, 0, len(workspaces))
+	for _, workspace := range workspaces {
+		r := provider.NewResource(*workspace.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
+		if err := r.Data().Set("name", *workspace.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the log analytics workspace '%s'", *workspace.Name)
+		}
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func logAnalyticsLinkedServices(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	workspaceNames, err := getLogAnalyticsWorkspaces(ctx, a, ar, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list Application Insights components from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, workspaceName := range workspaceNames {
+		linkedServices, err := ar.ListLogAnalyticsLinkedService(ctx, workspaceName)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list log analytics linked services set from reader")
+		}
+		for _, linkedService := range linkedServices {
+
+			r := provider.NewResource(*linkedService.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func logAnalyticsDatasources(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	workspaceNames, err := getLogAnalyticsWorkspaces(ctx, a, ar, resourceType, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list Application Insights components from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, workspaceName := range workspaceNames {
+		datasources, err := ar.ListLogAnalyticsDatasource(ctx, workspaceName, "", "")
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list log analytics datasources set from reader")
+		}
+		for _, datasource := range datasources {
+			if resourceType == "azurerm_log_analytics_datasource_windows_performance_counter" && datasource.Kind != "WindowsPerformanceCounter" {
+				continue
+			} else if resourceType == "azurerm_log_analytics_datasource_windows_event" && datasource.Kind != "WindowsEvent" {
+				continue
+			}
+			r := provider.NewResource(*datasource.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+// Monitor
+func monitorActionGroups(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	actionGroups, err := ar.ListMonitorActionsGroup(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list monitor action groups from reader")
+	}
+	resources := make([]provider.Resource, 0, len(actionGroups))
+	for _, actionGroup := range actionGroups {
+		r := provider.NewResource(*actionGroup.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func monitorActivityLogAlerts(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	activityLogAlerts, err := ar.ListMonitorActivityLogAlert(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list monitor activity log alert from reader")
+	}
+	resources := make([]provider.Resource, 0, len(activityLogAlerts))
+	for _, activityLogAlert := range activityLogAlerts {
+		r := provider.NewResource(*activityLogAlert.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func monitorAutoscaleSettings(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	autoscaleSettings, err := ar.ListMonitorAutoScaleSettings(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list monitor autoscale settings from reader")
+	}
+	resources := make([]provider.Resource, 0, len(autoscaleSettings))
+	for _, autoscaleSetting := range autoscaleSettings {
+		r := provider.NewResource(*autoscaleSetting.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func monitorLogProfiles(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	logProfiles, err := ar.ListMonitorLogProfiles(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list monitor log profile from reader")
+	}
+	resources := make([]provider.Resource, 0, len(logProfiles))
+	for _, logProfile := range logProfiles {
+		r := provider.NewResource(*logProfile.ID, resourceType, a)
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func monitorMetricAlerts(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	metricsAlerts, err := ar.ListMonitorMetricsAlerts(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list monitor metrics alerts from reader")
+	}
+	resources := make([]provider.Resource, 0, len(metricsAlerts))
+	for _, metricsAlert := range metricsAlerts {
+		r := provider.NewResource(*metricsAlert.ID, resourceType, a)
+		resources = append(resources, r)
 	}
 	return resources, nil
 }
