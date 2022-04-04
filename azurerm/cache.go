@@ -9,14 +9,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-func cacheVirtualNetworks(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
+func cacheVirtualNetworks(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
 	if err != nil {
 		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
 			return nil, errors.WithStack(err)
 		}
 
-		rs, err = virtualNetworks(ctx, a, rt, filters)
+		rs, err = virtualNetworks(ctx, a, ar, rt, filters)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to get virtual networks")
 		}
@@ -29,8 +29,8 @@ func cacheVirtualNetworks(ctx context.Context, a *azurerm, rt string, filters *f
 
 	return rs, nil
 }
-func getVirtualNetworkNames(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]string, error) {
-	rs, err := cacheVirtualNetworks(ctx, a, rt, filters)
+func getVirtualNetworkNames(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]string, error) {
+	rs, err := cacheVirtualNetworks(ctx, a, ar, rt, filters)
 	if err != nil {
 		return nil, err
 	}
@@ -43,14 +43,14 @@ func getVirtualNetworkNames(ctx context.Context, a *azurerm, rt string, filters 
 	return names, nil
 }
 
-func cacheVirtualMachines(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
+func cacheVirtualMachines(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
 	if err != nil {
 		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
 			return nil, errors.WithStack(err)
 		}
 
-		rs, err = virtualMachines(ctx, a, rt, filters)
+		rs, err = virtualMachines(ctx, a, ar, rt, filters)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to get virtual machines")
 		}
@@ -63,8 +63,8 @@ func cacheVirtualMachines(ctx context.Context, a *azurerm, rt string, filters *f
 
 	return rs, nil
 }
-func getVirtualMachineNames(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]string, error) {
-	rs, err := cacheVirtualMachines(ctx, a, rt, filters)
+func getVirtualMachineNames(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]string, error) {
+	rs, err := cacheVirtualMachines(ctx, a, ar, rt, filters)
 	if err != nil {
 		return nil, err
 	}
@@ -77,14 +77,14 @@ func getVirtualMachineNames(ctx context.Context, a *azurerm, rt string, filters 
 	return names, nil
 }
 
-func cacheWorkflows(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
+func cacheWorkflows(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
 	if err != nil {
 		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
 			return nil, errors.WithStack(err)
 		}
 
-		rs, err = logicAppWorkflows(ctx, a, rt, filters)
+		rs, err = logicAppWorkflows(ctx, a, ar, rt, filters)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to get workflows")
 		}
@@ -97,8 +97,8 @@ func cacheWorkflows(ctx context.Context, a *azurerm, rt string, filters *filter.
 
 	return rs, nil
 }
-func getWorkflowNames(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]string, error) {
-	rs, err := cacheWorkflows(ctx, a, rt, filters)
+func getWorkflowNames(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]string, error) {
+	rs, err := cacheWorkflows(ctx, a, ar, rt, filters)
 	if err != nil {
 		return nil, err
 	}
@@ -111,14 +111,14 @@ func getWorkflowNames(ctx context.Context, a *azurerm, rt string, filters *filte
 	return names, nil
 }
 
-func cacheSecurityGroups(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
+func cacheSecurityGroups(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
 	if err != nil {
 		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
 			return nil, errors.WithStack(err)
 		}
 
-		rs, err = networkSecurityGroups(ctx, a, rt, filters)
+		rs, err = networkSecurityGroups(ctx, a, ar, rt, filters)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to get Security Groups")
 		}
@@ -131,8 +131,8 @@ func cacheSecurityGroups(ctx context.Context, a *azurerm, rt string, filters *fi
 
 	return rs, nil
 }
-func getSecurityGroups(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]string, error) {
-	rs, err := cacheSecurityGroups(ctx, a, rt, filters)
+func getSecurityGroups(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]string, error) {
+	rs, err := cacheSecurityGroups(ctx, a, ar, rt, filters)
 	if err != nil {
 		return nil, err
 	}
@@ -145,14 +145,14 @@ func getSecurityGroups(ctx context.Context, a *azurerm, rt string, filters *filt
 	return names, nil
 }
 
-func cacheRouteTables(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
+func cacheRouteTables(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
 	if err != nil {
 		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
 			return nil, errors.WithStack(err)
 		}
 
-		rs, err = routeTables(ctx, a, rt, filters)
+		rs, err = routeTables(ctx, a, ar, rt, filters)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to get routeTables")
 		}
@@ -165,8 +165,8 @@ func cacheRouteTables(ctx context.Context, a *azurerm, rt string, filters *filte
 
 	return rs, nil
 }
-func getRouteTables(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]string, error) {
-	rs, err := cacheRouteTables(ctx, a, rt, filters)
+func getRouteTables(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]string, error) {
+	rs, err := cacheRouteTables(ctx, a, ar, rt, filters)
 	if err != nil {
 		return nil, err
 	}
@@ -179,14 +179,14 @@ func getRouteTables(ctx context.Context, a *azurerm, rt string, filters *filter.
 	return names, nil
 }
 
-func cacheContainerRegistries(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
+func cacheContainerRegistries(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
 	if err != nil {
 		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
 			return nil, errors.WithStack(err)
 		}
 
-		rs, err = containerRegistries(ctx, a, rt, filters)
+		rs, err = containerRegistries(ctx, a, ar, rt, filters)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to get ContainerRegistries")
 		}
@@ -199,8 +199,8 @@ func cacheContainerRegistries(ctx context.Context, a *azurerm, rt string, filter
 
 	return rs, nil
 }
-func getContainerRegistries(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]string, error) {
-	rs, err := cacheContainerRegistries(ctx, a, rt, filters)
+func getContainerRegistries(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]string, error) {
+	rs, err := cacheContainerRegistries(ctx, a, ar, rt, filters)
 	if err != nil {
 		return nil, err
 	}
@@ -213,14 +213,14 @@ func getContainerRegistries(ctx context.Context, a *azurerm, rt string, filters 
 	return names, nil
 }
 
-func cacheStorageAccounts(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
+func cacheStorageAccounts(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
 	if err != nil {
 		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
 			return nil, errors.WithStack(err)
 		}
 
-		rs, err = storageAccounts(ctx, a, rt, filters)
+		rs, err = storageAccounts(ctx, a, ar, rt, filters)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to get storageAccounts")
 		}
@@ -233,8 +233,8 @@ func cacheStorageAccounts(ctx context.Context, a *azurerm, rt string, filters *f
 
 	return rs, nil
 }
-func getStorageAccounts(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]string, error) {
-	rs, err := cacheStorageAccounts(ctx, a, rt, filters)
+func getStorageAccounts(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]string, error) {
+	rs, err := cacheStorageAccounts(ctx, a, ar, rt, filters)
 	if err != nil {
 		return nil, err
 	}
@@ -247,14 +247,14 @@ func getStorageAccounts(ctx context.Context, a *azurerm, rt string, filters *fil
 	return names, nil
 }
 
-func cacheMariadbServers(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
+func cacheMariadbServers(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
 	if err != nil {
 		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
 			return nil, errors.WithStack(err)
 		}
 
-		rs, err = mariadbServers(ctx, a, rt, filters)
+		rs, err = mariadbServers(ctx, a, ar, rt, filters)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to get MariaDB Servers")
 		}
@@ -267,8 +267,8 @@ func cacheMariadbServers(ctx context.Context, a *azurerm, rt string, filters *fi
 
 	return rs, nil
 }
-func getMariadbServers(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]string, error) {
-	rs, err := cacheMariadbServers(ctx, a, rt, filters)
+func getMariadbServers(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]string, error) {
+	rs, err := cacheMariadbServers(ctx, a, ar, rt, filters)
 	if err != nil {
 		return nil, err
 	}
@@ -281,14 +281,14 @@ func getMariadbServers(ctx context.Context, a *azurerm, rt string, filters *filt
 	return names, nil
 }
 
-func cacheMysqlServers(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
+func cacheMysqlServers(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
 	if err != nil {
 		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
 			return nil, errors.WithStack(err)
 		}
 
-		rs, err = mysqlServers(ctx, a, rt, filters)
+		rs, err = mysqlServers(ctx, a, ar, rt, filters)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to get MySQL Servers")
 		}
@@ -301,8 +301,8 @@ func cacheMysqlServers(ctx context.Context, a *azurerm, rt string, filters *filt
 
 	return rs, nil
 }
-func getMysqlServers(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]string, error) {
-	rs, err := cacheMysqlServers(ctx, a, rt, filters)
+func getMysqlServers(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]string, error) {
+	rs, err := cacheMysqlServers(ctx, a, ar, rt, filters)
 	if err != nil {
 		return nil, err
 	}
@@ -315,14 +315,14 @@ func getMysqlServers(ctx context.Context, a *azurerm, rt string, filters *filter
 	return names, nil
 }
 
-func cachePostgresqlServers(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
+func cachePostgresqlServers(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
 	if err != nil {
 		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
 			return nil, errors.WithStack(err)
 		}
 
-		rs, err = postgresqlServers(ctx, a, rt, filters)
+		rs, err = postgresqlServers(ctx, a, ar, rt, filters)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to get PostgreSQL Servers")
 		}
@@ -335,8 +335,8 @@ func cachePostgresqlServers(ctx context.Context, a *azurerm, rt string, filters 
 
 	return rs, nil
 }
-func getPostgresqlServers(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]string, error) {
-	rs, err := cachePostgresqlServers(ctx, a, rt, filters)
+func getPostgresqlServers(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]string, error) {
+	rs, err := cachePostgresqlServers(ctx, a, ar, rt, filters)
 	if err != nil {
 		return nil, err
 	}
@@ -349,14 +349,14 @@ func getPostgresqlServers(ctx context.Context, a *azurerm, rt string, filters *f
 	return names, nil
 }
 
-func cacheSQLServers(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]provider.Resource, error) {
+func cacheSQLServers(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
 	if err != nil {
 		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
 			return nil, errors.WithStack(err)
 		}
 
-		rs, err = sqlServers(ctx, a, rt, filters)
+		rs, err = sqlServers(ctx, a, ar, rt, filters)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to get SQL Servers")
 		}
@@ -369,8 +369,8 @@ func cacheSQLServers(ctx context.Context, a *azurerm, rt string, filters *filter
 
 	return rs, nil
 }
-func getSQLServers(ctx context.Context, a *azurerm, rt string, filters *filter.Filter) ([]string, error) {
-	rs, err := cacheSQLServers(ctx, a, rt, filters)
+func getSQLServers(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]string, error) {
+	rs, err := cacheSQLServers(ctx, a, ar, rt, filters)
 	if err != nil {
 		return nil, err
 	}
