@@ -84,7 +84,7 @@ const (
 	SQLServer
 )
 
-type rtFn func(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error)
+type rtFn func(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error)
 
 var (
 	resources = map[ResourceType]rtFn{
@@ -158,8 +158,8 @@ var (
 	}
 )
 
-func resourceGroup(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	resourceGroup := a.azurer.GetResourceGroup()
+func resourceGroup(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	resourceGroup := ar.GetResourceGroup()
 	r := provider.NewResource(*resourceGroup.ID, resourceType, a)
 	resources := []provider.Resource{r}
 	return resources, nil
@@ -167,8 +167,8 @@ func resourceGroup(ctx context.Context, a *azurerm, resourceType string, filters
 
 // Compute Resources
 
-func virtualMachines(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	virtualMachines, err := a.azurer.ListVirtualMachines(ctx)
+func virtualMachines(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	virtualMachines, err := ar.ListVirtualMachines(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual machines from reader")
 	}
@@ -185,8 +185,8 @@ func virtualMachines(ctx context.Context, a *azurerm, resourceType string, filte
 	return resources, nil
 }
 
-func virtualMachineScaleSets(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	virtualMachineScaleSets, err := a.azurer.ListVirtualMachineScaleSets(ctx)
+func virtualMachineScaleSets(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	virtualMachineScaleSets, err := ar.ListVirtualMachineScaleSets(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual machines scale sets from reader")
 	}
@@ -198,14 +198,14 @@ func virtualMachineScaleSets(ctx context.Context, a *azurerm, resourceType strin
 	return resources, nil
 }
 
-func virtualMachineExtensions(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	virtualMachineNames, err := getVirtualMachineNames(ctx, a, resourceType, filters)
+func virtualMachineExtensions(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	virtualMachineNames, err := getVirtualMachineNames(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual machines from reader")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, virtualMachineName := range virtualMachineNames {
-		extensions, err := a.azurer.ListVirtualMachineExtensions(ctx, virtualMachineName, "")
+		extensions, err := ar.ListVirtualMachineExtensions(ctx, virtualMachineName, "")
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list virtual machine extensions from reader")
 		}
@@ -217,8 +217,8 @@ func virtualMachineExtensions(ctx context.Context, a *azurerm, resourceType stri
 	return resources, nil
 }
 
-func availabilitySets(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	availabilitySets, err := a.azurer.ListAvailabilitySets(ctx)
+func availabilitySets(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	availabilitySets, err := ar.ListAvailabilitySets(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list availability sets from reader")
 	}
@@ -233,8 +233,8 @@ func availabilitySets(ctx context.Context, a *azurerm, resourceType string, filt
 	return resources, nil
 }
 
-func images(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	images, err := a.azurer.ListImages(ctx)
+func images(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	images, err := ar.ListImages(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list availability sets from reader")
 	}
@@ -251,8 +251,8 @@ func images(ctx context.Context, a *azurerm, resourceType string, filters *filte
 
 // Network Resources
 
-func virtualNetworks(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	virtualNetworks, err := a.azurer.ListVirtualNetworks(ctx)
+func virtualNetworks(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	virtualNetworks, err := ar.ListVirtualNetworks(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual networks from reader")
 	}
@@ -269,14 +269,14 @@ func virtualNetworks(ctx context.Context, a *azurerm, resourceType string, filte
 	return resources, nil
 }
 
-func subnets(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	virtualNetworkNames, err := getVirtualNetworkNames(ctx, a, resourceType, filters)
+func subnets(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	virtualNetworkNames, err := getVirtualNetworkNames(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual networks from cache")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, virtualNetworkName := range virtualNetworkNames {
-		subnets, err := a.azurer.ListSubnets(ctx, virtualNetworkName)
+		subnets, err := ar.ListSubnets(ctx, virtualNetworkName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list subnets from reader")
 		}
@@ -288,8 +288,8 @@ func subnets(ctx context.Context, a *azurerm, resourceType string, filters *filt
 	return resources, nil
 }
 
-func networkInterfaces(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	networkInterfaces, err := a.azurer.ListInterfaces(ctx)
+func networkInterfaces(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	networkInterfaces, err := ar.ListInterfaces(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list network interfaces from reader")
 	}
@@ -301,8 +301,8 @@ func networkInterfaces(ctx context.Context, a *azurerm, resourceType string, fil
 	return resources, nil
 }
 
-func networkSecurityGroups(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	securityGroups, err := a.azurer.ListSecurityGroups(ctx)
+func networkSecurityGroups(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	securityGroups, err := ar.ListSecurityGroups(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list network security groups from reader")
 	}
@@ -314,8 +314,8 @@ func networkSecurityGroups(ctx context.Context, a *azurerm, resourceType string,
 	return resources, nil
 }
 
-func applicationGateways(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	applicationGateways, err := a.azurer.ListApplicationGateways(ctx)
+func applicationGateways(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	applicationGateways, err := ar.ListApplicationGateways(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list network application gateways from reader")
 	}
@@ -327,8 +327,8 @@ func applicationGateways(ctx context.Context, a *azurerm, resourceType string, f
 	return resources, nil
 }
 
-func applicationSecurityGroups(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	applicationSecurityGroups, err := a.azurer.ListApplicationSecurityGroups(ctx)
+func applicationSecurityGroups(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	applicationSecurityGroups, err := ar.ListApplicationSecurityGroups(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list network application security groups from reader")
 	}
@@ -340,8 +340,8 @@ func applicationSecurityGroups(ctx context.Context, a *azurerm, resourceType str
 	return resources, nil
 }
 
-func networkddosProtectionPlans(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	ddosProtectionPlans, err := a.azurer.ListDdosProtectionPlans(ctx)
+func networkddosProtectionPlans(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	ddosProtectionPlans, err := ar.ListDdosProtectionPlans(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list network ddos protection plans from reader")
 	}
@@ -353,8 +353,8 @@ func networkddosProtectionPlans(ctx context.Context, a *azurerm, resourceType st
 	return resources, nil
 }
 
-func firewalls(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	azureFirewalls, err := a.azurer.ListAzureFirewalls(ctx)
+func firewalls(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	azureFirewalls, err := ar.ListAzureFirewalls(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list azure network firewall from reader")
 	}
@@ -366,8 +366,8 @@ func firewalls(ctx context.Context, a *azurerm, resourceType string, filters *fi
 	return resources, nil
 }
 
-func localNetworkGateways(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	localNetworkGateways, err := a.azurer.ListLocalNetworkGateways(ctx)
+func localNetworkGateways(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	localNetworkGateways, err := ar.ListLocalNetworkGateways(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list local network gateways from reader")
 	}
@@ -379,8 +379,8 @@ func localNetworkGateways(ctx context.Context, a *azurerm, resourceType string, 
 	return resources, nil
 }
 
-func natGateways(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	natGateways, err := a.azurer.ListNatGateways(ctx)
+func natGateways(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	natGateways, err := ar.ListNatGateways(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list local network gateways from reader")
 	}
@@ -392,8 +392,8 @@ func natGateways(ctx context.Context, a *azurerm, resourceType string, filters *
 	return resources, nil
 }
 
-func networkProfiles(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	profiles, err := a.azurer.ListProfiles(ctx)
+func networkProfiles(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	profiles, err := ar.ListProfiles(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list profiles from reader")
 	}
@@ -405,14 +405,14 @@ func networkProfiles(ctx context.Context, a *azurerm, resourceType string, filte
 	return resources, nil
 }
 
-func networkSecurityRules(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	securityGroupNames, err := getSecurityGroups(ctx, a, resourceType, filters)
+func networkSecurityRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	securityGroupNames, err := getSecurityGroups(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list security Groups from cache")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, securityGroupName := range securityGroupNames {
-		securityRule, err := a.azurer.ListSecurityRules(ctx, securityGroupName)
+		securityRule, err := ar.ListSecurityRules(ctx, securityGroupName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list security rules from reader")
 		}
@@ -424,8 +424,8 @@ func networkSecurityRules(ctx context.Context, a *azurerm, resourceType string, 
 	return resources, nil
 }
 
-func publicIP(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	publicIPAddresses, err := a.azurer.ListPublicIPAddresses(ctx)
+func publicIP(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	publicIPAddresses, err := ar.ListPublicIPAddresses(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list public IP addresses from reader")
 	}
@@ -440,8 +440,8 @@ func publicIP(ctx context.Context, a *azurerm, resourceType string, filters *fil
 	return resources, nil
 }
 
-func publicIPPrefixes(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	publicIPPrefixes, err := a.azurer.ListPublicIPPrefixes(ctx)
+func publicIPPrefixes(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	publicIPPrefixes, err := ar.ListPublicIPPrefixes(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list public IP addresses from reader")
 	}
@@ -456,8 +456,8 @@ func publicIPPrefixes(ctx context.Context, a *azurerm, resourceType string, filt
 	return resources, nil
 }
 
-func routeTables(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	routeTables, err := a.azurer.ListRouteTables(ctx)
+func routeTables(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	routeTables, err := ar.ListRouteTables(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list route tables from reader")
 	}
@@ -472,14 +472,14 @@ func routeTables(ctx context.Context, a *azurerm, resourceType string, filters *
 	return resources, nil
 }
 
-func routes(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	routeTablesNames, err := getRouteTables(ctx, a, resourceType, filters)
+func routes(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	routeTablesNames, err := getRouteTables(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list route Tables from cache")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, routeTableName := range routeTablesNames {
-		routes, err := a.azurer.ListRoutes(ctx, routeTableName)
+		routes, err := ar.ListRoutes(ctx, routeTableName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list routes from reader")
 		}
@@ -491,8 +491,8 @@ func routes(ctx context.Context, a *azurerm, resourceType string, filters *filte
 	return resources, nil
 }
 
-func virtualNetworkGateways(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	virtualNetworkGateways, err := a.azurer.ListVirtualNetworkGateways(ctx)
+func virtualNetworkGateways(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	virtualNetworkGateways, err := ar.ListVirtualNetworkGateways(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list Virtual Network Gateways from reader")
 	}
@@ -507,8 +507,8 @@ func virtualNetworkGateways(ctx context.Context, a *azurerm, resourceType string
 	return resources, nil
 }
 
-func virtualNetworkGatewayConnections(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	virtualNetworkGatewayConnections, err := a.azurer.ListVirtualNetworkGatewayConnections(ctx)
+func virtualNetworkGatewayConnections(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	virtualNetworkGatewayConnections, err := ar.ListVirtualNetworkGatewayConnections(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual network gateway connections from reader")
 	}
@@ -523,14 +523,14 @@ func virtualNetworkGatewayConnections(ctx context.Context, a *azurerm, resourceT
 	return resources, nil
 }
 
-func virtualNetworkPeerings(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	virtualNetworkNames, err := getVirtualNetworkNames(ctx, a, resourceType, filters)
+func virtualNetworkPeerings(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	virtualNetworkNames, err := getVirtualNetworkNames(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual network names from cache")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, virtualNetworkName := range virtualNetworkNames {
-		virtualNetworkPeerings, err := a.azurer.ListVirtualNetworkPeerings(ctx, virtualNetworkName)
+		virtualNetworkPeerings, err := ar.ListVirtualNetworkPeerings(ctx, virtualNetworkName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list virtual network peerings from reader")
 		}
@@ -542,8 +542,8 @@ func virtualNetworkPeerings(ctx context.Context, a *azurerm, resourceType string
 	return resources, nil
 }
 
-func webApplicationFirewallPolicies(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	webApplicationFirewallPolicies, err := a.azurer.ListWebApplicationFirewallPolicies(ctx)
+func webApplicationFirewallPolicies(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	webApplicationFirewallPolicies, err := ar.ListWebApplicationFirewallPolicies(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list web application firewall policies from reader")
 	}
@@ -560,8 +560,8 @@ func webApplicationFirewallPolicies(ctx context.Context, a *azurerm, resourceTyp
 
 // Desktop Resources
 
-func virtualDesktopHostPools(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	pools, err := a.azurer.ListHostPools(ctx)
+func virtualDesktopHostPools(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	pools, err := ar.ListHostPools(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list host pools from reader")
 	}
@@ -573,10 +573,10 @@ func virtualDesktopHostPools(ctx context.Context, a *azurerm, resourceType strin
 	return resources, nil
 }
 
-func virtualApplicationGroups(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+func virtualApplicationGroups(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	// the second argument; "filter" is set to "" because "Valid properties for filtering are applicationGroupType."
 	// https://godoc.org/github.com/Azure/azure-sdk-for-go/services/preview/desktopvirtualization/mgmt/2019-12-10-preview/desktopvirtualization#ApplicationGroupsClient.ListByResourceGroup
-	applicationGroups, err := a.azurer.ListApplicationGroups(ctx, "")
+	applicationGroups, err := ar.ListApplicationGroups(ctx, "")
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list application groups from reader")
 	}
@@ -590,8 +590,8 @@ func virtualApplicationGroups(ctx context.Context, a *azurerm, resourceType stri
 
 // Logic Resources
 
-func logicAppWorkflows(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	appWorkflows, err := a.azurer.ListWorkflows(ctx, nil, "")
+func logicAppWorkflows(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	appWorkflows, err := ar.ListWorkflows(ctx, nil, "")
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list logic app workflows from reader")
 	}
@@ -608,15 +608,15 @@ func logicAppWorkflows(ctx context.Context, a *azurerm, resourceType string, fil
 	return resources, nil
 }
 
-func logicAppTriggerCustoms(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	appWorkflowNames, err := getWorkflowNames(ctx, a, resourceType, filters)
+func logicAppTriggerCustoms(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	appWorkflowNames, err := getWorkflowNames(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list logic app workflows from reader")
 	}
 
 	resources := make([]provider.Resource, 0)
 	for _, appWorkflowName := range appWorkflowNames {
-		triggers, err := a.azurer.ListWorkflowTriggers(ctx, appWorkflowName, nil, "")
+		triggers, err := ar.ListWorkflowTriggers(ctx, appWorkflowName, nil, "")
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list logic app trigger HTTP requests from reader")
 		}
@@ -628,21 +628,21 @@ func logicAppTriggerCustoms(ctx context.Context, a *azurerm, resourceType string
 	return resources, nil
 }
 
-func logicAppActionCustoms(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	appWorkflowNames, err := getWorkflowNames(ctx, a, resourceType, filters)
+func logicAppActionCustoms(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	appWorkflowNames, err := getWorkflowNames(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list logic app workflows from reader")
 	}
 
 	resources := make([]provider.Resource, 0)
 	for _, appWorkflowName := range appWorkflowNames {
-		runs, err := a.azurer.ListWorkflowRuns(ctx, appWorkflowName, nil, "")
+		runs, err := ar.ListWorkflowRuns(ctx, appWorkflowName, nil, "")
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list workflow runs from reader")
 		}
 
 		for _, run := range runs {
-			actions, err := a.azurer.ListWorkflowRunActions(ctx, appWorkflowName, *run.Name, nil, "")
+			actions, err := ar.ListWorkflowRunActions(ctx, appWorkflowName, *run.Name, nil, "")
 			if err != nil {
 				return nil, errors.Wrap(err, "unable to list workflow run actions from reader")
 			}
@@ -657,8 +657,8 @@ func logicAppActionCustoms(ctx context.Context, a *azurerm, resourceType string,
 
 // Container Registry Resources
 
-func containerRegistries(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	containerRegistries, err := a.azurer.ListContainerRegistries(ctx)
+func containerRegistries(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	containerRegistries, err := ar.ListContainerRegistries(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list logic app workflows from reader")
 	}
@@ -673,14 +673,14 @@ func containerRegistries(ctx context.Context, a *azurerm, resourceType string, f
 	return resources, nil
 }
 
-func containerRegistryWebhooks(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	containerRegistriesNames, err := getContainerRegistries(ctx, a, resourceType, filters)
+func containerRegistryWebhooks(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	containerRegistriesNames, err := getContainerRegistries(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list container Registries from cache")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, containerRegistryName := range containerRegistriesNames {
-		containerRegistryWebhooks, err := a.azurer.ListContainerRegistryWebhooks(ctx, containerRegistryName)
+		containerRegistryWebhooks, err := ar.ListContainerRegistryWebhooks(ctx, containerRegistryName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list container registry webhooks from reader")
 		}
@@ -694,8 +694,8 @@ func containerRegistryWebhooks(ctx context.Context, a *azurerm, resourceType str
 
 // Storage Resources
 
-func storageAccounts(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	storageAccounts, err := a.azurer.ListSTORAGEAccounts(ctx)
+func storageAccounts(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	storageAccounts, err := ar.ListSTORAGEAccounts(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list storage accounts from reader")
 	}
@@ -710,8 +710,8 @@ func storageAccounts(ctx context.Context, a *azurerm, resourceType string, filte
 	return resources, nil
 }
 
-func storageQueues(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	storageAccountNames, err := getStorageAccounts(ctx, a, resourceType, filters)
+func storageQueues(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	storageAccountNames, err := getStorageAccounts(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list storage Accounts from cache")
 	}
@@ -721,7 +721,7 @@ func storageQueues(ctx context.Context, a *azurerm, resourceType string, filters
 		// https://github.com/Azure/azure-sdk-for-go/blob/main/services/storage/mgmt/2021-04-01/storage/queue.go#:~:text=//-,List,-gets%20a%20list
 		// maxpagesize - optional, a maximum number of queues that should be included in a list queue response
 		// filter - optional, When specified, only the queues with a name starting with the given filter will be
-		storageQueues, err := a.azurer.ListSTORAGEQueue(ctx, storageAccountName, "", "")
+		storageQueues, err := ar.ListSTORAGEQueue(ctx, storageAccountName, "", "")
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list storage queues from reader")
 		}
@@ -733,8 +733,8 @@ func storageQueues(ctx context.Context, a *azurerm, resourceType string, filters
 	return resources, nil
 }
 
-func storageShares(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	storageAccountNames, err := getStorageAccounts(ctx, a, resourceType, filters)
+func storageShares(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	storageAccountNames, err := getStorageAccounts(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list storage Accounts from cache")
 	}
@@ -745,7 +745,7 @@ func storageShares(ctx context.Context, a *azurerm, resourceType string, filters
 		// maxpagesize - optional, a maximum number of queues that should be included in a list queue response
 		// filter - optional, When specified, only the queues with a name starting with the given filter will be
 		// expand - optional, used to expand the properties within share's properties.
-		storageFileShares, err := a.azurer.ListSTORAGEFileShares(ctx, storageAccountName, "", "", "")
+		storageFileShares, err := ar.ListSTORAGEFileShares(ctx, storageAccountName, "", "", "")
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list storage fileshares from reader")
 		}
@@ -757,8 +757,8 @@ func storageShares(ctx context.Context, a *azurerm, resourceType string, filters
 	return resources, nil
 }
 
-func storageBlobs(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	storageAccountNames, err := getStorageAccounts(ctx, a, resourceType, filters)
+func storageBlobs(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	storageAccountNames, err := getStorageAccounts(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list storage Accounts from cache")
 	}
@@ -769,7 +769,7 @@ func storageBlobs(ctx context.Context, a *azurerm, resourceType string, filters 
 		// maxpagesize - optional, a maximum number of queues that should be included in a list queue response
 		// filter - optional, When specified, only the queues with a name starting with the given filter will be
 		// expand - optional, used to expand the properties within share's properties.
-		storageBlobs, err := a.azurer.ListSTORAGEBlobContainers(ctx, storageAccountName, "", "", "")
+		storageBlobs, err := ar.ListSTORAGEBlobContainers(ctx, storageAccountName, "", "", "")
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list storage blobs from reader")
 		}
@@ -781,14 +781,14 @@ func storageBlobs(ctx context.Context, a *azurerm, resourceType string, filters 
 	return resources, nil
 }
 
-func storageTables(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	storageAccountNames, err := getStorageAccounts(ctx, a, resourceType, filters)
+func storageTables(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	storageAccountNames, err := getStorageAccounts(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list storage Accounts from cache")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, storageAccountName := range storageAccountNames {
-		storageTables, err := a.azurer.ListSTORAGETable(ctx, storageAccountName)
+		storageTables, err := ar.ListSTORAGETable(ctx, storageAccountName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list storage table from reader")
 		}
@@ -802,8 +802,8 @@ func storageTables(ctx context.Context, a *azurerm, resourceType string, filters
 
 // Database Resources- mariadb
 
-func mariadbServers(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	mariadbServers, err := a.azurer.ListMARIADBServers(ctx)
+func mariadbServers(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	mariadbServers, err := ar.ListMARIADBServers(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list MariaDB Servers from reader")
 	}
@@ -818,14 +818,14 @@ func mariadbServers(ctx context.Context, a *azurerm, resourceType string, filter
 	return resources, nil
 }
 
-func mariadbConfigurations(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	mariadbServerNames, err := getMariadbServers(ctx, a, resourceType, filters)
+func mariadbConfigurations(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	mariadbServerNames, err := getMariadbServers(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list Mariadb Servers from cache")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, mariadbServerName := range mariadbServerNames {
-		mariadbConfigurations, err := a.azurer.ListMARIADBConfigurations(ctx, mariadbServerName)
+		mariadbConfigurations, err := ar.ListMARIADBConfigurations(ctx, mariadbServerName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list mariadb configurations from reader")
 		}
@@ -837,14 +837,14 @@ func mariadbConfigurations(ctx context.Context, a *azurerm, resourceType string,
 	return resources, nil
 }
 
-func mariadbDatabases(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	mariadbServerNames, err := getMariadbServers(ctx, a, resourceType, filters)
+func mariadbDatabases(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	mariadbServerNames, err := getMariadbServers(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list Mariadb Servers from cache")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, mariadbServerName := range mariadbServerNames {
-		mariadbDatabases, err := a.azurer.ListMARIADBDatabases(ctx, mariadbServerName)
+		mariadbDatabases, err := ar.ListMARIADBDatabases(ctx, mariadbServerName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list mariadb databases from reader")
 		}
@@ -856,14 +856,14 @@ func mariadbDatabases(ctx context.Context, a *azurerm, resourceType string, filt
 	return resources, nil
 }
 
-func mariadbFirewallRules(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	mariadbServerNames, err := getMariadbServers(ctx, a, resourceType, filters)
+func mariadbFirewallRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	mariadbServerNames, err := getMariadbServers(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list Mariadb Servers from cache")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, mariadbServerName := range mariadbServerNames {
-		mariadbFirewallRules, err := a.azurer.ListMARIADBFirewallRules(ctx, mariadbServerName)
+		mariadbFirewallRules, err := ar.ListMARIADBFirewallRules(ctx, mariadbServerName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list mariadb firewall rules from reader")
 		}
@@ -875,14 +875,14 @@ func mariadbFirewallRules(ctx context.Context, a *azurerm, resourceType string, 
 	return resources, nil
 }
 
-func mariadbVirtualNetworkRules(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	mariadbServerNames, err := getMariadbServers(ctx, a, resourceType, filters)
+func mariadbVirtualNetworkRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	mariadbServerNames, err := getMariadbServers(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list Mariadb Servers from cache")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, mariadbServerName := range mariadbServerNames {
-		mariadbVirtualNetworkRules, err := a.azurer.ListMARIADBVirtualNetworkRules(ctx, mariadbServerName)
+		mariadbVirtualNetworkRules, err := ar.ListMARIADBVirtualNetworkRules(ctx, mariadbServerName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list mariadb firewall rules from reader")
 		}
@@ -896,8 +896,8 @@ func mariadbVirtualNetworkRules(ctx context.Context, a *azurerm, resourceType st
 
 // Database Resources- mysql
 
-func mysqlServers(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	mysqlServers, err := a.azurer.ListMYSQLServers(ctx)
+func mysqlServers(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	mysqlServers, err := ar.ListMYSQLServers(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list MySQL Servers from reader")
 	}
@@ -912,14 +912,14 @@ func mysqlServers(ctx context.Context, a *azurerm, resourceType string, filters 
 	return resources, nil
 }
 
-func mysqlConfigurations(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	mysqlServerNames, err := getMysqlServers(ctx, a, resourceType, filters)
+func mysqlConfigurations(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	mysqlServerNames, err := getMysqlServers(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list MySQL Servers from cache")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, mysqlServerName := range mysqlServerNames {
-		mysqlConfigurations, err := a.azurer.ListMYSQLConfigurations(ctx, mysqlServerName)
+		mysqlConfigurations, err := ar.ListMYSQLConfigurations(ctx, mysqlServerName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list MySQL configurations from reader")
 		}
@@ -931,14 +931,14 @@ func mysqlConfigurations(ctx context.Context, a *azurerm, resourceType string, f
 	return resources, nil
 }
 
-func mysqlDatabases(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	mysqlServerNames, err := getMysqlServers(ctx, a, resourceType, filters)
+func mysqlDatabases(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	mysqlServerNames, err := getMysqlServers(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list MySQL Servers from cache")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, mysqlServerName := range mysqlServerNames {
-		mysqlDatabases, err := a.azurer.ListMYSQLDatabases(ctx, mysqlServerName)
+		mysqlDatabases, err := ar.ListMYSQLDatabases(ctx, mysqlServerName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list MySQL databases from reader")
 		}
@@ -950,14 +950,14 @@ func mysqlDatabases(ctx context.Context, a *azurerm, resourceType string, filter
 	return resources, nil
 }
 
-func mysqlFirewallRules(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	mysqlServerNames, err := getMysqlServers(ctx, a, resourceType, filters)
+func mysqlFirewallRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	mysqlServerNames, err := getMysqlServers(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list MySQL Servers from cache")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, mysqlServerName := range mysqlServerNames {
-		mysqlFirewallRules, err := a.azurer.ListMYSQLFirewallRules(ctx, mysqlServerName)
+		mysqlFirewallRules, err := ar.ListMYSQLFirewallRules(ctx, mysqlServerName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list MySQL firewall rules from reader")
 		}
@@ -969,14 +969,14 @@ func mysqlFirewallRules(ctx context.Context, a *azurerm, resourceType string, fi
 	return resources, nil
 }
 
-func mysqlVirtualNetworkRules(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	mysqlServerNames, err := getMysqlServers(ctx, a, resourceType, filters)
+func mysqlVirtualNetworkRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	mysqlServerNames, err := getMysqlServers(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list MySQL Servers from cache")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, mysqlServerName := range mysqlServerNames {
-		mysqlVirtualNetworkRules, err := a.azurer.ListMYSQLVirtualNetworkRules(ctx, mysqlServerName)
+		mysqlVirtualNetworkRules, err := ar.ListMYSQLVirtualNetworkRules(ctx, mysqlServerName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list MySQL firewall rules from reader")
 		}
@@ -990,8 +990,8 @@ func mysqlVirtualNetworkRules(ctx context.Context, a *azurerm, resourceType stri
 
 // Database Resources- PostgreSQL
 
-func postgresqlServers(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	postgresqlServers, err := a.azurer.ListPOSTGRESQLServers(ctx)
+func postgresqlServers(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	postgresqlServers, err := ar.ListPOSTGRESQLServers(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list PostgreSQL Servers from reader")
 	}
@@ -1006,14 +1006,14 @@ func postgresqlServers(ctx context.Context, a *azurerm, resourceType string, fil
 	return resources, nil
 }
 
-func postgresqlConfigurations(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	postgresqlServerNames, err := getPostgresqlServers(ctx, a, resourceType, filters)
+func postgresqlConfigurations(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	postgresqlServerNames, err := getPostgresqlServers(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list PostgreSQL Servers from cache")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, postgresqlServerName := range postgresqlServerNames {
-		postgresqlConfigurations, err := a.azurer.ListPOSTGRESQLConfigurations(ctx, postgresqlServerName)
+		postgresqlConfigurations, err := ar.ListPOSTGRESQLConfigurations(ctx, postgresqlServerName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list PostgreSQL configurations from reader")
 		}
@@ -1025,14 +1025,14 @@ func postgresqlConfigurations(ctx context.Context, a *azurerm, resourceType stri
 	return resources, nil
 }
 
-func postgresqlDatabases(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	postgresqlServerNames, err := getPostgresqlServers(ctx, a, resourceType, filters)
+func postgresqlDatabases(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	postgresqlServerNames, err := getPostgresqlServers(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list PostgreSQL Servers from cache")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, postgresqlServerName := range postgresqlServerNames {
-		postgresqlDatabases, err := a.azurer.ListPOSTGRESQLDatabases(ctx, postgresqlServerName)
+		postgresqlDatabases, err := ar.ListPOSTGRESQLDatabases(ctx, postgresqlServerName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list PostgreSQL databases from reader")
 		}
@@ -1044,14 +1044,14 @@ func postgresqlDatabases(ctx context.Context, a *azurerm, resourceType string, f
 	return resources, nil
 }
 
-func postgresqlFirewallRules(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	postgresqlServerNames, err := getPostgresqlServers(ctx, a, resourceType, filters)
+func postgresqlFirewallRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	postgresqlServerNames, err := getPostgresqlServers(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list PostgreSQL Servers from cache")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, postgresqlServerName := range postgresqlServerNames {
-		postgresqlFirewallRules, err := a.azurer.ListPOSTGRESQLFirewallRules(ctx, postgresqlServerName)
+		postgresqlFirewallRules, err := ar.ListPOSTGRESQLFirewallRules(ctx, postgresqlServerName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list PostgreSQL firewall rules from reader")
 		}
@@ -1063,14 +1063,14 @@ func postgresqlFirewallRules(ctx context.Context, a *azurerm, resourceType strin
 	return resources, nil
 }
 
-func postgresqlVirtualNetworkRules(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	postgresqlServerNames, err := getPostgresqlServers(ctx, a, resourceType, filters)
+func postgresqlVirtualNetworkRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	postgresqlServerNames, err := getPostgresqlServers(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list PostgreSQL Servers from cache")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, postgresqlServerName := range postgresqlServerNames {
-		postgresqlVirtualNetworkRules, err := a.azurer.ListPOSTGRESQLVirtualNetworkRules(ctx, postgresqlServerName)
+		postgresqlVirtualNetworkRules, err := ar.ListPOSTGRESQLVirtualNetworkRules(ctx, postgresqlServerName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list PostgreSQL firewall rules from reader")
 		}
@@ -1084,8 +1084,8 @@ func postgresqlVirtualNetworkRules(ctx context.Context, a *azurerm, resourceType
 
 // Database Resources- SQL
 
-func sqlServers(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	sqlServers, err := a.azurer.ListSQLServers(ctx)
+func sqlServers(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	sqlServers, err := ar.ListSQLServers(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list SQL Servers from reader")
 	}
@@ -1100,14 +1100,14 @@ func sqlServers(ctx context.Context, a *azurerm, resourceType string, filters *f
 	return resources, nil
 }
 
-func sqlElasticPools(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	sqlServerNames, err := getSQLServers(ctx, a, resourceType, filters)
+func sqlElasticPools(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	sqlServerNames, err := getSQLServers(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list SQL Servers from cache")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, sqlServerName := range sqlServerNames {
-		sqlElasticPools, err := a.azurer.ListSQLElasticPools(ctx, sqlServerName)
+		sqlElasticPools, err := ar.ListSQLElasticPools(ctx, sqlServerName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list SQL Elastic Pools from reader")
 		}
@@ -1119,8 +1119,8 @@ func sqlElasticPools(ctx context.Context, a *azurerm, resourceType string, filte
 	return resources, nil
 }
 
-func sqlDatabases(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	sqlServerNames, err := getSQLServers(ctx, a, resourceType, filters)
+func sqlDatabases(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	sqlServerNames, err := getSQLServers(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list SQL Servers from cache")
 	}
@@ -1130,7 +1130,7 @@ func sqlDatabases(ctx context.Context, a *azurerm, resourceType string, filters 
 		// https://github.com/Azure/azure-sdk-for-go/blob/main/services/sql/mgmt/2014-04-01/sql/databases.go#:~:text=func%20(client%20DatabasesClient)-,ListByServer,-(ctx%20context.Context
 		// expand - expand - a comma separated list of child objects to expand in the response.
 		// filter - an OData filter expression that describes a subset of databases to return.
-		sqlDatabases, err := a.azurer.ListSQLDatabases(ctx, sqlServerName, "", "")
+		sqlDatabases, err := ar.ListSQLDatabases(ctx, sqlServerName, "", "")
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list SQL databases from reader")
 		}
@@ -1142,14 +1142,14 @@ func sqlDatabases(ctx context.Context, a *azurerm, resourceType string, filters 
 	return resources, nil
 }
 
-func sqlFirewallRules(ctx context.Context, a *azurerm, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	sqlServerNames, err := getSQLServers(ctx, a, resourceType, filters)
+func sqlFirewallRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	sqlServerNames, err := getSQLServers(ctx, a, ar, resourceType, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list SQL Servers from cache")
 	}
 	resources := make([]provider.Resource, 0)
 	for _, sqlServerName := range sqlServerNames {
-		sqlFirewallRules, err := a.azurer.ListSQLFirewallRules(ctx, sqlServerName)
+		sqlFirewallRules, err := ar.ListSQLFirewallRules(ctx, sqlServerName)
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list SQL firewall rules from reader")
 		}

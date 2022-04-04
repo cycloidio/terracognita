@@ -43,9 +43,12 @@ var (
 			logger = kitlog.With(logger, "func", "cmd.azure.RunE")
 			// Validate required flags
 			if err := requiredStringFlags(
-				"client-id", "client-secret", "resource-group-name", "subscription-id", "tenant-id",
+				"client-id", "client-secret", "subscription-id", "tenant-id",
 			); err != nil {
 				return err
+			}
+			if len(viper.GetStringSlice("resource-group-name")) == 0 {
+				return fmt.Errorf("the flag 'resource-group-name' is required")
 			}
 
 			ctx := context.Background()
@@ -55,7 +58,7 @@ var (
 				viper.GetString("client-id"),
 				viper.GetString("client-secret"),
 				viper.GetString("environment"),
-				viper.GetString("resource-group-name"),
+				viper.GetStringSlice("resource-group-name"),
 				viper.GetString("subscription-id"),
 				viper.GetString("tenant-id"),
 			)
@@ -105,7 +108,7 @@ func init() {
 	// Required flags
 	azurermCmd.Flags().String("client-id", "", "Client ID (required)")
 	azurermCmd.Flags().String("client-secret", "", "Client Secret (required)")
-	azurermCmd.Flags().String("resource-group-name", "", "Resource Group Name (required)")
+	azurermCmd.Flags().StringSlice("resource-group-name", nil, "Resource Group Names (required)")
 	azurermCmd.Flags().String("subscription-id", "", "Subscription ID (required)")
 	azurermCmd.Flags().String("tenant-id", "", "Tenant ID (required)")
 

@@ -29,7 +29,7 @@ var skippableCodes = map[string]struct{}{
 type azurerm struct {
 	tfAzureRMClient interface{}
 	tfProvider      *schema.Provider
-	azurer          *AzureReader
+	azurerReaders   []*AzureReader
 
 	configuraiton map[string]interface{}
 
@@ -37,11 +37,15 @@ type azurerm struct {
 }
 
 // NewProvider returns a AzureRM Provider
-func NewProvider(ctx context.Context, clientID, clientSecret, environment, resourceGroupName, subscriptionID, tenantID string) (provider.Provider, error) {
+func NewProvider(ctx context.Context, clientID, clientSecret, environment string, resourceGroupNames []string, subscriptionID, tenantID string) (provider.Provider, error) {
+	readers := make([]*AzureReader, 0, len(resourceGroupNames))
 	log.Get().Log("func", "azurerm.NewProvider", "msg", "loading Azure reader")
-	reader, err := NewAzureReader(ctx, clientID, clientSecret, environment, resourceGroupName, subscriptionID, tenantID)
-	if err != nil {
-		return nil, fmt.Errorf("could not initialize AzureReader: %s", err)
+	for _, rgn := range resourceGroupNames {
+		reader, err := NewAzureReader(ctx, clientID, clientSecret, environment, rgn, subscriptionID, tenantID)
+		if err != nil {
+			return nil, fmt.Errorf("could not initialize AzureReader: %s", err)
+		}
+		readers = append(readers, reader)
 	}
 
 	log.Get().Log("func", "azurerm.NewProvider", "msg", "loading TF provider")
@@ -63,7 +67,7 @@ func NewProvider(ctx context.Context, clientID, clientSecret, environment, resou
 	return &azurerm{
 		tfAzureRMClient: tfp.Meta(),
 		tfProvider:      tfp,
-		azurer:          reader,
+		azurerReaders:   readers,
 		cache:           cache.New(),
 		configuraiton: map[string]interface{}{
 			"environment": environment,
@@ -76,8 +80,7 @@ func (a *azurerm) HasResourceType(t string) bool {
 	return err == nil
 }
 
-func (a *azurerm) ResourceGroup() string                 { return a.azurer.GetResourceGroupName() }
-func (a *azurerm) Region() string                        { return a.azurer.GetLocation() }
+func (a *azurerm) Region() string                        { return a.azurerReaders[0].GetLocation() }
 func (a *azurerm) String() string                        { return "azurerm" }
 func (a *azurerm) TagKey() string                        { return "tags" }
 func (a *azurerm) Source() string                        { return "hashicorp/azurerm" }
@@ -98,22 +101,26 @@ func (a *azurerm) Resources(ctx context.Context, t string, f *filter.Filter) ([]
 		return nil, errors.Errorf("the resource %q it's not implemented", t)
 	}
 
-	resources, err := rfn(ctx, a, t, f)
-	if err != nil {
-		// we filter the error from Azure and return a custom error
-		// type if it's an error that we want to skip
-		// Remove all wrap layer to get the right type
-		unwrapErr := err
-		for errors.Unwrap(unwrapErr) != nil {
-			unwrapErr = errors.Unwrap(unwrapErr)
-		}
-		if reqErr, ok := unwrapErr.(*autorestAzure.RequestError); ok {
-			if _, ok := skippableCodes[reqErr.ServiceError.Code]; ok {
-				return nil, fmt.Errorf("%w: %v", errcode.ErrProviderAPI, reqErr)
+	resources := make([]provider.Resource, 0, 0)
+	for _, ar := range a.azurerReaders {
+		nres, err := rfn(ctx, a, ar, t, f)
+		if err != nil {
+			// we filter the error from Azure and return a custom error
+			// type if it's an error that we want to skip
+			// Remove all wrap layer to get the right type
+			unwrapErr := err
+			for errors.Unwrap(unwrapErr) != nil {
+				unwrapErr = errors.Unwrap(unwrapErr)
 			}
-		}
+			if reqErr, ok := unwrapErr.(*autorestAzure.RequestError); ok {
+				if _, ok := skippableCodes[reqErr.ServiceError.Code]; ok {
+					return nil, fmt.Errorf("%w: %v", errcode.ErrProviderAPI, reqErr)
+				}
+			}
 
-		return nil, errors.Wrapf(err, "error while reading from resource %q", t)
+			return nil, errors.Wrapf(err, "error while reading from resource %q", t)
+		}
+		resources = append(resources, nres...)
 	}
 
 	return resources, nil

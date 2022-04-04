@@ -11,6 +11,8 @@
 
 - Update terraform-provider-azurerm from v1.44.0 to v2.99.0
   ([PR #263](https://github.com/cycloidio/terracognita/pull/263))
+- AzureRM now supports multiple Resource Group Names
+  ([Issue #266](https://github.com/cycloidio/terracognita/issues/266))
 
 ### Fixed
 
