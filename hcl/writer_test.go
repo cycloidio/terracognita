@@ -11,8 +11,8 @@ import (
 	"github.com/cycloidio/terracognita/mock"
 	"github.com/cycloidio/terracognita/writer"
 	"github.com/golang/mock/gomock"
-	"github.com/hashicorp/terraform-provider-azurerm/azurerm"
 	"github.com/hashicorp/terraform-provider-aws/aws"
+	"github.com/hashicorp/terraform-provider-azurerm/azurerm"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -24,7 +24,7 @@ func TestNewHCLWriter(t *testing.T) {
 			ctrl = gomock.NewController(t)
 			p    = mock.NewProvider(ctrl)
 		)
-		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().String().Return("aws").Times(2)
 		p.EXPECT().Source().Return("hashicorp/aws")
 		p.EXPECT().TFProvider().Return(aws.Provider())
 		p.EXPECT().Configuration().Return(map[string]interface{}{
@@ -34,11 +34,7 @@ func TestNewHCLWriter(t *testing.T) {
 		hw := hcl.NewWriter(nil, p, &writer.Options{HCLProviderBlock: true})
 		assert.Equal(t, map[string]map[string]interface{}{
 			"hcl": map[string]interface{}{
-				"provider": map[string]interface{}{
-					"aws": map[string]interface{}{
-						"region": "${var.region}",
-					},
-				},
+				"provider": map[string]interface{}{"aws": map[string]interface{}{}},
 				"resource": map[string]map[string]interface{}{},
 				"terraform": map[string]interface{}{
 					"required_providers": map[string]interface{}{
@@ -47,11 +43,6 @@ func TestNewHCLWriter(t *testing.T) {
 						},
 					},
 					"required_version": ">= 1.0",
-				},
-				"variable": map[string]interface{}{
-					"region": map[string]interface{}{
-						"default": "eu-west-1",
-					},
 				},
 			},
 		}, hw.Config)
@@ -253,9 +244,7 @@ func TestHCLWriter_Sync(t *testing.T) {
 				"tc_category": "some-category",
 			}
 			ehcl = `
-provider "aws" {
-	region = var.region
-}
+provider "aws" { }
 
 terraform {
 	required_providers {
@@ -266,10 +255,6 @@ terraform {
 	required_version = ">= 1.0"
 }
 
-variable "region" {
-	default = "eu-west-1"
-}
-
 resource "type" "name" {
   key = "value"
 }
@@ -277,7 +262,7 @@ resource "type" "name" {
 `
 		)
 
-		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().String().Return("aws").Times(2)
 		p.EXPECT().Source().Return("hashicorp/aws")
 		p.EXPECT().TFProvider().Return(aws.Provider())
 		p.EXPECT().Configuration().Return(map[string]interface{}{
@@ -378,9 +363,7 @@ module "test" {
   source = "./module-test"
 }
 
-provider "aws" {
-	region = var.region
-}
+provider "aws" { }
 
 terraform {
 	required_providers {
@@ -389,10 +372,6 @@ terraform {
 		}
 	}
 	required_version = ">= 1.0"
-}
-
-variable "region" {
-	default = "eu-west-1"
 }
 
 variable "type_name2_key" {
@@ -416,7 +395,7 @@ variable "type_name_key" {
 }
 `
 		)
-		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().String().Return("aws").Times(2)
 		p.EXPECT().Source().Return("hashicorp/aws")
 		p.EXPECT().TFProvider().Return(aws.Provider())
 		p.EXPECT().Configuration().Return(map[string]interface{}{
@@ -467,9 +446,7 @@ module "test" {
   source = "./module-test"
 }
 
-provider "aws" {
-	region = var.region
-}
+provider "aws" { }
 
 terraform {
 	required_providers {
@@ -478,10 +455,6 @@ terraform {
 		}
 	}
 	required_version = ">= 1.0"
-}
-
-variable "region" {
-	default = "eu-west-1"
 }
 
 variable "type_name2_key" {
@@ -493,7 +466,7 @@ variable "type_name_key" {
 }
 `
 		)
-		p.EXPECT().String().Return("aws").Times(3)
+		p.EXPECT().String().Return("aws").Times(2)
 		p.EXPECT().Source().Return("hashicorp/aws")
 		p.EXPECT().TFProvider().Return(aws.Provider())
 		p.EXPECT().Configuration().Return(map[string]interface{}{
