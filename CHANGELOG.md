@@ -18,6 +18,8 @@
   ([Issue #258](https://github.com/cycloidio/terracognita/issues/258))
 - Removed default region used on AWS initialization now uses the one specified by the user
   ([Issue #253](https://github.com/cycloidio/terracognita/issues/253))
+- HCL provider generation now users the Defaults instead of setting empty values
+  ([Issue #268](https://github.com/cycloidio/terracognita/issues/268))
 
 ## [0.7.3] _2021-09-23_
 

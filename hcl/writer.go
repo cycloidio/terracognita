@@ -610,14 +610,22 @@ func extractResourceTypeAndName(value string) (string, string) {
 // under the given category
 func (w *Writer) setProviderConfig(cat string) {
 	pcfg := w.provider.Configuration()
-	for k, v := range w.provider.TFProvider().Schema {
-		if v.Required {
+	for k, s := range w.provider.TFProvider().Schema {
+		if s.Required {
 			if _, ok := w.Config[cat]["variable"]; !ok {
 				w.Config[cat]["variable"] = make(map[string]interface{})
 			}
 			varVal := map[string]interface{}{}
 			if v, ok := pcfg[k]; ok {
 				varVal["default"] = v
+			} else if s.Default != nil {
+				varVal["default"] = s.Default
+			} else if s.DefaultFunc != nil {
+				v, err := s.DefaultFunc()
+				// If we have an error we ignore it
+				if err == nil {
+					varVal["default"] = v
+				}
 			}
 			w.Config[cat]["variable"].(map[string]interface{})[k] = varVal
 			w.Config[cat]["provider"].(map[string]interface{})[w.provider.String()].(map[string]interface{})[k] = fmt.Sprintf("${var.%s}", k)

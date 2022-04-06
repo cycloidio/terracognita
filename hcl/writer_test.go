@@ -11,6 +11,7 @@ import (
 	"github.com/cycloidio/terracognita/mock"
 	"github.com/cycloidio/terracognita/writer"
 	"github.com/golang/mock/gomock"
+	"github.com/hashicorp/terraform-provider-azurerm/azurerm"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -505,6 +506,75 @@ variable "type_name_key" {
 		require.NoError(t, err)
 
 		err = hw.Write("type.name2", value2)
+		require.NoError(t, err)
+
+		err = hw.Sync()
+		require.NoError(t, err)
+
+		b, err := ioutil.ReadAll(mx)
+		require.NoError(t, err)
+
+		assert.Equal(t, strings.Join(strings.Fields(ehcl), " "), strings.Join(strings.Fields(string(b)), " "))
+	})
+	t.Run("ModuleWithProviderDefaults", func(t *testing.T) {
+		var (
+			ctrl  = gomock.NewController(t)
+			p     = mock.NewProvider(ctrl)
+			mx    = mxwriter.NewMux()
+			value = map[string]interface{}{
+				"key": "value",
+			}
+			ehcl = `
+resource "type" "name" {
+  key = var.type_name_key
+}
+
+module "test" {
+	# type_name_key = "value"
+  source = "./module-test"
+}
+
+provider "azurerm" {
+	environment   = var.environment
+	features      = var.features
+	metadata_host = var.metadata_host
+}
+
+terraform {
+	required_providers {
+		azurerm = {
+			source = "hashicorp/azurerm"
+		}
+	}
+	required_version = ">= 1.0"
+}
+
+variable "environment" {
+  default = "public"
+}
+
+variable "features" {
+}
+
+variable "metadata_host" {
+	default = "host"
+}
+
+variable "type_name_key" {
+	default = "value"
+}
+`
+		)
+		p.EXPECT().String().Return("azurerm").Times(5)
+		p.EXPECT().Source().Return("hashicorp/azurerm")
+		p.EXPECT().TFProvider().Return(azurerm.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"metadata_host": "host",
+		})
+
+		hw := hcl.NewWriter(mx, p, &writer.Options{Interpolate: true, HCLProviderBlock: true, Module: "test"})
+
+		err := hw.Write("type.name", value)
 		require.NoError(t, err)
 
 		err = hw.Sync()
