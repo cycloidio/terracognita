@@ -244,7 +244,9 @@ Don't forget to update the `CHANGELOG.md`
 
 ###### How to update terraform-provider-aws
 
-> Only if aws provider need to updated
+If aws provider need to updated
+
+> :warning: **Only Cycloid can do it**: Since we use a fork of terraform-provider-aws on Cycloid repository.
 
 Since terraform-provider-azurerm moved, source code under `internal`, Terracognita use a fork including a commit to create [aws/provider.go](https://github.com/cycloidio/terraform-provider-azurerm/commit/e3be7857050579e69bea178b83bcae25fb1d4e3f) file.
 The process to update terraform-provider-azurerm is the following
@@ -349,7 +351,9 @@ Don't forget to update the `CHANGELOG.md`.
 
 ###### How to update terraform-provider-azurerm
 
-> Only if azurerm provider need to updated
+If azurerm provider need to updated
+
+> :warning: **Only Cycloid can do it**: Since we use a fork of terraform-provider-azurerm on Cycloid repository.
 
 Since terraform-provider-azurerm moved, source code under `internal`, Terracognita use a fork including a commit to create [azurerm/provider.go](https://github.com/cycloidio/terraform-provider-azurerm/commit/e3be7857050579e69bea178b83bcae25fb1d4e3f) file.
 The process to update terraform-provider-azurerm is the following
@@ -378,3 +382,12 @@ google_compute_instance
 #### Add a new provider
 
 For this, please open an issue to describe the provider that you want to add. We will discuss about the best way to help you in the implementation.
+
+
+#### How to update terraform-provider-google
+
+Only if google provider need to updated
+
+```
+PROVIDER=google make update-terraform-provider
+```
