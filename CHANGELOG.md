@@ -6,6 +6,9 @@
   ([Issue #254](https://github.com/cycloidio/terracognita/issues/254))
 - New flag `--hcl-provider-block` to be able to opt out of the `provider "" {}` on HCL
   ([Issue #250](https://github.com/cycloidio/terracognita/issues/250))
+- Azure resources : `azurerm_managed_disk`, `azurerm_virtual_machine_scale_set_extension`, `azurerm_linux_virtual_machine`,
+`azurerm_linux_virtual_machine`, `azurerm_linux_virtual_machine_scale_set`, `azurerm_windows_virtual_machine`, `azurerm_windows_virtual_machine_scale_set`, `azurerm_kubernetes_cluster`, `azurerm_kubernetes_cluster_node_pool`, `azurerm_network_interface`, `azurerm_virtual_hub`, `azurerm_virtual_hub_bgp_connection`, `azurerm_virtual_hub_connection`, `azurerm_virtual_hub_ip`, `azurerm_virtual_hub_route_table`, `azurerm_virtual_hub_security_partner_provider`,`azurerm_mssql_database`, `azurerm_mssql_elasticpool`,`azurerm_mssql_firewall_rule`,`azurerm_mssql_server`,`azurerm_mssql_server_security_alert_policy`,`azurerm_mssql_server_vulnerability_assessment`,`azurerm_mssql_virtual_machine`,`azurerm_mssql_virtual_network_rule`,`azurerm_redis_cache`,`azurerm_redis_firewall_rule`,`azurerm_dns_zone`,`azurerm_dns_a_record`,`azurerm_dns_aaaa_record`,`azurerm_dns_caa_record`,`azurerm_dns_cname_record`,`azurerm_dns_mx_record`,`azurerm_dns_ns_record`,`azurerm_dns_ptr_record`,`azurerm_dns_srv_record`,`azurerm_dns_txt_record`,`azurerm_private_dns_zone`,`azurerm_private_dns_zone_virtual_network_link`,`azurerm_private_dns_a_record`,`azurerm_private_dns_aaaa_record`,`azurerm_private_dns_cname_record`,`azurerm_private_dns_mx_record`,`azurerm_private_dns_ptr_record`,`azurerm_private_dns_srv_record`,`azurerm_private_dns_txt_record`,`azurerm_lb`,`azurerm_lb_backend_address_pool`,`azurerm_lb_rule `,`azurerm_lb_outbound_rule`,`azurerm_lb_nat_rule`,`azurerm_lb_nat_pool`,`azurerm_lb_probe`,`azurerm_policy_remediation`,`azurerm_policy_set_definition`,`azurerm_key_vault`,`azurerm_key_vault_access_policy`,`azurerm_application_insights`,`azurerm_application_insights_api_key`,`azurerm_application_insights_analytics_item`,`azurerm_application_insights_web_test`,`azurerm_log_analytics_workspace`,`azurerm_log_analytics_linked_service`,`azurerm_log_analytics_datasource_windows_performance_counter`,`azurerm_log_analytics_datasource_windows_event`,`azurerm_monitor_action_group`,`azurerm_monitor_activity_log_alert`,`azurerm_monitor_autoscale_setting`,`azurerm_monitor_log_profile`,`azurerm_monitor_metric_alert`
+  ([Issue #100](https://github.com/cycloidio/terracognita/issues/100))
 
 ### Changed
 
@@ -17,6 +20,8 @@
   ([PR #263](https://github.com/cycloidio/terracognita/pull/263))
 - AzureRM now supports multiple Resource Group Names
   ([Issue #266](https://github.com/cycloidio/terracognita/issues/266))
+- Azure API resources update to latest version, fix caching issue in resources.go, add modularity to template for irregular cases, update Azurerm contribute readme, removed Azurerm 3.0 deprecated resources:`azurerm_virtual_machine_scale_set`,`azurerm_sql_server`, `azurerm_sql_database`, `azurerm_sql_elasticpool`, `azurerm_sql_firewall_rule`, `azurerm_sql_server` and removed temporatily support for `azurerm_web_application_firewall_policy` due to json issue reported on sdk
+  ([Issue #100](https://github.com/cycloidio/terracognita/issues/100))
 
 ### Fixed
 
