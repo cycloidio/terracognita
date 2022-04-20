@@ -13,12 +13,12 @@ import (
 	"github.com/cycloidio/terracognita/writer"
 	"github.com/golang/mock/gomock"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/hashicorp/terraform-provider-aws/aws"
 	"github.com/hashicorp/terraform/configs/hcl2shim"
 	"github.com/hashicorp/terraform/providers"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/terraform-providers/terraform-provider-aws/aws"
 )
 
 func TestNewWriter(t *testing.T) {

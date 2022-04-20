@@ -1626,7 +1626,7 @@ func iamGroupMemberships(ctx context.Context, a *aws, resourceType string, filte
 		}
 
 		// TODO this resource is not importable. Define our own ResourceImporter
-		// Should be removed when terraform will support it https://github.com/terraform-providers/terraform-provider-aws/pull/13795
+		// Should be removed when terraform will support it https://github.com/hashicorp/terraform-provider-aws/pull/13795
 		// more detail: https://github.com/cycloidio/terracognita/issues/120
 		importer := &schema.ResourceImporter{
 			State: func(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
@@ -1665,7 +1665,7 @@ func iamGroupPolicies(ctx context.Context, a *aws, resourceType string, filters 
 
 		for _, i := range groupPolicies {
 			// It needs the ID to be "GN:PN"
-			// https://github.com/terraform-providers/terraform-provider-aws/blob/master/aws/resource_aws_iam_group_policy.go#L134:6
+			// https://github.com/hashicorp/terraform-provider-aws/blob/master/aws/resource_aws_iam_group_policy.go#L134:6
 			r, err := initializeResource(a, fmt.Sprintf("%s:%s", gn, *i), resourceType)
 			if err != nil {
 				return nil, err

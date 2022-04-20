@@ -12,6 +12,8 @@ PLATFORMS=darwin linux windows
 ARCHITECTURES=386 amd64
 BUILD_PATH := builds
 
+PROVIDER ?= all
+
 IS_CI := 0
 
 # Setup the -ldflags option for go build here, interpolate the variable values
@@ -92,3 +94,7 @@ install: ## Install the binary
 clean: ## Removes binary and/or docker image
 	rm -f $(BIN)
 	docker rmi -f $(BIN)
+
+.PHONY: update-terraform-provider
+update-terraform-provider: ## Update terraform-provider version used for AWS, Azure, GCP
+	./scripts/terraform-provider-update/update.sh $(PROVIDER)
