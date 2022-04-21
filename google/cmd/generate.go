@@ -10,23 +10,64 @@ import (
 )
 
 var functions = []Function{
-	Function{Resource: "BackendService", Zone: false},
+	// cloud dns
+	Function{Resource: "ManagedZone", API: "dns", AddAPISufix: true, ResourceList: "ManagedZonesListResponse", NoFilter: true, ItemName: "ManagedZones"},
+	Function{Resource: "Policy", API: "dns", AddAPISufix: true, ResourceList: "PoliciesListResponse", NoFilter: true, ItemName: "Policies"},
+	Function{Resource: "ResourceRecordSet", API: "dns", AddAPISufix: true, OtherListArg: "managedZones", ResourceList: "ResourceRecordSetsListResponse", NoFilter: true, ItemName: "Rrsets"},
+	// cloud platform
+	Function{Resource: "BillingAccount", FunctionName: "ListBillingSubaccounts", NoProjectScope: true, MaxResultFunc: "PageSize", API: "cloudbilling", ResourceList: "ListBillingAccountsResponse", NoFilter: true, ItemName: "BillingAccounts"},
+	Function{Resource: "Role", FunctionName: "ListProjectIAMCustomRoles", NoProjectScope: true, ParentFunction: true, MaxResultFunc: "PageSize", API: "iam", ResourceList: "ListRolesResponse", NoFilter: true, ItemName: "Roles"},
+	// cloud sql
+	Function{Resource: "DatabaseInstance", FunctionName: "ListSQLDatabaseInstances", PluralName: "StorageInstances", API: "sqladmin", ResourceList: "InstancesListResponse", ServiceName: "Instances"},
+	// cloud storage
+	Function{Resource: "Bucket", NoFilter: true, AddAPISufix: true, API: "storage", ResourceList: "Buckets"},
+	// compute
+	Function{Resource: "Address", Region: true},
+	Function{Resource: "Autoscaler", Zone: true},
+	Function{Resource: "BackendService"},
 	Function{Resource: "BackendBucket"},
-	Function{Resource: "Bucket", NoFilter: true, API: "storage", ResourceList: "Buckets"},
-	Function{Resource: "DatabaseInstance", Name: "StorageInstances", API: "sqladmin", ResourceList: "InstancesListResponse", ServiceName: "Instances"},
 	Function{Resource: "Disk", Zone: true},
-	Function{Resource: "Firewall", Zone: false},
-	Function{Resource: "ForwardingRule", Zone: false, Name: "GlobalForwardingRules", ServiceName: "GlobalForwardingRules"},
+	Function{Resource: "Firewall"},
+	Function{Resource: "ForwardingRule", PluralName: "GlobalForwardingRules", ServiceName: "GlobalForwardingRules"},
 	Function{Resource: "ForwardingRule", Region: true},
-	Function{Resource: "HealthCheck", Zone: false},
+	Function{Resource: "HealthCheck"},
 	Function{Resource: "Instance", Zone: true},
 	Function{Resource: "InstanceGroup", Zone: true},
-	Function{Resource: "ManagedZone", API: "dns", ResourceList: "ManagedZonesListResponse", NoFilter: true, ItemName: "ManagedZones"},
-	Function{Resource: "Network", Zone: false},
-	Function{Resource: "SslCertificate", Zone: false, Name: "SSLCertificates"},
-	Function{Resource: "TargetHttpProxy", Zone: false, Name: "TargetHTTPProxies", ServiceName: "TargetHttpProxies"},
-	Function{Resource: "TargetHttpsProxy", Zone: false, Name: "TargetHTTPSProxies", ServiceName: "TargetHttpsProxies"},
-	Function{Resource: "UrlMap", Zone: false, Name: "URLMaps"},
+	Function{Resource: "Network"},
+	Function{Resource: "SslCertificate", PluralName: "SSLCertificates"},
+	Function{Resource: "TargetHttpProxy", PluralName: "TargetHTTPProxies", ServiceName: "TargetHttpProxies"},
+	Function{Resource: "TargetHttpsProxy", PluralName: "TargetHTTPSProxies", ServiceName: "TargetHttpsProxies"},
+	Function{Resource: "UrlMap", PluralName: "URLMaps"},
+	Function{Resource: "Address", Region: true, FunctionName: "ListGlobalAddresses", PluralName: "GlobalAddress", ResourceList: "AddressList"},
+	Function{Resource: "Image"},
+	Function{Resource: "InstanceGroupManager", Zone: true},
+	Function{Resource: "InstanceTemplate"},
+	Function{Resource: "SslCertificate", FunctionName: "ListManagedSslCertificates"},
+	Function{Resource: "NetworkEndpointGroup", Zone: true},
+	Function{Resource: "Route"},
+	Function{Resource: "SecurityPolicy"},
+	Function{Resource: "ServiceAttachment", Region: true},
+	Function{Resource: "Snapshot"},
+	Function{Resource: "SslPolicy", ResourceList: "SslPoliciesList"},
+	Function{Resource: "Subnetwork", Region: true},
+	Function{Resource: "TargetGrpcProxy"},
+	Function{Resource: "TargetInstance", Zone: true},
+	Function{Resource: "TargetPool", Region: true},
+	Function{Resource: "TargetSslProxy"},
+	Function{Resource: "TargetTcpProxy", FunctionName: "ListTargetTCPProxies"},
+	//file
+	Function{Resource: "Instance", FunctionName: "ListFilestoreInstances", API: "file", ServiceName: "ProjectsLocationsInstances", MaxResultFunc: "PageSize", ParentListScope: true, ResourceList: "ListInstancesResponse", ItemName: "Instances"},
+	// kubernetes container engine
+	Function{Resource: "Cluster", AddAPISufix: true, ServiceName: "ProjectsLocationsClusters", API: "container", DoMethodToList: true, ParentListScope: true, NoProjectScope: true, ItemName: "Clusters"},
+	//	redis
+	Function{Resource: "Instance", FunctionName: "ListRedisInstances", API: "redis", ServiceName: "ProjectsLocationsInstances", MaxResultFunc: "PageSize", NoFilter: true, ParentListScope: true, ResourceList: "ListInstancesResponse", ItemName: "Instances"},
+	//	logging
+	Function{Resource: "LogMetric", ServiceName: "ProjectsMetrics", API: "logging", MaxResultFunc: "PageSize", ParentListScope: true, NoFilter: true, ResourceList: "ListLogMetricsResponse", ItemName: "Metrics"},
+	// monitoring
+	Function{Resource: "AlertPolicy", API: "monitoring", AddAPISufix: true, ServiceName: "ProjectsAlertPolicies", ParentListScope: true, MaxResultFunc: "PageSize", ResourceList: "ListAlertPoliciesResponse", ItemName: "AlertPolicies"},
+	Function{Resource: "Group", API: "monitoring", AddAPISufix: true, ServiceName: "ProjectsGroups", ParentListScope: true, MaxResultFunc: "PageSize", NoFilter: true, ResourceList: "ListGroupsResponse", ItemName: "Group"},
+	Function{Resource: "NotificationChannel", API: "monitoring", AddAPISufix: true, ServiceName: "ProjectsNotificationChannels", ParentListScope: true, MaxResultFunc: "PageSize", NoFilter: true, ResourceList: "ListNotificationChannelsResponse", ItemName: "NotificationChannels"},
+	Function{Resource: "UptimeCheckConfig", API: "monitoring", AddAPISufix: true, ServiceName: "ProjectsUptimeCheckConfigs", ParentListScope: true, MaxResultFunc: "PageSize", NoFilter: true, ResourceList: "ListUptimeCheckConfigsResponse", ItemName: "UptimeCheckConfigs"},
 }
 
 func main() {

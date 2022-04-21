@@ -2,15 +2,20 @@ package google
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
 
+	"google.golang.org/api/cloudbilling/v1"
 	"google.golang.org/api/compute/v1"
+	"google.golang.org/api/container/v1"
 	"google.golang.org/api/dns/v1"
+	"google.golang.org/api/file/v1"
 	"google.golang.org/api/iam/v1"
+	"google.golang.org/api/logging/v2"
+	"google.golang.org/api/monitoring/v3"
 	"google.golang.org/api/option"
+	"google.golang.org/api/redis/v1"
 	sqladmin "google.golang.org/api/sqladmin/v1beta4"
 	"google.golang.org/api/storage/v1"
 )
@@ -19,15 +24,21 @@ import (
 
 // GCPReader is the middleware between TC and GCP
 type GCPReader struct {
-	compute    *compute.Service
-	storage    *storage.Service
-	sqladmin   *sqladmin.Service
-	dns        *dns.Service
-	iam        *iam.Service
-	project    string
-	region     string
-	zones      []string
-	maxResults uint64
+	compute      *compute.Service
+	storage      *storage.Service
+	sqladmin     *sqladmin.Service
+	dns          *dns.Service
+	iam          *iam.Service
+	cloudbilling *cloudbilling.APIService
+	file         *file.Service
+	container    *container.Service
+	redis        *redis.Service
+	logging      *logging.Service
+	monitoring   *monitoring.Service
+	project      string
+	region       string
+	zones        []string
+	maxResults   uint64
 }
 
 // NewGcpReader returns a GCPReader with a catalog of services
@@ -56,16 +67,46 @@ func NewGcpReader(ctx context.Context, maxResults uint64, project, region, crede
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to create iam service")
 	}
+	bill, err := cloudbilling.NewService(ctx, option.WithCredentialsFile(credentials))
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to create cloud billing service")
+	}
+	file, err := file.NewService(ctx, option.WithCredentialsFile(credentials))
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to create filestore service")
+	}
+	container, err := container.NewService(ctx, option.WithCredentialsFile(credentials))
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to create container service")
+	}
+	redis, err := redis.NewService(ctx, option.WithCredentialsFile(credentials))
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to create redis service")
+	}
+	logging, err := logging.NewService(ctx, option.WithCredentialsFile(credentials))
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to create logging service")
+	}
+	monitoring, err := monitoring.NewService(ctx, option.WithCredentialsFile(credentials))
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to create logging service")
+	}
 	return &GCPReader{
-		compute:    comp,
-		storage:    storage,
-		sqladmin:   sql,
-		project:    project,
-		region:     region,
-		dns:        d,
-		iam:        i,
-		zones:      []string{},
-		maxResults: maxResults,
+		compute:      comp,
+		storage:      storage,
+		sqladmin:     sql,
+		project:      project,
+		region:       region,
+		dns:          d,
+		iam:          i,
+		cloudbilling: bill,
+		file:         file,
+		container:    container,
+		redis:        redis,
+		logging:      logging,
+		monitoring:   monitoring,
+		zones:        []string{},
+		maxResults:   maxResults,
 	}, nil
 }
 
@@ -88,54 +129,4 @@ func (r *GCPReader) getZones() ([]string, error) {
 	}
 	r.zones = zones
 	return zones, nil
-}
-
-// ListResourceRecordSets returns a list of ResourceRecordSets within a project and a zone
-func (r *GCPReader) ListResourceRecordSets(ctx context.Context, managedZone []string) (map[string][]dns.ResourceRecordSet, error) {
-	service := dns.NewResourceRecordSetsService(r.dns)
-
-	list := make(map[string][]dns.ResourceRecordSet)
-	for _, zone := range managedZone {
-
-		resources := make([]dns.ResourceRecordSet, 0)
-
-		if err := service.List(r.project, zone).
-			MaxResults(int64(r.maxResults)).
-			Pages(ctx, func(list *dns.ResourceRecordSetsListResponse) error {
-				for _, res := range list.Rrsets {
-					resources = append(resources, *res)
-				}
-				return nil
-			}); err != nil {
-			return nil, errors.Wrap(err, "unable to list dns ResourceRecordSet from google APIs")
-		}
-
-		list[zone] = resources
-	}
-	return list, nil
-
-}
-
-// ListProjectIAMCustomRoles returns a list of ProjectIamCustomRole within a parent
-func (r *GCPReader) ListProjectIAMCustomRoles(ctx context.Context, parent string) ([]iam.Role, error) {
-	service := iam.NewRolesService(r.iam)
-
-	resources := make([]iam.Role, 0)
-
-	if err := service.List().
-		// Parent is the "scope" of the search:
-		// organizations/{organization_id} for an organization level
-		// projects/{project_id} for a project level
-		Parent(parent).
-		PageSize(int64(r.maxResults)).
-		Pages(ctx, func(list *iam.ListRolesResponse) error {
-			for _, res := range list.Roles {
-				resources = append(resources, *res)
-			}
-			return nil
-		}); err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("unable to list roles from %s", parent))
-	}
-
-	return resources, nil
 }

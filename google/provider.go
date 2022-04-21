@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/cycloidio/terracognita/cache"
 	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/filter"
 	"github.com/cycloidio/terracognita/log"
@@ -29,6 +30,8 @@ type google struct {
 	tfGoogleClient interface{}
 	tfProvider     *schema.Provider
 	gcpr           *GCPReader
+
+	cache cache.Cache
 }
 
 // NewProvider returns a Gooogle Provider
@@ -58,6 +61,7 @@ func NewProvider(ctx context.Context, maxResults uint64, project, region, creden
 		tfGoogleClient: &cfg,
 		tfProvider:     tfp,
 		gcpr:           reader,
+		cache:          cache.New(),
 	}, nil
 }
 
