@@ -12,7 +12,8 @@ import (
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/provider"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	tfaws "github.com/hashicorp/terraform-provider-aws/aws"
+	"github.com/hashicorp/terraform-provider-aws/conns"
+	tfaws "github.com/hashicorp/terraform-provider-aws/provider"
 	"github.com/pkg/errors"
 )
 
@@ -46,7 +47,12 @@ func NewProvider(ctx context.Context, accessKey, secretKey, region, sessionToken
 		return nil, fmt.Errorf("could not initialize 'reader' because: %s", err)
 	}
 
-	cfg := tfaws.Config(accessKey, secretKey, region, sessionToken)
+	cfg := conns.Config{
+		AccessKey: accessKey,
+		SecretKey: secretKey,
+		Region:    region,
+		Token:     sessionToken,
+	}
 
 	log.Get().Log("func", "aws.NewProvider", "msg", "configuring TF Client")
 	awsClient, diags := cfg.Client(ctx)

@@ -23,7 +23,7 @@ Terracognita currently imports AWS, GCP and AzureRM cloud provider as Terraform 
 Please see the following versions as follow:
 
 Providers:
- * AWS: v4.8.0
+ * AWS: v4.9.0
  * AzureRM: 2.99.0
  * Google: v4.9.0
 

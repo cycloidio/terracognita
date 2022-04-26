@@ -11,7 +11,7 @@ import (
 	"github.com/cycloidio/terracognita/mock"
 	"github.com/cycloidio/terracognita/writer"
 	"github.com/golang/mock/gomock"
-	"github.com/hashicorp/terraform-provider-aws/aws"
+	aws "github.com/hashicorp/terraform-provider-aws/provider"
 	"github.com/hashicorp/terraform-provider-azurerm/azurerm"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
