@@ -13,7 +13,7 @@ import (
 	"github.com/cycloidio/terracognita/writer"
 	"github.com/golang/mock/gomock"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/hashicorp/terraform-provider-aws/aws"
+	aws "github.com/hashicorp/terraform-provider-aws/provider"
 	"github.com/hashicorp/terraform/configs/hcl2shim"
 	"github.com/hashicorp/terraform/providers"
 	"github.com/pkg/errors"
