@@ -14,12 +14,16 @@
 
 ### Changed
 
+- Update terraform from v0.13.5 to v1.1.9
+  ([PR #284](https://github.com/cycloidio/terracognita/pull/264))
 - Update terraform-provider-google from v3.67.0 to v4.9.0
   ([PR #263](https://github.com/cycloidio/terracognita/pull/264))
-- Update terraform-provider-aws from v3.40.0 to v4.8.0
+- Update terraform-provider-aws from v3.40.0 to v4.9.0
   ([PR #263](https://github.com/cycloidio/terracognita/pull/264))
-- Update terraform-provider-azurerm from v1.44.0 to v2.99.0
+  ([PR #284](https://github.com/cycloidio/terracognita/pull/264))
+- Update terraform-provider-azurerm from v1.44.0 to v3.3.0
   ([PR #263](https://github.com/cycloidio/terracognita/pull/263))
+  ([PR #284](https://github.com/cycloidio/terracognita/pull/264))
 - AzureRM now supports multiple Resource Group Names
   ([Issue #266](https://github.com/cycloidio/terracognita/issues/266))
 - Azure API resources update to latest version, fix caching issue in resources.go, add modularity to template for irregular cases, update Azurerm contribute readme, removed Azurerm 3.0 deprecated resources:`azurerm_virtual_machine_scale_set`,`azurerm_sql_server`, `azurerm_sql_database`, `azurerm_sql_elasticpool`, `azurerm_sql_firewall_rule`, `azurerm_sql_server` and removed temporatily support for `azurerm_web_application_firewall_policy` due to json issue reported on sdk
