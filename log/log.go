@@ -3,11 +3,12 @@ package log
 import (
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"sync"
 
 	kitlog "github.com/go-kit/kit/log"
-	"github.com/hashicorp/terraform/helper/logging"
+	"github.com/hashicorp/terraform/logging"
 )
 
 var logger kitlog.Logger
@@ -26,7 +27,12 @@ func Init(out io.Writer, tflogs bool) {
 
 		if !tflogs {
 			os.Setenv("TF_LOG", "")
-			logging.SetOutput()
+
+			out := logging.LogOutput()
+			if out == nil {
+				out = ioutil.Discard
+			}
+			log.SetOutput(out)
 		}
 
 		logger = kitlog.With(logger, "ts", kitlog.DefaultTimestampUTC, "caller", kitlog.DefaultCaller)
