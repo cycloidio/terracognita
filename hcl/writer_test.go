@@ -12,7 +12,7 @@ import (
 	"github.com/cycloidio/terracognita/writer"
 	"github.com/golang/mock/gomock"
 	aws "github.com/hashicorp/terraform-provider-aws/provider"
-	"github.com/hashicorp/terraform-provider-azurerm/azurerm"
+	azurerm "github.com/hashicorp/terraform-provider-azurerm/provider"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -540,7 +540,7 @@ variable "type_name_key" {
 		)
 		p.EXPECT().String().Return("azurerm").Times(5)
 		p.EXPECT().Source().Return("hashicorp/azurerm")
-		p.EXPECT().TFProvider().Return(azurerm.Provider())
+		p.EXPECT().TFProvider().Return(azurerm.AzureProvider())
 		p.EXPECT().Configuration().Return(map[string]interface{}{
 			"metadata_host": "host",
 		})

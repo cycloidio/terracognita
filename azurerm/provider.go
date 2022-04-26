@@ -7,7 +7,7 @@ import (
 	autorestAzure "github.com/Azure/go-autorest/autorest/azure"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	tfazurerm "github.com/hashicorp/terraform-provider-azurerm/azurerm"
+	tfazurerm "github.com/hashicorp/terraform-provider-azurerm/provider"
 	"github.com/pkg/errors"
 
 	"github.com/cycloidio/terracognita/cache"
@@ -49,7 +49,7 @@ func NewProvider(ctx context.Context, clientID, clientSecret, environment string
 	}
 
 	log.Get().Log("func", "azurerm.NewProvider", "msg", "loading TF provider")
-	tfp := tfazurerm.Provider()
+	tfp := tfazurerm.AzureProvider()
 
 	rawCfg := terraform.NewResourceConfigRaw(map[string]interface{}{
 		"client_id":       clientID,
