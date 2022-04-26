@@ -170,7 +170,8 @@ func TestSync(t *testing.T) {
                   "tags_all":null,
                   "unique_id":null
                },
-               "schema_version":0
+               "schema_version":0,
+               "sensitive_attributes": []
             }
          ],
          "mode":"managed",
@@ -180,7 +181,7 @@ func TestSync(t *testing.T) {
       }
    ],
    "serial":0,
-   "terraform_version":"0.13.5",
+   "terraform_version": "1.1.9",
    "version":4
 }`
 		)
@@ -248,7 +249,8 @@ func TestSync(t *testing.T) {
                   "tags_all":null,
                   "unique_id":null
                },
-               "schema_version":0
+               "schema_version":0,
+               "sensitive_attributes": []
             }
          ],
          "mode":"managed",
@@ -259,7 +261,7 @@ func TestSync(t *testing.T) {
       }
    ],
    "serial":0,
-   "terraform_version":"0.13.5",
+   "terraform_version": "1.1.9",
    "version":4
 }`
 		)
@@ -317,7 +319,7 @@ func TestDependencies(t *testing.T) {
 			sgr    = "aws_security_group_rule"
 			state  = `{
   "version": 4,
-  "terraform_version": "0.13.5",
+  "terraform_version": "1.1.9",
   "serial": 0,
   "lineage": "lineage",
   "outputs": {},
@@ -330,6 +332,7 @@ func TestDependencies(t *testing.T) {
       "instances": [
         {
           "schema_version": 1,
+          "sensitive_attributes": [],
           "attributes": {
             "id": "sg-1234",
             "name": "sg",
@@ -359,6 +362,7 @@ func TestDependencies(t *testing.T) {
       "instances": [
         {
           "schema_version": 2,
+          "sensitive_attributes": [],
           "attributes": {
             "id": "sgrule-1234",
             "security_group_id": "sg-1234",
@@ -460,7 +464,7 @@ func TestDependencies(t *testing.T) {
 			sgr    = "aws_security_group_rule"
 			state  = `{
   "version": 4,
-  "terraform_version": "0.13.5",
+  "terraform_version": "1.1.9",
   "serial": 0,
   "lineage": "lineage",
   "outputs": {},
@@ -474,6 +478,7 @@ func TestDependencies(t *testing.T) {
       "instances": [
         {
           "schema_version": 1,
+          "sensitive_attributes": [],
           "attributes": {
             "id": "sg-1234",
             "name": "sg",
@@ -504,6 +509,7 @@ func TestDependencies(t *testing.T) {
       "instances": [
         {
           "schema_version": 2,
+          "sensitive_attributes": [],
           "attributes": {
             "id": "sgrule-1234",
             "security_group_id": "sg-1234",
@@ -605,7 +611,7 @@ func TestDependencies(t *testing.T) {
 			sgr    = "aws_security_group_rule"
 			state  = `{
   "version": 4,
-  "terraform_version": "0.13.5",
+  "terraform_version": "1.1.9",
   "serial": 0,
   "lineage": "lineage",
   "outputs": {},
@@ -618,6 +624,7 @@ func TestDependencies(t *testing.T) {
       "instances": [
         {
           "schema_version": 1,
+          "sensitive_attributes": [],
           "attributes": {
             "id": "sg-1234",
             "name": "sg",
@@ -647,6 +654,7 @@ func TestDependencies(t *testing.T) {
       "instances": [
         {
           "schema_version": 2,
+          "sensitive_attributes": [],
           "attributes": {
             "id": "sgrule-1234",
             "security_group_id": "sg-1234",
