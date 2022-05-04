@@ -20,7 +20,7 @@ const (
 		"github.com/pkg/errors"
 
 		{{ range .AzureAPIs -}}
-		"github.com/Azure/azure-sdk-for-go/services/{{ if .IsPreview }}preview/{{ end }}{{ .API }}/mgmt/{{ .APIVersion }}{{ if .IsPreview }}-preview{{ end }}/{{ .API }}"
+		{{if .PackageIdentifier}}{{ .PackageIdentifier }}{{ end }}"github.com/Azure/azure-sdk-for-go/services/{{ if .IsPreview }}preview/{{ end }}{{ if .OtherPath }}{{ .OtherPath }}{{ else }}{{ .API }}/mgmt{{ end }}/{{ .APIVersion }}/{{ .API }}"
 		{{ end }}
 	)
 	`
@@ -29,10 +29,10 @@ const (
 	functionTmpl = `
 	// {{ .FunctionName }} returns a list of {{ .PluralName }} within a subscription {{ if .Location }}and a location {{ end }}{{ if .ResourceGroup }}and a resource group {{ end }}
 	func (ar *AzureReader) {{ .FunctionName }}(ctx context.Context{{ range .ExtraArgs }},{{ .Name }} {{ .Type }} {{ end }}) ([]{{ .API }}.{{ .ResourceName }}, error) {
-		client := {{ .API }}.New{{ .PluralName }}Client(ar.config.SubscriptionID)
+		client := {{ .API }}.{{ if .IrregularClientName }}{{ .IrregularClientName }}{{ else }}New{{ .PluralName }}Client{{ end }}(ar.config.SubscriptionID)
 		client.Authorizer = ar.authorizer
 
-		output, err := client.{{ .AzureSDKListFunction }}(ctx{{ if .Location }}, ar.GetLocation(){{ end }}{{ if .ResourceGroup }}, ar.GetResourceGroupName(){{ end }}{{ range .ExtraArgs }},{{ .Name }}{{ end }})
+		output, err := client.{{ .AzureSDKListFunction }}(ctx{{ if .Location }}, ar.GetLocation(){{ end }}{{ if .Subscription }}, ar.config.SubscriptionID{{ end }}{{ if .ResourceGroup }}, ar.GetResourceGroupName(){{ end }}{{ range .ExtraArgs }},{{ .Name }}{{ end }})
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list {{ .API }}.{{ .ResourceName }} from Azure APIs")
 		}
@@ -94,6 +94,16 @@ type AzureAPI struct {
 	// ex: compute, network
 	API string
 
+	// PackageIdentifier is used if multiple API versions are required
+	// allows to diferentiate the different API versions using GO package identifier
+	// Note! if used PackageIdentifier should be used as API when defining objects
+	PackageIdentifier string
+
+	// OtherPath is used for cases where the
+	// Azure API path is not the usual one github.com/Azure/azure-sdk-for-go/services/{{API}}/mgmt/{{APIVersion}}/{{API}}
+	// the path would then be github.com/Azure/azure-sdk-for-go/services/{{otherPath}}/{{APIVersion}}/{{API}}
+	OtherPath string
+
 	// APIVersion is used to determine the
 	// Azure API Version to use
 	// ex: 2019-07-01
@@ -125,6 +135,10 @@ type Function struct {
 	// Most cases determined automatically, no need to specify
 	PluralName string
 
+	// IrregularClientName allows to specify the cases where client name is not the usual New{{PluralName}}}Client
+	// Most cases no need to specify
+	IrregularClientName string
+
 	// API is used to determine the
 	// Azure API to use
 	// ex: compute, network
@@ -135,6 +149,9 @@ type Function struct {
 
 	// ResourceGroup is used to determine whether the resource should be filtered by Azure Resource Group or not
 	ResourceGroup bool
+
+	// ResourceGroup is used to determine whether the resource should be filtered Azure Subscription
+	Subscription bool
 
 	// AzureSDKListFunction is the Azure SKP list function to use
 	AzureSDKListFunction string

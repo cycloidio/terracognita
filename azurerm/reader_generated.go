@@ -6,24 +6,37 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2019-07-01/compute"
+	"github.com/Azure/azure-sdk-for-go/services/appinsights/mgmt/2020-02-02/insights"
+	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2021-12-01/compute"
 	"github.com/Azure/azure-sdk-for-go/services/containerregistry/mgmt/2019-05-01/containerregistry"
+	"github.com/Azure/azure-sdk-for-go/services/containerservice/mgmt/2022-01-01/containerservice"
+	"github.com/Azure/azure-sdk-for-go/services/dns/mgmt/2018-05-01/dns"
 	"github.com/Azure/azure-sdk-for-go/services/logic/mgmt/2019-05-01/logic"
 	"github.com/Azure/azure-sdk-for-go/services/mariadb/mgmt/2020-01-01/mariadb"
+	newActivityLogAlertsClient "github.com/Azure/azure-sdk-for-go/services/monitor/mgmt/2020-10-01/insights"
 	"github.com/Azure/azure-sdk-for-go/services/mysql/mgmt/2020-01-01/mysql"
-	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2019-06-01/network"
+	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2021-05-01/network"
+	"github.com/Azure/azure-sdk-for-go/services/operationalinsights/mgmt/2020-08-01/operationalinsights"
 	"github.com/Azure/azure-sdk-for-go/services/postgresql/mgmt/2020-01-01/postgresql"
-	"github.com/Azure/azure-sdk-for-go/services/preview/desktopvirtualization/mgmt/2019-12-10-preview/desktopvirtualization"
-	"github.com/Azure/azure-sdk-for-go/services/sql/mgmt/2014-04-01/sql"
-	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2021-02-01/storage"
+	"github.com/Azure/azure-sdk-for-go/services/preview/desktopvirtualization/mgmt/2021-09-03-preview/desktopvirtualization"
+	"github.com/Azure/azure-sdk-for-go/services/preview/keyvault/mgmt/2020-04-01-preview/keyvault"
+	monitor "github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2021-07-01-preview/insights"
+	newActionGroupClient "github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2021-09-01-preview/insights"
+	"github.com/Azure/azure-sdk-for-go/services/preview/policyinsights/mgmt/2020-07-01-preview/policyinsights"
+	"github.com/Azure/azure-sdk-for-go/services/preview/resources/mgmt/2021-06-01-preview/policy"
+	"github.com/Azure/azure-sdk-for-go/services/preview/sql/mgmt/v5.0/sql"
+	"github.com/Azure/azure-sdk-for-go/services/preview/sqlvirtualmachine/mgmt/2017-03-01-preview/sqlvirtualmachine"
+	"github.com/Azure/azure-sdk-for-go/services/privatedns/mgmt/2018-09-01/privatedns"
+	"github.com/Azure/azure-sdk-for-go/services/redis/mgmt/2020-12-01/redis"
+	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2021-08-01/storage"
 )
 
 // ListVirtualMachines returns a list of VirtualMachines within a subscription and a resource group
-func (ar *AzureReader) ListVirtualMachines(ctx context.Context) ([]compute.VirtualMachine, error) {
+func (ar *AzureReader) ListVirtualMachines(ctx context.Context, filter string) ([]compute.VirtualMachine, error) {
 	client := compute.NewVirtualMachinesClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
-	output, err := client.List(ctx, ar.GetResourceGroupName())
+	output, err := client.List(ctx, ar.GetResourceGroupName(), filter)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list compute.VirtualMachine from Azure APIs")
 	}
@@ -54,6 +67,31 @@ func (ar *AzureReader) ListVirtualMachineScaleSets(ctx context.Context) ([]compu
 	}
 
 	resources := make([]compute.VirtualMachineScaleSet, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListVirtualMachineScaleSetExtensions returns a list of VirtualMachineScaleSetExtensions within a subscription and a resource group
+func (ar *AzureReader) ListVirtualMachineScaleSetExtensions(ctx context.Context, VMScaleSetName string) ([]compute.VirtualMachineScaleSetExtension, error) {
+	client := compute.NewVirtualMachineScaleSetExtensionsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, ar.GetResourceGroupName(), VMScaleSetName)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list compute.VirtualMachineScaleSetExtension from Azure APIs")
+	}
+
+	resources := make([]compute.VirtualMachineScaleSetExtension, 0)
 	for output.NotDone() {
 
 		for _, res := range output.Values() {
@@ -118,6 +156,31 @@ func (ar *AzureReader) ListImages(ctx context.Context) ([]compute.Image, error) 
 	}
 
 	resources := make([]compute.Image, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListDisks returns a list of Disks within a subscription and a resource group
+func (ar *AzureReader) ListDisks(ctx context.Context) ([]compute.Disk, error) {
+	client := compute.NewDisksClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName())
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list compute.Disk from Azure APIs")
+	}
+
+	resources := make([]compute.Disk, 0)
 	for output.NotDone() {
 
 		for _, res := range output.Values() {
@@ -632,6 +695,206 @@ func (ar *AzureReader) ListWebApplicationFirewallPolicies(ctx context.Context) (
 
 }
 
+// ListVirtualHubs returns a list of VirtualHubs within a subscription
+func (ar *AzureReader) ListVirtualHubs(ctx context.Context) ([]network.VirtualHub, error) {
+	client := network.NewVirtualHubsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list network.VirtualHub from Azure APIs")
+	}
+
+	resources := make([]network.VirtualHub, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListVirtualHubBgpConnections returns a list of VirtualHubBgpConnections within a subscription and a resource group
+func (ar *AzureReader) ListVirtualHubBgpConnections(ctx context.Context, virtualHubName string) ([]network.BgpConnection, error) {
+	client := network.NewVirtualHubBgpConnectionsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, ar.GetResourceGroupName(), virtualHubName)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list network.BgpConnection from Azure APIs")
+	}
+
+	resources := make([]network.BgpConnection, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListHubVirtualNetworkConnections returns a list of HubVirtualNetworkConnections within a subscription and a resource group
+func (ar *AzureReader) ListHubVirtualNetworkConnections(ctx context.Context, virtualHubName string) ([]network.HubVirtualNetworkConnection, error) {
+	client := network.NewHubVirtualNetworkConnectionsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, ar.GetResourceGroupName(), virtualHubName)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list network.HubVirtualNetworkConnection from Azure APIs")
+	}
+
+	resources := make([]network.HubVirtualNetworkConnection, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListVirtualHubIPConfiguration returns a list of VirtualHubIPConfiguration within a subscription and a resource group
+func (ar *AzureReader) ListVirtualHubIPConfiguration(ctx context.Context, virtualHubName string) ([]network.HubIPConfiguration, error) {
+	client := network.NewVirtualHubIPConfigurationClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, ar.GetResourceGroupName(), virtualHubName)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list network.HubIPConfiguration from Azure APIs")
+	}
+
+	resources := make([]network.HubIPConfiguration, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListHubRouteTables returns a list of HubRouteTables within a subscription and a resource group
+func (ar *AzureReader) ListHubRouteTables(ctx context.Context, virtualHubName string) ([]network.HubRouteTable, error) {
+	client := network.NewHubRouteTablesClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, ar.GetResourceGroupName(), virtualHubName)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list network.HubRouteTable from Azure APIs")
+	}
+
+	resources := make([]network.HubRouteTable, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListSecurityPartnerProviders returns a list of SecurityPartnerProviders within a subscription
+func (ar *AzureReader) ListSecurityPartnerProviders(ctx context.Context) ([]network.SecurityPartnerProvider, error) {
+	client := network.NewSecurityPartnerProvidersClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list network.SecurityPartnerProvider from Azure APIs")
+	}
+
+	resources := make([]network.SecurityPartnerProvider, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListLoadBalancers returns a list of LoadBalancers within a subscription and a resource group
+func (ar *AzureReader) ListLoadBalancers(ctx context.Context) ([]network.LoadBalancer, error) {
+	client := network.NewLoadBalancersClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, ar.GetResourceGroupName())
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list network.LoadBalancer from Azure APIs")
+	}
+
+	resources := make([]network.LoadBalancer, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListLoadBalancerBackendAddressPools returns a list of LoadBalancerBackendAddressPools within a subscription and a resource group
+func (ar *AzureReader) ListLoadBalancerBackendAddressPools(ctx context.Context, loadBalancerName string) ([]network.BackendAddressPool, error) {
+	client := network.NewLoadBalancerBackendAddressPoolsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, ar.GetResourceGroupName(), loadBalancerName)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list network.BackendAddressPool from Azure APIs")
+	}
+
+	resources := make([]network.BackendAddressPool, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
 // ListHostPools returns a list of HostPools within a subscription and a resource group
 func (ar *AzureReader) ListHostPools(ctx context.Context) ([]desktopvirtualization.HostPool, error) {
 	client := desktopvirtualization.NewHostPoolsClient(ar.config.SubscriptionID)
@@ -832,6 +1095,56 @@ func (ar *AzureReader) ListContainerRegistryWebhooks(ctx context.Context, regist
 
 }
 
+// ListKubernetesClusters returns a list of ManagedClusters within a subscription
+func (ar *AzureReader) ListKubernetesClusters(ctx context.Context) ([]containerservice.ManagedCluster, error) {
+	client := containerservice.NewManagedClustersClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list containerservice.ManagedCluster from Azure APIs")
+	}
+
+	resources := make([]containerservice.ManagedCluster, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListKubernetesClusterNodes returns a list of AgentPools within a subscription and a resource group
+func (ar *AzureReader) ListKubernetesClusterNodes(ctx context.Context, managedClusterName string) ([]containerservice.AgentPool, error) {
+	client := containerservice.NewAgentPoolsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, ar.GetResourceGroupName(), managedClusterName)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list containerservice.AgentPool from Azure APIs")
+	}
+
+	resources := make([]containerservice.AgentPool, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
 // ListSTORAGEAccounts returns a list of Accounts within a subscription
 func (ar *AzureReader) ListSTORAGEAccounts(ctx context.Context) ([]storage.Account, error) {
 	client := storage.NewAccountsClient(ar.config.SubscriptionID)
@@ -908,7 +1221,7 @@ func (ar *AzureReader) ListSTORAGEQueue(ctx context.Context, accountName string,
 }
 
 // ListSTORAGEFileShares returns a list of FileShares within a subscription and a resource group
-func (ar *AzureReader) ListSTORAGEFileShares(ctx context.Context, accountName string, maxpagesize string, filter string, expand storage.ListSharesExpand) ([]storage.FileShareItem, error) {
+func (ar *AzureReader) ListSTORAGEFileShares(ctx context.Context, accountName string, maxpagesize string, filter string, expand string) ([]storage.FileShareItem, error) {
 	client := storage.NewFileSharesClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
@@ -1201,30 +1514,52 @@ func (ar *AzureReader) ListPOSTGRESQLVirtualNetworkRules(ctx context.Context, se
 }
 
 // ListSQLDatabases returns a list of Databases within a subscription and a resource group
-func (ar *AzureReader) ListSQLDatabases(ctx context.Context, serverName string, expand string, filter string) ([]sql.Database, error) {
+func (ar *AzureReader) ListSQLDatabases(ctx context.Context, serverName string, skipToken string) ([]sql.Database, error) {
 	client := sql.NewDatabasesClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
-	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName, expand, filter)
+	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName, skipToken)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list sql.Database from Azure APIs")
 	}
 
-	return *output.Value, nil
+	resources := make([]sql.Database, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
 
 }
 
 // ListSQLElasticPools returns a list of ElasticPools within a subscription and a resource group
-func (ar *AzureReader) ListSQLElasticPools(ctx context.Context, serverName string) ([]sql.ElasticPool, error) {
+func (ar *AzureReader) ListSQLElasticPools(ctx context.Context, serverName string, skip *int32) ([]sql.ElasticPool, error) {
 	client := sql.NewElasticPoolsClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
-	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName)
+	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName, skip)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list sql.ElasticPool from Azure APIs")
 	}
 
-	return *output.Value, nil
+	resources := make([]sql.ElasticPool, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
 
 }
 
@@ -1238,18 +1573,638 @@ func (ar *AzureReader) ListSQLFirewallRules(ctx context.Context, serverName stri
 		return nil, errors.Wrap(err, "unable to list sql.FirewallRule from Azure APIs")
 	}
 
-	return *output.Value, nil
+	resources := make([]sql.FirewallRule, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
 
 }
 
 // ListSQLServers returns a list of Servers within a subscription
-func (ar *AzureReader) ListSQLServers(ctx context.Context) ([]sql.Server, error) {
+func (ar *AzureReader) ListSQLServers(ctx context.Context, expand string) ([]sql.Server, error) {
 	client := sql.NewServersClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, expand)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list sql.Server from Azure APIs")
+	}
+
+	resources := make([]sql.Server, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListSQLServerSecurityAlertPolicies returns a list of ServerSecurityAlertPolicies within a subscription and a resource group
+func (ar *AzureReader) ListSQLServerSecurityAlertPolicies(ctx context.Context, serverName string) ([]sql.ServerSecurityAlertPolicy, error) {
+	client := sql.NewServerSecurityAlertPoliciesClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list sql.ServerSecurityAlertPolicy from Azure APIs")
+	}
+
+	resources := make([]sql.ServerSecurityAlertPolicy, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListSQLServerVulnerabilityAssessments returns a list of ServerVulnerabilityAssessments within a subscription and a resource group
+func (ar *AzureReader) ListSQLServerVulnerabilityAssessments(ctx context.Context, serverName string) ([]sql.ServerVulnerabilityAssessment, error) {
+	client := sql.NewServerVulnerabilityAssessmentsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list sql.ServerVulnerabilityAssessment from Azure APIs")
+	}
+
+	resources := make([]sql.ServerVulnerabilityAssessment, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListSQLVirtualNetworkRules returns a list of VirtualNetworkRules within a subscription and a resource group
+func (ar *AzureReader) ListSQLVirtualNetworkRules(ctx context.Context, serverName string) ([]sql.VirtualNetworkRule, error) {
+	client := sql.NewVirtualNetworkRulesClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list sql.VirtualNetworkRule from Azure APIs")
+	}
+
+	resources := make([]sql.VirtualNetworkRule, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListSQLVirtualMachines returns a list of SQLVirtualMachines within a subscription
+func (ar *AzureReader) ListSQLVirtualMachines(ctx context.Context) ([]sqlvirtualmachine.SQLVirtualMachine, error) {
+	client := sqlvirtualmachine.NewSQLVirtualMachinesClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to list sql.Server from Azure APIs")
+		return nil, errors.Wrap(err, "unable to list sqlvirtualmachine.SQLVirtualMachine from Azure APIs")
+	}
+
+	resources := make([]sqlvirtualmachine.SQLVirtualMachine, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListRedisCaches returns a list of RedisCaches within a subscription and a resource group
+func (ar *AzureReader) ListRedisCaches(ctx context.Context) ([]redis.ResourceType, error) {
+	client := redis.NewClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName())
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list redis.ResourceType from Azure APIs")
+	}
+
+	resources := make([]redis.ResourceType, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListREDISFirewallRules returns a list of FirewallRules within a subscription and a resource group
+func (ar *AzureReader) ListREDISFirewallRules(ctx context.Context, cacheName string) ([]redis.FirewallRule, error) {
+	client := redis.NewFirewallRulesClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, ar.GetResourceGroupName(), cacheName)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list redis.FirewallRule from Azure APIs")
+	}
+
+	resources := make([]redis.FirewallRule, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListDNSZones returns a list of Zones within a subscription
+func (ar *AzureReader) ListDNSZones(ctx context.Context, top *int32) ([]dns.Zone, error) {
+	client := dns.NewZonesClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, top)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list dns.Zone from Azure APIs")
+	}
+
+	resources := make([]dns.Zone, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListDNSRecordSets returns a list of RecordSets within a subscription and a resource group
+func (ar *AzureReader) ListDNSRecordSets(ctx context.Context, zoneName string, top *int32, recordSetNameSuffix string) ([]dns.RecordSet, error) {
+	client := dns.NewRecordSetsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListAllByDNSZone(ctx, ar.GetResourceGroupName(), zoneName, top, recordSetNameSuffix)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list dns.RecordSet from Azure APIs")
+	}
+
+	resources := make([]dns.RecordSet, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListPRIVATEDNSPrivateZones returns a list of PrivateZones within a subscription
+func (ar *AzureReader) ListPRIVATEDNSPrivateZones(ctx context.Context, top *int32) ([]privatedns.PrivateZone, error) {
+	client := privatedns.NewPrivateZonesClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, top)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list privatedns.PrivateZone from Azure APIs")
+	}
+
+	resources := make([]privatedns.PrivateZone, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListPRIVATEDNSRecordSets returns a list of RecordSets within a subscription and a resource group
+func (ar *AzureReader) ListPRIVATEDNSRecordSets(ctx context.Context, zoneName string, top *int32, recordSetNameSuffix string) ([]privatedns.RecordSet, error) {
+	client := privatedns.NewRecordSetsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, ar.GetResourceGroupName(), zoneName, top, recordSetNameSuffix)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list privatedns.RecordSet from Azure APIs")
+	}
+
+	resources := make([]privatedns.RecordSet, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListPRIVATEDNSVirtualNetworkLinks returns a list of VirtualNetworkLinks within a subscription and a resource group
+func (ar *AzureReader) ListPRIVATEDNSVirtualNetworkLinks(ctx context.Context, privateZoneName string, top *int32) ([]privatedns.VirtualNetworkLink, error) {
+	client := privatedns.NewVirtualNetworkLinksClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, ar.GetResourceGroupName(), privateZoneName, top)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list privatedns.VirtualNetworkLink from Azure APIs")
+	}
+
+	resources := make([]privatedns.VirtualNetworkLink, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListPOLICYDefinitions returns a list of Definitions within a subscription
+func (ar *AzureReader) ListPOLICYDefinitions(ctx context.Context, filter string, top *int32) ([]policy.Definition, error) {
+	client := policy.NewDefinitionsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, filter, top)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list policy.Definition from Azure APIs")
+	}
+
+	resources := make([]policy.Definition, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListPOLICYSetDefinitions returns a list of SetDefinitions within a subscription
+func (ar *AzureReader) ListPOLICYSetDefinitions(ctx context.Context, filter string, top *int32) ([]policy.SetDefinition, error) {
+	client := policy.NewSetDefinitionsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, filter, top)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list policy.SetDefinition from Azure APIs")
+	}
+
+	resources := make([]policy.SetDefinition, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListPOLICYINSIGHTSRemediations returns a list of Remediations within a subscription and a resource group
+func (ar *AzureReader) ListPOLICYINSIGHTSRemediations(ctx context.Context, top *int32, filter string) ([]policyinsights.Remediation, error) {
+	client := policyinsights.NewRemediationsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListForResourceGroup(ctx, ar.config.SubscriptionID, ar.GetResourceGroupName(), top, filter)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list policyinsights.Remediation from Azure APIs")
+	}
+
+	resources := make([]policyinsights.Remediation, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListKeyVaults returns a list of Vaults within a subscription and a resource group
+func (ar *AzureReader) ListKeyVaults(ctx context.Context, top *int32) ([]keyvault.Vault, error) {
+	client := keyvault.NewVaultsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName(), top)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list keyvault.Vault from Azure APIs")
+	}
+
+	resources := make([]keyvault.Vault, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListINSIGHTSComponents returns a list of Components within a subscription
+func (ar *AzureReader) ListINSIGHTSComponents(ctx context.Context) ([]insights.ApplicationInsightsComponent, error) {
+	client := insights.NewComponentsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list insights.ApplicationInsightsComponent from Azure APIs")
+	}
+
+	resources := make([]insights.ApplicationInsightsComponent, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListINSIGHTSAPIKeys returns a list of APIKeys within a subscription and a resource group
+func (ar *AzureReader) ListINSIGHTSAPIKeys(ctx context.Context, ApplicationInsightsComponent string) ([]insights.ApplicationInsightsComponentAPIKey, error) {
+	client := insights.NewAPIKeysClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, ar.GetResourceGroupName(), ApplicationInsightsComponent)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list insights.ApplicationInsightsComponentAPIKey from Azure APIs")
+	}
+
+	return *output.Value, nil
+
+}
+
+// ListINSIGHTSAnalyticsItems returns a list of AnalyticsItems within a subscription and a resource group
+func (ar *AzureReader) ListINSIGHTSAnalyticsItems(ctx context.Context, ApplicationInsightsComponent string, scopePath insights.ItemScopePath, scope insights.ItemScope, typeParameter insights.ItemTypeParameter, includeContent *bool) ([]insights.ApplicationInsightsComponentAnalyticsItem, error) {
+	client := insights.NewAnalyticsItemsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, ar.GetResourceGroupName(), ApplicationInsightsComponent, scopePath, scope, typeParameter, includeContent)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list insights.ApplicationInsightsComponentAnalyticsItem from Azure APIs")
+	}
+
+	return *output.Value, nil
+
+}
+
+// ListINSIGHTSWebTests returns a list of WebTests within a subscription
+func (ar *AzureReader) ListINSIGHTSWebTests(ctx context.Context) ([]insights.WebTest, error) {
+	client := insights.NewWebTestsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list insights.WebTest from Azure APIs")
+	}
+
+	resources := make([]insights.WebTest, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListLogAnalyticsWorkspaces returns a list of Workspaces within a subscription
+func (ar *AzureReader) ListLogAnalyticsWorkspaces(ctx context.Context) ([]operationalinsights.Workspace, error) {
+	client := operationalinsights.NewWorkspacesClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list operationalinsights.Workspace from Azure APIs")
+	}
+
+	return *output.Value, nil
+
+}
+
+// ListLogAnalyticsLinkedService returns a list of LinkedServices within a subscription and a resource group
+func (ar *AzureReader) ListLogAnalyticsLinkedService(ctx context.Context, workspaceName string) ([]operationalinsights.LinkedService, error) {
+	client := operationalinsights.NewLinkedServicesClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListByWorkspace(ctx, ar.GetResourceGroupName(), workspaceName)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list operationalinsights.LinkedService from Azure APIs")
+	}
+
+	return *output.Value, nil
+
+}
+
+// ListLogAnalyticsDatasource returns a list of DataSources within a subscription and a resource group
+func (ar *AzureReader) ListLogAnalyticsDatasource(ctx context.Context, workspaceName string, filter string, skiptoken string) ([]operationalinsights.DataSource, error) {
+	client := operationalinsights.NewDataSourcesClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListByWorkspace(ctx, ar.GetResourceGroupName(), workspaceName, filter, skiptoken)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list operationalinsights.DataSource from Azure APIs")
+	}
+
+	resources := make([]operationalinsights.DataSource, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListMonitorActionsGroup returns a list of ActionGroupResources within a subscription and a resource group
+func (ar *AzureReader) ListMonitorActionsGroup(ctx context.Context) ([]newActionGroupClient.ActionGroupResource, error) {
+	client := newActionGroupClient.NewActionGroupsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName())
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list newActionGroupClient.ActionGroupResource from Azure APIs")
+	}
+
+	return *output.Value, nil
+
+}
+
+// ListMonitorActivityLogAlert returns a list of ActivityLogAlertResources within a subscription and a resource group
+func (ar *AzureReader) ListMonitorActivityLogAlert(ctx context.Context) ([]newActivityLogAlertsClient.ActivityLogAlertResource, error) {
+	client := newActivityLogAlertsClient.NewActivityLogAlertsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName())
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list newActivityLogAlertsClient.ActivityLogAlertResource from Azure APIs")
+	}
+
+	resources := make([]newActivityLogAlertsClient.ActivityLogAlertResource, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListMonitorAutoScaleSettings returns a list of AutoscaleSettingResources within a subscription and a resource group
+func (ar *AzureReader) ListMonitorAutoScaleSettings(ctx context.Context) ([]monitor.AutoscaleSettingResource, error) {
+	client := monitor.NewAutoscaleSettingsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName())
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list monitor.AutoscaleSettingResource from Azure APIs")
+	}
+
+	resources := make([]monitor.AutoscaleSettingResource, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListMonitorLogProfiles returns a list of LogProfileResources within a subscription
+func (ar *AzureReader) ListMonitorLogProfiles(ctx context.Context) ([]monitor.LogProfileResource, error) {
+	client := monitor.NewLogProfilesClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list monitor.LogProfileResource from Azure APIs")
+	}
+
+	return *output.Value, nil
+
+}
+
+// ListMonitorMetricsAlerts returns a list of MetricAlertResources within a subscription and a resource group
+func (ar *AzureReader) ListMonitorMetricsAlerts(ctx context.Context) ([]monitor.MetricAlertResource, error) {
+	client := monitor.NewMetricAlertsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName())
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list monitor.MetricAlertResource from Azure APIs")
 	}
 
 	return *output.Value, nil

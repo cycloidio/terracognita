@@ -10,22 +10,46 @@ import (
 )
 
 var azureAPIs = []AzureAPI{
-	{API: "compute", APIVersion: "2019-07-01"},
-	{API: "network", APIVersion: "2019-06-01"},
-	{API: "desktopvirtualization", APIVersion: "2019-12-10", IsPreview: true},
+	{API: "compute", APIVersion: "2021-12-01"},
+	{API: "network", APIVersion: "2021-05-01"},
+	{API: "desktopvirtualization", APIVersion: "2021-09-03-preview", IsPreview: true},
 	{API: "logic", APIVersion: "2019-05-01"},
 	{API: "containerregistry", APIVersion: "2019-05-01"},
-	{API: "storage", APIVersion: "2021-02-01", AddAPISufix: true},
+	{API: "containerservice", APIVersion: "2022-01-01"},
+	{API: "storage", APIVersion: "2021-08-01", AddAPISufix: true},
 	{API: "mariadb", APIVersion: "2020-01-01", AddAPISufix: true},
 	{API: "mysql", APIVersion: "2020-01-01", AddAPISufix: true},
 	{API: "postgresql", APIVersion: "2020-01-01", AddAPISufix: true},
-	{API: "sql", APIVersion: "2014-04-01", AddAPISufix: true},
+	{API: "sql", APIVersion: "v5.0", AddAPISufix: true, IsPreview: true},          // used for mssql resources
+	{API: "sqlvirtualmachine", APIVersion: "2017-03-01-preview", IsPreview: true}, // used for mssql resources
+	{API: "redis", APIVersion: "2020-12-01", AddAPISufix: true},
+	{API: "dns", APIVersion: "2018-05-01", AddAPISufix: true},
+	{API: "privatedns", APIVersion: "2018-09-01", AddAPISufix: true},
+	{API: "policy", OtherPath: "resources/mgmt", APIVersion: "2021-06-01-preview", AddAPISufix: true, IsPreview: true},
+	{API: "policyinsights", APIVersion: "2020-07-01-preview", AddAPISufix: true, IsPreview: true},
+	{API: "keyvault", APIVersion: "2020-04-01-preview", IsPreview: true},                                                                       // used for keyvault resources
+	{API: "insights", OtherPath: "appinsights/mgmt", APIVersion: "2020-02-02", AddAPISufix: true},                                              // used for  app insights resources
+	{API: "operationalinsights", APIVersion: "2020-08-01"},                                                                                     // used for log analytics resources
+	{PackageIdentifier: "newActionGroupClient", API: "insights", OtherPath: "monitor/mgmt", APIVersion: "2021-09-01-preview", IsPreview: true}, // used for monitor resources
+	{PackageIdentifier: "newActivityLogAlertsClient", API: "insights", OtherPath: "monitor/mgmt", APIVersion: "2020-10-01"},                    // used for monitor resources
+	{PackageIdentifier: "monitor", API: "insights", OtherPath: "monitor/mgmt", APIVersion: "2021-07-01-preview", IsPreview: true},              // used for monitor resources
 }
 
 var functions = []Function{
 	// Compute API Resources
-	{ResourceName: "VirtualMachine", API: "compute", ResourceGroup: true},
+	{ResourceName: "VirtualMachine", API: "compute", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "filter",
+			Type: "string",
+		},
+	}},
 	{ResourceName: "VirtualMachineScaleSet", API: "compute", ResourceGroup: true},
+	{ResourceName: "VirtualMachineScaleSetExtension", API: "compute", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "VMScaleSetName",
+			Type: "string",
+		},
+	}},
 	{ResourceName: "VirtualMachineExtension", API: "compute", ResourceGroup: true, ReturnsList: true, ExtraArgs: []Arg{
 		{
 			Name: "VMName",
@@ -38,6 +62,7 @@ var functions = []Function{
 	}},
 	{ResourceName: "AvailabilitySet", API: "compute", ResourceGroup: true},
 	{ResourceName: "Image", API: "compute", ResourceGroup: false},
+	{ResourceName: "Disk", AzureSDKListFunction: "ListByResourceGroup", API: "compute", ResourceGroup: true},
 	// Network API Resources
 	{ResourceName: "VirtualNetwork", API: "network", ResourceGroup: true},
 	{ResourceName: "Subnet", API: "network", ResourceGroup: true, ExtraArgs: []Arg{
@@ -79,6 +104,39 @@ var functions = []Function{
 		},
 	}},
 	{ResourceName: "WebApplicationFirewallPolicy", API: "network", ResourceGroup: true},
+	{ResourceName: "VirtualHub", API: "network", ResourceGroup: false},
+	{ResourceName: "BgpConnection", PluralName: "VirtualHubBgpConnections", API: "network", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "virtualHubName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "HubVirtualNetworkConnection", API: "network", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "virtualHubName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "HubIPConfiguration", PluralName: "VirtualHubIPConfiguration", API: "network", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "virtualHubName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "HubRouteTable", API: "network", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "virtualHubName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "SecurityPartnerProvider", API: "network", ResourceGroup: false},
+	{ResourceName: "LoadBalancer", API: "network", ResourceGroup: true},
+	{ResourceName: "BackendAddressPool", PluralName: "LoadBalancerBackendAddressPools", API: "network", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "loadBalancerName",
+			Type: "string",
+		},
+	}},
 	// Desktop API Resources
 	{ResourceName: "HostPool", AzureSDKListFunction: "ListByResourceGroup", API: "desktopvirtualization", ResourceGroup: true},
 	{ResourceName: "ApplicationGroup", AzureSDKListFunction: "ListByResourceGroup", API: "desktopvirtualization", ResourceGroup: true, ExtraArgs: []Arg{
@@ -152,6 +210,15 @@ var functions = []Function{
 			Type: "string",
 		},
 	}},
+	// Container Service Resources - k8s services
+	{ResourceName: "ManagedCluster", API: "containerservice", FunctionName: "ListKubernetesClusters", ResourceGroup: false},
+	{ResourceName: "AgentPool", API: "containerservice", FunctionName: "ListKubernetesClusterNodes", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "managedClusterName",
+			Type: "string",
+		},
+	}},
+
 	// Storage Resources
 	{ResourceName: "Account", API: "storage", ResourceGroup: false},
 	{ResourceName: "ListContainerItem", PluralName: "BlobContainers", API: "storage", ResourceGroup: true, ExtraArgs: []Arg{
@@ -201,7 +268,7 @@ var functions = []Function{
 		},
 		{
 			Name: "expand",
-			Type: "storage.ListSharesExpand",
+			Type: "string",
 		},
 	}},
 	{ResourceName: "Table", API: "storage", PluralName: "Table", ResourceGroup: true, ExtraArgs: []Arg{
@@ -289,34 +356,218 @@ var functions = []Function{
 			Type: "string",
 		},
 	}},
-	// sql
-	{ResourceName: "Database", API: "sql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ReturnsList: true, ExtraArgs: []Arg{
+	// mssql
+	{ResourceName: "Database", API: "sql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ExtraArgs: []Arg{
 		{
 			Name: "serverName",
 			Type: "string",
 		},
 		{
+			Name: "skipToken",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "ElasticPool", API: "sql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ExtraArgs: []Arg{
+		{
+			Name: "serverName",
+			Type: "string",
+		},
+		{
+			Name: "skip",
+			Type: "*int32",
+		},
+	}},
+	{ResourceName: "FirewallRule", API: "sql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ExtraArgs: []Arg{
+		{
+			Name: "serverName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "Server", API: "sql", ResourceGroup: false, ExtraArgs: []Arg{
+		{
 			Name: "expand",
 			Type: "string",
+		},
+	}},
+	{ResourceName: "ServerSecurityAlertPolicy", API: "sql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ExtraArgs: []Arg{
+		{
+			Name: "serverName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "ServerVulnerabilityAssessment", API: "sql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ExtraArgs: []Arg{
+		{
+			Name: "serverName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "VirtualNetworkRule", API: "sql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ExtraArgs: []Arg{
+		{
+			Name: "serverName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "SQLVirtualMachine", API: "sqlvirtualmachine"},
+	//redis
+	//Corresponds to redis cache resource
+	{ResourceName: "ResourceType", API: "redis", FunctionName: "ListRedisCaches", PluralName: "RedisCaches", IrregularClientName: "NewClient", ResourceGroup: true, AzureSDKListFunction: "ListByResourceGroup"},
+	{ResourceName: "FirewallRule", API: "redis", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "cacheName",
+			Type: "string",
+		},
+	}},
+	// dns
+	{ResourceName: "Zone", API: "dns", ResourceGroup: false, ExtraArgs: []Arg{
+		{
+			Name: "top",
+			Type: "*int32",
+		},
+	}},
+
+	{ResourceName: "RecordSet", API: "dns", AzureSDKListFunction: "ListAllByDNSZone", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "zoneName",
+			Type: "string",
+		},
+		{
+			Name: "top",
+			Type: "*int32",
+		},
+		{
+			Name: "recordSetNameSuffix",
+			Type: "string",
+		},
+	}},
+	// privatedns
+	{ResourceName: "PrivateZone", API: "privatedns", ResourceGroup: false, ExtraArgs: []Arg{
+		{
+			Name: "top",
+			Type: "*int32",
+		},
+	}},
+	{ResourceName: "RecordSet", API: "privatedns", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "zoneName",
+			Type: "string",
+		},
+		{
+			Name: "top",
+			Type: "*int32",
+		},
+		{
+			Name: "recordSetNameSuffix",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "VirtualNetworkLink", API: "privatedns", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "privateZoneName",
+			Type: "string",
+		},
+		{
+			Name: "top",
+			Type: "*int32",
+		},
+	}},
+	// Policy
+	{ResourceName: "Definition", API: "policy", ResourceGroup: false, ExtraArgs: []Arg{
+		{
+			Name: "filter",
+			Type: "string",
+		},
+		{
+			Name: "top",
+			Type: "*int32",
+		},
+	}},
+	{ResourceName: "SetDefinition", API: "policy", ResourceGroup: false, ExtraArgs: []Arg{
+		{
+			Name: "filter",
+			Type: "string",
+		},
+		{
+			Name: "top",
+			Type: "*int32",
+		},
+	}},
+	{ResourceName: "Remediation", API: "policyinsights", AzureSDKListFunction: "ListForResourceGroup", ResourceGroup: true, Subscription: true, ExtraArgs: []Arg{
+		{
+			Name: "top",
+			Type: "*int32",
 		},
 		{
 			Name: "filter",
 			Type: "string",
 		},
 	}},
-	{ResourceName: "ElasticPool", API: "sql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ReturnsList: true, ExtraArgs: []Arg{
+	// key vault
+	{ResourceName: "Vault", FunctionName: "ListKeyVaults", ResourceGroup: true, AzureSDKListFunction: "ListByResourceGroup", API: "keyvault", ExtraArgs: []Arg{
 		{
-			Name: "serverName",
+			Name: "top",
+			Type: "*int32",
+		},
+	}},
+	// app insights
+	{ResourceName: "ApplicationInsightsComponent", PluralName: "Components", API: "insights", ResourceGroup: false},
+	{ResourceName: "ApplicationInsightsComponentAPIKey", PluralName: "APIKeys", API: "insights", ResourceGroup: true, ReturnsList: true, ExtraArgs: []Arg{
+		{
+			Name: "ApplicationInsightsComponent",
 			Type: "string",
 		},
 	}},
-	{ResourceName: "FirewallRule", API: "sql", ResourceGroup: true, AzureSDKListFunction: "ListByServer", ReturnsList: true, ExtraArgs: []Arg{
+	{ResourceName: "ApplicationInsightsComponentAnalyticsItem", PluralName: "AnalyticsItems", API: "insights", ResourceGroup: true, ReturnsList: true, ExtraArgs: []Arg{
 		{
-			Name: "serverName",
+			Name: "ApplicationInsightsComponent",
+			Type: "string",
+		},
+		{
+			Name: "scopePath",
+			Type: "insights.ItemScopePath",
+		},
+		{
+			Name: "scope",
+			Type: "insights.ItemScope",
+		},
+		{
+			Name: "typeParameter",
+			Type: "insights.ItemTypeParameter",
+		},
+		{
+			Name: "includeContent",
+			Type: "*bool",
+		},
+	}},
+	//issue at https://github.com/Azure/azure-rest-api-specs/issues/9463
+	{ResourceName: "WebTest", API: "insights", ResourceGroup: false},
+	// log analytics
+	{ResourceName: "Workspace", API: "operationalinsights", FunctionName: "ListLogAnalyticsWorkspaces", ReturnsList: true, ResourceGroup: false},
+	{ResourceName: "LinkedService", API: "operationalinsights", FunctionName: "ListLogAnalyticsLinkedService", AzureSDKListFunction: "ListByWorkspace", ReturnsList: true, ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "workspaceName",
 			Type: "string",
 		},
 	}},
-	{ResourceName: "Server", API: "sql", ReturnsList: true, ResourceGroup: false},
+	{ResourceName: "DataSource", API: "operationalinsights", FunctionName: "ListLogAnalyticsDatasource", AzureSDKListFunction: "ListByWorkspace", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "workspaceName",
+			Type: "string",
+		},
+		{
+			Name: "filter",
+			Type: "string",
+		},
+		{
+			Name: "skiptoken",
+			Type: "string",
+		},
+	}},
+	//monitor
+	{ResourceName: "ActionGroupResource", API: "newActionGroupClient", IrregularClientName: "NewActionGroupsClient", FunctionName: "ListMonitorActionsGroup", AzureSDKListFunction: "ListByResourceGroup", ReturnsList: true, ResourceGroup: true},
+	{ResourceName: "ActivityLogAlertResource", API: "newActivityLogAlertsClient", IrregularClientName: "NewActivityLogAlertsClient", FunctionName: "ListMonitorActivityLogAlert", AzureSDKListFunction: "ListByResourceGroup", ResourceGroup: true},
+	{ResourceName: "AutoscaleSettingResource", API: "monitor", IrregularClientName: "NewAutoscaleSettingsClient", FunctionName: "ListMonitorAutoScaleSettings", AzureSDKListFunction: "ListByResourceGroup", ResourceGroup: true},
+	{ResourceName: "LogProfileResource", API: "monitor", IrregularClientName: "NewLogProfilesClient", FunctionName: "ListMonitorLogProfiles", ReturnsList: true},
+	{ResourceName: "MetricAlertResource", API: "monitor", IrregularClientName: "NewMetricAlertsClient", FunctionName: "ListMonitorMetricsAlerts", ReturnsList: true, AzureSDKListFunction: "ListByResourceGroup", ResourceGroup: true},
 }
 
 func main() {

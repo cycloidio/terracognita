@@ -265,12 +265,13 @@ We have an `azurerm/cmd` that generates the `azurerm/reader_generated.go` method
 
 Functions are based on `https://github.com/Azure/azure-sdk-for-go/tree/master/services`.
 For example with `azurerm_virtual_machine` you should be able to find the required information in https://github.com/Azure/azure-sdk-for-go/blob/master/services/compute/mgmt/2019-12-01/compute/virtualmachines.go
-The API to use is the `compute` service with the version `2019-12-01`.
+The API we will use for this example is the `compute` service with the version `2019-12-01`.
 In our case we want to list data from the ResourceGroup used when executing `terracognita`, the corresponding function is `List`, sometimes another List function is needed as it's depends if it based on a ResourceGroup, a Location or will only list all resources without those delimiters.
+The functions are generated using templates that are defined at `azurerm/cmd/template.go`, they have different variables allowing to cover most of scenarios. For the current example:
 
   * API: SubDirectory azure-sdk-for-go services `compute`
   * APIVersion: SubDirectory azure-sdk-for-go mgmt `2019-12-01`
-  * Resource: resource name in singular PascalCase `VirtualMachine`
+  * ResourceName: resource name in singular PascalCase `VirtualMachine`
   * ResourceGroup: `true` as the List function require the resource group name as a parameter
 
 ```shell
@@ -289,6 +290,8 @@ var functions = []Function{
 ```
 
 Functions are used to generate List methods in `azurerm/reader_generated.go`. After a `make generate` execution, we should find a `ListVirtualMachines` method at the end of the file corresponding to our previous example.
+
+**Tips!** Sometimes it could be easier to check directly on terraform-provider-azure, each resource is defined in a specific file at https://github.com/hashicorp/terraform-provider-azurerm/tree/main/internal/services/<API>. To check the client to use just go to the Read method, but note that sometimes some logic may be needed to retrieve the resource list.
 
 2. Add your resource type
 
@@ -332,8 +335,13 @@ func virtualMachines(ctx context.Context, a *azurerm, resourceType string, tags 
 	return resources, nil
 }
 ```
+5. Optional: If the resource data is required to list other resources, you should add caching, e.g.: listing virtual machine extension requires the name of the virtual machines.
 
-4. Make generate
+	1. To enable this you should first change the resource code at `azurerm/resources.go` by adding the setting the resource data name on the method , check other virtualnetwork method for an example of this.
+
+	2. Then create the caching functions to use to retrieve the resources names at `azurerm/cache.go`, it should be straigthfroad and easy to do, just follow the example of the other functions.
+
+6. Make generate
 
 Last step is to re-generate the following files with enumer and build/install.
 
@@ -345,7 +353,7 @@ $ make generate
 $ make test
 ```
 
-5. Update CHANGELOG
+6. Update CHANGELOG
 
 Don't forget to update the `CHANGELOG.md`.
 

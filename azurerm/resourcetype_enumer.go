@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _ResourceTypeName = "azurerm_resource_groupazurerm_virtual_machineazurerm_virtual_machine_extensionazurerm_virtual_machine_scale_setazurerm_virtual_networkazurerm_availability_setazurerm_imageazurerm_subnetazurerm_network_interfaceazurerm_network_security_groupazurerm_application_gatewayazurerm_application_security_groupazurerm_network_ddos_protection_planazurerm_firewallazurerm_local_network_gatewayazurerm_nat_gatewayazurerm_network_profileazurerm_network_security_ruleazurerm_public_ipazurerm_public_ip_prefixazurerm_routeazurerm_route_tableazurerm_virtual_network_gatewayazurerm_virtual_network_gateway_connectionazurerm_virtual_network_peeringazurerm_web_application_firewall_policyazurerm_virtual_desktop_host_poolazurerm_virtual_desktop_application_groupazurerm_logic_app_workflowazurerm_logic_app_trigger_customazurerm_logic_app_action_customazurerm_container_registryazurerm_container_registry_webhookazurerm_storage_accountazurerm_storage_queueazurerm_storage_shareazurerm_storage_tableazurerm_storage_blobazurerm_mariadb_configurationazurerm_mariadb_databaseazurerm_mariadb_firewall_ruleazurerm_mariadb_serverazurerm_mariadb_virtual_network_ruleazurerm_mysql_configurationazurerm_mysql_databaseazurerm_mysql_firewall_ruleazurerm_mysql_serverazurerm_mysql_virtual_network_ruleazurerm_postgresql_configurationazurerm_postgresql_databaseazurerm_postgresql_firewall_ruleazurerm_postgresql_serverazurerm_postgresql_virtual_network_ruleazurerm_sql_elasticpoolazurerm_sql_databaseazurerm_sql_firewall_ruleazurerm_sql_server"
+const _ResourceTypeName = "azurerm_resource_groupazurerm_virtual_machineazurerm_windows_virtual_machineazurerm_linux_virtual_machineazurerm_virtual_machine_extensionazurerm_windows_virtual_machine_scale_setazurerm_linux_virtual_machine_scale_setazurerm_virtual_machine_scale_set_extensionazurerm_virtual_networkazurerm_availability_setazurerm_managed_diskazurerm_imageazurerm_subnetazurerm_network_interfaceazurerm_network_security_groupazurerm_application_gatewayazurerm_application_security_groupazurerm_network_ddos_protection_planazurerm_firewallazurerm_local_network_gatewayazurerm_nat_gatewayazurerm_network_profileazurerm_network_security_ruleazurerm_public_ipazurerm_public_ip_prefixazurerm_routeazurerm_route_tableazurerm_virtual_network_gatewayazurerm_virtual_network_gateway_connectionazurerm_virtual_network_peeringazurerm_web_application_firewall_policyazurerm_virtual_hubazurerm_virtual_hub_bgp_connectionazurerm_virtual_hub_connectionazurerm_virtual_hub_ipazurerm_virtual_hub_route_tableazurerm_virtual_hub_security_partner_providerazurerm_lbazurerm_lb_backend_address_poolazurerm_lb_ruleazurerm_lb_outbound_ruleazurerm_lb_nat_ruleazurerm_lb_nat_poolazurerm_lb_probeazurerm_virtual_desktop_host_poolazurerm_virtual_desktop_application_groupazurerm_logic_app_workflowazurerm_logic_app_trigger_customazurerm_logic_app_action_customazurerm_container_registryazurerm_container_registry_webhookazurerm_kubernetes_clusterazurerm_kubernetes_cluster_node_poolazurerm_storage_accountazurerm_storage_queueazurerm_storage_shareazurerm_storage_tableazurerm_storage_blobazurerm_mariadb_configurationazurerm_mariadb_databaseazurerm_mariadb_firewall_ruleazurerm_mariadb_serverazurerm_mariadb_virtual_network_ruleazurerm_mysql_configurationazurerm_mysql_databaseazurerm_mysql_firewall_ruleazurerm_mysql_serverazurerm_mysql_virtual_network_ruleazurerm_postgresql_configurationazurerm_postgresql_databaseazurerm_postgresql_firewall_ruleazurerm_postgresql_serverazurerm_postgresql_virtual_network_ruleazurerm_mssql_elastic_poolazurerm_mssql_databaseazurerm_mssql_firewall_ruleazurerm_mssql_serverazurerm_mssql_server_security_alert_policyazurerm_mssql_server_vulnerability_assessmentazurerm_mssql_virtual_machineazurerm_mssql_virtual_network_ruleazurerm_redis_cacheazurerm_redis_firewall_ruleazurerm_dns_zoneazurerm_dns_a_recordazurerm_dns_aaa_recordazurerm_dns_caa_recordazurerm_dns_cname_recordazurerm_dns_mx_recordazurerm_dns_ns_recordazurerm_dns_ptr_recordazurerm_dns_srv_recordazurerm_dns_txt_recordazurerm_private_dns_zoneazurerm_private_dns_a_recordazurerm_private_dns_aaa_recordazurerm_private_dns_cname_recordazurerm_private_dns_mx_recordazurerm_private_dns_ptr_recordazurerm_private_dns_srv_recordazurerm_private_dns_txt_recordazurerm_private_dns_zone_virtual_network_linkazurerm_policy_definitionazurerm_policy_remediationazurerm_policy_set_definitionazurerm_key_vaultazurerm_key_vault_access_policyazurerm_application_insightsazurerm_application_insights_api_keyazurerm_application_insights_analytics_itemazurerm_log_analytics_workspaceazurerm_log_analytics_linked_serviceazurerm_log_analytics_datasource_windows_performance_counterazurerm_log_analytics_datasource_windows_eventazurerm_monitor_action_groupazurerm_monitor_activity_log_alertazurerm_monitor_autoscale_settingazurerm_monitor_log_profileazurerm_monitor_metric_alert"
 
-var _ResourceTypeIndex = [...]uint16{0, 22, 45, 78, 111, 134, 158, 171, 185, 210, 240, 267, 301, 337, 353, 382, 401, 424, 453, 470, 494, 507, 526, 557, 599, 630, 669, 702, 743, 769, 801, 832, 858, 892, 915, 936, 957, 978, 998, 1027, 1051, 1080, 1102, 1138, 1165, 1187, 1214, 1234, 1268, 1300, 1327, 1359, 1384, 1423, 1446, 1466, 1491, 1509}
+var _ResourceTypeIndex = [...]uint16{0, 22, 45, 76, 105, 138, 179, 218, 261, 284, 308, 328, 341, 355, 380, 410, 437, 471, 507, 523, 552, 571, 594, 623, 640, 664, 677, 696, 727, 769, 800, 839, 858, 892, 922, 944, 975, 1020, 1030, 1061, 1076, 1100, 1119, 1138, 1154, 1187, 1228, 1254, 1286, 1317, 1343, 1377, 1403, 1439, 1462, 1483, 1504, 1525, 1545, 1574, 1598, 1627, 1649, 1685, 1712, 1734, 1761, 1781, 1815, 1847, 1874, 1906, 1931, 1970, 1996, 2018, 2045, 2065, 2107, 2152, 2181, 2215, 2234, 2261, 2277, 2297, 2319, 2341, 2365, 2386, 2407, 2429, 2451, 2473, 2497, 2525, 2555, 2587, 2616, 2646, 2676, 2706, 2751, 2776, 2802, 2831, 2848, 2879, 2907, 2943, 2986, 3017, 3053, 3113, 3159, 3187, 3221, 3254, 3281, 3309}
 
-const _ResourceTypeLowerName = "azurerm_resource_groupazurerm_virtual_machineazurerm_virtual_machine_extensionazurerm_virtual_machine_scale_setazurerm_virtual_networkazurerm_availability_setazurerm_imageazurerm_subnetazurerm_network_interfaceazurerm_network_security_groupazurerm_application_gatewayazurerm_application_security_groupazurerm_network_ddos_protection_planazurerm_firewallazurerm_local_network_gatewayazurerm_nat_gatewayazurerm_network_profileazurerm_network_security_ruleazurerm_public_ipazurerm_public_ip_prefixazurerm_routeazurerm_route_tableazurerm_virtual_network_gatewayazurerm_virtual_network_gateway_connectionazurerm_virtual_network_peeringazurerm_web_application_firewall_policyazurerm_virtual_desktop_host_poolazurerm_virtual_desktop_application_groupazurerm_logic_app_workflowazurerm_logic_app_trigger_customazurerm_logic_app_action_customazurerm_container_registryazurerm_container_registry_webhookazurerm_storage_accountazurerm_storage_queueazurerm_storage_shareazurerm_storage_tableazurerm_storage_blobazurerm_mariadb_configurationazurerm_mariadb_databaseazurerm_mariadb_firewall_ruleazurerm_mariadb_serverazurerm_mariadb_virtual_network_ruleazurerm_mysql_configurationazurerm_mysql_databaseazurerm_mysql_firewall_ruleazurerm_mysql_serverazurerm_mysql_virtual_network_ruleazurerm_postgresql_configurationazurerm_postgresql_databaseazurerm_postgresql_firewall_ruleazurerm_postgresql_serverazurerm_postgresql_virtual_network_ruleazurerm_sql_elasticpoolazurerm_sql_databaseazurerm_sql_firewall_ruleazurerm_sql_server"
+const _ResourceTypeLowerName = "azurerm_resource_groupazurerm_virtual_machineazurerm_windows_virtual_machineazurerm_linux_virtual_machineazurerm_virtual_machine_extensionazurerm_windows_virtual_machine_scale_setazurerm_linux_virtual_machine_scale_setazurerm_virtual_machine_scale_set_extensionazurerm_virtual_networkazurerm_availability_setazurerm_managed_diskazurerm_imageazurerm_subnetazurerm_network_interfaceazurerm_network_security_groupazurerm_application_gatewayazurerm_application_security_groupazurerm_network_ddos_protection_planazurerm_firewallazurerm_local_network_gatewayazurerm_nat_gatewayazurerm_network_profileazurerm_network_security_ruleazurerm_public_ipazurerm_public_ip_prefixazurerm_routeazurerm_route_tableazurerm_virtual_network_gatewayazurerm_virtual_network_gateway_connectionazurerm_virtual_network_peeringazurerm_web_application_firewall_policyazurerm_virtual_hubazurerm_virtual_hub_bgp_connectionazurerm_virtual_hub_connectionazurerm_virtual_hub_ipazurerm_virtual_hub_route_tableazurerm_virtual_hub_security_partner_providerazurerm_lbazurerm_lb_backend_address_poolazurerm_lb_ruleazurerm_lb_outbound_ruleazurerm_lb_nat_ruleazurerm_lb_nat_poolazurerm_lb_probeazurerm_virtual_desktop_host_poolazurerm_virtual_desktop_application_groupazurerm_logic_app_workflowazurerm_logic_app_trigger_customazurerm_logic_app_action_customazurerm_container_registryazurerm_container_registry_webhookazurerm_kubernetes_clusterazurerm_kubernetes_cluster_node_poolazurerm_storage_accountazurerm_storage_queueazurerm_storage_shareazurerm_storage_tableazurerm_storage_blobazurerm_mariadb_configurationazurerm_mariadb_databaseazurerm_mariadb_firewall_ruleazurerm_mariadb_serverazurerm_mariadb_virtual_network_ruleazurerm_mysql_configurationazurerm_mysql_databaseazurerm_mysql_firewall_ruleazurerm_mysql_serverazurerm_mysql_virtual_network_ruleazurerm_postgresql_configurationazurerm_postgresql_databaseazurerm_postgresql_firewall_ruleazurerm_postgresql_serverazurerm_postgresql_virtual_network_ruleazurerm_mssql_elastic_poolazurerm_mssql_databaseazurerm_mssql_firewall_ruleazurerm_mssql_serverazurerm_mssql_server_security_alert_policyazurerm_mssql_server_vulnerability_assessmentazurerm_mssql_virtual_machineazurerm_mssql_virtual_network_ruleazurerm_redis_cacheazurerm_redis_firewall_ruleazurerm_dns_zoneazurerm_dns_a_recordazurerm_dns_aaa_recordazurerm_dns_caa_recordazurerm_dns_cname_recordazurerm_dns_mx_recordazurerm_dns_ns_recordazurerm_dns_ptr_recordazurerm_dns_srv_recordazurerm_dns_txt_recordazurerm_private_dns_zoneazurerm_private_dns_a_recordazurerm_private_dns_aaa_recordazurerm_private_dns_cname_recordazurerm_private_dns_mx_recordazurerm_private_dns_ptr_recordazurerm_private_dns_srv_recordazurerm_private_dns_txt_recordazurerm_private_dns_zone_virtual_network_linkazurerm_policy_definitionazurerm_policy_remediationazurerm_policy_set_definitionazurerm_key_vaultazurerm_key_vault_access_policyazurerm_application_insightsazurerm_application_insights_api_keyazurerm_application_insights_analytics_itemazurerm_log_analytics_workspaceazurerm_log_analytics_linked_serviceazurerm_log_analytics_datasource_windows_performance_counterazurerm_log_analytics_datasource_windows_eventazurerm_monitor_action_groupazurerm_monitor_activity_log_alertazurerm_monitor_autoscale_settingazurerm_monitor_log_profileazurerm_monitor_metric_alert"
 
 func (i ResourceType) String() string {
 	if i < 0 || i >= ResourceType(len(_ResourceTypeIndex)-1) {
@@ -26,240 +26,488 @@ func _ResourceTypeNoOp() {
 	var x [1]struct{}
 	_ = x[ResourceGroup-(0)]
 	_ = x[VirtualMachine-(1)]
-	_ = x[VirtualMachineExtension-(2)]
-	_ = x[VirtualMachineScaleSet-(3)]
-	_ = x[VirtualNetwork-(4)]
-	_ = x[AvailabilitySet-(5)]
-	_ = x[Image-(6)]
-	_ = x[Subnet-(7)]
-	_ = x[NetworkInterface-(8)]
-	_ = x[NetworkSecurityGroup-(9)]
-	_ = x[ApplicationGateway-(10)]
-	_ = x[ApplicationSecurityGroup-(11)]
-	_ = x[NetworkDdosProtectionPlan-(12)]
-	_ = x[Firewall-(13)]
-	_ = x[LocalNetworkGateway-(14)]
-	_ = x[NatGateway-(15)]
-	_ = x[NetworkProfile-(16)]
-	_ = x[NetworkSecurityRule-(17)]
-	_ = x[PublicIP-(18)]
-	_ = x[PublicIPPrefix-(19)]
-	_ = x[Route-(20)]
-	_ = x[RouteTable-(21)]
-	_ = x[VirtualNetworkGateway-(22)]
-	_ = x[VirtualNetworkGatewayConnection-(23)]
-	_ = x[VirtualNetworkPeering-(24)]
-	_ = x[WebApplicationFirewallPolicy-(25)]
-	_ = x[VirtualDesktopHostPool-(26)]
-	_ = x[VirtualDesktopApplicationGroup-(27)]
-	_ = x[LogicAppWorkflow-(28)]
-	_ = x[LogicAppTriggerCustom-(29)]
-	_ = x[LogicAppActionCustom-(30)]
-	_ = x[ContainerRegistry-(31)]
-	_ = x[ContainerRegistryWebhook-(32)]
-	_ = x[StorageAccount-(33)]
-	_ = x[StorageQueue-(34)]
-	_ = x[StorageShare-(35)]
-	_ = x[StorageTable-(36)]
-	_ = x[StorageBlob-(37)]
-	_ = x[MariadbConfiguration-(38)]
-	_ = x[MariadbDatabase-(39)]
-	_ = x[MariadbFirewallRule-(40)]
-	_ = x[MariadbServer-(41)]
-	_ = x[MariadbVirtualNetworkRule-(42)]
-	_ = x[MysqlConfiguration-(43)]
-	_ = x[MysqlDatabase-(44)]
-	_ = x[MysqlFirewallRule-(45)]
-	_ = x[MysqlServer-(46)]
-	_ = x[MysqlVirtualNetworkRule-(47)]
-	_ = x[PostgresqlConfiguration-(48)]
-	_ = x[PostgresqlDatabase-(49)]
-	_ = x[PostgresqlFirewallRule-(50)]
-	_ = x[PostgresqlServer-(51)]
-	_ = x[PostgresqlVirtualNetworkRule-(52)]
-	_ = x[SQLElasticPool-(53)]
-	_ = x[SQLDatabase-(54)]
-	_ = x[SQLFirewallRule-(55)]
-	_ = x[SQLServer-(56)]
+	_ = x[WindowsVirtualMachine-(2)]
+	_ = x[LinuxVirtualMachine-(3)]
+	_ = x[VirtualMachineExtension-(4)]
+	_ = x[WindowsVirtualMachineScaleSet-(5)]
+	_ = x[LinuxVirtualMachineScaleSet-(6)]
+	_ = x[VirtualMachineScaleSetExtension-(7)]
+	_ = x[VirtualNetwork-(8)]
+	_ = x[AvailabilitySet-(9)]
+	_ = x[ManagedDisk-(10)]
+	_ = x[Image-(11)]
+	_ = x[Subnet-(12)]
+	_ = x[NetworkInterface-(13)]
+	_ = x[NetworkSecurityGroup-(14)]
+	_ = x[ApplicationGateway-(15)]
+	_ = x[ApplicationSecurityGroup-(16)]
+	_ = x[NetworkDdosProtectionPlan-(17)]
+	_ = x[Firewall-(18)]
+	_ = x[LocalNetworkGateway-(19)]
+	_ = x[NatGateway-(20)]
+	_ = x[NetworkProfile-(21)]
+	_ = x[NetworkSecurityRule-(22)]
+	_ = x[PublicIP-(23)]
+	_ = x[PublicIPPrefix-(24)]
+	_ = x[Route-(25)]
+	_ = x[RouteTable-(26)]
+	_ = x[VirtualNetworkGateway-(27)]
+	_ = x[VirtualNetworkGatewayConnection-(28)]
+	_ = x[VirtualNetworkPeering-(29)]
+	_ = x[WebApplicationFirewallPolicy-(30)]
+	_ = x[VirtualHub-(31)]
+	_ = x[VirtualHubBgpConnection-(32)]
+	_ = x[VirtualHubConnection-(33)]
+	_ = x[VirtualHubIP-(34)]
+	_ = x[VirtualHubRouteTable-(35)]
+	_ = x[VirtualHubSecurityPartnerProvider-(36)]
+	_ = x[Lb-(37)]
+	_ = x[LbBackendAddressPool-(38)]
+	_ = x[LbRule-(39)]
+	_ = x[LbOutboundRule-(40)]
+	_ = x[LbNatRule-(41)]
+	_ = x[LbNatPool-(42)]
+	_ = x[LbProbe-(43)]
+	_ = x[VirtualDesktopHostPool-(44)]
+	_ = x[VirtualDesktopApplicationGroup-(45)]
+	_ = x[LogicAppWorkflow-(46)]
+	_ = x[LogicAppTriggerCustom-(47)]
+	_ = x[LogicAppActionCustom-(48)]
+	_ = x[ContainerRegistry-(49)]
+	_ = x[ContainerRegistryWebhook-(50)]
+	_ = x[KubernetesCluster-(51)]
+	_ = x[KubernetesClusterNodePool-(52)]
+	_ = x[StorageAccount-(53)]
+	_ = x[StorageQueue-(54)]
+	_ = x[StorageShare-(55)]
+	_ = x[StorageTable-(56)]
+	_ = x[StorageBlob-(57)]
+	_ = x[MariadbConfiguration-(58)]
+	_ = x[MariadbDatabase-(59)]
+	_ = x[MariadbFirewallRule-(60)]
+	_ = x[MariadbServer-(61)]
+	_ = x[MariadbVirtualNetworkRule-(62)]
+	_ = x[MysqlConfiguration-(63)]
+	_ = x[MysqlDatabase-(64)]
+	_ = x[MysqlFirewallRule-(65)]
+	_ = x[MysqlServer-(66)]
+	_ = x[MysqlVirtualNetworkRule-(67)]
+	_ = x[PostgresqlConfiguration-(68)]
+	_ = x[PostgresqlDatabase-(69)]
+	_ = x[PostgresqlFirewallRule-(70)]
+	_ = x[PostgresqlServer-(71)]
+	_ = x[PostgresqlVirtualNetworkRule-(72)]
+	_ = x[MssqlElasticPool-(73)]
+	_ = x[MssqlDatabase-(74)]
+	_ = x[MssqlFirewallRule-(75)]
+	_ = x[MssqlServer-(76)]
+	_ = x[MssqlServerSecurityAlertPolicy-(77)]
+	_ = x[MssqlServerVulnerabilityAssessment-(78)]
+	_ = x[MssqlVirtualMachine-(79)]
+	_ = x[MssqlVirtualNetworkRule-(80)]
+	_ = x[RedisCache-(81)]
+	_ = x[RedisFirewallRule-(82)]
+	_ = x[DNSZone-(83)]
+	_ = x[DNSARecord-(84)]
+	_ = x[DNSAaaRecord-(85)]
+	_ = x[DNSCaaRecord-(86)]
+	_ = x[DNSCnameRecord-(87)]
+	_ = x[DNSMxRecord-(88)]
+	_ = x[DNSNsRecord-(89)]
+	_ = x[DNSPtrRecord-(90)]
+	_ = x[DNSSrvRecord-(91)]
+	_ = x[DNSTxtRecord-(92)]
+	_ = x[PrivateDNSZone-(93)]
+	_ = x[PrivateDNSARecord-(94)]
+	_ = x[PrivateDNSAaaRecord-(95)]
+	_ = x[PrivateDNSCnameRecord-(96)]
+	_ = x[PrivateDNSMxRecord-(97)]
+	_ = x[PrivateDNSPtrRecord-(98)]
+	_ = x[PrivateDNSSrvRecord-(99)]
+	_ = x[PrivateDNSTxtRecord-(100)]
+	_ = x[PrivateDNSZoneVirtualNetworkLink-(101)]
+	_ = x[PolicyDefinition-(102)]
+	_ = x[PolicyRemediation-(103)]
+	_ = x[PolicySetDefinition-(104)]
+	_ = x[KeyVault-(105)]
+	_ = x[KeyVaultAccessPolicy-(106)]
+	_ = x[ApplicationInsights-(107)]
+	_ = x[ApplicationInsightsAPIKey-(108)]
+	_ = x[ApplicationInsightsAnalyticsItem-(109)]
+	_ = x[LogAnalyticsWorkspace-(110)]
+	_ = x[LogAnalyticsLinkedService-(111)]
+	_ = x[LogAnalyticsDatasourceWindowsPerformanceCounter-(112)]
+	_ = x[LogAnalyticsDatasourceWindowsEvent-(113)]
+	_ = x[MonitorActionGroup-(114)]
+	_ = x[MonitorActivityLogAlert-(115)]
+	_ = x[MonitorAutoscaleSetting-(116)]
+	_ = x[MonitorLogProfile-(117)]
+	_ = x[MonitorMetricAlert-(118)]
 }
 
-var _ResourceTypeValues = []ResourceType{ResourceGroup, VirtualMachine, VirtualMachineExtension, VirtualMachineScaleSet, VirtualNetwork, AvailabilitySet, Image, Subnet, NetworkInterface, NetworkSecurityGroup, ApplicationGateway, ApplicationSecurityGroup, NetworkDdosProtectionPlan, Firewall, LocalNetworkGateway, NatGateway, NetworkProfile, NetworkSecurityRule, PublicIP, PublicIPPrefix, Route, RouteTable, VirtualNetworkGateway, VirtualNetworkGatewayConnection, VirtualNetworkPeering, WebApplicationFirewallPolicy, VirtualDesktopHostPool, VirtualDesktopApplicationGroup, LogicAppWorkflow, LogicAppTriggerCustom, LogicAppActionCustom, ContainerRegistry, ContainerRegistryWebhook, StorageAccount, StorageQueue, StorageShare, StorageTable, StorageBlob, MariadbConfiguration, MariadbDatabase, MariadbFirewallRule, MariadbServer, MariadbVirtualNetworkRule, MysqlConfiguration, MysqlDatabase, MysqlFirewallRule, MysqlServer, MysqlVirtualNetworkRule, PostgresqlConfiguration, PostgresqlDatabase, PostgresqlFirewallRule, PostgresqlServer, PostgresqlVirtualNetworkRule, SQLElasticPool, SQLDatabase, SQLFirewallRule, SQLServer}
+var _ResourceTypeValues = []ResourceType{ResourceGroup, VirtualMachine, WindowsVirtualMachine, LinuxVirtualMachine, VirtualMachineExtension, WindowsVirtualMachineScaleSet, LinuxVirtualMachineScaleSet, VirtualMachineScaleSetExtension, VirtualNetwork, AvailabilitySet, ManagedDisk, Image, Subnet, NetworkInterface, NetworkSecurityGroup, ApplicationGateway, ApplicationSecurityGroup, NetworkDdosProtectionPlan, Firewall, LocalNetworkGateway, NatGateway, NetworkProfile, NetworkSecurityRule, PublicIP, PublicIPPrefix, Route, RouteTable, VirtualNetworkGateway, VirtualNetworkGatewayConnection, VirtualNetworkPeering, WebApplicationFirewallPolicy, VirtualHub, VirtualHubBgpConnection, VirtualHubConnection, VirtualHubIP, VirtualHubRouteTable, VirtualHubSecurityPartnerProvider, Lb, LbBackendAddressPool, LbRule, LbOutboundRule, LbNatRule, LbNatPool, LbProbe, VirtualDesktopHostPool, VirtualDesktopApplicationGroup, LogicAppWorkflow, LogicAppTriggerCustom, LogicAppActionCustom, ContainerRegistry, ContainerRegistryWebhook, KubernetesCluster, KubernetesClusterNodePool, StorageAccount, StorageQueue, StorageShare, StorageTable, StorageBlob, MariadbConfiguration, MariadbDatabase, MariadbFirewallRule, MariadbServer, MariadbVirtualNetworkRule, MysqlConfiguration, MysqlDatabase, MysqlFirewallRule, MysqlServer, MysqlVirtualNetworkRule, PostgresqlConfiguration, PostgresqlDatabase, PostgresqlFirewallRule, PostgresqlServer, PostgresqlVirtualNetworkRule, MssqlElasticPool, MssqlDatabase, MssqlFirewallRule, MssqlServer, MssqlServerSecurityAlertPolicy, MssqlServerVulnerabilityAssessment, MssqlVirtualMachine, MssqlVirtualNetworkRule, RedisCache, RedisFirewallRule, DNSZone, DNSARecord, DNSAaaRecord, DNSCaaRecord, DNSCnameRecord, DNSMxRecord, DNSNsRecord, DNSPtrRecord, DNSSrvRecord, DNSTxtRecord, PrivateDNSZone, PrivateDNSARecord, PrivateDNSAaaRecord, PrivateDNSCnameRecord, PrivateDNSMxRecord, PrivateDNSPtrRecord, PrivateDNSSrvRecord, PrivateDNSTxtRecord, PrivateDNSZoneVirtualNetworkLink, PolicyDefinition, PolicyRemediation, PolicySetDefinition, KeyVault, KeyVaultAccessPolicy, ApplicationInsights, ApplicationInsightsAPIKey, ApplicationInsightsAnalyticsItem, LogAnalyticsWorkspace, LogAnalyticsLinkedService, LogAnalyticsDatasourceWindowsPerformanceCounter, LogAnalyticsDatasourceWindowsEvent, MonitorActionGroup, MonitorActivityLogAlert, MonitorAutoscaleSetting, MonitorLogProfile, MonitorMetricAlert}
 
 var _ResourceTypeNameToValueMap = map[string]ResourceType{
 	_ResourceTypeName[0:22]:           ResourceGroup,
 	_ResourceTypeLowerName[0:22]:      ResourceGroup,
 	_ResourceTypeName[22:45]:          VirtualMachine,
 	_ResourceTypeLowerName[22:45]:     VirtualMachine,
-	_ResourceTypeName[45:78]:          VirtualMachineExtension,
-	_ResourceTypeLowerName[45:78]:     VirtualMachineExtension,
-	_ResourceTypeName[78:111]:         VirtualMachineScaleSet,
-	_ResourceTypeLowerName[78:111]:    VirtualMachineScaleSet,
-	_ResourceTypeName[111:134]:        VirtualNetwork,
-	_ResourceTypeLowerName[111:134]:   VirtualNetwork,
-	_ResourceTypeName[134:158]:        AvailabilitySet,
-	_ResourceTypeLowerName[134:158]:   AvailabilitySet,
-	_ResourceTypeName[158:171]:        Image,
-	_ResourceTypeLowerName[158:171]:   Image,
-	_ResourceTypeName[171:185]:        Subnet,
-	_ResourceTypeLowerName[171:185]:   Subnet,
-	_ResourceTypeName[185:210]:        NetworkInterface,
-	_ResourceTypeLowerName[185:210]:   NetworkInterface,
-	_ResourceTypeName[210:240]:        NetworkSecurityGroup,
-	_ResourceTypeLowerName[210:240]:   NetworkSecurityGroup,
-	_ResourceTypeName[240:267]:        ApplicationGateway,
-	_ResourceTypeLowerName[240:267]:   ApplicationGateway,
-	_ResourceTypeName[267:301]:        ApplicationSecurityGroup,
-	_ResourceTypeLowerName[267:301]:   ApplicationSecurityGroup,
-	_ResourceTypeName[301:337]:        NetworkDdosProtectionPlan,
-	_ResourceTypeLowerName[301:337]:   NetworkDdosProtectionPlan,
-	_ResourceTypeName[337:353]:        Firewall,
-	_ResourceTypeLowerName[337:353]:   Firewall,
-	_ResourceTypeName[353:382]:        LocalNetworkGateway,
-	_ResourceTypeLowerName[353:382]:   LocalNetworkGateway,
-	_ResourceTypeName[382:401]:        NatGateway,
-	_ResourceTypeLowerName[382:401]:   NatGateway,
-	_ResourceTypeName[401:424]:        NetworkProfile,
-	_ResourceTypeLowerName[401:424]:   NetworkProfile,
-	_ResourceTypeName[424:453]:        NetworkSecurityRule,
-	_ResourceTypeLowerName[424:453]:   NetworkSecurityRule,
-	_ResourceTypeName[453:470]:        PublicIP,
-	_ResourceTypeLowerName[453:470]:   PublicIP,
-	_ResourceTypeName[470:494]:        PublicIPPrefix,
-	_ResourceTypeLowerName[470:494]:   PublicIPPrefix,
-	_ResourceTypeName[494:507]:        Route,
-	_ResourceTypeLowerName[494:507]:   Route,
-	_ResourceTypeName[507:526]:        RouteTable,
-	_ResourceTypeLowerName[507:526]:   RouteTable,
-	_ResourceTypeName[526:557]:        VirtualNetworkGateway,
-	_ResourceTypeLowerName[526:557]:   VirtualNetworkGateway,
-	_ResourceTypeName[557:599]:        VirtualNetworkGatewayConnection,
-	_ResourceTypeLowerName[557:599]:   VirtualNetworkGatewayConnection,
-	_ResourceTypeName[599:630]:        VirtualNetworkPeering,
-	_ResourceTypeLowerName[599:630]:   VirtualNetworkPeering,
-	_ResourceTypeName[630:669]:        WebApplicationFirewallPolicy,
-	_ResourceTypeLowerName[630:669]:   WebApplicationFirewallPolicy,
-	_ResourceTypeName[669:702]:        VirtualDesktopHostPool,
-	_ResourceTypeLowerName[669:702]:   VirtualDesktopHostPool,
-	_ResourceTypeName[702:743]:        VirtualDesktopApplicationGroup,
-	_ResourceTypeLowerName[702:743]:   VirtualDesktopApplicationGroup,
-	_ResourceTypeName[743:769]:        LogicAppWorkflow,
-	_ResourceTypeLowerName[743:769]:   LogicAppWorkflow,
-	_ResourceTypeName[769:801]:        LogicAppTriggerCustom,
-	_ResourceTypeLowerName[769:801]:   LogicAppTriggerCustom,
-	_ResourceTypeName[801:832]:        LogicAppActionCustom,
-	_ResourceTypeLowerName[801:832]:   LogicAppActionCustom,
-	_ResourceTypeName[832:858]:        ContainerRegistry,
-	_ResourceTypeLowerName[832:858]:   ContainerRegistry,
-	_ResourceTypeName[858:892]:        ContainerRegistryWebhook,
-	_ResourceTypeLowerName[858:892]:   ContainerRegistryWebhook,
-	_ResourceTypeName[892:915]:        StorageAccount,
-	_ResourceTypeLowerName[892:915]:   StorageAccount,
-	_ResourceTypeName[915:936]:        StorageQueue,
-	_ResourceTypeLowerName[915:936]:   StorageQueue,
-	_ResourceTypeName[936:957]:        StorageShare,
-	_ResourceTypeLowerName[936:957]:   StorageShare,
-	_ResourceTypeName[957:978]:        StorageTable,
-	_ResourceTypeLowerName[957:978]:   StorageTable,
-	_ResourceTypeName[978:998]:        StorageBlob,
-	_ResourceTypeLowerName[978:998]:   StorageBlob,
-	_ResourceTypeName[998:1027]:       MariadbConfiguration,
-	_ResourceTypeLowerName[998:1027]:  MariadbConfiguration,
-	_ResourceTypeName[1027:1051]:      MariadbDatabase,
-	_ResourceTypeLowerName[1027:1051]: MariadbDatabase,
-	_ResourceTypeName[1051:1080]:      MariadbFirewallRule,
-	_ResourceTypeLowerName[1051:1080]: MariadbFirewallRule,
-	_ResourceTypeName[1080:1102]:      MariadbServer,
-	_ResourceTypeLowerName[1080:1102]: MariadbServer,
-	_ResourceTypeName[1102:1138]:      MariadbVirtualNetworkRule,
-	_ResourceTypeLowerName[1102:1138]: MariadbVirtualNetworkRule,
-	_ResourceTypeName[1138:1165]:      MysqlConfiguration,
-	_ResourceTypeLowerName[1138:1165]: MysqlConfiguration,
-	_ResourceTypeName[1165:1187]:      MysqlDatabase,
-	_ResourceTypeLowerName[1165:1187]: MysqlDatabase,
-	_ResourceTypeName[1187:1214]:      MysqlFirewallRule,
-	_ResourceTypeLowerName[1187:1214]: MysqlFirewallRule,
-	_ResourceTypeName[1214:1234]:      MysqlServer,
-	_ResourceTypeLowerName[1214:1234]: MysqlServer,
-	_ResourceTypeName[1234:1268]:      MysqlVirtualNetworkRule,
-	_ResourceTypeLowerName[1234:1268]: MysqlVirtualNetworkRule,
-	_ResourceTypeName[1268:1300]:      PostgresqlConfiguration,
-	_ResourceTypeLowerName[1268:1300]: PostgresqlConfiguration,
-	_ResourceTypeName[1300:1327]:      PostgresqlDatabase,
-	_ResourceTypeLowerName[1300:1327]: PostgresqlDatabase,
-	_ResourceTypeName[1327:1359]:      PostgresqlFirewallRule,
-	_ResourceTypeLowerName[1327:1359]: PostgresqlFirewallRule,
-	_ResourceTypeName[1359:1384]:      PostgresqlServer,
-	_ResourceTypeLowerName[1359:1384]: PostgresqlServer,
-	_ResourceTypeName[1384:1423]:      PostgresqlVirtualNetworkRule,
-	_ResourceTypeLowerName[1384:1423]: PostgresqlVirtualNetworkRule,
-	_ResourceTypeName[1423:1446]:      SQLElasticPool,
-	_ResourceTypeLowerName[1423:1446]: SQLElasticPool,
-	_ResourceTypeName[1446:1466]:      SQLDatabase,
-	_ResourceTypeLowerName[1446:1466]: SQLDatabase,
-	_ResourceTypeName[1466:1491]:      SQLFirewallRule,
-	_ResourceTypeLowerName[1466:1491]: SQLFirewallRule,
-	_ResourceTypeName[1491:1509]:      SQLServer,
-	_ResourceTypeLowerName[1491:1509]: SQLServer,
+	_ResourceTypeName[45:76]:          WindowsVirtualMachine,
+	_ResourceTypeLowerName[45:76]:     WindowsVirtualMachine,
+	_ResourceTypeName[76:105]:         LinuxVirtualMachine,
+	_ResourceTypeLowerName[76:105]:    LinuxVirtualMachine,
+	_ResourceTypeName[105:138]:        VirtualMachineExtension,
+	_ResourceTypeLowerName[105:138]:   VirtualMachineExtension,
+	_ResourceTypeName[138:179]:        WindowsVirtualMachineScaleSet,
+	_ResourceTypeLowerName[138:179]:   WindowsVirtualMachineScaleSet,
+	_ResourceTypeName[179:218]:        LinuxVirtualMachineScaleSet,
+	_ResourceTypeLowerName[179:218]:   LinuxVirtualMachineScaleSet,
+	_ResourceTypeName[218:261]:        VirtualMachineScaleSetExtension,
+	_ResourceTypeLowerName[218:261]:   VirtualMachineScaleSetExtension,
+	_ResourceTypeName[261:284]:        VirtualNetwork,
+	_ResourceTypeLowerName[261:284]:   VirtualNetwork,
+	_ResourceTypeName[284:308]:        AvailabilitySet,
+	_ResourceTypeLowerName[284:308]:   AvailabilitySet,
+	_ResourceTypeName[308:328]:        ManagedDisk,
+	_ResourceTypeLowerName[308:328]:   ManagedDisk,
+	_ResourceTypeName[328:341]:        Image,
+	_ResourceTypeLowerName[328:341]:   Image,
+	_ResourceTypeName[341:355]:        Subnet,
+	_ResourceTypeLowerName[341:355]:   Subnet,
+	_ResourceTypeName[355:380]:        NetworkInterface,
+	_ResourceTypeLowerName[355:380]:   NetworkInterface,
+	_ResourceTypeName[380:410]:        NetworkSecurityGroup,
+	_ResourceTypeLowerName[380:410]:   NetworkSecurityGroup,
+	_ResourceTypeName[410:437]:        ApplicationGateway,
+	_ResourceTypeLowerName[410:437]:   ApplicationGateway,
+	_ResourceTypeName[437:471]:        ApplicationSecurityGroup,
+	_ResourceTypeLowerName[437:471]:   ApplicationSecurityGroup,
+	_ResourceTypeName[471:507]:        NetworkDdosProtectionPlan,
+	_ResourceTypeLowerName[471:507]:   NetworkDdosProtectionPlan,
+	_ResourceTypeName[507:523]:        Firewall,
+	_ResourceTypeLowerName[507:523]:   Firewall,
+	_ResourceTypeName[523:552]:        LocalNetworkGateway,
+	_ResourceTypeLowerName[523:552]:   LocalNetworkGateway,
+	_ResourceTypeName[552:571]:        NatGateway,
+	_ResourceTypeLowerName[552:571]:   NatGateway,
+	_ResourceTypeName[571:594]:        NetworkProfile,
+	_ResourceTypeLowerName[571:594]:   NetworkProfile,
+	_ResourceTypeName[594:623]:        NetworkSecurityRule,
+	_ResourceTypeLowerName[594:623]:   NetworkSecurityRule,
+	_ResourceTypeName[623:640]:        PublicIP,
+	_ResourceTypeLowerName[623:640]:   PublicIP,
+	_ResourceTypeName[640:664]:        PublicIPPrefix,
+	_ResourceTypeLowerName[640:664]:   PublicIPPrefix,
+	_ResourceTypeName[664:677]:        Route,
+	_ResourceTypeLowerName[664:677]:   Route,
+	_ResourceTypeName[677:696]:        RouteTable,
+	_ResourceTypeLowerName[677:696]:   RouteTable,
+	_ResourceTypeName[696:727]:        VirtualNetworkGateway,
+	_ResourceTypeLowerName[696:727]:   VirtualNetworkGateway,
+	_ResourceTypeName[727:769]:        VirtualNetworkGatewayConnection,
+	_ResourceTypeLowerName[727:769]:   VirtualNetworkGatewayConnection,
+	_ResourceTypeName[769:800]:        VirtualNetworkPeering,
+	_ResourceTypeLowerName[769:800]:   VirtualNetworkPeering,
+	_ResourceTypeName[800:839]:        WebApplicationFirewallPolicy,
+	_ResourceTypeLowerName[800:839]:   WebApplicationFirewallPolicy,
+	_ResourceTypeName[839:858]:        VirtualHub,
+	_ResourceTypeLowerName[839:858]:   VirtualHub,
+	_ResourceTypeName[858:892]:        VirtualHubBgpConnection,
+	_ResourceTypeLowerName[858:892]:   VirtualHubBgpConnection,
+	_ResourceTypeName[892:922]:        VirtualHubConnection,
+	_ResourceTypeLowerName[892:922]:   VirtualHubConnection,
+	_ResourceTypeName[922:944]:        VirtualHubIP,
+	_ResourceTypeLowerName[922:944]:   VirtualHubIP,
+	_ResourceTypeName[944:975]:        VirtualHubRouteTable,
+	_ResourceTypeLowerName[944:975]:   VirtualHubRouteTable,
+	_ResourceTypeName[975:1020]:       VirtualHubSecurityPartnerProvider,
+	_ResourceTypeLowerName[975:1020]:  VirtualHubSecurityPartnerProvider,
+	_ResourceTypeName[1020:1030]:      Lb,
+	_ResourceTypeLowerName[1020:1030]: Lb,
+	_ResourceTypeName[1030:1061]:      LbBackendAddressPool,
+	_ResourceTypeLowerName[1030:1061]: LbBackendAddressPool,
+	_ResourceTypeName[1061:1076]:      LbRule,
+	_ResourceTypeLowerName[1061:1076]: LbRule,
+	_ResourceTypeName[1076:1100]:      LbOutboundRule,
+	_ResourceTypeLowerName[1076:1100]: LbOutboundRule,
+	_ResourceTypeName[1100:1119]:      LbNatRule,
+	_ResourceTypeLowerName[1100:1119]: LbNatRule,
+	_ResourceTypeName[1119:1138]:      LbNatPool,
+	_ResourceTypeLowerName[1119:1138]: LbNatPool,
+	_ResourceTypeName[1138:1154]:      LbProbe,
+	_ResourceTypeLowerName[1138:1154]: LbProbe,
+	_ResourceTypeName[1154:1187]:      VirtualDesktopHostPool,
+	_ResourceTypeLowerName[1154:1187]: VirtualDesktopHostPool,
+	_ResourceTypeName[1187:1228]:      VirtualDesktopApplicationGroup,
+	_ResourceTypeLowerName[1187:1228]: VirtualDesktopApplicationGroup,
+	_ResourceTypeName[1228:1254]:      LogicAppWorkflow,
+	_ResourceTypeLowerName[1228:1254]: LogicAppWorkflow,
+	_ResourceTypeName[1254:1286]:      LogicAppTriggerCustom,
+	_ResourceTypeLowerName[1254:1286]: LogicAppTriggerCustom,
+	_ResourceTypeName[1286:1317]:      LogicAppActionCustom,
+	_ResourceTypeLowerName[1286:1317]: LogicAppActionCustom,
+	_ResourceTypeName[1317:1343]:      ContainerRegistry,
+	_ResourceTypeLowerName[1317:1343]: ContainerRegistry,
+	_ResourceTypeName[1343:1377]:      ContainerRegistryWebhook,
+	_ResourceTypeLowerName[1343:1377]: ContainerRegistryWebhook,
+	_ResourceTypeName[1377:1403]:      KubernetesCluster,
+	_ResourceTypeLowerName[1377:1403]: KubernetesCluster,
+	_ResourceTypeName[1403:1439]:      KubernetesClusterNodePool,
+	_ResourceTypeLowerName[1403:1439]: KubernetesClusterNodePool,
+	_ResourceTypeName[1439:1462]:      StorageAccount,
+	_ResourceTypeLowerName[1439:1462]: StorageAccount,
+	_ResourceTypeName[1462:1483]:      StorageQueue,
+	_ResourceTypeLowerName[1462:1483]: StorageQueue,
+	_ResourceTypeName[1483:1504]:      StorageShare,
+	_ResourceTypeLowerName[1483:1504]: StorageShare,
+	_ResourceTypeName[1504:1525]:      StorageTable,
+	_ResourceTypeLowerName[1504:1525]: StorageTable,
+	_ResourceTypeName[1525:1545]:      StorageBlob,
+	_ResourceTypeLowerName[1525:1545]: StorageBlob,
+	_ResourceTypeName[1545:1574]:      MariadbConfiguration,
+	_ResourceTypeLowerName[1545:1574]: MariadbConfiguration,
+	_ResourceTypeName[1574:1598]:      MariadbDatabase,
+	_ResourceTypeLowerName[1574:1598]: MariadbDatabase,
+	_ResourceTypeName[1598:1627]:      MariadbFirewallRule,
+	_ResourceTypeLowerName[1598:1627]: MariadbFirewallRule,
+	_ResourceTypeName[1627:1649]:      MariadbServer,
+	_ResourceTypeLowerName[1627:1649]: MariadbServer,
+	_ResourceTypeName[1649:1685]:      MariadbVirtualNetworkRule,
+	_ResourceTypeLowerName[1649:1685]: MariadbVirtualNetworkRule,
+	_ResourceTypeName[1685:1712]:      MysqlConfiguration,
+	_ResourceTypeLowerName[1685:1712]: MysqlConfiguration,
+	_ResourceTypeName[1712:1734]:      MysqlDatabase,
+	_ResourceTypeLowerName[1712:1734]: MysqlDatabase,
+	_ResourceTypeName[1734:1761]:      MysqlFirewallRule,
+	_ResourceTypeLowerName[1734:1761]: MysqlFirewallRule,
+	_ResourceTypeName[1761:1781]:      MysqlServer,
+	_ResourceTypeLowerName[1761:1781]: MysqlServer,
+	_ResourceTypeName[1781:1815]:      MysqlVirtualNetworkRule,
+	_ResourceTypeLowerName[1781:1815]: MysqlVirtualNetworkRule,
+	_ResourceTypeName[1815:1847]:      PostgresqlConfiguration,
+	_ResourceTypeLowerName[1815:1847]: PostgresqlConfiguration,
+	_ResourceTypeName[1847:1874]:      PostgresqlDatabase,
+	_ResourceTypeLowerName[1847:1874]: PostgresqlDatabase,
+	_ResourceTypeName[1874:1906]:      PostgresqlFirewallRule,
+	_ResourceTypeLowerName[1874:1906]: PostgresqlFirewallRule,
+	_ResourceTypeName[1906:1931]:      PostgresqlServer,
+	_ResourceTypeLowerName[1906:1931]: PostgresqlServer,
+	_ResourceTypeName[1931:1970]:      PostgresqlVirtualNetworkRule,
+	_ResourceTypeLowerName[1931:1970]: PostgresqlVirtualNetworkRule,
+	_ResourceTypeName[1970:1996]:      MssqlElasticPool,
+	_ResourceTypeLowerName[1970:1996]: MssqlElasticPool,
+	_ResourceTypeName[1996:2018]:      MssqlDatabase,
+	_ResourceTypeLowerName[1996:2018]: MssqlDatabase,
+	_ResourceTypeName[2018:2045]:      MssqlFirewallRule,
+	_ResourceTypeLowerName[2018:2045]: MssqlFirewallRule,
+	_ResourceTypeName[2045:2065]:      MssqlServer,
+	_ResourceTypeLowerName[2045:2065]: MssqlServer,
+	_ResourceTypeName[2065:2107]:      MssqlServerSecurityAlertPolicy,
+	_ResourceTypeLowerName[2065:2107]: MssqlServerSecurityAlertPolicy,
+	_ResourceTypeName[2107:2152]:      MssqlServerVulnerabilityAssessment,
+	_ResourceTypeLowerName[2107:2152]: MssqlServerVulnerabilityAssessment,
+	_ResourceTypeName[2152:2181]:      MssqlVirtualMachine,
+	_ResourceTypeLowerName[2152:2181]: MssqlVirtualMachine,
+	_ResourceTypeName[2181:2215]:      MssqlVirtualNetworkRule,
+	_ResourceTypeLowerName[2181:2215]: MssqlVirtualNetworkRule,
+	_ResourceTypeName[2215:2234]:      RedisCache,
+	_ResourceTypeLowerName[2215:2234]: RedisCache,
+	_ResourceTypeName[2234:2261]:      RedisFirewallRule,
+	_ResourceTypeLowerName[2234:2261]: RedisFirewallRule,
+	_ResourceTypeName[2261:2277]:      DNSZone,
+	_ResourceTypeLowerName[2261:2277]: DNSZone,
+	_ResourceTypeName[2277:2297]:      DNSARecord,
+	_ResourceTypeLowerName[2277:2297]: DNSARecord,
+	_ResourceTypeName[2297:2319]:      DNSAaaRecord,
+	_ResourceTypeLowerName[2297:2319]: DNSAaaRecord,
+	_ResourceTypeName[2319:2341]:      DNSCaaRecord,
+	_ResourceTypeLowerName[2319:2341]: DNSCaaRecord,
+	_ResourceTypeName[2341:2365]:      DNSCnameRecord,
+	_ResourceTypeLowerName[2341:2365]: DNSCnameRecord,
+	_ResourceTypeName[2365:2386]:      DNSMxRecord,
+	_ResourceTypeLowerName[2365:2386]: DNSMxRecord,
+	_ResourceTypeName[2386:2407]:      DNSNsRecord,
+	_ResourceTypeLowerName[2386:2407]: DNSNsRecord,
+	_ResourceTypeName[2407:2429]:      DNSPtrRecord,
+	_ResourceTypeLowerName[2407:2429]: DNSPtrRecord,
+	_ResourceTypeName[2429:2451]:      DNSSrvRecord,
+	_ResourceTypeLowerName[2429:2451]: DNSSrvRecord,
+	_ResourceTypeName[2451:2473]:      DNSTxtRecord,
+	_ResourceTypeLowerName[2451:2473]: DNSTxtRecord,
+	_ResourceTypeName[2473:2497]:      PrivateDNSZone,
+	_ResourceTypeLowerName[2473:2497]: PrivateDNSZone,
+	_ResourceTypeName[2497:2525]:      PrivateDNSARecord,
+	_ResourceTypeLowerName[2497:2525]: PrivateDNSARecord,
+	_ResourceTypeName[2525:2555]:      PrivateDNSAaaRecord,
+	_ResourceTypeLowerName[2525:2555]: PrivateDNSAaaRecord,
+	_ResourceTypeName[2555:2587]:      PrivateDNSCnameRecord,
+	_ResourceTypeLowerName[2555:2587]: PrivateDNSCnameRecord,
+	_ResourceTypeName[2587:2616]:      PrivateDNSMxRecord,
+	_ResourceTypeLowerName[2587:2616]: PrivateDNSMxRecord,
+	_ResourceTypeName[2616:2646]:      PrivateDNSPtrRecord,
+	_ResourceTypeLowerName[2616:2646]: PrivateDNSPtrRecord,
+	_ResourceTypeName[2646:2676]:      PrivateDNSSrvRecord,
+	_ResourceTypeLowerName[2646:2676]: PrivateDNSSrvRecord,
+	_ResourceTypeName[2676:2706]:      PrivateDNSTxtRecord,
+	_ResourceTypeLowerName[2676:2706]: PrivateDNSTxtRecord,
+	_ResourceTypeName[2706:2751]:      PrivateDNSZoneVirtualNetworkLink,
+	_ResourceTypeLowerName[2706:2751]: PrivateDNSZoneVirtualNetworkLink,
+	_ResourceTypeName[2751:2776]:      PolicyDefinition,
+	_ResourceTypeLowerName[2751:2776]: PolicyDefinition,
+	_ResourceTypeName[2776:2802]:      PolicyRemediation,
+	_ResourceTypeLowerName[2776:2802]: PolicyRemediation,
+	_ResourceTypeName[2802:2831]:      PolicySetDefinition,
+	_ResourceTypeLowerName[2802:2831]: PolicySetDefinition,
+	_ResourceTypeName[2831:2848]:      KeyVault,
+	_ResourceTypeLowerName[2831:2848]: KeyVault,
+	_ResourceTypeName[2848:2879]:      KeyVaultAccessPolicy,
+	_ResourceTypeLowerName[2848:2879]: KeyVaultAccessPolicy,
+	_ResourceTypeName[2879:2907]:      ApplicationInsights,
+	_ResourceTypeLowerName[2879:2907]: ApplicationInsights,
+	_ResourceTypeName[2907:2943]:      ApplicationInsightsAPIKey,
+	_ResourceTypeLowerName[2907:2943]: ApplicationInsightsAPIKey,
+	_ResourceTypeName[2943:2986]:      ApplicationInsightsAnalyticsItem,
+	_ResourceTypeLowerName[2943:2986]: ApplicationInsightsAnalyticsItem,
+	_ResourceTypeName[2986:3017]:      LogAnalyticsWorkspace,
+	_ResourceTypeLowerName[2986:3017]: LogAnalyticsWorkspace,
+	_ResourceTypeName[3017:3053]:      LogAnalyticsLinkedService,
+	_ResourceTypeLowerName[3017:3053]: LogAnalyticsLinkedService,
+	_ResourceTypeName[3053:3113]:      LogAnalyticsDatasourceWindowsPerformanceCounter,
+	_ResourceTypeLowerName[3053:3113]: LogAnalyticsDatasourceWindowsPerformanceCounter,
+	_ResourceTypeName[3113:3159]:      LogAnalyticsDatasourceWindowsEvent,
+	_ResourceTypeLowerName[3113:3159]: LogAnalyticsDatasourceWindowsEvent,
+	_ResourceTypeName[3159:3187]:      MonitorActionGroup,
+	_ResourceTypeLowerName[3159:3187]: MonitorActionGroup,
+	_ResourceTypeName[3187:3221]:      MonitorActivityLogAlert,
+	_ResourceTypeLowerName[3187:3221]: MonitorActivityLogAlert,
+	_ResourceTypeName[3221:3254]:      MonitorAutoscaleSetting,
+	_ResourceTypeLowerName[3221:3254]: MonitorAutoscaleSetting,
+	_ResourceTypeName[3254:3281]:      MonitorLogProfile,
+	_ResourceTypeLowerName[3254:3281]: MonitorLogProfile,
+	_ResourceTypeName[3281:3309]:      MonitorMetricAlert,
+	_ResourceTypeLowerName[3281:3309]: MonitorMetricAlert,
 }
 
 var _ResourceTypeNames = []string{
 	_ResourceTypeName[0:22],
 	_ResourceTypeName[22:45],
-	_ResourceTypeName[45:78],
-	_ResourceTypeName[78:111],
-	_ResourceTypeName[111:134],
-	_ResourceTypeName[134:158],
-	_ResourceTypeName[158:171],
-	_ResourceTypeName[171:185],
-	_ResourceTypeName[185:210],
-	_ResourceTypeName[210:240],
-	_ResourceTypeName[240:267],
-	_ResourceTypeName[267:301],
-	_ResourceTypeName[301:337],
-	_ResourceTypeName[337:353],
-	_ResourceTypeName[353:382],
-	_ResourceTypeName[382:401],
-	_ResourceTypeName[401:424],
-	_ResourceTypeName[424:453],
-	_ResourceTypeName[453:470],
-	_ResourceTypeName[470:494],
-	_ResourceTypeName[494:507],
-	_ResourceTypeName[507:526],
-	_ResourceTypeName[526:557],
-	_ResourceTypeName[557:599],
-	_ResourceTypeName[599:630],
-	_ResourceTypeName[630:669],
-	_ResourceTypeName[669:702],
-	_ResourceTypeName[702:743],
-	_ResourceTypeName[743:769],
-	_ResourceTypeName[769:801],
-	_ResourceTypeName[801:832],
-	_ResourceTypeName[832:858],
+	_ResourceTypeName[45:76],
+	_ResourceTypeName[76:105],
+	_ResourceTypeName[105:138],
+	_ResourceTypeName[138:179],
+	_ResourceTypeName[179:218],
+	_ResourceTypeName[218:261],
+	_ResourceTypeName[261:284],
+	_ResourceTypeName[284:308],
+	_ResourceTypeName[308:328],
+	_ResourceTypeName[328:341],
+	_ResourceTypeName[341:355],
+	_ResourceTypeName[355:380],
+	_ResourceTypeName[380:410],
+	_ResourceTypeName[410:437],
+	_ResourceTypeName[437:471],
+	_ResourceTypeName[471:507],
+	_ResourceTypeName[507:523],
+	_ResourceTypeName[523:552],
+	_ResourceTypeName[552:571],
+	_ResourceTypeName[571:594],
+	_ResourceTypeName[594:623],
+	_ResourceTypeName[623:640],
+	_ResourceTypeName[640:664],
+	_ResourceTypeName[664:677],
+	_ResourceTypeName[677:696],
+	_ResourceTypeName[696:727],
+	_ResourceTypeName[727:769],
+	_ResourceTypeName[769:800],
+	_ResourceTypeName[800:839],
+	_ResourceTypeName[839:858],
 	_ResourceTypeName[858:892],
-	_ResourceTypeName[892:915],
-	_ResourceTypeName[915:936],
-	_ResourceTypeName[936:957],
-	_ResourceTypeName[957:978],
-	_ResourceTypeName[978:998],
-	_ResourceTypeName[998:1027],
-	_ResourceTypeName[1027:1051],
-	_ResourceTypeName[1051:1080],
-	_ResourceTypeName[1080:1102],
-	_ResourceTypeName[1102:1138],
-	_ResourceTypeName[1138:1165],
-	_ResourceTypeName[1165:1187],
-	_ResourceTypeName[1187:1214],
-	_ResourceTypeName[1214:1234],
-	_ResourceTypeName[1234:1268],
-	_ResourceTypeName[1268:1300],
-	_ResourceTypeName[1300:1327],
-	_ResourceTypeName[1327:1359],
-	_ResourceTypeName[1359:1384],
-	_ResourceTypeName[1384:1423],
-	_ResourceTypeName[1423:1446],
-	_ResourceTypeName[1446:1466],
-	_ResourceTypeName[1466:1491],
-	_ResourceTypeName[1491:1509],
+	_ResourceTypeName[892:922],
+	_ResourceTypeName[922:944],
+	_ResourceTypeName[944:975],
+	_ResourceTypeName[975:1020],
+	_ResourceTypeName[1020:1030],
+	_ResourceTypeName[1030:1061],
+	_ResourceTypeName[1061:1076],
+	_ResourceTypeName[1076:1100],
+	_ResourceTypeName[1100:1119],
+	_ResourceTypeName[1119:1138],
+	_ResourceTypeName[1138:1154],
+	_ResourceTypeName[1154:1187],
+	_ResourceTypeName[1187:1228],
+	_ResourceTypeName[1228:1254],
+	_ResourceTypeName[1254:1286],
+	_ResourceTypeName[1286:1317],
+	_ResourceTypeName[1317:1343],
+	_ResourceTypeName[1343:1377],
+	_ResourceTypeName[1377:1403],
+	_ResourceTypeName[1403:1439],
+	_ResourceTypeName[1439:1462],
+	_ResourceTypeName[1462:1483],
+	_ResourceTypeName[1483:1504],
+	_ResourceTypeName[1504:1525],
+	_ResourceTypeName[1525:1545],
+	_ResourceTypeName[1545:1574],
+	_ResourceTypeName[1574:1598],
+	_ResourceTypeName[1598:1627],
+	_ResourceTypeName[1627:1649],
+	_ResourceTypeName[1649:1685],
+	_ResourceTypeName[1685:1712],
+	_ResourceTypeName[1712:1734],
+	_ResourceTypeName[1734:1761],
+	_ResourceTypeName[1761:1781],
+	_ResourceTypeName[1781:1815],
+	_ResourceTypeName[1815:1847],
+	_ResourceTypeName[1847:1874],
+	_ResourceTypeName[1874:1906],
+	_ResourceTypeName[1906:1931],
+	_ResourceTypeName[1931:1970],
+	_ResourceTypeName[1970:1996],
+	_ResourceTypeName[1996:2018],
+	_ResourceTypeName[2018:2045],
+	_ResourceTypeName[2045:2065],
+	_ResourceTypeName[2065:2107],
+	_ResourceTypeName[2107:2152],
+	_ResourceTypeName[2152:2181],
+	_ResourceTypeName[2181:2215],
+	_ResourceTypeName[2215:2234],
+	_ResourceTypeName[2234:2261],
+	_ResourceTypeName[2261:2277],
+	_ResourceTypeName[2277:2297],
+	_ResourceTypeName[2297:2319],
+	_ResourceTypeName[2319:2341],
+	_ResourceTypeName[2341:2365],
+	_ResourceTypeName[2365:2386],
+	_ResourceTypeName[2386:2407],
+	_ResourceTypeName[2407:2429],
+	_ResourceTypeName[2429:2451],
+	_ResourceTypeName[2451:2473],
+	_ResourceTypeName[2473:2497],
+	_ResourceTypeName[2497:2525],
+	_ResourceTypeName[2525:2555],
+	_ResourceTypeName[2555:2587],
+	_ResourceTypeName[2587:2616],
+	_ResourceTypeName[2616:2646],
+	_ResourceTypeName[2646:2676],
+	_ResourceTypeName[2676:2706],
+	_ResourceTypeName[2706:2751],
+	_ResourceTypeName[2751:2776],
+	_ResourceTypeName[2776:2802],
+	_ResourceTypeName[2802:2831],
+	_ResourceTypeName[2831:2848],
+	_ResourceTypeName[2848:2879],
+	_ResourceTypeName[2879:2907],
+	_ResourceTypeName[2907:2943],
+	_ResourceTypeName[2943:2986],
+	_ResourceTypeName[2986:3017],
+	_ResourceTypeName[3017:3053],
+	_ResourceTypeName[3053:3113],
+	_ResourceTypeName[3113:3159],
+	_ResourceTypeName[3159:3187],
+	_ResourceTypeName[3187:3221],
+	_ResourceTypeName[3221:3254],
+	_ResourceTypeName[3254:3281],
+	_ResourceTypeName[3281:3309],
 }
 
 // ResourceTypeString retrieves an enum value from the enum constants string name.
