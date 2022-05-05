@@ -466,7 +466,57 @@ var (
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
-
+		Function{
+			FnName:           "GetRouteTables",
+			Entity:           "RouteTables",
+			Prefix:           "Describe",
+			Service:          "ec2",
+			HasNotPagination: true,
+			Documentation: `
+			// GetRouteTables returns the ec2 VPN Route Tables on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:  "GetTransitGateways",
+			Entity:  "TransitGateways",
+			Prefix:  "Describe",
+			Service: "ec2",
+			Documentation: `
+			// GetTransitGateways returns the ec2 Transit Gateways on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:  "GetTransitGatewayVpcAttachments",
+			Entity:  "TransitGatewayVpcAttachments",
+			Prefix:  "Describe",
+			Service: "ec2",
+			Documentation: `
+			// GetTransitGateways returns the ec2 Transit Gateway VPC Attachments on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:  "GetTransitGatewayRouteTables",
+			Entity:  "TransitGatewayRouteTables",
+			Prefix:  "Describe",
+			Service: "ec2",
+			Documentation: `
+			// GetTransitGateways returns the ec2 Transit Gateway Route Tables on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:  "GetTransitGatewayMulticast",
+			Entity:  "TransitGatewayMulticastDomains",
+			Prefix:  "Describe",
+			Service: "ec2",
+			Documentation: `
+			// GetTransitGateways returns the ec2 Transit Gateway Multicasts on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
 		// ECS
 		Function{
 			FnName:          "GetECSClustersArns",
