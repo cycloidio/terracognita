@@ -225,6 +225,26 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetVPNGateways(ctx context.Context, input *ec2.DescribeVpnGatewaysInput) ([]*ec2.VpnGateway, error)
 
+	// GetRouteTables returns the ec2 VPN Route Tables on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetRouteTables(ctx context.Context, input *ec2.DescribeRouteTablesInput) ([]*ec2.RouteTable, error)
+
+	// GetTransitGateways returns the ec2 Transit Gateways on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetTransitGateways(ctx context.Context, input *ec2.DescribeTransitGatewaysInput) ([]*ec2.TransitGateway, error)
+
+	// GetTransitGateways returns the ec2 Transit Gateway VPC Attachments on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetTransitGatewayVpcAttachments(ctx context.Context, input *ec2.DescribeTransitGatewayVpcAttachmentsInput) ([]*ec2.TransitGatewayVpcAttachment, error)
+
+	// GetTransitGateways returns the ec2 Transit Gateway Route Tables on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetTransitGatewayRouteTables(ctx context.Context, input *ec2.DescribeTransitGatewayRouteTablesInput) ([]*ec2.TransitGatewayRouteTable, error)
+
+	// GetTransitGateways returns the ec2 Transit Gateway Multicasts on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetTransitGatewayMulticast(ctx context.Context, input *ec2.DescribeTransitGatewayMulticastDomainsInput) ([]*ec2.TransitGatewayMulticastDomain, error)
+
 	// GetECSClustersArns returns the ecs clusters arns on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetECSClustersArns(ctx context.Context, input *ecs.ListClustersInput) ([]*string, error)
@@ -1723,6 +1743,157 @@ func (c *connector) GetVPNGateways(ctx context.Context, input *ec2.DescribeVpnGa
 		hasNextToken = false
 
 		opt = append(opt, o.VpnGateways...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetRouteTables(ctx context.Context, input *ec2.DescribeRouteTablesInput) ([]*ec2.RouteTable, error) {
+	if c.svc.ec2 == nil {
+		c.svc.ec2 = ec2.New(c.svc.session)
+	}
+
+	opt := make([]*ec2.RouteTable, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeRouteTablesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.RouteTables == nil {
+			hasNextToken = false
+			continue
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.RouteTables...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetTransitGateways(ctx context.Context, input *ec2.DescribeTransitGatewaysInput) ([]*ec2.TransitGateway, error) {
+	if c.svc.ec2 == nil {
+		c.svc.ec2 = ec2.New(c.svc.session)
+	}
+
+	opt := make([]*ec2.TransitGateway, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeTransitGatewaysWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.TransitGateways == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &ec2.DescribeTransitGatewaysInput{}
+		}
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.TransitGateways...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetTransitGatewayVpcAttachments(ctx context.Context, input *ec2.DescribeTransitGatewayVpcAttachmentsInput) ([]*ec2.TransitGatewayVpcAttachment, error) {
+	if c.svc.ec2 == nil {
+		c.svc.ec2 = ec2.New(c.svc.session)
+	}
+
+	opt := make([]*ec2.TransitGatewayVpcAttachment, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeTransitGatewayVpcAttachmentsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.TransitGatewayVpcAttachments == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &ec2.DescribeTransitGatewayVpcAttachmentsInput{}
+		}
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.TransitGatewayVpcAttachments...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetTransitGatewayRouteTables(ctx context.Context, input *ec2.DescribeTransitGatewayRouteTablesInput) ([]*ec2.TransitGatewayRouteTable, error) {
+	if c.svc.ec2 == nil {
+		c.svc.ec2 = ec2.New(c.svc.session)
+	}
+
+	opt := make([]*ec2.TransitGatewayRouteTable, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeTransitGatewayRouteTablesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.TransitGatewayRouteTables == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &ec2.DescribeTransitGatewayRouteTablesInput{}
+		}
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.TransitGatewayRouteTables...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetTransitGatewayMulticast(ctx context.Context, input *ec2.DescribeTransitGatewayMulticastDomainsInput) ([]*ec2.TransitGatewayMulticastDomain, error) {
+	if c.svc.ec2 == nil {
+		c.svc.ec2 = ec2.New(c.svc.session)
+	}
+
+	opt := make([]*ec2.TransitGatewayMulticastDomain, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeTransitGatewayMulticastDomainsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.TransitGatewayMulticastDomains == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &ec2.DescribeTransitGatewayMulticastDomainsInput{}
+		}
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.TransitGatewayMulticastDomains...)
 
 	}
 
