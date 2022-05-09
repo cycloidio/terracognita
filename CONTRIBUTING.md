@@ -67,6 +67,8 @@ You also need to install other code dependencies not mandatory in the runtime en
 
 :warning: It has to support `github.com/hashicorp/terraform-plugin-sdk@v2.0.0` or higher, providers with `v1` will not work anymore :warning:
 
+For this, please open an issue to describe the provider that you want to add. We will discuss about the best way to help you in the implementation.
+
 All the provider names of packages and so one are the ones used by the provider itself, the one in which all the resources are prefixed with (ex: `aws_instance` is `aws`)
 
 **Provider**
@@ -375,7 +377,7 @@ PROVIDER=azurerm make update-terraform-provider
 In `reader.go`, you can add your middleware function `ListInstances`. You will need to be equipped with this [documentation](https://godoc.org/google.golang.org/api/compute/v1). Google SDK is pretty standard, APIs are most of the time used in a similar way.
 You only need to find out if your component belongs to a `project` or a `project` and a `zone`. It's highly recommended to base your code on the other functions (a method to generate this function will be provided soon).
 
-#### Build and test your component
+###### Build and test your component
 
 That's it ! You can now generate some code and build your binary:
 
@@ -386,16 +388,22 @@ $ ./terracognita google resources
 google_compute_instance
 ...
 ```
-
-#### Add a new provider
-
-For this, please open an issue to describe the provider that you want to add. We will discuss about the best way to help you in the implementation.
-
-
-#### How to update terraform-provider-google
+###### How to update terraform-provider-google
 
 Only if google provider need to updated
 
 ```
 PROVIDER=google make update-terraform-provider
+```
+
+##### Terraform Middleware layer
+
+Terraform is used to generate HCL or/and Terraform State. At some point, the Terraform version might need to be updated.
+
+###### How to update terraform
+
+Only if terraform need to updated
+
+```
+PROVIDER=terraform make update-terraform-provider
 ```
