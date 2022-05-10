@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Changed
+
+- Module no longer has variables commented in it
+  ([Issue #290](https://github.com/cycloidio/terracognita/issues/290))
+
 ## [0.7.5] _2022-05-10_
 
 ### Added

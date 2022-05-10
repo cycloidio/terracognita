@@ -348,7 +348,7 @@ func (w *Writer) setVariables() {
 	}
 
 	for k, v := range variables {
-		w.Config[writer.ModuleCategoryKey]["module"].(map[string]interface{})[w.opts.Module].(map[string]interface{})[fmt.Sprintf("# %s", k)] = v.(map[string]interface{})["default"]
+		w.Config[writer.ModuleCategoryKey]["module"].(map[string]interface{})[w.opts.Module].(map[string]interface{})[fmt.Sprintf("%s", k)] = v.(map[string]interface{})["default"]
 	}
 }
 

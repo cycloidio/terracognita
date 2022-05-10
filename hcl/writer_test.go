@@ -355,12 +355,12 @@ resource "type" "name2" {
 }
 
 module "test" {
-	# type_name2_key = "value"
-	# type_name2_key2 = "value"
-	# type_name2_key3 = []
-	# type_name2_key4_nested_key_4 = "value4"
-	# type_name_key = "value"
   source = "./module-test"
+	type_name2_key = "value"
+	type_name2_key2 = "value"
+	type_name2_key3 = []
+	type_name2_key4_nested_key_4 = "value4"
+	type_name_key = "value"
 }
 
 provider "aws" { }
@@ -441,9 +441,9 @@ resource "type" "name2" {
 }
 
 module "test" {
-	# type_name2_key = "value"
-	# type_name_key = "value"
   source = "./module-test"
+	type_name2_key = "value"
+	type_name_key = "value"
 }
 
 provider "aws" { }
@@ -503,8 +503,8 @@ resource "type" "name" {
 }
 
 module "test" {
-	# type_name_key = "value"
   source = "./module-test"
+	type_name_key = "value"
 }
 
 provider "azurerm" {
