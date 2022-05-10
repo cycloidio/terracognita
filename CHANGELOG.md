@@ -1,6 +1,6 @@
 ## [Unreleased]
 
-## [0.7.4] _2022-05-10_
+## [0.7.5] _2022-05-10_
 
 ### Added
 
@@ -42,7 +42,7 @@
 - HCL provider generation now users the Defaults instead of setting empty values
   ([Issue #268](https://github.com/cycloidio/terracognita/issues/268))
 
-## [0.7.3] _2021-09-23_
+## [0.7.4] _2021-09-23_
 
 ### Changed
 
