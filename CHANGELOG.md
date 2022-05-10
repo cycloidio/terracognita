@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.7.4] _2022-05-10_
+
 ### Added
 
 - aws resources: `aws_vpc_endpoint`
