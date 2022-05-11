@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.7.6] _2022-05-11_
+
 ### Changed
 
 - Module no longer has variables commented in it
