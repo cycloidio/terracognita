@@ -337,7 +337,15 @@ resource "type" "name" {
 				"key2": "value",
 				"key3": []interface{}{},
 				"key4": map[string]interface{}{
-					"nested:key:4": "value4",
+					"nested_key4": "value4",
+				},
+				"key5": []interface{}{
+					map[string]interface{}{
+						"nested_key5": "value5.0",
+					},
+					map[string]interface{}{
+						"nested_key5": "value5.1",
+					},
 				},
 			}
 			ehcl = `
@@ -350,7 +358,15 @@ resource "type" "name2" {
 	key2 = var.type_name2_key2
 	key3 = var.type_name2_key3
 	key4 {
-		"nested:key:4" = var.type_name2_key4_nested_key_4
+		nested_key4 = var.type_name2_key4_nested_key4
+	}
+
+	key5 {
+		nested_key5 = var.type_name2_key5_0_nested_key5
+	}
+
+	key5 {
+		nested_key5 = var.type_name2_key5_1_nested_key5
 	}
 }
 
@@ -359,7 +375,9 @@ module "test" {
 	type_name2_key = "value"
 	type_name2_key2 = "value"
 	type_name2_key3 = []
-	type_name2_key4_nested_key_4 = "value4"
+	type_name2_key4_nested_key4 = "value4"
+	type_name2_key5_0_nested_key5 = "value5.0"
+	type_name2_key5_1_nested_key5 = "value5.1"
 	type_name_key = "value"
 }
 
@@ -386,8 +404,16 @@ variable "type_name2_key3" {
 	default = []
 }
 
-variable "type_name2_key4_nested_key_4" {
+variable "type_name2_key4_nested_key4" {
 	default = "value4"
+}
+
+variable "type_name2_key5_0_nested_key5" {
+	default = "value5.0"
+}
+
+variable "type_name2_key5_1_nested_key5" {
+	default = "value5.1"
 }
 
 variable "type_name_key" {
