@@ -53,7 +53,7 @@ move_out_internal() {
 
   # create a tag to help following releases
   git tag -f ${TAG}-cy
-  git push --tags
+  git push -f origin ${TAG}-cy
 
   # Push the updated code to cycloid repo
   git push -f origin cy-${TAG}

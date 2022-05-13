@@ -4,6 +4,8 @@
 
 - Repetitive blocks now have the proper variables within them
   ([Issue #285](https://github.com/cycloidio/terracognita/issues/285))
+- Script to update providers now pushed the tag to the fork
+  ([PR #294](https://github.com/cycloidio/terracognita/pull/294))
 
 ## [0.7.6] _2022-05-11_
 
