@@ -24,7 +24,7 @@ Please see the following versions as follow:
 
 Providers:
  * AWS: v4.9.0
- * AzureRM: v3.3.0
+ * AzureRM: v3.6.0
  * Google: v4.9.0
 
 ## Installation
