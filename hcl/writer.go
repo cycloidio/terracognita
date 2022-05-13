@@ -376,7 +376,7 @@ func walkVariables(cfg map[string]interface{}, validVariables map[string]struct{
 			// it has complex data, if not it's a "simple" slice of values
 			if _, ok := v[0].(map[string]interface{}); ok {
 				for i, vvv := range v {
-					v[i] = walkVariables(vvv.(map[string]interface{}), validVariables, currentKey, variables)
+					v[i] = walkVariables(vvv.(map[string]interface{}), validVariables, fmt.Sprintf("%s.%d", currentKey, i), variables)
 				}
 			} else {
 				if hasKey(validVariables, currentKey) {

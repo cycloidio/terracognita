@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Fixed
+
+- Repetitive blocks now have the proper variables within them
+  ([Issue #285](https://github.com/cycloidio/terracognita/issues/285))
+
 ## [0.7.6] _2022-05-11_
 
 ### Changed
