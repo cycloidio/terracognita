@@ -492,7 +492,7 @@ func albTargetGroupAttachments(ctx context.Context, a *aws, resourceType string,
 		for _, t := range targetHealths {
 			// As this are the required values to get the resource
 			// we validate that they are present
-			if t.Target == nil || i.TargetGroupArn == nil {
+			if t.Target == nil || t.Target.Id == nil || t.Target.Port == nil || i.TargetGroupArn == nil {
 				continue
 			}
 			r, err := initializeResource(a, fmt.Sprintf("%s_%d_%s", *t.Target.Id, *t.Target.Port, *i.TargetGroupArn), resourceType)
