@@ -387,3 +387,40 @@ func getGlueDatabasesNames(ctx context.Context, a *aws, rt string, filters *filt
 
 	return names, nil
 }
+
+func cacheTransitGatewayRouteTables(ctx context.Context, a *aws, rt string, filters *filter.Filter) ([]provider.Resource, error) {
+	rs, err := a.cache.Get(rt)
+	if err != nil {
+		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
+			return nil, errors.WithStack(err)
+		}
+
+		rs, err = ec2TransitGatewayRouteTable(ctx, a, rt, filters)
+		if err != nil {
+			return nil, err
+		}
+
+		err = a.cache.Set(rt, rs)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return rs, nil
+}
+
+func getTransitGatewayRouteTablesIDs(ctx context.Context, a *aws, rt string, filters *filter.Filter) ([]string, error) {
+	rs, err := cacheTransitGatewayRouteTables(ctx, a, rt, filters)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get the actual needed value
+	// TODO cach this result too
+	ids := make([]string, 0, len(rs))
+	for _, i := range rs {
+		ids = append(ids, i.ID())
+	}
+
+	return ids, nil
+}
