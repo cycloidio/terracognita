@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _ResourceTypeName = "aws_instanceaws_albaws_alb_listeneraws_alb_listener_certificateaws_alb_listener_ruleaws_alb_target_groupaws_alb_target_group_attachmentaws_api_gateway_deploymentaws_api_gateway_resourceaws_api_gateway_rest_apiaws_api_gateway_stageaws_athena_workgroupaws_autoscaling_groupaws_autoscaling_policyaws_autoscaling_scheduleaws_batch_job_definitionaws_cloudfront_distributionaws_cloudfront_origin_access_identityaws_cloudfront_public_keyaws_cloudwatch_metric_alarmaws_dax_clusteraws_db_instanceaws_db_parameter_groupaws_db_subnet_groupaws_directory_service_directoryaws_dms_replication_instanceaws_dx_gatewayaws_dynamodb_global_tableaws_dynamodb_tableaws_ebs_volumeaws_ecs_clusteraws_ecs_serviceaws_ec2_transit_gatewayaws_ec2_transit_gateway_vpc_attachmentaws_ec2_transit_gateway_route_tableaws_ec2_transit_gateway_multicast_domainaws_efs_file_systemaws_eipaws_eks_clusteraws_elasticache_clusteraws_elasticache_replication_groupaws_elastic_beanstalk_applicationaws_elasticsearch_domainaws_elasticsearch_domain_policyaws_elbaws_emr_clusteraws_fsx_lustre_file_systemaws_glue_catalog_databaseaws_glue_catalog_tableaws_iam_access_keyaws_iam_account_aliasaws_iam_account_password_policyaws_iam_groupaws_iam_group_membershipaws_iam_group_policyaws_iam_group_policy_attachmentaws_iam_instance_profileaws_iam_openid_connect_provideraws_iam_policyaws_iam_roleaws_iam_role_policyaws_iam_role_policy_attachmentaws_iam_saml_provideraws_iam_server_certificateaws_iam_useraws_iam_user_group_membershipaws_iam_user_policyaws_iam_user_policy_attachmentaws_iam_user_ssh_keyaws_internet_gatewayaws_key_pairaws_kinesis_streamaws_lambda_functionaws_launch_configurationaws_launch_templateaws_lbaws_lb_cookie_stickiness_policyaws_lb_listeneraws_lb_listener_certificateaws_lb_listener_ruleaws_lb_target_groupaws_lb_target_group_attachmentaws_lightsail_instanceaws_media_store_containeraws_mq_brokeraws_nat_gatewayaws_neptune_clusteraws_rds_clusteraws_rds_global_clusteraws_redshift_clusteraws_route53_delegation_setaws_route53_health_checkaws_route53_query_logaws_route53_recordaws_route53_resolver_endpointaws_route53_resolver_rule_associationaws_route53_zoneaws_route53_zone_associationaws_route_tableaws_s3_bucketaws_security_groupaws_ses_active_receipt_rule_setaws_ses_configuration_setaws_ses_domain_dkimaws_ses_domain_identityaws_ses_domain_mail_fromaws_ses_identity_notification_topicaws_ses_receipt_filteraws_ses_receipt_ruleaws_ses_receipt_rule_setaws_ses_templateaws_sqs_queueaws_storagegateway_gatewayaws_subnetaws_volume_attachmentaws_vpcaws_vpc_endpointaws_vpc_peering_connectionaws_vpn_gateway"
+const _ResourceTypeName = "aws_instanceaws_albaws_alb_listeneraws_alb_listener_certificateaws_alb_listener_ruleaws_alb_target_groupaws_alb_target_group_attachmentaws_api_gateway_deploymentaws_api_gateway_resourceaws_api_gateway_rest_apiaws_api_gateway_stageaws_athena_workgroupaws_autoscaling_groupaws_autoscaling_policyaws_autoscaling_scheduleaws_batch_job_definitionaws_cloudfront_distributionaws_cloudfront_origin_access_identityaws_cloudfront_public_keyaws_cloudwatch_metric_alarmaws_dax_clusteraws_db_instanceaws_db_parameter_groupaws_db_subnet_groupaws_directory_service_directoryaws_dms_replication_instanceaws_dx_gatewayaws_dynamodb_global_tableaws_dynamodb_tableaws_ebs_volumeaws_ecs_clusteraws_ecs_serviceaws_ec2_transit_gatewayaws_ec2_transit_gateway_vpc_attachmentaws_ec2_transit_gateway_route_tableaws_ec2_transit_gateway_multicast_domainaws_ec2_transit_gateway_peering_attachmentaws_ec2_transit_gateway_peering_attachment_accepteraws_ec2_transit_gateway_prefix_list_referenceaws_ec2_transit_gateway_routeaws_ec2_transit_gateway_route_table_associationaws_ec2_transit_gateway_route_table_propagationaws_ec2_transit_gateway_vpc_attachment_accepteraws_efs_file_systemaws_eipaws_eks_clusteraws_elasticache_clusteraws_elasticache_replication_groupaws_elastic_beanstalk_applicationaws_elasticsearch_domainaws_elasticsearch_domain_policyaws_elbaws_emr_clusteraws_fsx_lustre_file_systemaws_glue_catalog_databaseaws_glue_catalog_tableaws_iam_access_keyaws_iam_account_aliasaws_iam_account_password_policyaws_iam_groupaws_iam_group_membershipaws_iam_group_policyaws_iam_group_policy_attachmentaws_iam_instance_profileaws_iam_openid_connect_provideraws_iam_policyaws_iam_roleaws_iam_role_policyaws_iam_role_policy_attachmentaws_iam_saml_provideraws_iam_server_certificateaws_iam_useraws_iam_user_group_membershipaws_iam_user_policyaws_iam_user_policy_attachmentaws_iam_user_ssh_keyaws_internet_gatewayaws_key_pairaws_kinesis_streamaws_lambda_functionaws_launch_configurationaws_launch_templateaws_lbaws_lb_cookie_stickiness_policyaws_lb_listeneraws_lb_listener_certificateaws_lb_listener_ruleaws_lb_target_groupaws_lb_target_group_attachmentaws_lightsail_instanceaws_media_store_containeraws_mq_brokeraws_nat_gatewayaws_neptune_clusteraws_rds_clusteraws_rds_global_clusteraws_redshift_clusteraws_route53_delegation_setaws_route53_health_checkaws_route53_query_logaws_route53_recordaws_route53_resolver_endpointaws_route53_resolver_rule_associationaws_route53_zoneaws_route53_zone_associationaws_route_tableaws_s3_bucketaws_security_groupaws_ses_active_receipt_rule_setaws_ses_configuration_setaws_ses_domain_dkimaws_ses_domain_identityaws_ses_domain_mail_fromaws_ses_identity_notification_topicaws_ses_receipt_filteraws_ses_receipt_ruleaws_ses_receipt_rule_setaws_ses_templateaws_sqs_queueaws_storagegateway_gatewayaws_subnetaws_volume_attachmentaws_vpcaws_vpc_endpointaws_vpc_peering_connectionaws_vpn_gateway"
 
-var _ResourceTypeIndex = [...]uint16{0, 12, 19, 35, 63, 84, 104, 135, 161, 185, 209, 230, 250, 271, 293, 317, 341, 368, 405, 430, 457, 472, 487, 509, 528, 559, 587, 601, 626, 644, 658, 673, 688, 711, 749, 784, 824, 843, 850, 865, 888, 921, 954, 978, 1009, 1016, 1031, 1057, 1082, 1104, 1122, 1143, 1174, 1187, 1211, 1231, 1262, 1286, 1317, 1331, 1343, 1362, 1392, 1413, 1439, 1451, 1480, 1499, 1529, 1549, 1569, 1581, 1599, 1618, 1642, 1661, 1667, 1698, 1713, 1740, 1760, 1779, 1809, 1831, 1856, 1869, 1884, 1903, 1918, 1940, 1960, 1986, 2010, 2031, 2049, 2078, 2115, 2131, 2159, 2174, 2187, 2205, 2236, 2261, 2280, 2303, 2327, 2362, 2384, 2404, 2428, 2444, 2457, 2483, 2493, 2514, 2521, 2537, 2563, 2578}
+var _ResourceTypeIndex = [...]uint16{0, 12, 19, 35, 63, 84, 104, 135, 161, 185, 209, 230, 250, 271, 293, 317, 341, 368, 405, 430, 457, 472, 487, 509, 528, 559, 587, 601, 626, 644, 658, 673, 688, 711, 749, 784, 824, 866, 917, 962, 991, 1038, 1085, 1132, 1151, 1158, 1173, 1196, 1229, 1262, 1286, 1317, 1324, 1339, 1365, 1390, 1412, 1430, 1451, 1482, 1495, 1519, 1539, 1570, 1594, 1625, 1639, 1651, 1670, 1700, 1721, 1747, 1759, 1788, 1807, 1837, 1857, 1877, 1889, 1907, 1926, 1950, 1969, 1975, 2006, 2021, 2048, 2068, 2087, 2117, 2139, 2164, 2177, 2192, 2211, 2226, 2248, 2268, 2294, 2318, 2339, 2357, 2386, 2423, 2439, 2467, 2482, 2495, 2513, 2544, 2569, 2588, 2611, 2635, 2670, 2692, 2712, 2736, 2752, 2765, 2791, 2801, 2822, 2829, 2845, 2871, 2886}
 
-const _ResourceTypeLowerName = "aws_instanceaws_albaws_alb_listeneraws_alb_listener_certificateaws_alb_listener_ruleaws_alb_target_groupaws_alb_target_group_attachmentaws_api_gateway_deploymentaws_api_gateway_resourceaws_api_gateway_rest_apiaws_api_gateway_stageaws_athena_workgroupaws_autoscaling_groupaws_autoscaling_policyaws_autoscaling_scheduleaws_batch_job_definitionaws_cloudfront_distributionaws_cloudfront_origin_access_identityaws_cloudfront_public_keyaws_cloudwatch_metric_alarmaws_dax_clusteraws_db_instanceaws_db_parameter_groupaws_db_subnet_groupaws_directory_service_directoryaws_dms_replication_instanceaws_dx_gatewayaws_dynamodb_global_tableaws_dynamodb_tableaws_ebs_volumeaws_ecs_clusteraws_ecs_serviceaws_ec2_transit_gatewayaws_ec2_transit_gateway_vpc_attachmentaws_ec2_transit_gateway_route_tableaws_ec2_transit_gateway_multicast_domainaws_efs_file_systemaws_eipaws_eks_clusteraws_elasticache_clusteraws_elasticache_replication_groupaws_elastic_beanstalk_applicationaws_elasticsearch_domainaws_elasticsearch_domain_policyaws_elbaws_emr_clusteraws_fsx_lustre_file_systemaws_glue_catalog_databaseaws_glue_catalog_tableaws_iam_access_keyaws_iam_account_aliasaws_iam_account_password_policyaws_iam_groupaws_iam_group_membershipaws_iam_group_policyaws_iam_group_policy_attachmentaws_iam_instance_profileaws_iam_openid_connect_provideraws_iam_policyaws_iam_roleaws_iam_role_policyaws_iam_role_policy_attachmentaws_iam_saml_provideraws_iam_server_certificateaws_iam_useraws_iam_user_group_membershipaws_iam_user_policyaws_iam_user_policy_attachmentaws_iam_user_ssh_keyaws_internet_gatewayaws_key_pairaws_kinesis_streamaws_lambda_functionaws_launch_configurationaws_launch_templateaws_lbaws_lb_cookie_stickiness_policyaws_lb_listeneraws_lb_listener_certificateaws_lb_listener_ruleaws_lb_target_groupaws_lb_target_group_attachmentaws_lightsail_instanceaws_media_store_containeraws_mq_brokeraws_nat_gatewayaws_neptune_clusteraws_rds_clusteraws_rds_global_clusteraws_redshift_clusteraws_route53_delegation_setaws_route53_health_checkaws_route53_query_logaws_route53_recordaws_route53_resolver_endpointaws_route53_resolver_rule_associationaws_route53_zoneaws_route53_zone_associationaws_route_tableaws_s3_bucketaws_security_groupaws_ses_active_receipt_rule_setaws_ses_configuration_setaws_ses_domain_dkimaws_ses_domain_identityaws_ses_domain_mail_fromaws_ses_identity_notification_topicaws_ses_receipt_filteraws_ses_receipt_ruleaws_ses_receipt_rule_setaws_ses_templateaws_sqs_queueaws_storagegateway_gatewayaws_subnetaws_volume_attachmentaws_vpcaws_vpc_endpointaws_vpc_peering_connectionaws_vpn_gateway"
+const _ResourceTypeLowerName = "aws_instanceaws_albaws_alb_listeneraws_alb_listener_certificateaws_alb_listener_ruleaws_alb_target_groupaws_alb_target_group_attachmentaws_api_gateway_deploymentaws_api_gateway_resourceaws_api_gateway_rest_apiaws_api_gateway_stageaws_athena_workgroupaws_autoscaling_groupaws_autoscaling_policyaws_autoscaling_scheduleaws_batch_job_definitionaws_cloudfront_distributionaws_cloudfront_origin_access_identityaws_cloudfront_public_keyaws_cloudwatch_metric_alarmaws_dax_clusteraws_db_instanceaws_db_parameter_groupaws_db_subnet_groupaws_directory_service_directoryaws_dms_replication_instanceaws_dx_gatewayaws_dynamodb_global_tableaws_dynamodb_tableaws_ebs_volumeaws_ecs_clusteraws_ecs_serviceaws_ec2_transit_gatewayaws_ec2_transit_gateway_vpc_attachmentaws_ec2_transit_gateway_route_tableaws_ec2_transit_gateway_multicast_domainaws_ec2_transit_gateway_peering_attachmentaws_ec2_transit_gateway_peering_attachment_accepteraws_ec2_transit_gateway_prefix_list_referenceaws_ec2_transit_gateway_routeaws_ec2_transit_gateway_route_table_associationaws_ec2_transit_gateway_route_table_propagationaws_ec2_transit_gateway_vpc_attachment_accepteraws_efs_file_systemaws_eipaws_eks_clusteraws_elasticache_clusteraws_elasticache_replication_groupaws_elastic_beanstalk_applicationaws_elasticsearch_domainaws_elasticsearch_domain_policyaws_elbaws_emr_clusteraws_fsx_lustre_file_systemaws_glue_catalog_databaseaws_glue_catalog_tableaws_iam_access_keyaws_iam_account_aliasaws_iam_account_password_policyaws_iam_groupaws_iam_group_membershipaws_iam_group_policyaws_iam_group_policy_attachmentaws_iam_instance_profileaws_iam_openid_connect_provideraws_iam_policyaws_iam_roleaws_iam_role_policyaws_iam_role_policy_attachmentaws_iam_saml_provideraws_iam_server_certificateaws_iam_useraws_iam_user_group_membershipaws_iam_user_policyaws_iam_user_policy_attachmentaws_iam_user_ssh_keyaws_internet_gatewayaws_key_pairaws_kinesis_streamaws_lambda_functionaws_launch_configurationaws_launch_templateaws_lbaws_lb_cookie_stickiness_policyaws_lb_listeneraws_lb_listener_certificateaws_lb_listener_ruleaws_lb_target_groupaws_lb_target_group_attachmentaws_lightsail_instanceaws_media_store_containeraws_mq_brokeraws_nat_gatewayaws_neptune_clusteraws_rds_clusteraws_rds_global_clusteraws_redshift_clusteraws_route53_delegation_setaws_route53_health_checkaws_route53_query_logaws_route53_recordaws_route53_resolver_endpointaws_route53_resolver_rule_associationaws_route53_zoneaws_route53_zone_associationaws_route_tableaws_s3_bucketaws_security_groupaws_ses_active_receipt_rule_setaws_ses_configuration_setaws_ses_domain_dkimaws_ses_domain_identityaws_ses_domain_mail_fromaws_ses_identity_notification_topicaws_ses_receipt_filteraws_ses_receipt_ruleaws_ses_receipt_rule_setaws_ses_templateaws_sqs_queueaws_storagegateway_gatewayaws_subnetaws_volume_attachmentaws_vpcaws_vpc_endpointaws_vpc_peering_connectionaws_vpn_gateway"
 
 func (i ResourceType) String() string {
 	i -= 1
@@ -61,92 +61,99 @@ func _ResourceTypeNoOp() {
 	_ = x[EC2TransitGatewayVPCAttachment-(34)]
 	_ = x[EC2TransitGatewayRouteTable-(35)]
 	_ = x[EC2TransitGatewayMulticastDomain-(36)]
-	_ = x[EFSFileSystem-(37)]
-	_ = x[EIP-(38)]
-	_ = x[EKSCluster-(39)]
-	_ = x[ElasticacheCluster-(40)]
-	_ = x[ElasticacheReplicationGroup-(41)]
-	_ = x[ElasticBeanstalkApplication-(42)]
-	_ = x[ElasticsearchDomain-(43)]
-	_ = x[ElasticsearchDomainPolicy-(44)]
-	_ = x[ELB-(45)]
-	_ = x[EMRCluster-(46)]
-	_ = x[FsxLustreFileSystem-(47)]
-	_ = x[GlueCatalogDatabase-(48)]
-	_ = x[GlueCatalogTable-(49)]
-	_ = x[IAMAccessKey-(50)]
-	_ = x[IAMAccountAlias-(51)]
-	_ = x[IAMAccountPasswordPolicy-(52)]
-	_ = x[IAMGroup-(53)]
-	_ = x[IAMGroupMembership-(54)]
-	_ = x[IAMGroupPolicy-(55)]
-	_ = x[IAMGroupPolicyAttachment-(56)]
-	_ = x[IAMInstanceProfile-(57)]
-	_ = x[IAMOpenidConnectProvider-(58)]
-	_ = x[IAMPolicy-(59)]
-	_ = x[IAMRole-(60)]
-	_ = x[IAMRolePolicy-(61)]
-	_ = x[IAMRolePolicyAttachment-(62)]
-	_ = x[IAMSAMLProvider-(63)]
-	_ = x[IAMServerCertificate-(64)]
-	_ = x[IAMUser-(65)]
-	_ = x[IAMUserGroupMembership-(66)]
-	_ = x[IAMUserPolicy-(67)]
-	_ = x[IAMUserPolicyAttachment-(68)]
-	_ = x[IAMUserSSHKey-(69)]
-	_ = x[InternetGateway-(70)]
-	_ = x[KeyPair-(71)]
-	_ = x[KinesisStream-(72)]
-	_ = x[LambdaFunction-(73)]
-	_ = x[LaunchConfiguration-(74)]
-	_ = x[LaunchTemplate-(75)]
-	_ = x[LB-(76)]
-	_ = x[LBCookieStickinessPolicy-(77)]
-	_ = x[LBListener-(78)]
-	_ = x[LBListenerCertificate-(79)]
-	_ = x[LBListenerRule-(80)]
-	_ = x[LBTargetGroup-(81)]
-	_ = x[LBTargetGroupAttachment-(82)]
-	_ = x[LightsailInstance-(83)]
-	_ = x[MediaStoreContainer-(84)]
-	_ = x[MQBroker-(85)]
-	_ = x[NatGateway-(86)]
-	_ = x[NeptuneCluster-(87)]
-	_ = x[RDSCluster-(88)]
-	_ = x[RDSGlobalCluster-(89)]
-	_ = x[RedshiftCluster-(90)]
-	_ = x[Route53DelegationSet-(91)]
-	_ = x[Route53HealthCheck-(92)]
-	_ = x[Route53QueryLog-(93)]
-	_ = x[Route53Record-(94)]
-	_ = x[Route53ResolverEndpoint-(95)]
-	_ = x[Route53ResolverRuleAssociation-(96)]
-	_ = x[Route53Zone-(97)]
-	_ = x[Route53ZoneAssociation-(98)]
-	_ = x[RouteTable-(99)]
-	_ = x[S3Bucket-(100)]
-	_ = x[SecurityGroup-(101)]
-	_ = x[SESActiveReceiptRuleSet-(102)]
-	_ = x[SESConfigurationSet-(103)]
-	_ = x[SESDomainDKIM-(104)]
-	_ = x[SESDomainIdentity-(105)]
-	_ = x[SESDomainMailFrom-(106)]
-	_ = x[SESIdentityNotificationTopic-(107)]
-	_ = x[SESReceiptFilter-(108)]
-	_ = x[SESReceiptRule-(109)]
-	_ = x[SESReceiptRuleSet-(110)]
-	_ = x[SESTemplate-(111)]
-	_ = x[SQSQueue-(112)]
-	_ = x[StoragegatewayGateway-(113)]
-	_ = x[Subnet-(114)]
-	_ = x[VolumeAttachment-(115)]
-	_ = x[VPC-(116)]
-	_ = x[VPCEndpoint-(117)]
-	_ = x[VPCPeeringConnection-(118)]
-	_ = x[VPNGateway-(119)]
+	_ = x[EC2TransitGatewayPeeringAttachment-(37)]
+	_ = x[EC2TransitGatewayPeeringAttachmentAccepter-(38)]
+	_ = x[EC2TransitGatewayPrefixListReference-(39)]
+	_ = x[EC2TransitGatewayRoute-(40)]
+	_ = x[EC2TransitGatewayRouteTableAssociation-(41)]
+	_ = x[EC2TransitGatewayRouteTablePropagation-(42)]
+	_ = x[EC2TransitGatewayVPCAttachmentAccepter-(43)]
+	_ = x[EFSFileSystem-(44)]
+	_ = x[EIP-(45)]
+	_ = x[EKSCluster-(46)]
+	_ = x[ElasticacheCluster-(47)]
+	_ = x[ElasticacheReplicationGroup-(48)]
+	_ = x[ElasticBeanstalkApplication-(49)]
+	_ = x[ElasticsearchDomain-(50)]
+	_ = x[ElasticsearchDomainPolicy-(51)]
+	_ = x[ELB-(52)]
+	_ = x[EMRCluster-(53)]
+	_ = x[FsxLustreFileSystem-(54)]
+	_ = x[GlueCatalogDatabase-(55)]
+	_ = x[GlueCatalogTable-(56)]
+	_ = x[IAMAccessKey-(57)]
+	_ = x[IAMAccountAlias-(58)]
+	_ = x[IAMAccountPasswordPolicy-(59)]
+	_ = x[IAMGroup-(60)]
+	_ = x[IAMGroupMembership-(61)]
+	_ = x[IAMGroupPolicy-(62)]
+	_ = x[IAMGroupPolicyAttachment-(63)]
+	_ = x[IAMInstanceProfile-(64)]
+	_ = x[IAMOpenidConnectProvider-(65)]
+	_ = x[IAMPolicy-(66)]
+	_ = x[IAMRole-(67)]
+	_ = x[IAMRolePolicy-(68)]
+	_ = x[IAMRolePolicyAttachment-(69)]
+	_ = x[IAMSAMLProvider-(70)]
+	_ = x[IAMServerCertificate-(71)]
+	_ = x[IAMUser-(72)]
+	_ = x[IAMUserGroupMembership-(73)]
+	_ = x[IAMUserPolicy-(74)]
+	_ = x[IAMUserPolicyAttachment-(75)]
+	_ = x[IAMUserSSHKey-(76)]
+	_ = x[InternetGateway-(77)]
+	_ = x[KeyPair-(78)]
+	_ = x[KinesisStream-(79)]
+	_ = x[LambdaFunction-(80)]
+	_ = x[LaunchConfiguration-(81)]
+	_ = x[LaunchTemplate-(82)]
+	_ = x[LB-(83)]
+	_ = x[LBCookieStickinessPolicy-(84)]
+	_ = x[LBListener-(85)]
+	_ = x[LBListenerCertificate-(86)]
+	_ = x[LBListenerRule-(87)]
+	_ = x[LBTargetGroup-(88)]
+	_ = x[LBTargetGroupAttachment-(89)]
+	_ = x[LightsailInstance-(90)]
+	_ = x[MediaStoreContainer-(91)]
+	_ = x[MQBroker-(92)]
+	_ = x[NatGateway-(93)]
+	_ = x[NeptuneCluster-(94)]
+	_ = x[RDSCluster-(95)]
+	_ = x[RDSGlobalCluster-(96)]
+	_ = x[RedshiftCluster-(97)]
+	_ = x[Route53DelegationSet-(98)]
+	_ = x[Route53HealthCheck-(99)]
+	_ = x[Route53QueryLog-(100)]
+	_ = x[Route53Record-(101)]
+	_ = x[Route53ResolverEndpoint-(102)]
+	_ = x[Route53ResolverRuleAssociation-(103)]
+	_ = x[Route53Zone-(104)]
+	_ = x[Route53ZoneAssociation-(105)]
+	_ = x[RouteTable-(106)]
+	_ = x[S3Bucket-(107)]
+	_ = x[SecurityGroup-(108)]
+	_ = x[SESActiveReceiptRuleSet-(109)]
+	_ = x[SESConfigurationSet-(110)]
+	_ = x[SESDomainDKIM-(111)]
+	_ = x[SESDomainIdentity-(112)]
+	_ = x[SESDomainMailFrom-(113)]
+	_ = x[SESIdentityNotificationTopic-(114)]
+	_ = x[SESReceiptFilter-(115)]
+	_ = x[SESReceiptRule-(116)]
+	_ = x[SESReceiptRuleSet-(117)]
+	_ = x[SESTemplate-(118)]
+	_ = x[SQSQueue-(119)]
+	_ = x[StoragegatewayGateway-(120)]
+	_ = x[Subnet-(121)]
+	_ = x[VolumeAttachment-(122)]
+	_ = x[VPC-(123)]
+	_ = x[VPCEndpoint-(124)]
+	_ = x[VPCPeeringConnection-(125)]
+	_ = x[VPNGateway-(126)]
 }
 
-var _ResourceTypeValues = []ResourceType{Instance, ALB, ALBListener, ALBListenerCertificate, ALBListenerRule, ALBTargetGroup, ALBTargetGroupAttachment, APIGatewayDeployment, APIGatewayResource, APIGatewayRestAPI, APIGatewayStage, AthenaWorkgroup, AutoscalingGroup, AutoscalingPolicy, AutoscalingSchedule, BatchJobDefinition, CloudfrontDistribution, CloudfrontOriginAccessIdentity, CloudfrontPublicKey, CloudwatchMetricAlarm, DaxCluster, DBInstance, DBParameterGroup, DBSubnetGroup, DirectoryServiceDirectory, DmsReplicationInstance, DXGateway, DynamodbGlobalTable, DynamodbTable, EBSVolume, ECSCluster, ECSService, EC2TransitGateway, EC2TransitGatewayVPCAttachment, EC2TransitGatewayRouteTable, EC2TransitGatewayMulticastDomain, EFSFileSystem, EIP, EKSCluster, ElasticacheCluster, ElasticacheReplicationGroup, ElasticBeanstalkApplication, ElasticsearchDomain, ElasticsearchDomainPolicy, ELB, EMRCluster, FsxLustreFileSystem, GlueCatalogDatabase, GlueCatalogTable, IAMAccessKey, IAMAccountAlias, IAMAccountPasswordPolicy, IAMGroup, IAMGroupMembership, IAMGroupPolicy, IAMGroupPolicyAttachment, IAMInstanceProfile, IAMOpenidConnectProvider, IAMPolicy, IAMRole, IAMRolePolicy, IAMRolePolicyAttachment, IAMSAMLProvider, IAMServerCertificate, IAMUser, IAMUserGroupMembership, IAMUserPolicy, IAMUserPolicyAttachment, IAMUserSSHKey, InternetGateway, KeyPair, KinesisStream, LambdaFunction, LaunchConfiguration, LaunchTemplate, LB, LBCookieStickinessPolicy, LBListener, LBListenerCertificate, LBListenerRule, LBTargetGroup, LBTargetGroupAttachment, LightsailInstance, MediaStoreContainer, MQBroker, NatGateway, NeptuneCluster, RDSCluster, RDSGlobalCluster, RedshiftCluster, Route53DelegationSet, Route53HealthCheck, Route53QueryLog, Route53Record, Route53ResolverEndpoint, Route53ResolverRuleAssociation, Route53Zone, Route53ZoneAssociation, RouteTable, S3Bucket, SecurityGroup, SESActiveReceiptRuleSet, SESConfigurationSet, SESDomainDKIM, SESDomainIdentity, SESDomainMailFrom, SESIdentityNotificationTopic, SESReceiptFilter, SESReceiptRule, SESReceiptRuleSet, SESTemplate, SQSQueue, StoragegatewayGateway, Subnet, VolumeAttachment, VPC, VPCEndpoint, VPCPeeringConnection, VPNGateway}
+var _ResourceTypeValues = []ResourceType{Instance, ALB, ALBListener, ALBListenerCertificate, ALBListenerRule, ALBTargetGroup, ALBTargetGroupAttachment, APIGatewayDeployment, APIGatewayResource, APIGatewayRestAPI, APIGatewayStage, AthenaWorkgroup, AutoscalingGroup, AutoscalingPolicy, AutoscalingSchedule, BatchJobDefinition, CloudfrontDistribution, CloudfrontOriginAccessIdentity, CloudfrontPublicKey, CloudwatchMetricAlarm, DaxCluster, DBInstance, DBParameterGroup, DBSubnetGroup, DirectoryServiceDirectory, DmsReplicationInstance, DXGateway, DynamodbGlobalTable, DynamodbTable, EBSVolume, ECSCluster, ECSService, EC2TransitGateway, EC2TransitGatewayVPCAttachment, EC2TransitGatewayRouteTable, EC2TransitGatewayMulticastDomain, EC2TransitGatewayPeeringAttachment, EC2TransitGatewayPeeringAttachmentAccepter, EC2TransitGatewayPrefixListReference, EC2TransitGatewayRoute, EC2TransitGatewayRouteTableAssociation, EC2TransitGatewayRouteTablePropagation, EC2TransitGatewayVPCAttachmentAccepter, EFSFileSystem, EIP, EKSCluster, ElasticacheCluster, ElasticacheReplicationGroup, ElasticBeanstalkApplication, ElasticsearchDomain, ElasticsearchDomainPolicy, ELB, EMRCluster, FsxLustreFileSystem, GlueCatalogDatabase, GlueCatalogTable, IAMAccessKey, IAMAccountAlias, IAMAccountPasswordPolicy, IAMGroup, IAMGroupMembership, IAMGroupPolicy, IAMGroupPolicyAttachment, IAMInstanceProfile, IAMOpenidConnectProvider, IAMPolicy, IAMRole, IAMRolePolicy, IAMRolePolicyAttachment, IAMSAMLProvider, IAMServerCertificate, IAMUser, IAMUserGroupMembership, IAMUserPolicy, IAMUserPolicyAttachment, IAMUserSSHKey, InternetGateway, KeyPair, KinesisStream, LambdaFunction, LaunchConfiguration, LaunchTemplate, LB, LBCookieStickinessPolicy, LBListener, LBListenerCertificate, LBListenerRule, LBTargetGroup, LBTargetGroupAttachment, LightsailInstance, MediaStoreContainer, MQBroker, NatGateway, NeptuneCluster, RDSCluster, RDSGlobalCluster, RedshiftCluster, Route53DelegationSet, Route53HealthCheck, Route53QueryLog, Route53Record, Route53ResolverEndpoint, Route53ResolverRuleAssociation, Route53Zone, Route53ZoneAssociation, RouteTable, S3Bucket, SecurityGroup, SESActiveReceiptRuleSet, SESConfigurationSet, SESDomainDKIM, SESDomainIdentity, SESDomainMailFrom, SESIdentityNotificationTopic, SESReceiptFilter, SESReceiptRule, SESReceiptRuleSet, SESTemplate, SQSQueue, StoragegatewayGateway, Subnet, VolumeAttachment, VPC, VPCEndpoint, VPCPeeringConnection, VPNGateway}
 
 var _ResourceTypeNameToValueMap = map[string]ResourceType{
 	_ResourceTypeName[0:12]:           Instance,
@@ -221,172 +228,186 @@ var _ResourceTypeNameToValueMap = map[string]ResourceType{
 	_ResourceTypeLowerName[749:784]:   EC2TransitGatewayRouteTable,
 	_ResourceTypeName[784:824]:        EC2TransitGatewayMulticastDomain,
 	_ResourceTypeLowerName[784:824]:   EC2TransitGatewayMulticastDomain,
-	_ResourceTypeName[824:843]:        EFSFileSystem,
-	_ResourceTypeLowerName[824:843]:   EFSFileSystem,
-	_ResourceTypeName[843:850]:        EIP,
-	_ResourceTypeLowerName[843:850]:   EIP,
-	_ResourceTypeName[850:865]:        EKSCluster,
-	_ResourceTypeLowerName[850:865]:   EKSCluster,
-	_ResourceTypeName[865:888]:        ElasticacheCluster,
-	_ResourceTypeLowerName[865:888]:   ElasticacheCluster,
-	_ResourceTypeName[888:921]:        ElasticacheReplicationGroup,
-	_ResourceTypeLowerName[888:921]:   ElasticacheReplicationGroup,
-	_ResourceTypeName[921:954]:        ElasticBeanstalkApplication,
-	_ResourceTypeLowerName[921:954]:   ElasticBeanstalkApplication,
-	_ResourceTypeName[954:978]:        ElasticsearchDomain,
-	_ResourceTypeLowerName[954:978]:   ElasticsearchDomain,
-	_ResourceTypeName[978:1009]:       ElasticsearchDomainPolicy,
-	_ResourceTypeLowerName[978:1009]:  ElasticsearchDomainPolicy,
-	_ResourceTypeName[1009:1016]:      ELB,
-	_ResourceTypeLowerName[1009:1016]: ELB,
-	_ResourceTypeName[1016:1031]:      EMRCluster,
-	_ResourceTypeLowerName[1016:1031]: EMRCluster,
-	_ResourceTypeName[1031:1057]:      FsxLustreFileSystem,
-	_ResourceTypeLowerName[1031:1057]: FsxLustreFileSystem,
-	_ResourceTypeName[1057:1082]:      GlueCatalogDatabase,
-	_ResourceTypeLowerName[1057:1082]: GlueCatalogDatabase,
-	_ResourceTypeName[1082:1104]:      GlueCatalogTable,
-	_ResourceTypeLowerName[1082:1104]: GlueCatalogTable,
-	_ResourceTypeName[1104:1122]:      IAMAccessKey,
-	_ResourceTypeLowerName[1104:1122]: IAMAccessKey,
-	_ResourceTypeName[1122:1143]:      IAMAccountAlias,
-	_ResourceTypeLowerName[1122:1143]: IAMAccountAlias,
-	_ResourceTypeName[1143:1174]:      IAMAccountPasswordPolicy,
-	_ResourceTypeLowerName[1143:1174]: IAMAccountPasswordPolicy,
-	_ResourceTypeName[1174:1187]:      IAMGroup,
-	_ResourceTypeLowerName[1174:1187]: IAMGroup,
-	_ResourceTypeName[1187:1211]:      IAMGroupMembership,
-	_ResourceTypeLowerName[1187:1211]: IAMGroupMembership,
-	_ResourceTypeName[1211:1231]:      IAMGroupPolicy,
-	_ResourceTypeLowerName[1211:1231]: IAMGroupPolicy,
-	_ResourceTypeName[1231:1262]:      IAMGroupPolicyAttachment,
-	_ResourceTypeLowerName[1231:1262]: IAMGroupPolicyAttachment,
-	_ResourceTypeName[1262:1286]:      IAMInstanceProfile,
-	_ResourceTypeLowerName[1262:1286]: IAMInstanceProfile,
-	_ResourceTypeName[1286:1317]:      IAMOpenidConnectProvider,
-	_ResourceTypeLowerName[1286:1317]: IAMOpenidConnectProvider,
-	_ResourceTypeName[1317:1331]:      IAMPolicy,
-	_ResourceTypeLowerName[1317:1331]: IAMPolicy,
-	_ResourceTypeName[1331:1343]:      IAMRole,
-	_ResourceTypeLowerName[1331:1343]: IAMRole,
-	_ResourceTypeName[1343:1362]:      IAMRolePolicy,
-	_ResourceTypeLowerName[1343:1362]: IAMRolePolicy,
-	_ResourceTypeName[1362:1392]:      IAMRolePolicyAttachment,
-	_ResourceTypeLowerName[1362:1392]: IAMRolePolicyAttachment,
-	_ResourceTypeName[1392:1413]:      IAMSAMLProvider,
-	_ResourceTypeLowerName[1392:1413]: IAMSAMLProvider,
-	_ResourceTypeName[1413:1439]:      IAMServerCertificate,
-	_ResourceTypeLowerName[1413:1439]: IAMServerCertificate,
-	_ResourceTypeName[1439:1451]:      IAMUser,
-	_ResourceTypeLowerName[1439:1451]: IAMUser,
-	_ResourceTypeName[1451:1480]:      IAMUserGroupMembership,
-	_ResourceTypeLowerName[1451:1480]: IAMUserGroupMembership,
-	_ResourceTypeName[1480:1499]:      IAMUserPolicy,
-	_ResourceTypeLowerName[1480:1499]: IAMUserPolicy,
-	_ResourceTypeName[1499:1529]:      IAMUserPolicyAttachment,
-	_ResourceTypeLowerName[1499:1529]: IAMUserPolicyAttachment,
-	_ResourceTypeName[1529:1549]:      IAMUserSSHKey,
-	_ResourceTypeLowerName[1529:1549]: IAMUserSSHKey,
-	_ResourceTypeName[1549:1569]:      InternetGateway,
-	_ResourceTypeLowerName[1549:1569]: InternetGateway,
-	_ResourceTypeName[1569:1581]:      KeyPair,
-	_ResourceTypeLowerName[1569:1581]: KeyPair,
-	_ResourceTypeName[1581:1599]:      KinesisStream,
-	_ResourceTypeLowerName[1581:1599]: KinesisStream,
-	_ResourceTypeName[1599:1618]:      LambdaFunction,
-	_ResourceTypeLowerName[1599:1618]: LambdaFunction,
-	_ResourceTypeName[1618:1642]:      LaunchConfiguration,
-	_ResourceTypeLowerName[1618:1642]: LaunchConfiguration,
-	_ResourceTypeName[1642:1661]:      LaunchTemplate,
-	_ResourceTypeLowerName[1642:1661]: LaunchTemplate,
-	_ResourceTypeName[1661:1667]:      LB,
-	_ResourceTypeLowerName[1661:1667]: LB,
-	_ResourceTypeName[1667:1698]:      LBCookieStickinessPolicy,
-	_ResourceTypeLowerName[1667:1698]: LBCookieStickinessPolicy,
-	_ResourceTypeName[1698:1713]:      LBListener,
-	_ResourceTypeLowerName[1698:1713]: LBListener,
-	_ResourceTypeName[1713:1740]:      LBListenerCertificate,
-	_ResourceTypeLowerName[1713:1740]: LBListenerCertificate,
-	_ResourceTypeName[1740:1760]:      LBListenerRule,
-	_ResourceTypeLowerName[1740:1760]: LBListenerRule,
-	_ResourceTypeName[1760:1779]:      LBTargetGroup,
-	_ResourceTypeLowerName[1760:1779]: LBTargetGroup,
-	_ResourceTypeName[1779:1809]:      LBTargetGroupAttachment,
-	_ResourceTypeLowerName[1779:1809]: LBTargetGroupAttachment,
-	_ResourceTypeName[1809:1831]:      LightsailInstance,
-	_ResourceTypeLowerName[1809:1831]: LightsailInstance,
-	_ResourceTypeName[1831:1856]:      MediaStoreContainer,
-	_ResourceTypeLowerName[1831:1856]: MediaStoreContainer,
-	_ResourceTypeName[1856:1869]:      MQBroker,
-	_ResourceTypeLowerName[1856:1869]: MQBroker,
-	_ResourceTypeName[1869:1884]:      NatGateway,
-	_ResourceTypeLowerName[1869:1884]: NatGateway,
-	_ResourceTypeName[1884:1903]:      NeptuneCluster,
-	_ResourceTypeLowerName[1884:1903]: NeptuneCluster,
-	_ResourceTypeName[1903:1918]:      RDSCluster,
-	_ResourceTypeLowerName[1903:1918]: RDSCluster,
-	_ResourceTypeName[1918:1940]:      RDSGlobalCluster,
-	_ResourceTypeLowerName[1918:1940]: RDSGlobalCluster,
-	_ResourceTypeName[1940:1960]:      RedshiftCluster,
-	_ResourceTypeLowerName[1940:1960]: RedshiftCluster,
-	_ResourceTypeName[1960:1986]:      Route53DelegationSet,
-	_ResourceTypeLowerName[1960:1986]: Route53DelegationSet,
-	_ResourceTypeName[1986:2010]:      Route53HealthCheck,
-	_ResourceTypeLowerName[1986:2010]: Route53HealthCheck,
-	_ResourceTypeName[2010:2031]:      Route53QueryLog,
-	_ResourceTypeLowerName[2010:2031]: Route53QueryLog,
-	_ResourceTypeName[2031:2049]:      Route53Record,
-	_ResourceTypeLowerName[2031:2049]: Route53Record,
-	_ResourceTypeName[2049:2078]:      Route53ResolverEndpoint,
-	_ResourceTypeLowerName[2049:2078]: Route53ResolverEndpoint,
-	_ResourceTypeName[2078:2115]:      Route53ResolverRuleAssociation,
-	_ResourceTypeLowerName[2078:2115]: Route53ResolverRuleAssociation,
-	_ResourceTypeName[2115:2131]:      Route53Zone,
-	_ResourceTypeLowerName[2115:2131]: Route53Zone,
-	_ResourceTypeName[2131:2159]:      Route53ZoneAssociation,
-	_ResourceTypeLowerName[2131:2159]: Route53ZoneAssociation,
-	_ResourceTypeName[2159:2174]:      RouteTable,
-	_ResourceTypeLowerName[2159:2174]: RouteTable,
-	_ResourceTypeName[2174:2187]:      S3Bucket,
-	_ResourceTypeLowerName[2174:2187]: S3Bucket,
-	_ResourceTypeName[2187:2205]:      SecurityGroup,
-	_ResourceTypeLowerName[2187:2205]: SecurityGroup,
-	_ResourceTypeName[2205:2236]:      SESActiveReceiptRuleSet,
-	_ResourceTypeLowerName[2205:2236]: SESActiveReceiptRuleSet,
-	_ResourceTypeName[2236:2261]:      SESConfigurationSet,
-	_ResourceTypeLowerName[2236:2261]: SESConfigurationSet,
-	_ResourceTypeName[2261:2280]:      SESDomainDKIM,
-	_ResourceTypeLowerName[2261:2280]: SESDomainDKIM,
-	_ResourceTypeName[2280:2303]:      SESDomainIdentity,
-	_ResourceTypeLowerName[2280:2303]: SESDomainIdentity,
-	_ResourceTypeName[2303:2327]:      SESDomainMailFrom,
-	_ResourceTypeLowerName[2303:2327]: SESDomainMailFrom,
-	_ResourceTypeName[2327:2362]:      SESIdentityNotificationTopic,
-	_ResourceTypeLowerName[2327:2362]: SESIdentityNotificationTopic,
-	_ResourceTypeName[2362:2384]:      SESReceiptFilter,
-	_ResourceTypeLowerName[2362:2384]: SESReceiptFilter,
-	_ResourceTypeName[2384:2404]:      SESReceiptRule,
-	_ResourceTypeLowerName[2384:2404]: SESReceiptRule,
-	_ResourceTypeName[2404:2428]:      SESReceiptRuleSet,
-	_ResourceTypeLowerName[2404:2428]: SESReceiptRuleSet,
-	_ResourceTypeName[2428:2444]:      SESTemplate,
-	_ResourceTypeLowerName[2428:2444]: SESTemplate,
-	_ResourceTypeName[2444:2457]:      SQSQueue,
-	_ResourceTypeLowerName[2444:2457]: SQSQueue,
-	_ResourceTypeName[2457:2483]:      StoragegatewayGateway,
-	_ResourceTypeLowerName[2457:2483]: StoragegatewayGateway,
-	_ResourceTypeName[2483:2493]:      Subnet,
-	_ResourceTypeLowerName[2483:2493]: Subnet,
-	_ResourceTypeName[2493:2514]:      VolumeAttachment,
-	_ResourceTypeLowerName[2493:2514]: VolumeAttachment,
-	_ResourceTypeName[2514:2521]:      VPC,
-	_ResourceTypeLowerName[2514:2521]: VPC,
-	_ResourceTypeName[2521:2537]:      VPCEndpoint,
-	_ResourceTypeLowerName[2521:2537]: VPCEndpoint,
-	_ResourceTypeName[2537:2563]:      VPCPeeringConnection,
-	_ResourceTypeLowerName[2537:2563]: VPCPeeringConnection,
-	_ResourceTypeName[2563:2578]:      VPNGateway,
-	_ResourceTypeLowerName[2563:2578]: VPNGateway,
+	_ResourceTypeName[824:866]:        EC2TransitGatewayPeeringAttachment,
+	_ResourceTypeLowerName[824:866]:   EC2TransitGatewayPeeringAttachment,
+	_ResourceTypeName[866:917]:        EC2TransitGatewayPeeringAttachmentAccepter,
+	_ResourceTypeLowerName[866:917]:   EC2TransitGatewayPeeringAttachmentAccepter,
+	_ResourceTypeName[917:962]:        EC2TransitGatewayPrefixListReference,
+	_ResourceTypeLowerName[917:962]:   EC2TransitGatewayPrefixListReference,
+	_ResourceTypeName[962:991]:        EC2TransitGatewayRoute,
+	_ResourceTypeLowerName[962:991]:   EC2TransitGatewayRoute,
+	_ResourceTypeName[991:1038]:       EC2TransitGatewayRouteTableAssociation,
+	_ResourceTypeLowerName[991:1038]:  EC2TransitGatewayRouteTableAssociation,
+	_ResourceTypeName[1038:1085]:      EC2TransitGatewayRouteTablePropagation,
+	_ResourceTypeLowerName[1038:1085]: EC2TransitGatewayRouteTablePropagation,
+	_ResourceTypeName[1085:1132]:      EC2TransitGatewayVPCAttachmentAccepter,
+	_ResourceTypeLowerName[1085:1132]: EC2TransitGatewayVPCAttachmentAccepter,
+	_ResourceTypeName[1132:1151]:      EFSFileSystem,
+	_ResourceTypeLowerName[1132:1151]: EFSFileSystem,
+	_ResourceTypeName[1151:1158]:      EIP,
+	_ResourceTypeLowerName[1151:1158]: EIP,
+	_ResourceTypeName[1158:1173]:      EKSCluster,
+	_ResourceTypeLowerName[1158:1173]: EKSCluster,
+	_ResourceTypeName[1173:1196]:      ElasticacheCluster,
+	_ResourceTypeLowerName[1173:1196]: ElasticacheCluster,
+	_ResourceTypeName[1196:1229]:      ElasticacheReplicationGroup,
+	_ResourceTypeLowerName[1196:1229]: ElasticacheReplicationGroup,
+	_ResourceTypeName[1229:1262]:      ElasticBeanstalkApplication,
+	_ResourceTypeLowerName[1229:1262]: ElasticBeanstalkApplication,
+	_ResourceTypeName[1262:1286]:      ElasticsearchDomain,
+	_ResourceTypeLowerName[1262:1286]: ElasticsearchDomain,
+	_ResourceTypeName[1286:1317]:      ElasticsearchDomainPolicy,
+	_ResourceTypeLowerName[1286:1317]: ElasticsearchDomainPolicy,
+	_ResourceTypeName[1317:1324]:      ELB,
+	_ResourceTypeLowerName[1317:1324]: ELB,
+	_ResourceTypeName[1324:1339]:      EMRCluster,
+	_ResourceTypeLowerName[1324:1339]: EMRCluster,
+	_ResourceTypeName[1339:1365]:      FsxLustreFileSystem,
+	_ResourceTypeLowerName[1339:1365]: FsxLustreFileSystem,
+	_ResourceTypeName[1365:1390]:      GlueCatalogDatabase,
+	_ResourceTypeLowerName[1365:1390]: GlueCatalogDatabase,
+	_ResourceTypeName[1390:1412]:      GlueCatalogTable,
+	_ResourceTypeLowerName[1390:1412]: GlueCatalogTable,
+	_ResourceTypeName[1412:1430]:      IAMAccessKey,
+	_ResourceTypeLowerName[1412:1430]: IAMAccessKey,
+	_ResourceTypeName[1430:1451]:      IAMAccountAlias,
+	_ResourceTypeLowerName[1430:1451]: IAMAccountAlias,
+	_ResourceTypeName[1451:1482]:      IAMAccountPasswordPolicy,
+	_ResourceTypeLowerName[1451:1482]: IAMAccountPasswordPolicy,
+	_ResourceTypeName[1482:1495]:      IAMGroup,
+	_ResourceTypeLowerName[1482:1495]: IAMGroup,
+	_ResourceTypeName[1495:1519]:      IAMGroupMembership,
+	_ResourceTypeLowerName[1495:1519]: IAMGroupMembership,
+	_ResourceTypeName[1519:1539]:      IAMGroupPolicy,
+	_ResourceTypeLowerName[1519:1539]: IAMGroupPolicy,
+	_ResourceTypeName[1539:1570]:      IAMGroupPolicyAttachment,
+	_ResourceTypeLowerName[1539:1570]: IAMGroupPolicyAttachment,
+	_ResourceTypeName[1570:1594]:      IAMInstanceProfile,
+	_ResourceTypeLowerName[1570:1594]: IAMInstanceProfile,
+	_ResourceTypeName[1594:1625]:      IAMOpenidConnectProvider,
+	_ResourceTypeLowerName[1594:1625]: IAMOpenidConnectProvider,
+	_ResourceTypeName[1625:1639]:      IAMPolicy,
+	_ResourceTypeLowerName[1625:1639]: IAMPolicy,
+	_ResourceTypeName[1639:1651]:      IAMRole,
+	_ResourceTypeLowerName[1639:1651]: IAMRole,
+	_ResourceTypeName[1651:1670]:      IAMRolePolicy,
+	_ResourceTypeLowerName[1651:1670]: IAMRolePolicy,
+	_ResourceTypeName[1670:1700]:      IAMRolePolicyAttachment,
+	_ResourceTypeLowerName[1670:1700]: IAMRolePolicyAttachment,
+	_ResourceTypeName[1700:1721]:      IAMSAMLProvider,
+	_ResourceTypeLowerName[1700:1721]: IAMSAMLProvider,
+	_ResourceTypeName[1721:1747]:      IAMServerCertificate,
+	_ResourceTypeLowerName[1721:1747]: IAMServerCertificate,
+	_ResourceTypeName[1747:1759]:      IAMUser,
+	_ResourceTypeLowerName[1747:1759]: IAMUser,
+	_ResourceTypeName[1759:1788]:      IAMUserGroupMembership,
+	_ResourceTypeLowerName[1759:1788]: IAMUserGroupMembership,
+	_ResourceTypeName[1788:1807]:      IAMUserPolicy,
+	_ResourceTypeLowerName[1788:1807]: IAMUserPolicy,
+	_ResourceTypeName[1807:1837]:      IAMUserPolicyAttachment,
+	_ResourceTypeLowerName[1807:1837]: IAMUserPolicyAttachment,
+	_ResourceTypeName[1837:1857]:      IAMUserSSHKey,
+	_ResourceTypeLowerName[1837:1857]: IAMUserSSHKey,
+	_ResourceTypeName[1857:1877]:      InternetGateway,
+	_ResourceTypeLowerName[1857:1877]: InternetGateway,
+	_ResourceTypeName[1877:1889]:      KeyPair,
+	_ResourceTypeLowerName[1877:1889]: KeyPair,
+	_ResourceTypeName[1889:1907]:      KinesisStream,
+	_ResourceTypeLowerName[1889:1907]: KinesisStream,
+	_ResourceTypeName[1907:1926]:      LambdaFunction,
+	_ResourceTypeLowerName[1907:1926]: LambdaFunction,
+	_ResourceTypeName[1926:1950]:      LaunchConfiguration,
+	_ResourceTypeLowerName[1926:1950]: LaunchConfiguration,
+	_ResourceTypeName[1950:1969]:      LaunchTemplate,
+	_ResourceTypeLowerName[1950:1969]: LaunchTemplate,
+	_ResourceTypeName[1969:1975]:      LB,
+	_ResourceTypeLowerName[1969:1975]: LB,
+	_ResourceTypeName[1975:2006]:      LBCookieStickinessPolicy,
+	_ResourceTypeLowerName[1975:2006]: LBCookieStickinessPolicy,
+	_ResourceTypeName[2006:2021]:      LBListener,
+	_ResourceTypeLowerName[2006:2021]: LBListener,
+	_ResourceTypeName[2021:2048]:      LBListenerCertificate,
+	_ResourceTypeLowerName[2021:2048]: LBListenerCertificate,
+	_ResourceTypeName[2048:2068]:      LBListenerRule,
+	_ResourceTypeLowerName[2048:2068]: LBListenerRule,
+	_ResourceTypeName[2068:2087]:      LBTargetGroup,
+	_ResourceTypeLowerName[2068:2087]: LBTargetGroup,
+	_ResourceTypeName[2087:2117]:      LBTargetGroupAttachment,
+	_ResourceTypeLowerName[2087:2117]: LBTargetGroupAttachment,
+	_ResourceTypeName[2117:2139]:      LightsailInstance,
+	_ResourceTypeLowerName[2117:2139]: LightsailInstance,
+	_ResourceTypeName[2139:2164]:      MediaStoreContainer,
+	_ResourceTypeLowerName[2139:2164]: MediaStoreContainer,
+	_ResourceTypeName[2164:2177]:      MQBroker,
+	_ResourceTypeLowerName[2164:2177]: MQBroker,
+	_ResourceTypeName[2177:2192]:      NatGateway,
+	_ResourceTypeLowerName[2177:2192]: NatGateway,
+	_ResourceTypeName[2192:2211]:      NeptuneCluster,
+	_ResourceTypeLowerName[2192:2211]: NeptuneCluster,
+	_ResourceTypeName[2211:2226]:      RDSCluster,
+	_ResourceTypeLowerName[2211:2226]: RDSCluster,
+	_ResourceTypeName[2226:2248]:      RDSGlobalCluster,
+	_ResourceTypeLowerName[2226:2248]: RDSGlobalCluster,
+	_ResourceTypeName[2248:2268]:      RedshiftCluster,
+	_ResourceTypeLowerName[2248:2268]: RedshiftCluster,
+	_ResourceTypeName[2268:2294]:      Route53DelegationSet,
+	_ResourceTypeLowerName[2268:2294]: Route53DelegationSet,
+	_ResourceTypeName[2294:2318]:      Route53HealthCheck,
+	_ResourceTypeLowerName[2294:2318]: Route53HealthCheck,
+	_ResourceTypeName[2318:2339]:      Route53QueryLog,
+	_ResourceTypeLowerName[2318:2339]: Route53QueryLog,
+	_ResourceTypeName[2339:2357]:      Route53Record,
+	_ResourceTypeLowerName[2339:2357]: Route53Record,
+	_ResourceTypeName[2357:2386]:      Route53ResolverEndpoint,
+	_ResourceTypeLowerName[2357:2386]: Route53ResolverEndpoint,
+	_ResourceTypeName[2386:2423]:      Route53ResolverRuleAssociation,
+	_ResourceTypeLowerName[2386:2423]: Route53ResolverRuleAssociation,
+	_ResourceTypeName[2423:2439]:      Route53Zone,
+	_ResourceTypeLowerName[2423:2439]: Route53Zone,
+	_ResourceTypeName[2439:2467]:      Route53ZoneAssociation,
+	_ResourceTypeLowerName[2439:2467]: Route53ZoneAssociation,
+	_ResourceTypeName[2467:2482]:      RouteTable,
+	_ResourceTypeLowerName[2467:2482]: RouteTable,
+	_ResourceTypeName[2482:2495]:      S3Bucket,
+	_ResourceTypeLowerName[2482:2495]: S3Bucket,
+	_ResourceTypeName[2495:2513]:      SecurityGroup,
+	_ResourceTypeLowerName[2495:2513]: SecurityGroup,
+	_ResourceTypeName[2513:2544]:      SESActiveReceiptRuleSet,
+	_ResourceTypeLowerName[2513:2544]: SESActiveReceiptRuleSet,
+	_ResourceTypeName[2544:2569]:      SESConfigurationSet,
+	_ResourceTypeLowerName[2544:2569]: SESConfigurationSet,
+	_ResourceTypeName[2569:2588]:      SESDomainDKIM,
+	_ResourceTypeLowerName[2569:2588]: SESDomainDKIM,
+	_ResourceTypeName[2588:2611]:      SESDomainIdentity,
+	_ResourceTypeLowerName[2588:2611]: SESDomainIdentity,
+	_ResourceTypeName[2611:2635]:      SESDomainMailFrom,
+	_ResourceTypeLowerName[2611:2635]: SESDomainMailFrom,
+	_ResourceTypeName[2635:2670]:      SESIdentityNotificationTopic,
+	_ResourceTypeLowerName[2635:2670]: SESIdentityNotificationTopic,
+	_ResourceTypeName[2670:2692]:      SESReceiptFilter,
+	_ResourceTypeLowerName[2670:2692]: SESReceiptFilter,
+	_ResourceTypeName[2692:2712]:      SESReceiptRule,
+	_ResourceTypeLowerName[2692:2712]: SESReceiptRule,
+	_ResourceTypeName[2712:2736]:      SESReceiptRuleSet,
+	_ResourceTypeLowerName[2712:2736]: SESReceiptRuleSet,
+	_ResourceTypeName[2736:2752]:      SESTemplate,
+	_ResourceTypeLowerName[2736:2752]: SESTemplate,
+	_ResourceTypeName[2752:2765]:      SQSQueue,
+	_ResourceTypeLowerName[2752:2765]: SQSQueue,
+	_ResourceTypeName[2765:2791]:      StoragegatewayGateway,
+	_ResourceTypeLowerName[2765:2791]: StoragegatewayGateway,
+	_ResourceTypeName[2791:2801]:      Subnet,
+	_ResourceTypeLowerName[2791:2801]: Subnet,
+	_ResourceTypeName[2801:2822]:      VolumeAttachment,
+	_ResourceTypeLowerName[2801:2822]: VolumeAttachment,
+	_ResourceTypeName[2822:2829]:      VPC,
+	_ResourceTypeLowerName[2822:2829]: VPC,
+	_ResourceTypeName[2829:2845]:      VPCEndpoint,
+	_ResourceTypeLowerName[2829:2845]: VPCEndpoint,
+	_ResourceTypeName[2845:2871]:      VPCPeeringConnection,
+	_ResourceTypeLowerName[2845:2871]: VPCPeeringConnection,
+	_ResourceTypeName[2871:2886]:      VPNGateway,
+	_ResourceTypeLowerName[2871:2886]: VPNGateway,
 }
 
 var _ResourceTypeNames = []string{
@@ -426,89 +447,96 @@ var _ResourceTypeNames = []string{
 	_ResourceTypeName[711:749],
 	_ResourceTypeName[749:784],
 	_ResourceTypeName[784:824],
-	_ResourceTypeName[824:843],
-	_ResourceTypeName[843:850],
-	_ResourceTypeName[850:865],
-	_ResourceTypeName[865:888],
-	_ResourceTypeName[888:921],
-	_ResourceTypeName[921:954],
-	_ResourceTypeName[954:978],
-	_ResourceTypeName[978:1009],
-	_ResourceTypeName[1009:1016],
-	_ResourceTypeName[1016:1031],
-	_ResourceTypeName[1031:1057],
-	_ResourceTypeName[1057:1082],
-	_ResourceTypeName[1082:1104],
-	_ResourceTypeName[1104:1122],
-	_ResourceTypeName[1122:1143],
-	_ResourceTypeName[1143:1174],
-	_ResourceTypeName[1174:1187],
-	_ResourceTypeName[1187:1211],
-	_ResourceTypeName[1211:1231],
-	_ResourceTypeName[1231:1262],
+	_ResourceTypeName[824:866],
+	_ResourceTypeName[866:917],
+	_ResourceTypeName[917:962],
+	_ResourceTypeName[962:991],
+	_ResourceTypeName[991:1038],
+	_ResourceTypeName[1038:1085],
+	_ResourceTypeName[1085:1132],
+	_ResourceTypeName[1132:1151],
+	_ResourceTypeName[1151:1158],
+	_ResourceTypeName[1158:1173],
+	_ResourceTypeName[1173:1196],
+	_ResourceTypeName[1196:1229],
+	_ResourceTypeName[1229:1262],
 	_ResourceTypeName[1262:1286],
 	_ResourceTypeName[1286:1317],
-	_ResourceTypeName[1317:1331],
-	_ResourceTypeName[1331:1343],
-	_ResourceTypeName[1343:1362],
-	_ResourceTypeName[1362:1392],
-	_ResourceTypeName[1392:1413],
-	_ResourceTypeName[1413:1439],
-	_ResourceTypeName[1439:1451],
-	_ResourceTypeName[1451:1480],
-	_ResourceTypeName[1480:1499],
-	_ResourceTypeName[1499:1529],
-	_ResourceTypeName[1529:1549],
-	_ResourceTypeName[1549:1569],
-	_ResourceTypeName[1569:1581],
-	_ResourceTypeName[1581:1599],
-	_ResourceTypeName[1599:1618],
-	_ResourceTypeName[1618:1642],
-	_ResourceTypeName[1642:1661],
-	_ResourceTypeName[1661:1667],
-	_ResourceTypeName[1667:1698],
-	_ResourceTypeName[1698:1713],
-	_ResourceTypeName[1713:1740],
-	_ResourceTypeName[1740:1760],
-	_ResourceTypeName[1760:1779],
-	_ResourceTypeName[1779:1809],
-	_ResourceTypeName[1809:1831],
-	_ResourceTypeName[1831:1856],
-	_ResourceTypeName[1856:1869],
-	_ResourceTypeName[1869:1884],
-	_ResourceTypeName[1884:1903],
-	_ResourceTypeName[1903:1918],
-	_ResourceTypeName[1918:1940],
-	_ResourceTypeName[1940:1960],
-	_ResourceTypeName[1960:1986],
-	_ResourceTypeName[1986:2010],
-	_ResourceTypeName[2010:2031],
-	_ResourceTypeName[2031:2049],
-	_ResourceTypeName[2049:2078],
-	_ResourceTypeName[2078:2115],
-	_ResourceTypeName[2115:2131],
-	_ResourceTypeName[2131:2159],
-	_ResourceTypeName[2159:2174],
-	_ResourceTypeName[2174:2187],
-	_ResourceTypeName[2187:2205],
-	_ResourceTypeName[2205:2236],
-	_ResourceTypeName[2236:2261],
-	_ResourceTypeName[2261:2280],
-	_ResourceTypeName[2280:2303],
-	_ResourceTypeName[2303:2327],
-	_ResourceTypeName[2327:2362],
-	_ResourceTypeName[2362:2384],
-	_ResourceTypeName[2384:2404],
-	_ResourceTypeName[2404:2428],
-	_ResourceTypeName[2428:2444],
-	_ResourceTypeName[2444:2457],
-	_ResourceTypeName[2457:2483],
-	_ResourceTypeName[2483:2493],
-	_ResourceTypeName[2493:2514],
-	_ResourceTypeName[2514:2521],
-	_ResourceTypeName[2521:2537],
-	_ResourceTypeName[2537:2563],
-	_ResourceTypeName[2563:2578],
+	_ResourceTypeName[1317:1324],
+	_ResourceTypeName[1324:1339],
+	_ResourceTypeName[1339:1365],
+	_ResourceTypeName[1365:1390],
+	_ResourceTypeName[1390:1412],
+	_ResourceTypeName[1412:1430],
+	_ResourceTypeName[1430:1451],
+	_ResourceTypeName[1451:1482],
+	_ResourceTypeName[1482:1495],
+	_ResourceTypeName[1495:1519],
+	_ResourceTypeName[1519:1539],
+	_ResourceTypeName[1539:1570],
+	_ResourceTypeName[1570:1594],
+	_ResourceTypeName[1594:1625],
+	_ResourceTypeName[1625:1639],
+	_ResourceTypeName[1639:1651],
+	_ResourceTypeName[1651:1670],
+	_ResourceTypeName[1670:1700],
+	_ResourceTypeName[1700:1721],
+	_ResourceTypeName[1721:1747],
+	_ResourceTypeName[1747:1759],
+	_ResourceTypeName[1759:1788],
+	_ResourceTypeName[1788:1807],
+	_ResourceTypeName[1807:1837],
+	_ResourceTypeName[1837:1857],
+	_ResourceTypeName[1857:1877],
+	_ResourceTypeName[1877:1889],
+	_ResourceTypeName[1889:1907],
+	_ResourceTypeName[1907:1926],
+	_ResourceTypeName[1926:1950],
+	_ResourceTypeName[1950:1969],
+	_ResourceTypeName[1969:1975],
+	_ResourceTypeName[1975:2006],
+	_ResourceTypeName[2006:2021],
+	_ResourceTypeName[2021:2048],
+	_ResourceTypeName[2048:2068],
+	_ResourceTypeName[2068:2087],
+	_ResourceTypeName[2087:2117],
+	_ResourceTypeName[2117:2139],
+	_ResourceTypeName[2139:2164],
+	_ResourceTypeName[2164:2177],
+	_ResourceTypeName[2177:2192],
+	_ResourceTypeName[2192:2211],
+	_ResourceTypeName[2211:2226],
+	_ResourceTypeName[2226:2248],
+	_ResourceTypeName[2248:2268],
+	_ResourceTypeName[2268:2294],
+	_ResourceTypeName[2294:2318],
+	_ResourceTypeName[2318:2339],
+	_ResourceTypeName[2339:2357],
+	_ResourceTypeName[2357:2386],
+	_ResourceTypeName[2386:2423],
+	_ResourceTypeName[2423:2439],
+	_ResourceTypeName[2439:2467],
+	_ResourceTypeName[2467:2482],
+	_ResourceTypeName[2482:2495],
+	_ResourceTypeName[2495:2513],
+	_ResourceTypeName[2513:2544],
+	_ResourceTypeName[2544:2569],
+	_ResourceTypeName[2569:2588],
+	_ResourceTypeName[2588:2611],
+	_ResourceTypeName[2611:2635],
+	_ResourceTypeName[2635:2670],
+	_ResourceTypeName[2670:2692],
+	_ResourceTypeName[2692:2712],
+	_ResourceTypeName[2712:2736],
+	_ResourceTypeName[2736:2752],
+	_ResourceTypeName[2752:2765],
+	_ResourceTypeName[2765:2791],
+	_ResourceTypeName[2791:2801],
+	_ResourceTypeName[2801:2822],
+	_ResourceTypeName[2822:2829],
+	_ResourceTypeName[2829:2845],
+	_ResourceTypeName[2845:2871],
+	_ResourceTypeName[2871:2886],
 }
 
 // ResourceTypeString retrieves an enum value from the enum constants string name.
@@ -517,8 +545,8 @@ func ResourceTypeString(s string) (ResourceType, error) {
 	if val, ok := _ResourceTypeNameToValueMap[s]; ok {
 		return val, nil
 	}
-
-	if val, ok := _ResourceTypeNameToValueMap[strings.ToLower(s)]; ok {
+	s = strings.ToLower(s)
+	if val, ok := _ResourceTypeNameToValueMap[s]; ok {
 		return val, nil
 	}
 	return 0, fmt.Errorf("%s does not belong to ResourceType values", s)
