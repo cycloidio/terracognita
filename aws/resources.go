@@ -87,6 +87,13 @@ const (
 	EC2TransitGatewayVPCAttachment
 	EC2TransitGatewayRouteTable
 	EC2TransitGatewayMulticastDomain
+	EC2TransitGatewayPeeringAttachment
+	EC2TransitGatewayPeeringAttachmentAccepter
+	EC2TransitGatewayPrefixListReference
+	EC2TransitGatewayRoute
+	EC2TransitGatewayRouteTableAssociation
+	EC2TransitGatewayRouteTablePropagation
+	EC2TransitGatewayVPCAttachmentAccepter
 	EFSFileSystem
 	EIP
 	EKSCluster
@@ -213,77 +220,84 @@ var (
 		DynamodbGlobalTable:            dynamodbGlobalTables,
 		DynamodbTable:                  dynamodbTables,
 		//EBSSnapshot:         ebsSnapshots,
-		EBSVolume:                        ebsVolumes,
-		ECSCluster:                       cacheECSClusters,
-		ECSService:                       ecsServices,
-		EC2TransitGateway:                ec2TransitGateways,
-		EC2TransitGatewayVPCAttachment:   ec2TransitGatewayVPCAttachment,
-		EC2TransitGatewayRouteTable:      ec2TransitGatewayRouteTable,
-		EC2TransitGatewayMulticastDomain: ec2TransitGatewayMulticastDomain,
-		EFSFileSystem:                    efsFileSystems,
-		EIP:                              eips,
-		EKSCluster:                       eksClusters,
-		ElasticacheCluster:               elasticacheClusters,
-		ElasticacheReplicationGroup:      elasticacheReplicationGroups,
-		ElasticBeanstalkApplication:      elasticBeanstalkApplications,
-		ElasticsearchDomain:              elasticsearchDomains,
-		ElasticsearchDomainPolicy:        elasticsearchDomains,
-		ELB:                              elbs,
-		EMRCluster:                       emrClusters,
-		FsxLustreFileSystem:              fsxLustreFileSystems,
-		GlueCatalogDatabase:              cacheGlueDatabases,
-		GlueCatalogTable:                 glueCatalogTables,
-		IAMAccessKey:                     iamAccessKeys,
-		IAMAccountAlias:                  iamAccountAliases,
-		IAMAccountPasswordPolicy:         iamAccountPasswordPolicy,
-		IAMGroup:                         cacheIAMGroups,
-		IAMGroupMembership:               iamGroupMemberships,
-		IAMGroupPolicyAttachment:         iamGroupPolicyAttachments,
-		IAMGroupPolicy:                   iamGroupPolicies,
-		IAMInstanceProfile:               iamInstanceProfiles,
-		IAMOpenidConnectProvider:         iamOpenidConnectProviders,
-		IAMPolicy:                        iamPolicies,
-		IAMRole:                          cacheIAMRoles,
-		IAMRolePolicyAttachment:          iamRolePolicyAttachments,
-		IAMRolePolicy:                    iamRolePolicies,
-		IAMSAMLProvider:                  iamSAMLProviders,
-		IAMServerCertificate:             iamServerCertificates,
-		IAMUser:                          cacheIAMUsers,
-		IAMUserGroupMembership:           iamUserGroupMemberships,
-		IAMUserPolicyAttachment:          iamUserPolicyAttachments,
-		IAMUserPolicy:                    iamUserPolicies,
-		IAMUserSSHKey:                    iamUserSSHKeys,
-		Instance:                         instances,
-		InternetGateway:                  internetGateways,
-		KeyPair:                          keyPairs,
-		KinesisStream:                    kinesisStreams,
-		LambdaFunction:                   lambdaFunctions,
-		LaunchConfiguration:              launchConfigurations,
-		LaunchTemplate:                   launchTemplates,
-		LB:                               cacheLoadBalancersV2,
-		LBCookieStickinessPolicy:         lbCookieStickinessPolicies,
-		LBListener:                       cacheLoadBalancersV2Listeners,
-		LBListenerCertificate:            albListenerCertificates,
-		LBListenerRule:                   albListenerRules,
-		LBTargetGroup:                    albTargetGroups,
-		LBTargetGroupAttachment:          albTargetGroupAttachments,
-		LightsailInstance:                lightsailInstances,
-		MediaStoreContainer:              mediaStoreContainers,
-		MQBroker:                         mqBrokers,
-		NatGateway:                       natGateways,
-		NeptuneCluster:                   neptuneClusters,
-		RDSCluster:                       rdsClusters,
-		RDSGlobalCluster:                 rdsGlobalClusters,
-		RedshiftCluster:                  redshiftClusters,
-		Route53DelegationSet:             route53DelegationSets,
-		Route53HealthCheck:               route53HealthChecks,
-		Route53QueryLog:                  route53QueryLogs,
-		Route53Record:                    route53Records,
-		Route53ResolverEndpoint:          route53ResolverEndpoints,
-		Route53ResolverRuleAssociation:   route53ResolverRuleAssociation,
-		Route53ZoneAssociation:           route53ZoneAssociations,
-		Route53Zone:                      cacheRoute53Zones,
-		RouteTable:                       routeTables,
+		EBSVolume:                                  ebsVolumes,
+		ECSCluster:                                 cacheECSClusters,
+		ECSService:                                 ecsServices,
+		EC2TransitGateway:                          ec2TransitGateways,
+		EC2TransitGatewayVPCAttachment:             ec2TransitGatewayVPCAttachment,
+		EC2TransitGatewayRouteTable:                cacheTransitGatewayRouteTables,
+		EC2TransitGatewayMulticastDomain:           ec2TransitGatewayMulticastDomain,
+		EC2TransitGatewayPeeringAttachment:         ec2TransitGatewayPeeringAttachments,
+		EC2TransitGatewayPeeringAttachmentAccepter: ec2TransitGatewayPeeringAttachments,
+		EC2TransitGatewayPrefixListReference:       ec2TransitGatewayPrefixListReferences,
+		EC2TransitGatewayRoute:                     ec2TransitGatewayRoutes,
+		EC2TransitGatewayRouteTableAssociation:     ec2TransitGatewayRouteTableAssociations,
+		EC2TransitGatewayRouteTablePropagation:     ec2TransitGatewayRouteTablePropagations,
+		EC2TransitGatewayVPCAttachmentAccepter:     ec2TransitGatewayVPCAttachment,
+		EFSFileSystem:                              efsFileSystems,
+		EIP:                                        eips,
+		EKSCluster:                                 eksClusters,
+		ElasticacheCluster:                         elasticacheClusters,
+		ElasticacheReplicationGroup:                elasticacheReplicationGroups,
+		ElasticBeanstalkApplication:                elasticBeanstalkApplications,
+		ElasticsearchDomain:                        elasticsearchDomains,
+		ElasticsearchDomainPolicy:                  elasticsearchDomains,
+		ELB:                                        elbs,
+		EMRCluster:                                 emrClusters,
+		FsxLustreFileSystem:                        fsxLustreFileSystems,
+		GlueCatalogDatabase:                        cacheGlueDatabases,
+		GlueCatalogTable:                           glueCatalogTables,
+		IAMAccessKey:                               iamAccessKeys,
+		IAMAccountAlias:                            iamAccountAliases,
+		IAMAccountPasswordPolicy:                   iamAccountPasswordPolicy,
+		IAMGroup:                                   cacheIAMGroups,
+		IAMGroupMembership:                         iamGroupMemberships,
+		IAMGroupPolicyAttachment:                   iamGroupPolicyAttachments,
+		IAMGroupPolicy:                             iamGroupPolicies,
+		IAMInstanceProfile:                         iamInstanceProfiles,
+		IAMOpenidConnectProvider:                   iamOpenidConnectProviders,
+		IAMPolicy:                                  iamPolicies,
+		IAMRole:                                    cacheIAMRoles,
+		IAMRolePolicyAttachment:                    iamRolePolicyAttachments,
+		IAMRolePolicy:                              iamRolePolicies,
+		IAMSAMLProvider:                            iamSAMLProviders,
+		IAMServerCertificate:                       iamServerCertificates,
+		IAMUser:                                    cacheIAMUsers,
+		IAMUserGroupMembership:                     iamUserGroupMemberships,
+		IAMUserPolicyAttachment:                    iamUserPolicyAttachments,
+		IAMUserPolicy:                              iamUserPolicies,
+		IAMUserSSHKey:                              iamUserSSHKeys,
+		Instance:                                   instances,
+		InternetGateway:                            internetGateways,
+		KeyPair:                                    keyPairs,
+		KinesisStream:                              kinesisStreams,
+		LambdaFunction:                             lambdaFunctions,
+		LaunchConfiguration:                        launchConfigurations,
+		LaunchTemplate:                             launchTemplates,
+		LB:                                         cacheLoadBalancersV2,
+		LBCookieStickinessPolicy:                   lbCookieStickinessPolicies,
+		LBListener:                                 cacheLoadBalancersV2Listeners,
+		LBListenerCertificate:                      albListenerCertificates,
+		LBListenerRule:                             albListenerRules,
+		LBTargetGroup:                              albTargetGroups,
+		LBTargetGroupAttachment:                    albTargetGroupAttachments,
+		LightsailInstance:                          lightsailInstances,
+		MediaStoreContainer:                        mediaStoreContainers,
+		MQBroker:                                   mqBrokers,
+		NatGateway:                                 natGateways,
+		NeptuneCluster:                             neptuneClusters,
+		RDSCluster:                                 rdsClusters,
+		RDSGlobalCluster:                           rdsGlobalClusters,
+		RedshiftCluster:                            redshiftClusters,
+		Route53DelegationSet:                       route53DelegationSets,
+		Route53HealthCheck:                         route53HealthChecks,
+		Route53QueryLog:                            route53QueryLogs,
+		Route53Record:                              route53Records,
+		Route53ResolverEndpoint:                    route53ResolverEndpoints,
+		Route53ResolverRuleAssociation:             route53ResolverRuleAssociation,
+		Route53ZoneAssociation:                     route53ZoneAssociations,
+		Route53Zone:                                cacheRoute53Zones,
+		RouteTable:                                 routeTables,
 		//S3BucketObject:      s3_bucket_objects,
 		S3Bucket:                     s3Buckets,
 		SecurityGroup:                securityGroups,
@@ -1323,6 +1337,145 @@ func ec2TransitGatewayMulticastDomain(ctx context.Context, a *aws, resourceType 
 		}
 
 		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func ec2TransitGatewayPeeringAttachments(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	transitGatewayPeeringAttachments, err := a.awsr.GetTransitGatewayPeeringAttachments(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+
+	for _, i := range transitGatewayPeeringAttachments {
+
+		r, err := initializeResource(a, *i.TransitGatewayAttachmentId, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func ec2TransitGatewayPrefixListReferences(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	routeTablesIDs, err := getTransitGatewayRouteTablesIDs(ctx, a, EC2TransitGatewayRouteTable.String(), filters)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, tableID := range routeTablesIDs {
+		input := &ec2.GetTransitGatewayPrefixListReferencesInput{
+			TransitGatewayRouteTableId: awsSDK.String(tableID),
+		}
+		prefixListReferences, err := a.awsr.GetTransitGatewayPrefixListReference(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, i := range prefixListReferences {
+			r, err := initializeResource(a, fmt.Sprintf("%s_%s", tableID, *i.PrefixListId), resourceType)
+			if err != nil {
+				return nil, err
+			}
+			resources = append(resources, r)
+		}
+	}
+
+	return resources, nil
+}
+
+func ec2TransitGatewayRoutes(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	routeTablesIDs, err := getTransitGatewayRouteTablesIDs(ctx, a, EC2TransitGatewayRouteTable.String(), filters)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, tableID := range routeTablesIDs {
+		input := &ec2.SearchTransitGatewayRoutesInput{
+			Filters: []*ec2.Filter{
+				&ec2.Filter{
+					Name:   awsSDK.String("type"),
+					Values: []*string{awsSDK.String(ec2.TransitGatewayRouteTypeStatic)},
+				},
+			},
+			TransitGatewayRouteTableId: awsSDK.String(tableID),
+		}
+		routes, err := a.awsr.GetTransitGatewayRoutes(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, i := range routes {
+			r, err := initializeResource(a, fmt.Sprintf("%s_%s", tableID, *i.DestinationCidrBlock), resourceType)
+			if err != nil {
+				return nil, err
+			}
+			resources = append(resources, r)
+		}
+	}
+
+	return resources, nil
+}
+
+func ec2TransitGatewayRouteTableAssociations(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	routeTablesIDs, err := getTransitGatewayRouteTablesIDs(ctx, a, EC2TransitGatewayRouteTable.String(), filters)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, tableID := range routeTablesIDs {
+		input := &ec2.GetTransitGatewayRouteTableAssociationsInput{
+			TransitGatewayRouteTableId: awsSDK.String(tableID),
+		}
+		associations, err := a.awsr.GetTransitGatewayRouteTableAssociations(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, i := range associations {
+			r, err := initializeResource(a, fmt.Sprintf("%s_%s", tableID, *i.TransitGatewayAttachmentId), resourceType)
+			if err != nil {
+				return nil, err
+			}
+			resources = append(resources, r)
+		}
+	}
+
+	return resources, nil
+}
+
+func ec2TransitGatewayRouteTablePropagations(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	routeTablesIDs, err := getTransitGatewayRouteTablesIDs(ctx, a, EC2TransitGatewayRouteTable.String(), filters)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, tableID := range routeTablesIDs {
+		input := &ec2.GetTransitGatewayRouteTablePropagationsInput{
+			TransitGatewayRouteTableId: awsSDK.String(tableID),
+		}
+		propagations, err := a.awsr.GetTransitGatewayRouteTablePropagations(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, i := range propagations {
+			r, err := initializeResource(a, fmt.Sprintf("%s_%s", tableID, *i.TransitGatewayAttachmentId), resourceType)
+			if err != nil {
+				return nil, err
+			}
+			resources = append(resources, r)
+		}
 	}
 
 	return resources, nil

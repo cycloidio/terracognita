@@ -245,6 +245,26 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetTransitGatewayMulticast(ctx context.Context, input *ec2.DescribeTransitGatewayMulticastDomainsInput) ([]*ec2.TransitGatewayMulticastDomain, error)
 
+	// GetTransitGatewayPeeringAttachments returns the ec2 Transit Gateway Peering Attachments on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetTransitGatewayPeeringAttachments(ctx context.Context, input *ec2.DescribeTransitGatewayPeeringAttachmentsInput) ([]*ec2.TransitGatewayPeeringAttachment, error)
+
+	// GetTransitGatewayPrefixListReference returns the ec2 Transit Gateway Prefix List References on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetTransitGatewayPrefixListReference(ctx context.Context, input *ec2.GetTransitGatewayPrefixListReferencesInput) ([]*ec2.TransitGatewayPrefixListReference, error)
+
+	// GetTransitGatewayRoutes returns the ec2 Transit Gateway Routes on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetTransitGatewayRoutes(ctx context.Context, input *ec2.SearchTransitGatewayRoutesInput) ([]*ec2.TransitGatewayRoute, error)
+
+	// GetTransitGatewayRouteTableAssociations returns the ec2 Transit Gateway Route Table Associations on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetTransitGatewayRouteTableAssociations(ctx context.Context, input *ec2.GetTransitGatewayRouteTableAssociationsInput) ([]*ec2.TransitGatewayRouteTableAssociation, error)
+
+	// GetTransitGatewayRouteTablePropagations returns the ec2 Transit Gateway Route Table Propagations on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetTransitGatewayRouteTablePropagations(ctx context.Context, input *ec2.GetTransitGatewayRouteTablePropagationsInput) ([]*ec2.TransitGatewayRouteTablePropagation, error)
+
 	// GetECSClustersArns returns the ecs clusters arns on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetECSClustersArns(ctx context.Context, input *ecs.ListClustersInput) ([]*string, error)
@@ -1894,6 +1914,157 @@ func (c *connector) GetTransitGatewayMulticast(ctx context.Context, input *ec2.D
 		hasNextToken = o.NextToken != nil
 
 		opt = append(opt, o.TransitGatewayMulticastDomains...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetTransitGatewayPeeringAttachments(ctx context.Context, input *ec2.DescribeTransitGatewayPeeringAttachmentsInput) ([]*ec2.TransitGatewayPeeringAttachment, error) {
+	if c.svc.ec2 == nil {
+		c.svc.ec2 = ec2.New(c.svc.session)
+	}
+
+	opt := make([]*ec2.TransitGatewayPeeringAttachment, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.DescribeTransitGatewayPeeringAttachmentsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.TransitGatewayPeeringAttachments == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &ec2.DescribeTransitGatewayPeeringAttachmentsInput{}
+		}
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.TransitGatewayPeeringAttachments...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetTransitGatewayPrefixListReference(ctx context.Context, input *ec2.GetTransitGatewayPrefixListReferencesInput) ([]*ec2.TransitGatewayPrefixListReference, error) {
+	if c.svc.ec2 == nil {
+		c.svc.ec2 = ec2.New(c.svc.session)
+	}
+
+	opt := make([]*ec2.TransitGatewayPrefixListReference, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.GetTransitGatewayPrefixListReferencesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.TransitGatewayPrefixListReferences == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &ec2.GetTransitGatewayPrefixListReferencesInput{}
+		}
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.TransitGatewayPrefixListReferences...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetTransitGatewayRoutes(ctx context.Context, input *ec2.SearchTransitGatewayRoutesInput) ([]*ec2.TransitGatewayRoute, error) {
+	if c.svc.ec2 == nil {
+		c.svc.ec2 = ec2.New(c.svc.session)
+	}
+
+	opt := make([]*ec2.TransitGatewayRoute, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.SearchTransitGatewayRoutesWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.Routes == nil {
+			hasNextToken = false
+			continue
+		}
+
+		hasNextToken = false
+
+		opt = append(opt, o.Routes...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetTransitGatewayRouteTableAssociations(ctx context.Context, input *ec2.GetTransitGatewayRouteTableAssociationsInput) ([]*ec2.TransitGatewayRouteTableAssociation, error) {
+	if c.svc.ec2 == nil {
+		c.svc.ec2 = ec2.New(c.svc.session)
+	}
+
+	opt := make([]*ec2.TransitGatewayRouteTableAssociation, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.GetTransitGatewayRouteTableAssociationsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.Associations == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &ec2.GetTransitGatewayRouteTableAssociationsInput{}
+		}
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.Associations...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetTransitGatewayRouteTablePropagations(ctx context.Context, input *ec2.GetTransitGatewayRouteTablePropagationsInput) ([]*ec2.TransitGatewayRouteTablePropagation, error) {
+	if c.svc.ec2 == nil {
+		c.svc.ec2 = ec2.New(c.svc.session)
+	}
+
+	opt := make([]*ec2.TransitGatewayRouteTablePropagation, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ec2.GetTransitGatewayRouteTablePropagationsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.TransitGatewayRouteTablePropagations == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &ec2.GetTransitGatewayRouteTablePropagationsInput{}
+		}
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.TransitGatewayRouteTablePropagations...)
 
 	}
 

@@ -9,6 +9,11 @@
 - `aws_lb_target_group_attachment` was raising a nil pointer exception
   ([Issue #297](https://github.com/cycloidio/terracognita/issues/297))
 
+
+### Added
+- Added new AWS resources: `aws_ec2_transit_gateway_peering_attachment`, `aws_ec2_transit_gateway_peering_attachment_accepter`, `aws_ec2_transit_gateway_prefix_list_reference`, `aws_ec2_transit_gateway_route`, `aws_ec2_transit_gateway_route_table_association`, `aws_ec2_transit_gateway_route_table_propagation`, `aws_ec2_transit_gateway_vpc_attachment_accepter`
+  ([Issue #299](https://github.com/cycloidio/terracognita/issues/299))
+
 ## [0.7.6] _2022-05-11_
 
 ### Changed

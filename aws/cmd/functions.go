@@ -517,6 +517,59 @@ var (
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
+		Function{
+			FnName:  "GetTransitGatewayPeeringAttachments",
+			Entity:  "TransitGatewayPeeringAttachments",
+			Prefix:  "Describe",
+			Service: "ec2",
+			Documentation: `
+			// GetTransitGatewayPeeringAttachments returns the ec2 Transit Gateway Peering Attachments on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:  "GetTransitGatewayPrefixListReference",
+			Entity:  "TransitGatewayPrefixListReferences",
+			Prefix:  "Get",
+			Service: "ec2",
+			Documentation: `
+			// GetTransitGatewayPrefixListReference returns the ec2 Transit Gateway Prefix List References on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:           "GetTransitGatewayRoutes",
+			Entity:           "TransitGatewayRoutes",
+			Prefix:           "Search",
+			Service:          "ec2",
+			HasNotPagination: true,
+			FnAttributeList:  "Routes",
+			Documentation: `
+			// GetTransitGatewayRoutes returns the ec2 Transit Gateway Routes on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:          "GetTransitGatewayRouteTableAssociations",
+			Entity:          "TransitGatewayRouteTableAssociations",
+			FnAttributeList: "Associations",
+			Prefix:          "Get",
+			Service:         "ec2",
+			Documentation: `
+			// GetTransitGatewayRouteTableAssociations returns the ec2 Transit Gateway Route Table Associations on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			FnName:  "GetTransitGatewayRouteTablePropagations",
+			Entity:  "TransitGatewayRouteTablePropagations",
+			Prefix:  "Get",
+			Service: "ec2",
+			Documentation: `
+			// GetTransitGatewayRouteTablePropagations returns the ec2 Transit Gateway Route Table Propagations on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
 		// ECS
 		Function{
 			FnName:          "GetECSClustersArns",
