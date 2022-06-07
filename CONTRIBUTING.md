@@ -377,7 +377,105 @@ PROVIDER=azurerm make update-terraform-provider
 In `reader.go`, you can add your middleware function `ListInstances`. You will need to be equipped with this [documentation](https://godoc.org/google.golang.org/api/compute/v1). Google SDK is pretty standard, APIs are most of the time used in a similar way.
 You only need to find out if your component belongs to a `project` or a `project` and a `zone`. It's highly recommended to base your code on the other functions (a method to generate this function will be provided soon).
 
-###### Build and test your component
+We have a `google/cmd` that generates the `google/reader_generated.go` methods used to get the resources from the GCP SDK. To add a new call you have to add a new Function to the list in `google/cmd/generate.go` (and the corresponding GCP API if necessary) and run `make generate`, you'll have the code fully generated for that function.
+
+###### Example with google_compute_instance
+
+1. Add your function
+
+Functions are based on `https://github.com/googleapis/google-api-go-client`. Google SDK is a bit different than the other providers, there's not a file per object but a file per api so it makes it a bit more tricky to search for information. You need to find the corresponding API file,for example with `google_compute_instance` you should be able to find the required information in https://github.com/googleapis/google-api-go-client/blob/main/compute/v1/compute-gen.go. The API to use is the `compute` service with the version `v1`.
+*TIP!* A quick way to find the API is to check the corresponding import in the [terraform-provider-google](https://github.com/hashicorp/terraform-provider-google) repository for the given resource.
+
+Once you know the API file to use to retrieve the information you need to write your function is quite easy:
+
+i. Check the `Services` struct where all the API services are specified, in the case of the example `InstancesService`,
+ii. Using the service name search in the file for the `List` method that applies to this Service and returns a ListCall pointer for the object, in the case of the example `*InstancesListCall`
+iii. Then using this return object search for the available methods to apply to this call, these are the methods you'll need to define the function
+*Note!* you can also retrieve this information using the online docs for the example it would be here https://cloud.google.com/compute/docs/reference/rest/v1/instances/list
+
+With this information you can now create your functions using the template parameters:
+  * Resource: resource name in singular PascalCase
+  * API: the api name by default compute
+  * Region/Zone: if the list method requires one of these parameters
+You can find the full list of available parameters at `google/cmd/template.go`
+
+```shell
+$ vim google/cmd/generate.go
+```
+```go
+var functions = []Function{
+	...
+	Function{Resource: "Instance", Zone: true},
+}
+```
+
+Functions are used to generate List methods in `google/reader_generated.go`. After a `make generate` execution, we should find a `ListInstances` method at the end of the file corresponding to our previous example.
+
+*Note!* If you cannot use the template to create the List method, because the resource is too irregular, you can define it yourself in the file `google/reader_irregular_cases.go`
+
+2. Add your resource type
+
+The naming is based on terraform resources like `google_compute_instance` but without the `google` prefix and Snake case like `bla_foo` needs to be replaced by Camel case  `blaFoo`. The end result would be `ComputeInstance`.
+
+```shell
+$ vim azurerm/resources.go
+```
+```go
+const (
+	...
+	ComputeInstance ResourceType = iota
+)
+
+...
+
+var (
+	resources = map[ResourceType]rtFn{
+		...
+		ComputeInstance: computeInstance,
+	}
+)
+```
+
+The const is used to generate `google/resourcetype_enumer.go`.
+
+3. Add the associated function to generate terraform codes.
+
+```go
+func computeInstance(ctx context.Context, g *google, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	f := initializeFilter(filters)
+	instancesList, err := g.gcpr.ListInstances(ctx, f)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list instances from reader")
+	}
+	resources := make([]provider.Resource, 0)
+	for z, instances := range instancesList {
+		for _, instance := range instances {
+			r := provider.NewResource(fmt.Sprintf("%s/%s/%s", g.Project(), z, instance.Name), resourceType, g)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+```
+
+4. Make generate
+
+Last step is to re-generate the following files with enumer and build/install.
+
+  * `google/reader_generated.go`
+  * `google/resourcetype_enumer.go`
+
+```
+$ make generate
+$ make test
+```
+
+5. Update CHANGELOG
+
+Don't forget to update the `CHANGELOG.md`.
+
+
+#### Build and test your component
 
 That's it ! You can now generate some code and build your binary:
 
