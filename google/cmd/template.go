@@ -2,8 +2,10 @@ package main
 
 import (
 	"io"
+	"strings"
 	"text/template"
 
+	"github.com/gertd/go-pluralize"
 	"github.com/pkg/errors"
 )
 
@@ -16,17 +18,22 @@ const (
 		"context"
 
 		"github.com/pkg/errors"
-
+		"google.golang.org/api/dns/v1"
 		"google.golang.org/api/compute/v1"
 		"google.golang.org/api/sqladmin/v1beta4"
 		"google.golang.org/api/storage/v1"
+		"google.golang.org/api/cloudbilling/v1"
+		"google.golang.org/api/iam/v1"
+		"google.golang.org/api/file/v1"
+		"google.golang.org/api/container/v1"
+		"google.golang.org/api/logging/v2"
 	)
 	`
 
 	// functionTmpl it's the implementation of a reader function
 	functionTmpl = `
-	// List{{ .Name }} returns a list of {{ .Name }} within a project {{ if .Zone }}and a zone {{ end }}
-	func (r *GCPReader) List{{ .Name}}(ctx context.Context{{ if not .NoFilter }}, filter string {{ end }}) ({{ if .Zone }}map[string]{{end}}[]{{ .API }}.{{ .Resource }}, error) {
+	// {{ .FunctionName }} returns a list of {{ .PluralName }}{{ if .NoProjectScope }}{{ else }} within a project {{ if .Zone }}and a zone {{ else if .OtherListArg }}and a {{ .OtherListArg }}{{ end }}{{ end }}
+	func (r *GCPReader) {{ .FunctionName }} (ctx context.Context{{ if not .NoFilter }}, filter string {{ end }}{{ if or .ParentListScope .ParentFunction}}, parent string {{ end }}{{ if .OtherListArg }}, {{ .OtherListArg }} []string{{ end }}) ({{ if or .Zone .OtherListArg }}map[string]{{end}}[]{{ .API }}.{{ .Resource }}, error) {
 		service := {{ .API }}.New{{ .ServiceName}}Service(r.{{ .API }})
 		{{ if .Zone }}
 		list := make(map[string][]{{ .API }}.{{ .Resource }})
@@ -35,29 +42,44 @@ const (
 			return nil, errors.Wrap(err, "unable to get zones in region")
 		}
 		for _, zone := range zones {
+		{{ else if .OtherListArg }}
+		list := make(map[string][]{{ .API }}.{{ .Resource }})
+		for _, elem := range {{ .OtherListArg }} {
 		{{ end }}
 		resources := make([]{{ .API }}.{{ .Resource }}, 0)
-		{{ if .Zone }}
-		if err := service.List(r.project, zone).
-		{{ else if .Region }}
-		if err := service.List(r.project, r.region).
+		{{ if .DoMethodToList }}
+		elemList, err := service.List({{ if .ParentListScope }}parent{{ else if .NoProjectScope }}{{ else }}r.project,{{ end }}{{ if .OtherListArg }}elem{{ end }}).
+			Context(ctx).Do()
 		{{ else }}
-		if err := service.List(r.project).
+		err := service.List({{ if .ParentListScope }}parent{{ else if .NoProjectScope }}{{ else }}r.project{{ end }}{{ if .Zone }},zone {{ else if .OtherListArg }},elem {{ end }}{{ if .Region }}, r.region {{ end }}).
+		{{ if .ParentFunction }}
+			Parent(parent).
 		{{ end }}
 		{{ if not .NoFilter }}
 			Filter(filter).
 		{{ end }}
-			MaxResults(int64(r.maxResults)).
-			Pages(ctx, func(list *{{ .API }}.{{ .ResourceList }}) error {
-				for _, res := range list.{{ .ItemName }}{
-					resources = append(resources, *res)
-				}
-				return nil
-			}); err != nil {
+		{{ if .MaxResultFunc }}{{ .MaxResultFunc }}{{ else }}MaxResults{{ end }}(int64(r.maxResults)).
+		Pages(ctx, func(list *{{ .API }}.{{ .ResourceList }}) error {
+			for _, res := range list.{{ .ItemName }}{
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+		{{ end }}
+		if err != nil {
 			return nil, errors.Wrap(err, "unable to list {{ .API }} {{ .Resource }} from google APIs")
 		}
+		{{ if .DoMethodToList }}
+		for _, res := range elemList.{{ .ItemName }} {
+			resources = append(resources, *res)
+		}
+		{{ end }}
 		{{ if .Zone }}
 		list[zone] = resources
+		}
+		return list, nil
+		{{ else if .OtherListArg }}
+			list[elem] = resources
 		}
 		return list, nil
 		{{ else }}
@@ -89,47 +111,90 @@ type Function struct {
 	// Resource is the Google name of the entity, like
 	// Firewall, Instance, etc.
 	// https://godoc.org/google.golang.org/api/compute/v1
+	// Mandatory field
 	Resource string
 
-	// Zone is used to determine whether the resource is located within google zones or not
-	Zone bool
+	// API is used to determine the
+	// google API to use as defined in the Reader
+	// for a complete list of API: https://godoc.org/google.golang.org/api
+	// ex: compute, storage
+	// Optional field: default goes to `compute`
+	API string
 
-	// Name is the function name to be generated
+	// NoFilter is used to determine if the
+	// resource is based on filters or not
+	// Optional field: default goes to `false`
+	NoFilter bool
+
+	// FunctionName corresponds to the function name
+	// Optional field: By default "List"+ PluralName or "List" + API + PluralName if AddAPISufix is true
+	// Can also be specified for special cases
+	FunctionName string
+
+	// PluralName is the function name to be generated
 	// it can be useful if you `Resource` is `SslCertificate`, which is not `go`
 	// compliant, `Name` will be `SSLCertificate`, your Function name will be
 	// `ListSSLCertificates`
-	Name string
+	// Optional field
+	PluralName string
+
+	// AddAPISufix adds api name to list function to generate
+	// Optional field: by default "List" + PluralName AddAPISuffix = true then FunctionName = "List" + API + PluralName instead of "List" + PluralName
+	AddAPISufix bool
 
 	// ServiceName is name of the Google SDK service name
 	// If your service is `TargetHttpProxy`, your service name will
 	// be `TargetHttpProxies`
 	ServiceName string
 
+	// Zone is used to determine whether the resource is located within google zones or not
+	// If it is the case the list will be done trough a loop of all the zones within the region of the provider
+	// Optional field: use if the List method of the resource requires Zone as a param
+	Zone bool
+
 	// Region is used to determine whether the resource is dedicated to a region or not
+	// Optional field: use if the List method of the resource requires region as a param
 	Region bool
 
-	// API is used to determine the
-	// google API to use as defined in the Reader
-	// for a complete list of API: https://godoc.org/google.golang.org/api
-	// ex: compute, storage
-	// default goes to `compute`
-	API string
+	// OtherListArg is used in case the resource list function to get the resources requires as argument a name, cached from another resource
+	// in that case the list will be done trough a loop of the corresponding map of strings, similar to Zone parameter
+	// Optional field: use if the List method of the resource requires a parameter string from another resource, e.g: db sql requires sql instance name
+	OtherListArg string
 
-	// NoFilter is used to determine if the
-	// resource is based on filters or not
-	// default goes to `false`
-	NoFilter bool
+	// DoMethodToList is used when the method to get the objects data is not Pages() but Do()
+	// Optional field
+	DoMethodToList bool
+
+	// NoProjectScope is used when the List method doesn't require project
+	// Optional field
+	NoProjectScope bool
+
+	// MaxResultFunc to specify if the function to limit results has a different name than the default one MaxResults
+	// Optional field
+	MaxResultFunc string
+
+	// ParentListScope to use if the scope of the search can be either
+	// organizations/{organization_id} for an organization level
+	// or projects/{project_id} for a project level and the list
+	// Optional  field: use if the List method has a parend field
+	ParentListScope bool
+
+	// ParentFunction to use if the scope of the search is parent (as explained in ParentListScope field)
+	// but the list uses a separate Parent Function
+	// Optional  field
+	ParentFunction bool
 
 	// ResourceList overrides the default name of
 	// the resources list: `resourceList`
 	// exemple:
 	// for the components Instance, the list struct is `InstanceList`
 	// but for the components Bucket, the list struct is `Buckets`
+	// Optional field: use if the List method of the resource requires Zone as a param
 	ResourceList string
 
 	// ItemName overrides the default name of
-	// of the list of resources inside the List elements
-	// fetch by TC
+	// of the list of resources inside the List elements when using Pages()
+	// Optional field
 	ItemName string
 }
 
@@ -142,14 +207,20 @@ func (f Function) Execute(w io.Writer) error {
 	if len(f.API) == 0 {
 		f.API = "compute"
 	}
-	if len(f.Name) == 0 {
-		f.Name = f.Resource + "s"
+	if len(f.PluralName) == 0 {
+		f.PluralName = pluralize.NewClient().Plural(f.Resource)
 	}
 	if len(f.ServiceName) == 0 {
-		f.ServiceName = f.Resource + "s"
+		f.ServiceName = pluralize.NewClient().Plural(f.Resource)
 	}
 	if len(f.ItemName) == 0 {
 		f.ItemName = "Items"
+	}
+	if len(f.FunctionName) == 0 {
+		f.FunctionName = "List" + f.PluralName
+		if f.AddAPISufix {
+			f.FunctionName = "List" + strings.ToUpper(f.API) + f.PluralName
+		}
 	}
 	if err := fnTmpl.Execute(w, f); err != nil {
 		return errors.Wrapf(err, "failed to Execute with Function %+v", f)

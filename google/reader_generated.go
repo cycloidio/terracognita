@@ -5,12 +5,243 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-
+	"google.golang.org/api/cloudbilling/v1"
 	"google.golang.org/api/compute/v1"
+	"google.golang.org/api/container/v1"
 	"google.golang.org/api/dns/v1"
+	"google.golang.org/api/file/v1"
+	"google.golang.org/api/iam/v1"
+	"google.golang.org/api/logging/v2"
+	"google.golang.org/api/monitoring/v3"
+	"google.golang.org/api/redis/v1"
 	sqladmin "google.golang.org/api/sqladmin/v1beta4"
 	"google.golang.org/api/storage/v1"
 )
+
+// ListDNSManagedZones returns a list of ManagedZones within a project
+func (r *GCPReader) ListDNSManagedZones(ctx context.Context) ([]dns.ManagedZone, error) {
+	service := dns.NewManagedZonesService(r.dns)
+
+	resources := make([]dns.ManagedZone, 0)
+
+	err := service.List(r.project).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *dns.ManagedZonesListResponse) error {
+			for _, res := range list.ManagedZones {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list dns ManagedZone from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListDNSPolicies returns a list of Policies within a project
+func (r *GCPReader) ListDNSPolicies(ctx context.Context) ([]dns.Policy, error) {
+	service := dns.NewPoliciesService(r.dns)
+
+	resources := make([]dns.Policy, 0)
+
+	err := service.List(r.project).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *dns.PoliciesListResponse) error {
+			for _, res := range list.Policies {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list dns Policy from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListDNSResourceRecordSets returns a list of ResourceRecordSets within a project and a managedZones
+func (r *GCPReader) ListDNSResourceRecordSets(ctx context.Context, managedZones []string) (map[string][]dns.ResourceRecordSet, error) {
+	service := dns.NewResourceRecordSetsService(r.dns)
+
+	list := make(map[string][]dns.ResourceRecordSet)
+	for _, elem := range managedZones {
+
+		resources := make([]dns.ResourceRecordSet, 0)
+
+		err := service.List(r.project, elem).
+			MaxResults(int64(r.maxResults)).
+			Pages(ctx, func(list *dns.ResourceRecordSetsListResponse) error {
+				for _, res := range list.Rrsets {
+					resources = append(resources, *res)
+				}
+				return nil
+			})
+
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list dns ResourceRecordSet from google APIs")
+		}
+
+		list[elem] = resources
+	}
+	return list, nil
+
+}
+
+// ListBillingSubaccounts returns a list of BillingAccounts
+func (r *GCPReader) ListBillingSubaccounts(ctx context.Context) ([]cloudbilling.BillingAccount, error) {
+	service := cloudbilling.NewBillingAccountsService(r.cloudbilling)
+
+	resources := make([]cloudbilling.BillingAccount, 0)
+
+	err := service.List().
+		PageSize(int64(r.maxResults)).
+		Pages(ctx, func(list *cloudbilling.ListBillingAccountsResponse) error {
+			for _, res := range list.BillingAccounts {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list cloudbilling BillingAccount from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListProjectIAMCustomRoles returns a list of Roles
+func (r *GCPReader) ListProjectIAMCustomRoles(ctx context.Context, parent string) ([]iam.Role, error) {
+	service := iam.NewRolesService(r.iam)
+
+	resources := make([]iam.Role, 0)
+
+	err := service.List().
+		Parent(parent).
+		PageSize(int64(r.maxResults)).
+		Pages(ctx, func(list *iam.ListRolesResponse) error {
+			for _, res := range list.Roles {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list iam Role from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListSQLDatabaseInstances returns a list of StorageInstances within a project
+func (r *GCPReader) ListSQLDatabaseInstances(ctx context.Context, filter string) ([]sqladmin.DatabaseInstance, error) {
+	service := sqladmin.NewInstancesService(r.sqladmin)
+
+	resources := make([]sqladmin.DatabaseInstance, 0)
+
+	err := service.List(r.project).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *sqladmin.InstancesListResponse) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list sqladmin DatabaseInstance from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListSTORAGEBuckets returns a list of Buckets within a project
+func (r *GCPReader) ListSTORAGEBuckets(ctx context.Context) ([]storage.Bucket, error) {
+	service := storage.NewBucketsService(r.storage)
+
+	resources := make([]storage.Bucket, 0)
+
+	err := service.List(r.project).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *storage.Buckets) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list storage Bucket from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListAddresses returns a list of Addresses within a project
+func (r *GCPReader) ListAddresses(ctx context.Context, filter string) ([]compute.Address, error) {
+	service := compute.NewAddressesService(r.compute)
+
+	resources := make([]compute.Address, 0)
+
+	err := service.List(r.project, r.region).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.AddressList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list compute Address from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListAutoscalers returns a list of Autoscalers within a project and a zone
+func (r *GCPReader) ListAutoscalers(ctx context.Context, filter string) (map[string][]compute.Autoscaler, error) {
+	service := compute.NewAutoscalersService(r.compute)
+
+	list := make(map[string][]compute.Autoscaler)
+	zones, err := r.getZones()
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get zones in region")
+	}
+	for _, zone := range zones {
+
+		resources := make([]compute.Autoscaler, 0)
+
+		err := service.List(r.project, zone).
+			Filter(filter).
+			MaxResults(int64(r.maxResults)).
+			Pages(ctx, func(list *compute.AutoscalerList) error {
+				for _, res := range list.Items {
+					resources = append(resources, *res)
+				}
+				return nil
+			})
+
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list compute Autoscaler from google APIs")
+		}
+
+		list[zone] = resources
+	}
+	return list, nil
+
+}
 
 // ListBackendServices returns a list of BackendServices within a project
 func (r *GCPReader) ListBackendServices(ctx context.Context, filter string) ([]compute.BackendService, error) {
@@ -18,7 +249,7 @@ func (r *GCPReader) ListBackendServices(ctx context.Context, filter string) ([]c
 
 	resources := make([]compute.BackendService, 0)
 
-	if err := service.List(r.project).
+	err := service.List(r.project).
 		Filter(filter).
 		MaxResults(int64(r.maxResults)).
 		Pages(ctx, func(list *compute.BackendServiceList) error {
@@ -26,7 +257,9 @@ func (r *GCPReader) ListBackendServices(ctx context.Context, filter string) ([]c
 				resources = append(resources, *res)
 			}
 			return nil
-		}); err != nil {
+		})
+
+	if err != nil {
 		return nil, errors.Wrap(err, "unable to list compute BackendService from google APIs")
 	}
 
@@ -40,7 +273,7 @@ func (r *GCPReader) ListBackendBuckets(ctx context.Context, filter string) ([]co
 
 	resources := make([]compute.BackendBucket, 0)
 
-	if err := service.List(r.project).
+	err := service.List(r.project).
 		Filter(filter).
 		MaxResults(int64(r.maxResults)).
 		Pages(ctx, func(list *compute.BackendBucketList) error {
@@ -48,51 +281,10 @@ func (r *GCPReader) ListBackendBuckets(ctx context.Context, filter string) ([]co
 				resources = append(resources, *res)
 			}
 			return nil
-		}); err != nil {
+		})
+
+	if err != nil {
 		return nil, errors.Wrap(err, "unable to list compute BackendBucket from google APIs")
-	}
-
-	return resources, nil
-
-}
-
-// ListBuckets returns a list of Buckets within a project
-func (r *GCPReader) ListBuckets(ctx context.Context) ([]storage.Bucket, error) {
-	service := storage.NewBucketsService(r.storage)
-
-	resources := make([]storage.Bucket, 0)
-
-	if err := service.List(r.project).
-		MaxResults(int64(r.maxResults)).
-		Pages(ctx, func(list *storage.Buckets) error {
-			for _, res := range list.Items {
-				resources = append(resources, *res)
-			}
-			return nil
-		}); err != nil {
-		return nil, errors.Wrap(err, "unable to list storage Bucket from google APIs")
-	}
-
-	return resources, nil
-
-}
-
-// ListStorageInstances returns a list of StorageInstances within a project
-func (r *GCPReader) ListStorageInstances(ctx context.Context, filter string) ([]sqladmin.DatabaseInstance, error) {
-	service := sqladmin.NewInstancesService(r.sqladmin)
-
-	resources := make([]sqladmin.DatabaseInstance, 0)
-
-	if err := service.List(r.project).
-		Filter(filter).
-		MaxResults(int64(r.maxResults)).
-		Pages(ctx, func(list *sqladmin.InstancesListResponse) error {
-			for _, res := range list.Items {
-				resources = append(resources, *res)
-			}
-			return nil
-		}); err != nil {
-		return nil, errors.Wrap(err, "unable to list sqladmin DatabaseInstance from google APIs")
 	}
 
 	return resources, nil
@@ -112,7 +304,7 @@ func (r *GCPReader) ListDisks(ctx context.Context, filter string) (map[string][]
 
 		resources := make([]compute.Disk, 0)
 
-		if err := service.List(r.project, zone).
+		err := service.List(r.project, zone).
 			Filter(filter).
 			MaxResults(int64(r.maxResults)).
 			Pages(ctx, func(list *compute.DiskList) error {
@@ -120,7 +312,9 @@ func (r *GCPReader) ListDisks(ctx context.Context, filter string) (map[string][]
 					resources = append(resources, *res)
 				}
 				return nil
-			}); err != nil {
+			})
+
+		if err != nil {
 			return nil, errors.Wrap(err, "unable to list compute Disk from google APIs")
 		}
 
@@ -136,7 +330,7 @@ func (r *GCPReader) ListFirewalls(ctx context.Context, filter string) ([]compute
 
 	resources := make([]compute.Firewall, 0)
 
-	if err := service.List(r.project).
+	err := service.List(r.project).
 		Filter(filter).
 		MaxResults(int64(r.maxResults)).
 		Pages(ctx, func(list *compute.FirewallList) error {
@@ -144,7 +338,9 @@ func (r *GCPReader) ListFirewalls(ctx context.Context, filter string) ([]compute
 				resources = append(resources, *res)
 			}
 			return nil
-		}); err != nil {
+		})
+
+	if err != nil {
 		return nil, errors.Wrap(err, "unable to list compute Firewall from google APIs")
 	}
 
@@ -158,7 +354,7 @@ func (r *GCPReader) ListGlobalForwardingRules(ctx context.Context, filter string
 
 	resources := make([]compute.ForwardingRule, 0)
 
-	if err := service.List(r.project).
+	err := service.List(r.project).
 		Filter(filter).
 		MaxResults(int64(r.maxResults)).
 		Pages(ctx, func(list *compute.ForwardingRuleList) error {
@@ -166,7 +362,9 @@ func (r *GCPReader) ListGlobalForwardingRules(ctx context.Context, filter string
 				resources = append(resources, *res)
 			}
 			return nil
-		}); err != nil {
+		})
+
+	if err != nil {
 		return nil, errors.Wrap(err, "unable to list compute ForwardingRule from google APIs")
 	}
 
@@ -180,7 +378,7 @@ func (r *GCPReader) ListForwardingRules(ctx context.Context, filter string) ([]c
 
 	resources := make([]compute.ForwardingRule, 0)
 
-	if err := service.List(r.project, r.region).
+	err := service.List(r.project, r.region).
 		Filter(filter).
 		MaxResults(int64(r.maxResults)).
 		Pages(ctx, func(list *compute.ForwardingRuleList) error {
@@ -188,7 +386,9 @@ func (r *GCPReader) ListForwardingRules(ctx context.Context, filter string) ([]c
 				resources = append(resources, *res)
 			}
 			return nil
-		}); err != nil {
+		})
+
+	if err != nil {
 		return nil, errors.Wrap(err, "unable to list compute ForwardingRule from google APIs")
 	}
 
@@ -202,7 +402,7 @@ func (r *GCPReader) ListHealthChecks(ctx context.Context, filter string) ([]comp
 
 	resources := make([]compute.HealthCheck, 0)
 
-	if err := service.List(r.project).
+	err := service.List(r.project).
 		Filter(filter).
 		MaxResults(int64(r.maxResults)).
 		Pages(ctx, func(list *compute.HealthCheckList) error {
@@ -210,7 +410,9 @@ func (r *GCPReader) ListHealthChecks(ctx context.Context, filter string) ([]comp
 				resources = append(resources, *res)
 			}
 			return nil
-		}); err != nil {
+		})
+
+	if err != nil {
 		return nil, errors.Wrap(err, "unable to list compute HealthCheck from google APIs")
 	}
 
@@ -231,7 +433,7 @@ func (r *GCPReader) ListInstances(ctx context.Context, filter string) (map[strin
 
 		resources := make([]compute.Instance, 0)
 
-		if err := service.List(r.project, zone).
+		err := service.List(r.project, zone).
 			Filter(filter).
 			MaxResults(int64(r.maxResults)).
 			Pages(ctx, func(list *compute.InstanceList) error {
@@ -239,7 +441,9 @@ func (r *GCPReader) ListInstances(ctx context.Context, filter string) (map[strin
 					resources = append(resources, *res)
 				}
 				return nil
-			}); err != nil {
+			})
+
+		if err != nil {
 			return nil, errors.Wrap(err, "unable to list compute Instance from google APIs")
 		}
 
@@ -262,7 +466,7 @@ func (r *GCPReader) ListInstanceGroups(ctx context.Context, filter string) (map[
 
 		resources := make([]compute.InstanceGroup, 0)
 
-		if err := service.List(r.project, zone).
+		err := service.List(r.project, zone).
 			Filter(filter).
 			MaxResults(int64(r.maxResults)).
 			Pages(ctx, func(list *compute.InstanceGroupList) error {
@@ -270,7 +474,9 @@ func (r *GCPReader) ListInstanceGroups(ctx context.Context, filter string) (map[
 					resources = append(resources, *res)
 				}
 				return nil
-			}); err != nil {
+			})
+
+		if err != nil {
 			return nil, errors.Wrap(err, "unable to list compute InstanceGroup from google APIs")
 		}
 
@@ -280,34 +486,13 @@ func (r *GCPReader) ListInstanceGroups(ctx context.Context, filter string) (map[
 
 }
 
-// ListManagedZones returns a list of ManagedZones within a project
-func (r *GCPReader) ListManagedZones(ctx context.Context) ([]dns.ManagedZone, error) {
-	service := dns.NewManagedZonesService(r.dns)
-
-	resources := make([]dns.ManagedZone, 0)
-
-	if err := service.List(r.project).
-		MaxResults(int64(r.maxResults)).
-		Pages(ctx, func(list *dns.ManagedZonesListResponse) error {
-			for _, res := range list.ManagedZones {
-				resources = append(resources, *res)
-			}
-			return nil
-		}); err != nil {
-		return nil, errors.Wrap(err, "unable to list dns ManagedZone from google APIs")
-	}
-
-	return resources, nil
-
-}
-
 // ListNetworks returns a list of Networks within a project
 func (r *GCPReader) ListNetworks(ctx context.Context, filter string) ([]compute.Network, error) {
 	service := compute.NewNetworksService(r.compute)
 
 	resources := make([]compute.Network, 0)
 
-	if err := service.List(r.project).
+	err := service.List(r.project).
 		Filter(filter).
 		MaxResults(int64(r.maxResults)).
 		Pages(ctx, func(list *compute.NetworkList) error {
@@ -315,7 +500,9 @@ func (r *GCPReader) ListNetworks(ctx context.Context, filter string) ([]compute.
 				resources = append(resources, *res)
 			}
 			return nil
-		}); err != nil {
+		})
+
+	if err != nil {
 		return nil, errors.Wrap(err, "unable to list compute Network from google APIs")
 	}
 
@@ -329,7 +516,7 @@ func (r *GCPReader) ListSSLCertificates(ctx context.Context, filter string) ([]c
 
 	resources := make([]compute.SslCertificate, 0)
 
-	if err := service.List(r.project).
+	err := service.List(r.project).
 		Filter(filter).
 		MaxResults(int64(r.maxResults)).
 		Pages(ctx, func(list *compute.SslCertificateList) error {
@@ -337,7 +524,9 @@ func (r *GCPReader) ListSSLCertificates(ctx context.Context, filter string) ([]c
 				resources = append(resources, *res)
 			}
 			return nil
-		}); err != nil {
+		})
+
+	if err != nil {
 		return nil, errors.Wrap(err, "unable to list compute SslCertificate from google APIs")
 	}
 
@@ -351,7 +540,7 @@ func (r *GCPReader) ListTargetHTTPProxies(ctx context.Context, filter string) ([
 
 	resources := make([]compute.TargetHttpProxy, 0)
 
-	if err := service.List(r.project).
+	err := service.List(r.project).
 		Filter(filter).
 		MaxResults(int64(r.maxResults)).
 		Pages(ctx, func(list *compute.TargetHttpProxyList) error {
@@ -359,7 +548,9 @@ func (r *GCPReader) ListTargetHTTPProxies(ctx context.Context, filter string) ([
 				resources = append(resources, *res)
 			}
 			return nil
-		}); err != nil {
+		})
+
+	if err != nil {
 		return nil, errors.Wrap(err, "unable to list compute TargetHttpProxy from google APIs")
 	}
 
@@ -373,7 +564,7 @@ func (r *GCPReader) ListTargetHTTPSProxies(ctx context.Context, filter string) (
 
 	resources := make([]compute.TargetHttpsProxy, 0)
 
-	if err := service.List(r.project).
+	err := service.List(r.project).
 		Filter(filter).
 		MaxResults(int64(r.maxResults)).
 		Pages(ctx, func(list *compute.TargetHttpsProxyList) error {
@@ -381,7 +572,9 @@ func (r *GCPReader) ListTargetHTTPSProxies(ctx context.Context, filter string) (
 				resources = append(resources, *res)
 			}
 			return nil
-		}); err != nil {
+		})
+
+	if err != nil {
 		return nil, errors.Wrap(err, "unable to list compute TargetHttpsProxy from google APIs")
 	}
 
@@ -395,7 +588,7 @@ func (r *GCPReader) ListURLMaps(ctx context.Context, filter string) ([]compute.U
 
 	resources := make([]compute.UrlMap, 0)
 
-	if err := service.List(r.project).
+	err := service.List(r.project).
 		Filter(filter).
 		MaxResults(int64(r.maxResults)).
 		Pages(ctx, func(list *compute.UrlMapList) error {
@@ -403,8 +596,629 @@ func (r *GCPReader) ListURLMaps(ctx context.Context, filter string) ([]compute.U
 				resources = append(resources, *res)
 			}
 			return nil
-		}); err != nil {
+		})
+
+	if err != nil {
 		return nil, errors.Wrap(err, "unable to list compute UrlMap from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListGlobalAddresses returns a list of GlobalAddress within a project
+func (r *GCPReader) ListGlobalAddresses(ctx context.Context, filter string) ([]compute.Address, error) {
+	service := compute.NewAddressesService(r.compute)
+
+	resources := make([]compute.Address, 0)
+
+	err := service.List(r.project, r.region).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.AddressList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list compute Address from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListImages returns a list of Images within a project
+func (r *GCPReader) ListImages(ctx context.Context, filter string) ([]compute.Image, error) {
+	service := compute.NewImagesService(r.compute)
+
+	resources := make([]compute.Image, 0)
+
+	err := service.List(r.project).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.ImageList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list compute Image from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListInstanceGroupManagers returns a list of InstanceGroupManagers within a project and a zone
+func (r *GCPReader) ListInstanceGroupManagers(ctx context.Context, filter string) (map[string][]compute.InstanceGroupManager, error) {
+	service := compute.NewInstanceGroupManagersService(r.compute)
+
+	list := make(map[string][]compute.InstanceGroupManager)
+	zones, err := r.getZones()
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get zones in region")
+	}
+	for _, zone := range zones {
+
+		resources := make([]compute.InstanceGroupManager, 0)
+
+		err := service.List(r.project, zone).
+			Filter(filter).
+			MaxResults(int64(r.maxResults)).
+			Pages(ctx, func(list *compute.InstanceGroupManagerList) error {
+				for _, res := range list.Items {
+					resources = append(resources, *res)
+				}
+				return nil
+			})
+
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list compute InstanceGroupManager from google APIs")
+		}
+
+		list[zone] = resources
+	}
+	return list, nil
+
+}
+
+// ListInstanceTemplates returns a list of InstanceTemplates within a project
+func (r *GCPReader) ListInstanceTemplates(ctx context.Context, filter string) ([]compute.InstanceTemplate, error) {
+	service := compute.NewInstanceTemplatesService(r.compute)
+
+	resources := make([]compute.InstanceTemplate, 0)
+
+	err := service.List(r.project).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.InstanceTemplateList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list compute InstanceTemplate from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListManagedSslCertificates returns a list of SslCertificates within a project
+func (r *GCPReader) ListManagedSslCertificates(ctx context.Context, filter string) ([]compute.SslCertificate, error) {
+	service := compute.NewSslCertificatesService(r.compute)
+
+	resources := make([]compute.SslCertificate, 0)
+
+	err := service.List(r.project).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.SslCertificateList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list compute SslCertificate from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListNetworkEndpointGroups returns a list of NetworkEndpointGroups within a project and a zone
+func (r *GCPReader) ListNetworkEndpointGroups(ctx context.Context, filter string) (map[string][]compute.NetworkEndpointGroup, error) {
+	service := compute.NewNetworkEndpointGroupsService(r.compute)
+
+	list := make(map[string][]compute.NetworkEndpointGroup)
+	zones, err := r.getZones()
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get zones in region")
+	}
+	for _, zone := range zones {
+
+		resources := make([]compute.NetworkEndpointGroup, 0)
+
+		err := service.List(r.project, zone).
+			Filter(filter).
+			MaxResults(int64(r.maxResults)).
+			Pages(ctx, func(list *compute.NetworkEndpointGroupList) error {
+				for _, res := range list.Items {
+					resources = append(resources, *res)
+				}
+				return nil
+			})
+
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list compute NetworkEndpointGroup from google APIs")
+		}
+
+		list[zone] = resources
+	}
+	return list, nil
+
+}
+
+// ListRoutes returns a list of Routes within a project
+func (r *GCPReader) ListRoutes(ctx context.Context, filter string) ([]compute.Route, error) {
+	service := compute.NewRoutesService(r.compute)
+
+	resources := make([]compute.Route, 0)
+
+	err := service.List(r.project).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.RouteList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list compute Route from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListSecurityPolicies returns a list of SecurityPolicies within a project
+func (r *GCPReader) ListSecurityPolicies(ctx context.Context, filter string) ([]compute.SecurityPolicy, error) {
+	service := compute.NewSecurityPoliciesService(r.compute)
+
+	resources := make([]compute.SecurityPolicy, 0)
+
+	err := service.List(r.project).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.SecurityPolicyList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list compute SecurityPolicy from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListServiceAttachments returns a list of ServiceAttachments within a project
+func (r *GCPReader) ListServiceAttachments(ctx context.Context, filter string) ([]compute.ServiceAttachment, error) {
+	service := compute.NewServiceAttachmentsService(r.compute)
+
+	resources := make([]compute.ServiceAttachment, 0)
+
+	err := service.List(r.project, r.region).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.ServiceAttachmentList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list compute ServiceAttachment from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListSnapshots returns a list of Snapshots within a project
+func (r *GCPReader) ListSnapshots(ctx context.Context, filter string) ([]compute.Snapshot, error) {
+	service := compute.NewSnapshotsService(r.compute)
+
+	resources := make([]compute.Snapshot, 0)
+
+	err := service.List(r.project).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.SnapshotList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list compute Snapshot from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListSslPolicies returns a list of SslPolicies within a project
+func (r *GCPReader) ListSslPolicies(ctx context.Context, filter string) ([]compute.SslPolicy, error) {
+	service := compute.NewSslPoliciesService(r.compute)
+
+	resources := make([]compute.SslPolicy, 0)
+
+	err := service.List(r.project).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.SslPoliciesList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list compute SslPolicy from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListSubnetworks returns a list of Subnetworks within a project
+func (r *GCPReader) ListSubnetworks(ctx context.Context, filter string) ([]compute.Subnetwork, error) {
+	service := compute.NewSubnetworksService(r.compute)
+
+	resources := make([]compute.Subnetwork, 0)
+
+	err := service.List(r.project, r.region).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.SubnetworkList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list compute Subnetwork from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListTargetGrpcProxies returns a list of TargetGrpcProxies within a project
+func (r *GCPReader) ListTargetGrpcProxies(ctx context.Context, filter string) ([]compute.TargetGrpcProxy, error) {
+	service := compute.NewTargetGrpcProxiesService(r.compute)
+
+	resources := make([]compute.TargetGrpcProxy, 0)
+
+	err := service.List(r.project).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.TargetGrpcProxyList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list compute TargetGrpcProxy from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListTargetInstances returns a list of TargetInstances within a project and a zone
+func (r *GCPReader) ListTargetInstances(ctx context.Context, filter string) (map[string][]compute.TargetInstance, error) {
+	service := compute.NewTargetInstancesService(r.compute)
+
+	list := make(map[string][]compute.TargetInstance)
+	zones, err := r.getZones()
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get zones in region")
+	}
+	for _, zone := range zones {
+
+		resources := make([]compute.TargetInstance, 0)
+
+		err := service.List(r.project, zone).
+			Filter(filter).
+			MaxResults(int64(r.maxResults)).
+			Pages(ctx, func(list *compute.TargetInstanceList) error {
+				for _, res := range list.Items {
+					resources = append(resources, *res)
+				}
+				return nil
+			})
+
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list compute TargetInstance from google APIs")
+		}
+
+		list[zone] = resources
+	}
+	return list, nil
+
+}
+
+// ListTargetPools returns a list of TargetPools within a project
+func (r *GCPReader) ListTargetPools(ctx context.Context, filter string) ([]compute.TargetPool, error) {
+	service := compute.NewTargetPoolsService(r.compute)
+
+	resources := make([]compute.TargetPool, 0)
+
+	err := service.List(r.project, r.region).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.TargetPoolList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list compute TargetPool from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListTargetSslProxies returns a list of TargetSslProxies within a project
+func (r *GCPReader) ListTargetSslProxies(ctx context.Context, filter string) ([]compute.TargetSslProxy, error) {
+	service := compute.NewTargetSslProxiesService(r.compute)
+
+	resources := make([]compute.TargetSslProxy, 0)
+
+	err := service.List(r.project).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.TargetSslProxyList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list compute TargetSslProxy from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListTargetTCPProxies returns a list of TargetTcpProxies within a project
+func (r *GCPReader) ListTargetTCPProxies(ctx context.Context, filter string) ([]compute.TargetTcpProxy, error) {
+	service := compute.NewTargetTcpProxiesService(r.compute)
+
+	resources := make([]compute.TargetTcpProxy, 0)
+
+	err := service.List(r.project).
+		Filter(filter).
+		MaxResults(int64(r.maxResults)).
+		Pages(ctx, func(list *compute.TargetTcpProxyList) error {
+			for _, res := range list.Items {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list compute TargetTcpProxy from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListFilestoreInstances returns a list of Instances within a project
+func (r *GCPReader) ListFilestoreInstances(ctx context.Context, filter string, parent string) ([]file.Instance, error) {
+	service := file.NewProjectsLocationsInstancesService(r.file)
+
+	resources := make([]file.Instance, 0)
+
+	err := service.List(parent).
+		Filter(filter).
+		PageSize(int64(r.maxResults)).
+		Pages(ctx, func(list *file.ListInstancesResponse) error {
+			for _, res := range list.Instances {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list file Instance from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListCONTAINERClusters returns a list of Clusters
+func (r *GCPReader) ListCONTAINERClusters(ctx context.Context, filter string, parent string) ([]container.Cluster, error) {
+	service := container.NewProjectsLocationsClustersService(r.container)
+
+	resources := make([]container.Cluster, 0)
+
+	elemList, err := service.List(parent).
+		Context(ctx).Do()
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list container Cluster from google APIs")
+	}
+
+	for _, res := range elemList.Clusters {
+		resources = append(resources, *res)
+	}
+
+	return resources, nil
+
+}
+
+// ListRedisInstances returns a list of Instances within a project
+func (r *GCPReader) ListRedisInstances(ctx context.Context, parent string) ([]redis.Instance, error) {
+	service := redis.NewProjectsLocationsInstancesService(r.redis)
+
+	resources := make([]redis.Instance, 0)
+
+	err := service.List(parent).
+		PageSize(int64(r.maxResults)).
+		Pages(ctx, func(list *redis.ListInstancesResponse) error {
+			for _, res := range list.Instances {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list redis Instance from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListLogMetrics returns a list of LogMetrics within a project
+func (r *GCPReader) ListLogMetrics(ctx context.Context, parent string) ([]logging.LogMetric, error) {
+	service := logging.NewProjectsMetricsService(r.logging)
+
+	resources := make([]logging.LogMetric, 0)
+
+	err := service.List(parent).
+		PageSize(int64(r.maxResults)).
+		Pages(ctx, func(list *logging.ListLogMetricsResponse) error {
+			for _, res := range list.Metrics {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list logging LogMetric from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListMONITORINGAlertPolicies returns a list of AlertPolicies within a project
+func (r *GCPReader) ListMONITORINGAlertPolicies(ctx context.Context, filter string, parent string) ([]monitoring.AlertPolicy, error) {
+	service := monitoring.NewProjectsAlertPoliciesService(r.monitoring)
+
+	resources := make([]monitoring.AlertPolicy, 0)
+
+	err := service.List(parent).
+		Filter(filter).
+		PageSize(int64(r.maxResults)).
+		Pages(ctx, func(list *monitoring.ListAlertPoliciesResponse) error {
+			for _, res := range list.AlertPolicies {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list monitoring AlertPolicy from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListMONITORINGGroups returns a list of Groups within a project
+func (r *GCPReader) ListMONITORINGGroups(ctx context.Context, parent string) ([]monitoring.Group, error) {
+	service := monitoring.NewProjectsGroupsService(r.monitoring)
+
+	resources := make([]monitoring.Group, 0)
+
+	err := service.List(parent).
+		PageSize(int64(r.maxResults)).
+		Pages(ctx, func(list *monitoring.ListGroupsResponse) error {
+			for _, res := range list.Group {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list monitoring Group from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListMONITORINGNotificationChannels returns a list of NotificationChannels within a project
+func (r *GCPReader) ListMONITORINGNotificationChannels(ctx context.Context, parent string) ([]monitoring.NotificationChannel, error) {
+	service := monitoring.NewProjectsNotificationChannelsService(r.monitoring)
+
+	resources := make([]monitoring.NotificationChannel, 0)
+
+	err := service.List(parent).
+		PageSize(int64(r.maxResults)).
+		Pages(ctx, func(list *monitoring.ListNotificationChannelsResponse) error {
+			for _, res := range list.NotificationChannels {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list monitoring NotificationChannel from google APIs")
+	}
+
+	return resources, nil
+
+}
+
+// ListMONITORINGUptimeCheckConfigs returns a list of UptimeCheckConfigs within a project
+func (r *GCPReader) ListMONITORINGUptimeCheckConfigs(ctx context.Context, parent string) ([]monitoring.UptimeCheckConfig, error) {
+	service := monitoring.NewProjectsUptimeCheckConfigsService(r.monitoring)
+
+	resources := make([]monitoring.UptimeCheckConfig, 0)
+
+	err := service.List(parent).
+		PageSize(int64(r.maxResults)).
+		Pages(ctx, func(list *monitoring.ListUptimeCheckConfigsResponse) error {
+			for _, res := range list.UptimeCheckConfigs {
+				resources = append(resources, *res)
+			}
+			return nil
+		})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list monitoring UptimeCheckConfig from google APIs")
 	}
 
 	return resources, nil
