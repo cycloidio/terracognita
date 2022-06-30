@@ -101,7 +101,7 @@ const (
 	PostgresqlServer
 	PostgresqlVirtualNetworkRule
 	// Database Resources- mssql
-	MssqlElasticPool
+	MssqlElasticpool
 	MssqlDatabase
 	MssqlFirewallRule
 	MssqlServer
@@ -115,7 +115,7 @@ const (
 	// DNS
 	DNSZone
 	DNSARecord //dns_a_record
-	DNSAaaRecord
+	DNSAaaaRecord
 	DNSCaaRecord
 	DNSCnameRecord
 	DNSMxRecord
@@ -126,7 +126,7 @@ const (
 	// Private DNS
 	PrivateDNSZone
 	PrivateDNSARecord //private_dns_a_record
-	PrivateDNSAaaRecord
+	PrivateDNSAaaaRecord
 	PrivateDNSCnameRecord
 	PrivateDNSMxRecord
 	PrivateDNSPtrRecord
@@ -247,7 +247,7 @@ var (
 		PostgresqlServer:             postgresqlServers,
 		PostgresqlVirtualNetworkRule: postgresqlVirtualNetworkRules,
 		// Database Resources- mssql
-		MssqlElasticPool:                   mssqlElasticPools,
+		MssqlElasticpool:                   mssqlElasticPools,
 		MssqlDatabase:                      mssqlDatabases,
 		MssqlFirewallRule:                  mssqlFirewallRules,
 		MssqlServer:                        mssqlServers,
@@ -261,7 +261,7 @@ var (
 		// 	Dns
 		DNSZone:        dnsZones,
 		DNSARecord:     dnsRecordSets,
-		DNSAaaRecord:   dnsRecordSets,
+		DNSAaaaRecord:  dnsRecordSets,
 		DNSCaaRecord:   dnsRecordSets,
 		DNSCnameRecord: dnsRecordSets,
 		DNSMxRecord:    dnsRecordSets,
@@ -272,7 +272,7 @@ var (
 		// Private DNS
 		PrivateDNSZone:                   privateDNSZones,
 		PrivateDNSARecord:                privateDNSRecordSets,
-		PrivateDNSAaaRecord:              privateDNSRecordSets,
+		PrivateDNSAaaaRecord:             privateDNSRecordSets,
 		PrivateDNSCnameRecord:            privateDNSRecordSets,
 		PrivateDNSMxRecord:               privateDNSRecordSets,
 		PrivateDNSPtrRecord:              privateDNSRecordSets,
@@ -418,7 +418,7 @@ func virtualMachineScaleSets(ctx context.Context, a *azurerm, ar *AzureReader, r
 }
 
 func virtualMachineScaleSetExtensions(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	scaleSetNames, err := getVirtualMachineScaleSetNames(ctx, a, ar, resourceType, filters)
+	scaleSetNames, err := getVirtualMachineScaleSetNames(ctx, a, ar, []string{WindowsVirtualMachineScaleSet.String(), LinuxVirtualMachineScaleSet.String()}, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual machines scale sets from reader")
 	}
@@ -450,7 +450,7 @@ func disks(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string
 }
 
 func virtualMachineExtensions(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	virtualMachineNames, err := getVirtualMachineNames(ctx, a, ar, resourceType, filters)
+	virtualMachineNames, err := getVirtualMachineNames(ctx, a, ar, []string{VirtualMachine.String(), WindowsVirtualMachine.String(), LinuxVirtualMachine.String()}, filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual machines from reader")
 	}
@@ -515,7 +515,7 @@ func virtualNetworks(ctx context.Context, a *azurerm, ar *AzureReader, resourceT
 }
 
 func subnets(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	virtualNetworkNames, err := getVirtualNetworkNames(ctx, a, ar, resourceType, filters)
+	virtualNetworkNames, err := getVirtualNetworkNames(ctx, a, ar, VirtualNetwork.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual networks from cache")
 	}
@@ -656,7 +656,7 @@ func networkProfiles(ctx context.Context, a *azurerm, ar *AzureReader, resourceT
 }
 
 func networkSecurityRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	securityGroupNames, err := getSecurityGroups(ctx, a, ar, resourceType, filters)
+	securityGroupNames, err := getSecurityGroups(ctx, a, ar, NetworkSecurityGroup.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list security Groups from cache")
 	}
@@ -719,7 +719,7 @@ func routeTables(ctx context.Context, a *azurerm, ar *AzureReader, resourceType 
 }
 
 func routes(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	routeTablesNames, err := getRouteTables(ctx, a, ar, resourceType, filters)
+	routeTablesNames, err := getRouteTables(ctx, a, ar, RouteTable.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list route Tables from cache")
 	}
@@ -764,7 +764,7 @@ func virtualNetworkGatewayConnections(ctx context.Context, a *azurerm, ar *Azure
 }
 
 func virtualNetworkPeerings(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	virtualNetworkNames, err := getVirtualNetworkNames(ctx, a, ar, resourceType, filters)
+	virtualNetworkNames, err := getVirtualNetworkNames(ctx, a, ar, VirtualNetwork.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual network names from cache")
 	}
@@ -814,7 +814,7 @@ func virtualHubs(ctx context.Context, a *azurerm, ar *AzureReader, resourceType 
 }
 
 func virtualHubBgpConnection(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	virtualHubNames, err := getVirtualHub(ctx, a, ar, resourceType, filters)
+	virtualHubNames, err := getVirtualHub(ctx, a, ar, VirtualHub.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual hubs from reader")
 	}
@@ -834,7 +834,7 @@ func virtualHubBgpConnection(ctx context.Context, a *azurerm, ar *AzureReader, r
 }
 
 func virtualHubConnection(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	virtualHubNames, err := getVirtualHub(ctx, a, ar, resourceType, filters)
+	virtualHubNames, err := getVirtualHub(ctx, a, ar, VirtualHub.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual hubs from reader")
 	}
@@ -854,7 +854,7 @@ func virtualHubConnection(ctx context.Context, a *azurerm, ar *AzureReader, reso
 }
 
 func virtualHubIP(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	virtualHubNames, err := getVirtualHub(ctx, a, ar, resourceType, filters)
+	virtualHubNames, err := getVirtualHub(ctx, a, ar, VirtualHub.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual hubs from reader")
 	}
@@ -874,7 +874,7 @@ func virtualHubIP(ctx context.Context, a *azurerm, ar *AzureReader, resourceType
 }
 
 func virtualHubRouteTable(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	virtualHubNames, err := getVirtualHub(ctx, a, ar, resourceType, filters)
+	virtualHubNames, err := getVirtualHub(ctx, a, ar, VirtualHub.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list virtual hubs from reader")
 	}
@@ -926,7 +926,7 @@ func lbs(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, 
 }
 
 func lbBackendAddressPools(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	lbNames, err := getLbs(ctx, a, ar, resourceType, filters)
+	lbNames, err := getLbs(ctx, a, ar, Lb.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list load balancers from reader")
 	}
@@ -1035,7 +1035,7 @@ func logicAppWorkflows(ctx context.Context, a *azurerm, ar *AzureReader, resourc
 }
 
 func logicAppTriggerCustoms(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	appWorkflowNames, err := getWorkflowNames(ctx, a, ar, resourceType, filters)
+	appWorkflowNames, err := getWorkflowNames(ctx, a, ar, LogicAppWorkflow.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list logic app workflows from reader")
 	}
@@ -1055,7 +1055,7 @@ func logicAppTriggerCustoms(ctx context.Context, a *azurerm, ar *AzureReader, re
 }
 
 func logicAppActionCustoms(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	appWorkflowNames, err := getWorkflowNames(ctx, a, ar, resourceType, filters)
+	appWorkflowNames, err := getWorkflowNames(ctx, a, ar, LogicAppWorkflow.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list logic app workflows from reader")
 	}
@@ -1102,7 +1102,7 @@ func containerRegistries(ctx context.Context, a *azurerm, ar *AzureReader, resou
 }
 
 func containerRegistryWebhooks(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	containerRegistriesNames, err := getContainerRegistries(ctx, a, ar, resourceType, filters)
+	containerRegistriesNames, err := getContainerRegistries(ctx, a, ar, ContainerRegistry.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list container Registries from cache")
 	}
@@ -1141,7 +1141,7 @@ func kubernetesClusters(ctx context.Context, a *azurerm, ar *AzureReader, resour
 }
 
 func kubernetesClustersNodePools(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	kubernetesClusters, err := getKubernetesClusters(ctx, a, ar, resourceType, filters)
+	kubernetesClusters, err := getKubernetesClusters(ctx, a, ar, KubernetesCluster.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list kubernetes clusters from reader")
 	}
@@ -1180,7 +1180,7 @@ func storageAccounts(ctx context.Context, a *azurerm, ar *AzureReader, resourceT
 }
 
 func storageQueues(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	storageAccountNames, err := getStorageAccounts(ctx, a, ar, resourceType, filters)
+	storageAccountNames, err := getStorageAccounts(ctx, a, ar, StorageAccount.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list storage Accounts from cache")
 	}
@@ -1203,7 +1203,7 @@ func storageQueues(ctx context.Context, a *azurerm, ar *AzureReader, resourceTyp
 }
 
 func storageShares(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	storageAccountNames, err := getStorageAccounts(ctx, a, ar, resourceType, filters)
+	storageAccountNames, err := getStorageAccounts(ctx, a, ar, StorageAccount.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list storage Accounts from cache")
 	}
@@ -1227,7 +1227,7 @@ func storageShares(ctx context.Context, a *azurerm, ar *AzureReader, resourceTyp
 }
 
 func storageBlobs(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	storageAccountNames, err := getStorageAccounts(ctx, a, ar, resourceType, filters)
+	storageAccountNames, err := getStorageAccounts(ctx, a, ar, StorageAccount.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list storage Accounts from cache")
 	}
@@ -1251,7 +1251,7 @@ func storageBlobs(ctx context.Context, a *azurerm, ar *AzureReader, resourceType
 }
 
 func storageTables(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	storageAccountNames, err := getStorageAccounts(ctx, a, ar, resourceType, filters)
+	storageAccountNames, err := getStorageAccounts(ctx, a, ar, StorageAccount.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list storage Accounts from cache")
 	}
@@ -1290,7 +1290,7 @@ func mariadbServers(ctx context.Context, a *azurerm, ar *AzureReader, resourceTy
 }
 
 func mariadbConfigurations(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	mariadbServerNames, err := getMariadbServers(ctx, a, ar, resourceType, filters)
+	mariadbServerNames, err := getMariadbServers(ctx, a, ar, MariadbServer.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list Mariadb Servers from cache")
 	}
@@ -1309,7 +1309,7 @@ func mariadbConfigurations(ctx context.Context, a *azurerm, ar *AzureReader, res
 }
 
 func mariadbDatabases(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	mariadbServerNames, err := getMariadbServers(ctx, a, ar, resourceType, filters)
+	mariadbServerNames, err := getMariadbServers(ctx, a, ar, MariadbServer.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list Mariadb Servers from cache")
 	}
@@ -1328,7 +1328,7 @@ func mariadbDatabases(ctx context.Context, a *azurerm, ar *AzureReader, resource
 }
 
 func mariadbFirewallRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	mariadbServerNames, err := getMariadbServers(ctx, a, ar, resourceType, filters)
+	mariadbServerNames, err := getMariadbServers(ctx, a, ar, MariadbServer.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list Mariadb Servers from cache")
 	}
@@ -1347,7 +1347,7 @@ func mariadbFirewallRules(ctx context.Context, a *azurerm, ar *AzureReader, reso
 }
 
 func mariadbVirtualNetworkRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	mariadbServerNames, err := getMariadbServers(ctx, a, ar, resourceType, filters)
+	mariadbServerNames, err := getMariadbServers(ctx, a, ar, MariadbServer.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list Mariadb Servers from cache")
 	}
@@ -1386,7 +1386,7 @@ func mysqlServers(ctx context.Context, a *azurerm, ar *AzureReader, resourceType
 }
 
 func mysqlConfigurations(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	mysqlServerNames, err := getMysqlServers(ctx, a, ar, resourceType, filters)
+	mysqlServerNames, err := getMysqlServers(ctx, a, ar, MysqlServer.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list MySQL Servers from cache")
 	}
@@ -1405,7 +1405,7 @@ func mysqlConfigurations(ctx context.Context, a *azurerm, ar *AzureReader, resou
 }
 
 func mysqlDatabases(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	mysqlServerNames, err := getMysqlServers(ctx, a, ar, resourceType, filters)
+	mysqlServerNames, err := getMysqlServers(ctx, a, ar, MysqlServer.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list MySQL Servers from cache")
 	}
@@ -1424,7 +1424,7 @@ func mysqlDatabases(ctx context.Context, a *azurerm, ar *AzureReader, resourceTy
 }
 
 func mysqlFirewallRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	mysqlServerNames, err := getMysqlServers(ctx, a, ar, resourceType, filters)
+	mysqlServerNames, err := getMysqlServers(ctx, a, ar, MysqlServer.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list MySQL Servers from cache")
 	}
@@ -1443,7 +1443,7 @@ func mysqlFirewallRules(ctx context.Context, a *azurerm, ar *AzureReader, resour
 }
 
 func mysqlVirtualNetworkRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	mysqlServerNames, err := getMysqlServers(ctx, a, ar, resourceType, filters)
+	mysqlServerNames, err := getMysqlServers(ctx, a, ar, MysqlServer.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list MySQL Servers from cache")
 	}
@@ -1482,7 +1482,7 @@ func postgresqlServers(ctx context.Context, a *azurerm, ar *AzureReader, resourc
 }
 
 func postgresqlConfigurations(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	postgresqlServerNames, err := getPostgresqlServers(ctx, a, ar, resourceType, filters)
+	postgresqlServerNames, err := getPostgresqlServers(ctx, a, ar, PostgresqlServer.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list PostgreSQL Servers from cache")
 	}
@@ -1501,7 +1501,7 @@ func postgresqlConfigurations(ctx context.Context, a *azurerm, ar *AzureReader, 
 }
 
 func postgresqlDatabases(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	postgresqlServerNames, err := getPostgresqlServers(ctx, a, ar, resourceType, filters)
+	postgresqlServerNames, err := getPostgresqlServers(ctx, a, ar, PostgresqlServer.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list PostgreSQL Servers from cache")
 	}
@@ -1520,7 +1520,7 @@ func postgresqlDatabases(ctx context.Context, a *azurerm, ar *AzureReader, resou
 }
 
 func postgresqlFirewallRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	postgresqlServerNames, err := getPostgresqlServers(ctx, a, ar, resourceType, filters)
+	postgresqlServerNames, err := getPostgresqlServers(ctx, a, ar, PostgresqlServer.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list PostgreSQL Servers from cache")
 	}
@@ -1539,7 +1539,7 @@ func postgresqlFirewallRules(ctx context.Context, a *azurerm, ar *AzureReader, r
 }
 
 func postgresqlVirtualNetworkRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	postgresqlServerNames, err := getPostgresqlServers(ctx, a, ar, resourceType, filters)
+	postgresqlServerNames, err := getPostgresqlServers(ctx, a, ar, PostgresqlServer.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list PostgreSQL Servers from cache")
 	}
@@ -1578,7 +1578,7 @@ func mssqlServers(ctx context.Context, a *azurerm, ar *AzureReader, resourceType
 }
 
 func mssqlElasticPools(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	sqlServerNames, err := getMsSQLServers(ctx, a, ar, resourceType, filters)
+	sqlServerNames, err := getMsSQLServers(ctx, a, ar, MssqlServer.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list SQL Servers from cache")
 	}
@@ -1597,7 +1597,7 @@ func mssqlElasticPools(ctx context.Context, a *azurerm, ar *AzureReader, resourc
 }
 
 func mssqlDatabases(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	sqlServerNames, err := getMsSQLServers(ctx, a, ar, resourceType, filters)
+	sqlServerNames, err := getMsSQLServers(ctx, a, ar, MssqlServer.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list SQL Servers from cache")
 	}
@@ -1620,7 +1620,7 @@ func mssqlDatabases(ctx context.Context, a *azurerm, ar *AzureReader, resourceTy
 }
 
 func mssqlFirewallRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	sqlServerNames, err := getMsSQLServers(ctx, a, ar, resourceType, filters)
+	sqlServerNames, err := getMsSQLServers(ctx, a, ar, MssqlServer.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list SQL Servers from cache")
 	}
@@ -1639,7 +1639,7 @@ func mssqlFirewallRules(ctx context.Context, a *azurerm, ar *AzureReader, resour
 }
 
 func mssqlServerSecurityAlertPolicies(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	sqlServerNames, err := getMsSQLServers(ctx, a, ar, resourceType, filters)
+	sqlServerNames, err := getMsSQLServers(ctx, a, ar, MssqlServer.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list SQL Servers from cache")
 	}
@@ -1658,7 +1658,7 @@ func mssqlServerSecurityAlertPolicies(ctx context.Context, a *azurerm, ar *Azure
 }
 
 func mssqlServerVulnerabilityAssessments(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	sqlServerNames, err := getMsSQLServers(ctx, a, ar, resourceType, filters)
+	sqlServerNames, err := getMsSQLServers(ctx, a, ar, MssqlServer.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list SQL Servers from cache")
 	}
@@ -1690,7 +1690,7 @@ func mssqlVirtualMachines(ctx context.Context, a *azurerm, ar *AzureReader, reso
 }
 
 func mssqlVirtualNetworkRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	sqlServerNames, err := getMsSQLServers(ctx, a, ar, resourceType, filters)
+	sqlServerNames, err := getMsSQLServers(ctx, a, ar, MssqlServer.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list SQL Servers from cache")
 	}
@@ -1729,7 +1729,7 @@ func redisCaches(ctx context.Context, a *azurerm, ar *AzureReader, resourceType 
 }
 
 func redisFirewallRules(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	redisCachesNames, err := getRedisCaches(ctx, a, ar, resourceType, filters)
+	redisCachesNames, err := getRedisCaches(ctx, a, ar, RedisCache.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list Redis Caches from cache")
 	}
@@ -1768,7 +1768,7 @@ func dnsZones(ctx context.Context, a *azurerm, ar *AzureReader, resourceType str
 }
 
 func dnsRecordSets(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	dnsZones, err := getDNSZones(ctx, a, ar, resourceType, filters)
+	dnsZones, err := getDNSZones(ctx, a, ar, DNSZone.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list DNS Zones from cache")
 	}
@@ -1830,7 +1830,7 @@ func privateDNSZones(ctx context.Context, a *azurerm, ar *AzureReader, resourceT
 }
 
 func privateDNSRecordSets(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	privateDNSZones, err := getPrivateDNSZones(ctx, a, ar, resourceType, filters)
+	privateDNSZones, err := getPrivateDNSZones(ctx, a, ar, PrivateDNSZone.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list Private DNS Zones from cache")
 	}
@@ -1868,7 +1868,7 @@ func privateDNSRecordSets(ctx context.Context, a *azurerm, ar *AzureReader, reso
 }
 
 func privateDNSVirtualNetworkLinks(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	privateDNSZones, err := getPrivateDNSZones(ctx, a, ar, resourceType, filters)
+	privateDNSZones, err := getPrivateDNSZones(ctx, a, ar, PrivateDNSZone.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list Private DNS Zones from cache")
 	}
@@ -1982,7 +1982,7 @@ func applicationInsights(ctx context.Context, a *azurerm, ar *AzureReader, resou
 }
 
 func applicationInsightsAPIKeys(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	applicationInsightsNames, err := getApplicationInsightsComponents(ctx, a, ar, resourceType, filters)
+	applicationInsightsNames, err := getApplicationInsightsComponents(ctx, a, ar, ApplicationInsights.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list Application Insights components from cache")
 	}
@@ -2002,7 +2002,7 @@ func applicationInsightsAPIKeys(ctx context.Context, a *azurerm, ar *AzureReader
 }
 
 func applicationInsightsAnalyticsItems(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	applicationInsightsNames, err := getApplicationInsightsComponents(ctx, a, ar, resourceType, filters)
+	applicationInsightsNames, err := getApplicationInsightsComponents(ctx, a, ar, ApplicationInsights.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list Application Insights components from cache")
 	}
@@ -2056,7 +2056,7 @@ func logAnalyticsWorkspaces(ctx context.Context, a *azurerm, ar *AzureReader, re
 }
 
 func logAnalyticsLinkedServices(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	workspaceNames, err := getLogAnalyticsWorkspaces(ctx, a, ar, resourceType, filters)
+	workspaceNames, err := getLogAnalyticsWorkspaces(ctx, a, ar, LogAnalyticsWorkspace.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list Application Insights components from cache")
 	}
@@ -2076,7 +2076,7 @@ func logAnalyticsLinkedServices(ctx context.Context, a *azurerm, ar *AzureReader
 }
 
 func logAnalyticsDatasources(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
-	workspaceNames, err := getLogAnalyticsWorkspaces(ctx, a, ar, resourceType, filters)
+	workspaceNames, err := getLogAnalyticsWorkspaces(ctx, a, ar, LogAnalyticsWorkspace.String(), filters)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list Application Insights components from cache")
 	}

@@ -195,27 +195,30 @@ func getLbs(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters
 
 // Compute
 
-func cacheVirtualMachines(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]provider.Resource, error) {
-	rs, err := a.cache.Get(rt)
-	if err != nil {
-		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
-			return nil, errors.WithStack(err)
-		}
-
-		rs, err = virtualMachines(ctx, a, ar, rt, filters)
+func cacheVirtualMachines(ctx context.Context, a *azurerm, ar *AzureReader, rtList []string, filters *filter.Filter) ([]provider.Resource, error) {
+	var resources []provider.Resource
+	for _, rt := range rtList {
+		rs, err := a.cache.Get(rt)
 		if err != nil {
-			return nil, errors.Wrap(err, "unable to get virtual machines")
-		}
+			if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
+				return nil, errors.WithStack(err)
+			}
 
-		err = a.cache.Set(rt, rs)
-		if err != nil {
-			return nil, err
+			rs, err = virtualMachines(ctx, a, ar, rt, filters)
+			if err != nil {
+				return nil, errors.Wrap(err, "unable to get virtual machines")
+			}
+
+			err = a.cache.Set(rt, rs)
+			if err != nil {
+				return nil, err
+			}
+			resources = append(resources, rs...)
 		}
 	}
-
-	return rs, nil
+	return resources, nil
 }
-func getVirtualMachineNames(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]string, error) {
+func getVirtualMachineNames(ctx context.Context, a *azurerm, ar *AzureReader, rt []string, filters *filter.Filter) ([]string, error) {
 	rs, err := cacheVirtualMachines(ctx, a, ar, rt, filters)
 	if err != nil {
 		return nil, err
@@ -229,28 +232,30 @@ func getVirtualMachineNames(ctx context.Context, a *azurerm, ar *AzureReader, rt
 	return names, nil
 }
 
-func cacheVirtualMachineScaleSets(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]provider.Resource, error) {
-	rs, err := a.cache.Get(rt)
-	if err != nil {
-		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
-			return nil, errors.WithStack(err)
-		}
+func cacheVirtualMachineScaleSets(ctx context.Context, a *azurerm, ar *AzureReader, rtList []string, filters *filter.Filter) ([]provider.Resource, error) {
+	var resources []provider.Resource
 
-		rs, err = virtualMachineScaleSets(ctx, a, ar, rt, filters)
+	for _, rt := range rtList {
+		rs, err := a.cache.Get(rt)
 		if err != nil {
-			return nil, errors.Wrap(err, "unable to get virtual machines scale sets")
-		}
+			if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
+				return nil, errors.WithStack(err)
+			}
+			rs, err = virtualMachineScaleSets(ctx, a, ar, rt, filters)
+			if err != nil {
+				return nil, errors.Wrap(err, "unable to get virtual machines scale sets")
+			}
 
-		err = a.cache.Set(rt, rs)
-		if err != nil {
-			return nil, err
+			err = a.cache.Set(rt, rs)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
-
-	return rs, nil
+	return resources, nil
 }
-func getVirtualMachineScaleSetNames(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]string, error) {
-	rs, err := cacheVirtualMachineScaleSets(ctx, a, ar, rt, filters)
+func getVirtualMachineScaleSetNames(ctx context.Context, a *azurerm, ar *AzureReader, rtList []string, filters *filter.Filter) ([]string, error) {
+	rs, err := cacheVirtualMachineScaleSets(ctx, a, ar, rtList, filters)
 	if err != nil {
 		return nil, err
 	}
