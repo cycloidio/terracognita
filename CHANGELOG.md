@@ -8,6 +8,9 @@
   ([PR #294](https://github.com/cycloidio/terracognita/pull/294))
 - `aws_lb_target_group_attachment` was raising a nil pointer exception
   ([Issue #297](https://github.com/cycloidio/terracognita/issues/297))
+-  fix resource name in `azurerm_dns_aaaa_record` and `azurerm_mssql_elastic_pool` and also fix caching of resources
+  ([Issue #303](https://github.com/cycloidio/terracognita/issues/303))
+  ([Issue #305](https://github.com/cycloidio/terracognita/issues/305))
 
 
 ### Added
