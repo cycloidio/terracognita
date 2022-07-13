@@ -9,7 +9,7 @@ import (
 
 //go:generate mockgen -destination=../mock/provider.go -mock_names=Provider=Provider -package mock github.com/cycloidio/terracognita/provider Provider
 
-// Provider is the ggeneral interface used to abstract
+// Provider is the general interface used to abstract
 // a cloud provider from Terraform
 type Provider interface {
 	// Region returns the actual region in which the
@@ -47,7 +47,7 @@ type Provider interface {
 	// to declare on the HCL
 	Source() string
 
-	// Configuration returns the Provider configuraiton
+	// Configuration returns the Provider configuration
 	// that may be interpolated with HCL when declaring
 	// the provider. The keys have to be the Provider
 	// attributes as defined on the TF Schema

@@ -17,6 +17,7 @@ import (
 	awsdocs "github.com/cycloidio/tfdocs/providers/aws"
 	azuredocs "github.com/cycloidio/tfdocs/providers/azurerm"
 	googledocs "github.com/cycloidio/tfdocs/providers/google"
+	"github.com/cycloidio/tfdocs/providers/vsphere"
 	tfdocs "github.com/cycloidio/tfdocs/resource"
 	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -126,6 +127,7 @@ var (
 		"aws":     awsdocs.GetResource,
 		"azurerm": azuredocs.GetResource,
 		"google":  googledocs.GetResource,
+		"vsphere": vsphere.GetResource,
 	}
 )
 
