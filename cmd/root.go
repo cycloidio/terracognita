@@ -317,7 +317,7 @@ func init() {
 	RootCmd.PersistentFlags().BoolP("verbose", "v", false, "Activate the verbose mode")
 	_ = viper.BindPFlag("verbose", RootCmd.PersistentFlags().Lookup("verbose"))
 
-	RootCmd.PersistentFlags().BoolP("debug", "d", false, "Activate the debug mode wich includes TF logs via TF_LOG=TRACE|DEBUG|INFO|WARN|ERROR configuration https://www.terraform.io/docs/internals/debugging.html")
+	RootCmd.PersistentFlags().BoolP("debug", "d", false, "Activate the debug mode which includes TF logs via TF_LOG=TRACE|DEBUG|INFO|WARN|ERROR configuration https://www.terraform.io/docs/internals/debugging.html")
 	_ = viper.BindPFlag("debug", RootCmd.PersistentFlags().Lookup("debug"))
 
 	RootCmd.PersistentFlags().String("log-file", path.Join(xdg.CacheHome, "terracognita", "terracognita.log"), "Write the logs with -v to this destination")
