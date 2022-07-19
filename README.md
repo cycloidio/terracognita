@@ -127,7 +127,7 @@ module "test" {
 }
 ```
 
-If you want to change this behavior, as for big infrastructures this will create a lot of variables, you can use the `--module-varibles path/to/file` and the file will have the list of attributes that you want to actually be used as variables, it can be in JSON or YAML:
+If you want to change this behavior, as for big infrastructures this will create a lot of variables, you can use the `--module-variables path/to/file` and the file will have the list of attributes that you want to actually be used as variables, it can be in JSON or YAML:
 
 ```json
 {
