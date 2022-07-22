@@ -22,12 +22,14 @@ require (
 	github.com/hashicorp/terraform-provider-aws v1.60.1-0.20210513231836-489654890359
 	github.com/hashicorp/terraform-provider-azurerm v1.44.1-0.20201029183808-d721bcc1bb55
 	github.com/hashicorp/terraform-provider-google v1.20.1-0.20210510171431-a764cf3da527
+	github.com/hashicorp/terraform-provider-vsphere v1.26.1-0.20220510172607-30f37d268d79
 	github.com/jinzhu/inflection v1.0.0
 	github.com/pascaldekloe/name v1.0.1
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
+	github.com/vmware/govmomi v0.28.0
 	github.com/zclconf/go-cty v1.10.0
 	google.golang.org/api v0.61.0
 	google.golang.org/grpc v1.45.0
@@ -93,7 +95,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/google/go-cmp v0.5.7 // indirect
-	github.com/google/uuid v1.2.0 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.1.1 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
 	github.com/hashicorp/aws-cloudformation-resource-schema-sdk-go v0.16.0 // indirect
@@ -161,12 +163,12 @@ require (
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4 // indirect
-	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
+	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8 // indirect
-	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
+	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
+	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20211118181313-81c1377c94b1 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect

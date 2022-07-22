@@ -1,8 +1,8 @@
 package cmd
 
 import (
+	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -11,10 +11,17 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/pkg/errors"
+
 	"github.com/adrg/xdg"
 	"github.com/cycloidio/mxwriter"
+	"github.com/cycloidio/terracognita/filter"
+	"github.com/cycloidio/terracognita/hcl"
 	"github.com/cycloidio/terracognita/log"
+	"github.com/cycloidio/terracognita/provider"
+	"github.com/cycloidio/terracognita/state"
 	"github.com/cycloidio/terracognita/writer"
+	kitlog "github.com/go-kit/kit/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
@@ -286,11 +293,47 @@ func getWriterOptions() (*writer.Options, error) {
 	}, nil
 }
 
+func importProvider(ctx context.Context, logger kitlog.Logger, p provider.Provider) error {
+	f := &filter.Filter{
+		Include: include,
+		Exclude: exclude,
+		Targets: targets,
+	}
+
+	var hclW, stateW writer.Writer
+	options, err := getWriterOptions()
+	if err != nil {
+		return err
+	}
+
+	if hclOut != nil {
+		logger.Log("msg", "initializing HCL writer")
+		hclW = hcl.NewWriter(hclOut, p, options)
+	}
+
+	if stateOut != nil {
+		logger.Log("msg", "initializing TFState writer")
+		stateW = state.NewWriter(stateOut, options)
+	}
+
+	logger.Log("msg", "importing")
+
+	fmt.Fprintf(logsOut, "Starting Terracognita with version %s\n", Version)
+	logger.Log("msg", "starting terracognita", "version", Version)
+	err = provider.Import(ctx, p, hclW, stateW, f, logsOut)
+	if err != nil {
+		return errors.Wrap(err, "could not import from "+p.String())
+	}
+
+	return nil
+}
+
 func init() {
 	cobra.OnInitialize(initViper)
 	RootCmd.AddCommand(awsCmd)
 	RootCmd.AddCommand(googleCmd)
 	RootCmd.AddCommand(azurermCmd)
+	RootCmd.AddCommand(vsphereCmd)
 	RootCmd.AddCommand(versionCmd)
 
 	RootCmd.PersistentFlags().String("hcl", "", "HCL output file or directory. If it's a directory it'll be emptied before importing")

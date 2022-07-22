@@ -9,13 +9,8 @@ import (
 	kitlog "github.com/go-kit/kit/log"
 
 	"github.com/cycloidio/terracognita/aws"
-	"github.com/cycloidio/terracognita/filter"
-	"github.com/cycloidio/terracognita/hcl"
 	"github.com/cycloidio/terracognita/log"
-	"github.com/cycloidio/terracognita/provider"
-	"github.com/cycloidio/terracognita/state"
 	"github.com/cycloidio/terracognita/tag"
-	"github.com/cycloidio/terracognita/writer"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -80,36 +75,9 @@ var (
 				return err
 			}
 
-			f := &filter.Filter{
-				Tags:    tags,
-				Include: include,
-				Exclude: exclude,
-				Targets: targets,
-			}
-
-			var hclW, stateW writer.Writer
-			options, err := getWriterOptions()
+			err = importProvider(ctx, logger, awsP)
 			if err != nil {
 				return err
-			}
-
-			if hclOut != nil {
-				logger.Log("msg", "initializing HCL writer")
-				hclW = hcl.NewWriter(hclOut, awsP, options)
-			}
-
-			if stateOut != nil {
-				logger.Log("msg", "initializing TFState writer")
-				stateW = state.NewWriter(stateOut, options)
-			}
-
-			logger.Log("msg", "importing")
-
-			fmt.Fprintf(logsOut, "Starting Terracognita with version %s\n", Version)
-			logger.Log("msg", "starting terracognita", "version", Version)
-			err = provider.Import(ctx, awsP, hclW, stateW, f, logsOut)
-			if err != nil {
-				return fmt.Errorf("could not import from AWS: %+v", err)
 			}
 
 			return nil

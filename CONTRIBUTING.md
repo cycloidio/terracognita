@@ -115,6 +115,7 @@ For both providers, you need to add your component to this places or equivalent:
   * [here](https://github.com/cycloidio/terracognita/blob/21f3387820bae5577c277acb634ebde5607c23ec/aws/resources.go#L23) for AWS.
   * [here](https://github.com/cycloidio/terracognita/blob/21f3387820bae5577c277acb634ebde5607c23ec/azurerm/resources.go#L17) for AzureRM.
   * [here](https://github.com/cycloidio/terracognita/blob/21f3387820bae5577c277acb634ebde5607c23ec/google/resources.go#L19) for Google.
+  * [here](https://github.com/cycloidio/terracognita/blob/21f3387820bae5577c277acb634ebde5607c23ec/vsphere/resources.go#L19) for vSphere.
 
 :warning: your component name must exactly map the name as in Terraform documentation. Example: `ComputeInstance` will be later used as `google_compute_instance` :warning:.
 

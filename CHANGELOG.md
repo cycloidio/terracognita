@@ -17,6 +17,8 @@
 - Updated Contribute GCP section, added template modularity and added new GCP resources: `google_dns_policy`, `google_billing_subaccount`, `google_sql_database`,  `google_compute_address`, ` google_compute_attached_disk`, `google_compute_autoscaler `,  `google_compute_global_address`, `google_compute_image`, `google_compute_instance_group_manager`, `google_compute_instance_template`, `google_compute_managed_ssl_certificate`, `google_compute_network_endpoint_group`, `google_compute_route`, `google_compute_security_policy`, `google_compute_service_attachment`, `google_compute_snapshot`, `google_compute_ssl_policy`, `google_compute_subnetwork`closes issue #188, `google_compute_target_grpc_proxy`, `google_compute_target_instance`, `google_compute_target_pool`, `google_compute_target_ssl_proxy`, `google_compute_target_tcp_proxy`, `google_filestore_instance`, `google_container_cluster`,`google_container_node_pool`,`google_redis_instance`,`google_logging_metric`,`google_monitoring_alert_policy`,`google_monitoring_group`, `google_monitoring_notification_channel`,`google_monitoring_uptime_check_config`
   ([Issue #188](https://github.com/cycloidio/terracognita/issues/188))
   ([Issue #273](https://github.com/cycloidio/terracognita/issues/273))
+- Support for vSphere provider
+  ([Issue #296](https://github.com/cycloidio/terracognita/issues/296))
 
 
 - Added new AWS resources: `aws_ec2_transit_gateway_peering_attachment`, `aws_ec2_transit_gateway_peering_attachment_accepter`, `aws_ec2_transit_gateway_prefix_list_reference`, `aws_ec2_transit_gateway_route`, `aws_ec2_transit_gateway_route_table_association`, `aws_ec2_transit_gateway_route_table_propagation`, `aws_ec2_transit_gateway_vpc_attachment_accepter`
