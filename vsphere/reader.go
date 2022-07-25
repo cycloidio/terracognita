@@ -7,14 +7,12 @@ import (
 
 	"github.com/vmware/govmomi/find"
 	"github.com/vmware/govmomi/session/cache"
-	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25"
 	"github.com/vmware/govmomi/vim25/soap"
 )
 
 type reader struct {
 	*find.Finder
-	*view.Manager
 }
 
 type optional struct {
