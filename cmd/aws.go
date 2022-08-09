@@ -6,6 +6,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/credentials/ssocreds"
 	kitlog "github.com/go-kit/kit/log"
 
 	"github.com/cycloidio/terracognita/aws"
@@ -107,6 +108,7 @@ func loadAWSCredentials() error {
 		Providers: []credentials.Provider{
 			&credentials.EnvProvider{},
 			&credentials.SharedCredentialsProvider{Filename: viper.GetString("aws-shared-credentials-file"), Profile: viper.GetString("aws-profile")},
+			&ssocreds.Provider{},
 		},
 	})
 

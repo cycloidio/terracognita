@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Added
+- AWS SSO authentication
+  ([Issue #282](https://github.com/cycloidio/terracognita/issues/282))
+
 ### Fixed
 
 - Bug with tfdocs, updated it to the latest version
