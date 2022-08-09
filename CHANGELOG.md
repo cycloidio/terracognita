@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Fixed
+
+- Bug with tfdocs, updated it to the latest version
+  ([Issue #317](https://github.com/cycloidio/terracognita/pull/317))
+
 ## [0.8.0] _2022-08-09_
 
 ### Fixed
