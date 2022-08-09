@@ -23,6 +23,8 @@
 
 - Added new AWS resources: `aws_ec2_transit_gateway_peering_attachment`, `aws_ec2_transit_gateway_peering_attachment_accepter`, `aws_ec2_transit_gateway_prefix_list_reference`, `aws_ec2_transit_gateway_route`, `aws_ec2_transit_gateway_route_table_association`, `aws_ec2_transit_gateway_route_table_propagation`, `aws_ec2_transit_gateway_vpc_attachment_accepter`
   ([Issue #299](https://github.com/cycloidio/terracognita/issues/299))
+- Update tfdocs version to v0.0.0-20220809093344-d999d1c2069e and added app service azurerm resources: `azurerm_linux_web_app`, `azurerm_linux_web_app_slot`, `azurerm_service_plan`, `azurerm_source_control_token`, `azurerm_static_site`, `azurerm_static_site_custom_domain`, `azurerm_web_app_active_slot`, `azurerm_web_app_hybrid_connection`, `azurerm_windows_web_app`, `azurerm_windows_web_app_slot`
+  ([PR #314](https://github.com/cycloidio/terracognita/pull/314))
 
 ## [0.7.6] _2022-05-11_
 
