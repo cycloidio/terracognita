@@ -29,6 +29,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/privatedns/mgmt/2018-09-01/privatedns"
 	"github.com/Azure/azure-sdk-for-go/services/redis/mgmt/2020-12-01/redis"
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2021-08-01/storage"
+	"github.com/Azure/azure-sdk-for-go/services/web/mgmt/2021-03-01/web"
 )
 
 // ListVirtualMachines returns a list of VirtualMachines within a subscription and a resource group
@@ -2208,5 +2209,180 @@ func (ar *AzureReader) ListMonitorMetricsAlerts(ctx context.Context) ([]monitor.
 	}
 
 	return *output.Value, nil
+
+}
+
+// ListWebApps returns a list of Sites within a subscription
+func (ar *AzureReader) ListWebApps(ctx context.Context) ([]web.Site, error) {
+	client := web.NewAppsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list web.Site from Azure APIs")
+	}
+
+	resources := make([]web.Site, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListDeploymentSlots returns a list of Sites within a subscription and a resource group
+func (ar *AzureReader) ListDeploymentSlots(ctx context.Context, name string) ([]web.Site, error) {
+	client := web.NewAppsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListSlots(ctx, ar.GetResourceGroupName(), name)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list web.Site from Azure APIs")
+	}
+
+	resources := make([]web.Site, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListAppServicePlans returns a list of AppServicePlans within a subscription
+func (ar *AzureReader) ListAppServicePlans(ctx context.Context, detailed *bool) ([]web.AppServicePlan, error) {
+	client := web.NewAppServicePlansClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, detailed)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list web.AppServicePlan from Azure APIs")
+	}
+
+	resources := make([]web.AppServicePlan, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListSourceControls returns a list of SourceControls within a subscription
+func (ar *AzureReader) ListSourceControls(ctx context.Context) ([]web.SourceControl, error) {
+	client := web.New(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListSourceControls(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list web.SourceControl from Azure APIs")
+	}
+
+	resources := make([]web.SourceControl, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListStaticSites returns a list of StaticSiteARMResources within a subscription
+func (ar *AzureReader) ListStaticSites(ctx context.Context) ([]web.StaticSiteARMResource, error) {
+	client := web.NewStaticSitesClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list web.StaticSiteARMResource from Azure APIs")
+	}
+
+	resources := make([]web.StaticSiteARMResource, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListStaticSitesCustomDomain returns a list of StaticSiteCustomDomainOverviewARMResources within a subscription and a resource group
+func (ar *AzureReader) ListStaticSitesCustomDomain(ctx context.Context, name string) ([]web.StaticSiteCustomDomainOverviewARMResource, error) {
+	client := web.NewStaticSitesClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListStaticSiteCustomDomains(ctx, ar.GetResourceGroupName(), name)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list web.StaticSiteCustomDomainOverviewARMResource from Azure APIs")
+	}
+
+	resources := make([]web.StaticSiteCustomDomainOverviewARMResource, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListHybridConnections returns a list of HybridConnections within a subscription and a resource group
+func (ar *AzureReader) ListHybridConnections(ctx context.Context, name string) ([]web.HybridConnection, error) {
+	client := web.NewAppServicePlansClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListHybridConnections(ctx, ar.GetResourceGroupName(), name)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list web.HybridConnection from Azure APIs")
+	}
+
+	resources := make([]web.HybridConnection, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
 
 }

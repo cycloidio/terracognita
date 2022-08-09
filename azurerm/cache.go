@@ -22,6 +22,7 @@ import (
 //   Private DNS -> dns_zones
 //   Application Insights -> application_insights
 //   Log analytics -> log_analytics_workspace
+//   App service -> web_app, service_plans, static_sites
 
 //Network
 
@@ -720,6 +721,119 @@ func cachelogAnalyticsWorkspaces(ctx context.Context, a *azurerm, ar *AzureReade
 
 func getLogAnalyticsWorkspaces(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]string, error) {
 	rs, err := cachelogAnalyticsWorkspaces(ctx, a, ar, rt, filters)
+	if err != nil {
+		return nil, err
+	}
+
+	names := make([]string, 0, len(rs))
+	for _, i := range rs {
+		names = append(names, i.Data().Get("name").(string))
+	}
+
+	return names, nil
+}
+
+// app service web apps
+func cacheWebApps(ctx context.Context, a *azurerm, ar *AzureReader, rtList []string, filters *filter.Filter) ([]provider.Resource, error) {
+	var resources []provider.Resource
+	for _, rt := range rtList {
+		rs, err := a.cache.Get(rt)
+		if err != nil {
+			if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
+				return nil, errors.WithStack(err)
+			}
+
+			rs, err = webApps(ctx, a, ar, rt, filters)
+			if err != nil {
+				return nil, errors.Wrap(err, "unable to get app service web apps")
+			}
+
+			err = a.cache.Set(rt, rs)
+			if err != nil {
+				return nil, err
+			}
+			resources = append(resources, rs...)
+		}
+	}
+	return resources, nil
+}
+
+func getWebApps(ctx context.Context, a *azurerm, ar *AzureReader, rt []string, filters *filter.Filter) ([]string, error) {
+	rs, err := cacheWebApps(ctx, a, ar, rt, filters)
+	if err != nil {
+		return nil, err
+	}
+
+	names := make([]string, 0, len(rs))
+	for _, i := range rs {
+		names = append(names, i.Data().Get("name").(string))
+	}
+
+	return names, nil
+}
+
+// app service service plan
+
+func cacheServicePlans(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]provider.Resource, error) {
+	rs, err := a.cache.Get(rt)
+	if err != nil {
+		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
+			return nil, errors.WithStack(err)
+		}
+
+		rs, err = servicePlans(ctx, a, ar, rt, filters)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to get app service service plans")
+		}
+
+		err = a.cache.Set(rt, rs)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return rs, nil
+}
+
+func getServicePlans(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]string, error) {
+	rs, err := cacheServicePlans(ctx, a, ar, rt, filters)
+	if err != nil {
+		return nil, err
+	}
+
+	names := make([]string, 0, len(rs))
+	for _, i := range rs {
+		names = append(names, i.Data().Get("name").(string))
+	}
+
+	return names, nil
+}
+
+// app service static sites
+
+func cacheStaticSites(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]provider.Resource, error) {
+	rs, err := a.cache.Get(rt)
+	if err != nil {
+		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
+			return nil, errors.WithStack(err)
+		}
+
+		rs, err = staticSites(ctx, a, ar, rt, filters)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to get app service static sites")
+		}
+
+		err = a.cache.Set(rt, rs)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return rs, nil
+}
+
+func getStaticSites(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]string, error) {
+	rs, err := cacheStaticSites(ctx, a, ar, rt, filters)
 	if err != nil {
 		return nil, err
 	}

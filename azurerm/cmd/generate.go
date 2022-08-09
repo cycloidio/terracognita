@@ -33,6 +33,7 @@ var azureAPIs = []AzureAPI{
 	{PackageIdentifier: "newActionGroupClient", API: "insights", OtherPath: "monitor/mgmt", APIVersion: "2021-09-01-preview", IsPreview: true}, // used for monitor resources
 	{PackageIdentifier: "newActivityLogAlertsClient", API: "insights", OtherPath: "monitor/mgmt", APIVersion: "2020-10-01"},                    // used for monitor resources
 	{PackageIdentifier: "monitor", API: "insights", OtherPath: "monitor/mgmt", APIVersion: "2021-07-01-preview", IsPreview: true},              // used for monitor resources
+	{API: "web", APIVersion: "2021-03-01"},
 }
 
 var functions = []Function{
@@ -568,6 +569,34 @@ var functions = []Function{
 	{ResourceName: "AutoscaleSettingResource", API: "monitor", IrregularClientName: "NewAutoscaleSettingsClient", FunctionName: "ListMonitorAutoScaleSettings", AzureSDKListFunction: "ListByResourceGroup", ResourceGroup: true},
 	{ResourceName: "LogProfileResource", API: "monitor", IrregularClientName: "NewLogProfilesClient", FunctionName: "ListMonitorLogProfiles", ReturnsList: true},
 	{ResourceName: "MetricAlertResource", API: "monitor", IrregularClientName: "NewMetricAlertsClient", FunctionName: "ListMonitorMetricsAlerts", ReturnsList: true, AzureSDKListFunction: "ListByResourceGroup", ResourceGroup: true},
+	// app service
+	{ResourceName: "Site", API: "web", IrregularClientName: "NewAppsClient", FunctionName: "ListWebApps"},
+	{ResourceName: "Site", API: "web", IrregularClientName: "NewAppsClient", FunctionName: "ListDeploymentSlots", AzureSDKListFunction: "ListSlots", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "name",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "AppServicePlan", API: "web", ExtraArgs: []Arg{
+		{
+			Name: "detailed",
+			Type: "*bool",
+		},
+	}},
+	{ResourceName: "SourceControl", API: "web", IrregularClientName: "New", AzureSDKListFunction: "ListSourceControls"},
+	{ResourceName: "StaticSiteARMResource", API: "web", IrregularClientName: "NewStaticSitesClient", FunctionName: "ListStaticSites"},
+	{ResourceName: "StaticSiteCustomDomainOverviewARMResource", API: "web", IrregularClientName: "NewStaticSitesClient", AzureSDKListFunction: "ListStaticSiteCustomDomains", FunctionName: "ListStaticSitesCustomDomain", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "name",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "HybridConnection", API: "web", IrregularClientName: "NewAppServicePlansClient", AzureSDKListFunction: "ListHybridConnections", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "name",
+			Type: "string",
+		},
+	}},
 }
 
 func main() {
