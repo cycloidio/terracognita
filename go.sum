@@ -309,6 +309,8 @@ github.com/cycloidio/terraform-provider-azurerm v1.44.1-0.20220513132617-9184971
 github.com/cycloidio/terraform-provider-azurerm v1.44.1-0.20220513132617-918497152827/go.mod h1:yAWZMAEgx+bUWhfOVBiymy/oxIbobZslFE8I0kjaeKE=
 github.com/cycloidio/tfdocs v0.0.0-20210903075122-31a804b31daf h1:bTxGdxb8uk0orMw726niNd3EYmnwuygtZZidDXZura8=
 github.com/cycloidio/tfdocs v0.0.0-20210903075122-31a804b31daf/go.mod h1:4zRiWOHuVkhb2vatajIFxV5g/AC4W7Zb/0pMF1G0yyA=
+github.com/cycloidio/tfdocs v0.0.0-20220809093344-d999d1c2069e h1:Dc9l5uHbyMzClz0jchr8W0oC6JDQgoRgPDQ/SGAlpIA=
+github.com/cycloidio/tfdocs v0.0.0-20220809093344-d999d1c2069e/go.mod h1:4zRiWOHuVkhb2vatajIFxV5g/AC4W7Zb/0pMF1G0yyA=
 github.com/daixiang0/gci v0.2.8/go.mod h1:+4dZ7TISfSmqfAGv59ePaHfNzgGtIkHAhhdKggP1JAc=
 github.com/davecgh/go-spew v0.0.0-20161028175848-04cdfd42973b/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
