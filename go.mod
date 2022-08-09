@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go v1.43.34
 	github.com/chr4/pwgen v1.1.0
 	github.com/cycloidio/mxwriter v1.0.4
-	github.com/cycloidio/tfdocs v0.0.0-20210903075122-31a804b31daf
+	github.com/cycloidio/tfdocs v0.0.0-20220809093344-d999d1c2069e
 	github.com/gertd/go-pluralize v0.1.7
 	github.com/go-kit/kit v0.9.0
 	github.com/golang/mock v1.6.0

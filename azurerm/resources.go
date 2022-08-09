@@ -156,6 +156,17 @@ const (
 	MonitorAutoscaleSetting
 	MonitorLogProfile
 	MonitorMetricAlert
+	// App service
+	WindowsWebApp
+	LinuxWebApp
+	LinuxWebAppSlot
+	WindowsWebAppSlot
+	WebAppActiveSlot
+	ServicePlan
+	SourceControlToken
+	StaticSite
+	StaticSiteCustomDomain
+	WebAppHybridConnection
 )
 
 type rtFn func(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error)
@@ -302,6 +313,17 @@ var (
 		MonitorAutoscaleSetting: monitorAutoscaleSettings,
 		MonitorLogProfile:       monitorLogProfiles,
 		MonitorMetricAlert:      monitorMetricAlerts,
+		// App service
+		WindowsWebApp:          webApps,
+		LinuxWebApp:            webApps,
+		LinuxWebAppSlot:        linuxWebAppSlots,
+		WindowsWebAppSlot:      windowsWebAppSlots,
+		WebAppActiveSlot:       webAppActiveSlots,
+		ServicePlan:            servicePlans,
+		SourceControlToken:     sourceControlTokens,
+		StaticSite:             staticSites,
+		StaticSiteCustomDomain: staticSiteCustomDomains,
+		WebAppHybridConnection: webAppHybridConnections,
 	}
 )
 
@@ -2161,6 +2183,190 @@ func monitorMetricAlerts(ctx context.Context, a *azurerm, ar *AzureReader, resou
 	for _, metricsAlert := range metricsAlerts {
 		r := provider.NewResource(*metricsAlert.ID, resourceType, a)
 		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+// App service
+func webApps(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	webApps, err := ar.ListWebApps(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list app service web apps from reader")
+	}
+	resources := make([]provider.Resource, 0, len(webApps))
+	for _, webApp := range webApps {
+
+		// https://azure.github.io/AppService/2021/08/31/Kind-property-overview.html
+		// is linux if reserved is set
+		if resourceType == "azurerm_windows_web_app" && *webApp.SiteProperties.Reserved == false || resourceType == "azurerm_linux_web_app" && *webApp.SiteProperties.Reserved == true {
+			r := provider.NewResource(*webApp.ID, resourceType, a)
+			// we set the name prior of reading it from the state
+			// as it is required to able to List resources depending on this one
+			if err := r.Data().Set("name", *webApp.Name); err != nil {
+				return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the app service web app '%s'", *webApp.Name)
+			}
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func servicePlans(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	// specify detailed = true to return all App Service plan properties, defaults to false, which returns a subset of the properties.
+	// Note! Retrieval of all properties may increase the API latency.
+	detailed := false
+	servicePlans, err := ar.ListAppServicePlans(ctx, &detailed)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list app service service plans from reader")
+	}
+	resources := make([]provider.Resource, 0, len(servicePlans))
+	for _, servicePlan := range servicePlans {
+
+		r := provider.NewResource(*servicePlan.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
+		if err := r.Data().Set("name", *servicePlan.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the app service plan '%s'", *servicePlan.Name)
+		}
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func sourceControlTokens(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	sourceControls, err := ar.ListSourceControls(ctx)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list app service source controls from reader")
+	}
+	resources := make([]provider.Resource, 0, len(sourceControls))
+	for _, sourceControl := range sourceControls {
+		if sourceControl.SourceControlProperties != nil && sourceControl.ID != nil {
+			//fmt.Sprintf("/providers/Microsoft.Web/sourcecontrols/%s", *sourceControl.Type)
+			r := provider.NewResource(*sourceControl.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func staticSites(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	staticSites, err := ar.ListStaticSites(ctx)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list app service static sites from reader")
+	}
+	resources := make([]provider.Resource, 0, len(staticSites))
+	for _, staticSite := range staticSites {
+
+		r := provider.NewResource(*staticSite.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
+		if err := r.Data().Set("name", *staticSite.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the app service static site '%s'", *staticSite.Name)
+		}
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func staticSiteCustomDomains(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	staticSitesNames, err := getStaticSites(ctx, a, ar, StaticSite.String(), filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list app service static sites from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, staticSitesName := range staticSitesNames {
+		staticSiteCustomDomains, err := ar.ListStaticSitesCustomDomain(ctx, staticSitesName)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list app service static sites custom domains set from reader")
+		}
+		for _, staticSiteCustomDomain := range staticSiteCustomDomains {
+
+			r := provider.NewResource(*staticSiteCustomDomain.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func webAppHybridConnections(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	servicePlansNames, err := getServicePlans(ctx, a, ar, ServicePlan.String(), filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list app service plan from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, servicePlanName := range servicePlansNames {
+		hybridConnections, err := ar.ListHybridConnections(ctx, servicePlanName)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list app service web app hybrid connections set from reader")
+		}
+		for _, hybridConnection := range hybridConnections {
+
+			r := provider.NewResource(*hybridConnection.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func linuxWebAppSlots(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	webAppsNames, err := getWebApps(ctx, a, ar, []string{LinuxWebApp.String()}, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list app service linux web apps from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, webAppsName := range webAppsNames {
+		deploymentSlots, err := ar.ListDeploymentSlots(ctx, webAppsName)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list app service linux web app deployment slots set from reader")
+		}
+		for _, deploymentSlot := range deploymentSlots {
+
+			r := provider.NewResource(*deploymentSlot.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func windowsWebAppSlots(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	webAppsNames, err := getWebApps(ctx, a, ar, []string{WindowsWebApp.String()}, filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list app service windows web apps from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, webAppsName := range webAppsNames {
+		deploymentSlots, err := ar.ListDeploymentSlots(ctx, webAppsName)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list app service web windows app deployment slots set from reader")
+		}
+		for _, deploymentSlot := range deploymentSlots {
+
+			r := provider.NewResource(*deploymentSlot.ID, resourceType, a)
+			resources = append(resources, r)
+		}
+	}
+	return resources, nil
+}
+
+func webAppActiveSlots(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	webApps, err := ar.ListWebApps(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list app service web apps from reader")
+	}
+	resources := make([]provider.Resource, 0, len(webApps))
+	for _, webApp := range webApps {
+
+		if webApp.SiteProperties != nil && webApp.SiteProperties.SlotSwapStatus != nil {
+
+			if webApp.SiteProperties.SlotSwapStatus.SourceSlotName != nil {
+				r := provider.NewResource(*webApp.ID, resourceType, a)
+
+				resources = append(resources, r)
+			}
+		}
 	}
 	return resources, nil
 }
