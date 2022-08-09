@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.8.0] _2022-08-09_
+
 ### Fixed
 
 - Repetitive blocks now have the proper variables within them
