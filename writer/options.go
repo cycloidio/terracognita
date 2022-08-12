@@ -20,6 +20,11 @@ type Options struct {
 	// HCLProviderBlock make the HCL generate or not the
 	// 'provider "" {}' block
 	HCLProviderBlock bool
+
+	// TerraformCategoryKey allows to write the Terraform
+	// block containing the required version of the provider
+	// and provider block elsewhere than the module/default file
+	TerraformCategoryKey string
 }
 
 // HasModule will check if the Module is empty or not

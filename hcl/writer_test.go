@@ -2,6 +2,7 @@ package hcl_test
 
 import (
 	"io/ioutil"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -47,6 +48,40 @@ func TestNewHCLWriter(t *testing.T) {
 			},
 		}, hw.Config)
 	})
+	t.Run("SuccessWithSplitConfig", func(t *testing.T) {
+		var (
+			ctrl = gomock.NewController(t)
+			p    = mock.NewProvider(ctrl)
+		)
+		p.EXPECT().String().Return("aws").Times(2)
+		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().TFProvider().Return(aws.Provider())
+		p.EXPECT().Configuration().Return(map[string]interface{}{
+			"region": "eu-west-1",
+		})
+
+		hw := hcl.NewWriter(nil, p, &writer.Options{
+			HCLProviderBlock:     true,
+			TerraformCategoryKey: "config",
+		})
+
+		assert.True(t, reflect.DeepEqual(map[string]map[string]interface{}{
+			"hcl": map[string]interface{}{
+				"resource": map[string]map[string]interface{}{},
+			},
+			"config": map[string]interface{}{
+				"provider": map[string]interface{}{"aws": map[string]interface{}{}},
+				"terraform": map[string]interface{}{
+					"required_providers": map[string]interface{}{
+						"=tc=aws": map[string]interface{}{
+							"source": "hashicorp/aws",
+						},
+					},
+					"required_version": ">= 1.0",
+				},
+			},
+		}, hw.Config))
+	})
 	t.Run("SuccessWithoutProviderBLock", func(t *testing.T) {
 		var (
 			ctrl = gomock.NewController(t)
@@ -86,6 +121,38 @@ func TestNewHCLWriter(t *testing.T) {
 						"source": "./module-my-module",
 					},
 				},
+				"terraform": map[string]interface{}{
+					"required_providers": map[string]interface{}{
+						"=tc=aws": map[string]interface{}{
+							"source": "hashicorp/aws",
+						},
+					},
+					"required_version": ">= 1.0",
+				},
+			},
+		}, hw.Config)
+	})
+	t.Run("SuccessWithModuleAndConfig", func(t *testing.T) {
+		var (
+			ctrl = gomock.NewController(t)
+			p    = mock.NewProvider(ctrl)
+		)
+		p.EXPECT().String().Return("aws")
+		p.EXPECT().Source().Return("hashicorp/aws")
+
+		hw := hcl.NewWriter(nil, p, &writer.Options{
+			Module:               "my-module",
+			TerraformCategoryKey: "config",
+		})
+		assert.Equal(t, map[string]map[string]interface{}{
+			"tc_module": map[string]interface{}{
+				"module": map[string]interface{}{
+					"my-module": map[string]interface{}{
+						"source": "./module-my-module",
+					},
+				},
+			},
+			"config": map[string]interface{}{
 				"terraform": map[string]interface{}{
 					"required_providers": map[string]interface{}{
 						"=tc=aws": map[string]interface{}{
