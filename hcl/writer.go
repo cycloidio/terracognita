@@ -611,7 +611,7 @@ func extractResourceTypeAndName(value string) (string, string) {
 func (w *Writer) setProviderConfig(cat string) {
 	pcfg := w.provider.Configuration()
 	for k, s := range w.provider.TFProvider().Schema {
-		if s.Required {
+		if _, ok := pcfg[k]; s.Required || ok {
 			if _, ok := w.Config[cat]["variable"]; !ok {
 				w.Config[cat]["variable"] = make(map[string]interface{})
 			}
