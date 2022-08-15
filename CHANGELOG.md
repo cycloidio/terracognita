@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Fixed
+
+- Now the configuration used (not sensible) when importing will be written to the HCL provider configuration too
+  ([PR #320](https://github.com/cycloidio/terracognita/pull/320))
+
 ## [0.8.1] _2022-08-10_
 
 ### Fixed
