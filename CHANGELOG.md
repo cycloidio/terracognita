@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Added
+
+- Allow the writing of tf/provider into a separated config key
+  ([PR#319](https://github.com/cycloidio/terracognita/pull/319))
+
 ## [0.8.1] _2022-08-10_
 
 ### Fixed

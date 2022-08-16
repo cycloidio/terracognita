@@ -81,13 +81,23 @@ func NewWriter(w io.Writer, pv provider.Provider, opts *writer.Options) *Writer 
 		wr.Config[cat]["resource"] = make(map[string]map[string]interface{})
 		wr.categories = append(wr.categories, cat)
 	}
-	wr.Config[cat]["terraform"] = tfcfg
+
+	// If no option is given to write Terraform block elsewhere
+	// write it into the file of the module
+	tfKey := cat
+	if opts.TerraformCategoryKey != "" {
+		tfKey = opts.TerraformCategoryKey
+		wr.Config[tfKey] = make(map[string]interface{})
+		wr.categories = append(wr.categories, tfKey)
+	}
+	wr.Config[tfKey]["terraform"] = tfcfg
+
 	if opts.HCLProviderBlock {
 		pvcfg := map[string]interface{}{
 			pv.String(): make(map[string]interface{}),
 		}
-		wr.Config[cat]["provider"] = pvcfg
-		wr.setProviderConfig(cat)
+		wr.Config[tfKey]["provider"] = pvcfg
+		wr.setProviderConfig(tfKey)
 	}
 
 	return wr
@@ -159,7 +169,7 @@ func (w *Writer) Has(key string) (bool, error) {
 	name := strings.Join(keys[1:], "")
 
 	for k, v := range w.Config {
-		if k == writer.ModuleCategoryKey || k == variablesCategoryKey {
+		if k == writer.ModuleCategoryKey || k == variablesCategoryKey || k == w.opts.TerraformCategoryKey {
 			continue
 		}
 		if _, ok := v["resource"].(map[string]map[string]interface{})[keys[0]][name]; ok {
@@ -336,7 +346,7 @@ func getValueKeys(val cty.Value) []string {
 func (w *Writer) setVariables() {
 	variables := make(map[string]interface{})
 	for c, cfg := range w.Config {
-		if c == writer.ModuleCategoryKey || c == variablesCategoryKey {
+		if c == writer.ModuleCategoryKey || c == variablesCategoryKey || c == w.opts.TerraformCategoryKey {
 			continue
 		}
 		for k, v := range cfg["resource"].(map[string]map[string]interface{}) {
@@ -485,7 +495,7 @@ func (w *Writer) Interpolate(i map[string]string) {
 		return
 	}
 	for k, v := range w.Config {
-		if k == writer.ModuleCategoryKey || k == variablesCategoryKey {
+		if k == writer.ModuleCategoryKey || k == variablesCategoryKey || k == w.opts.TerraformCategoryKey {
 			continue
 		}
 		resources := v["resource"]
