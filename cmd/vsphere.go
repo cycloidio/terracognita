@@ -52,7 +52,7 @@ var (
 				return err
 			}
 
-			err = importProvider(ctx, logger, vsphereProvider)
+			err = importProvider(ctx, logger, vsphereProvider, noTags)
 			if err != nil {
 				return err
 			}

@@ -63,7 +63,7 @@ var (
 				return err
 			}
 
-			err = importProvider(ctx, logger, googleP)
+			err = importProvider(ctx, logger, googleP, tags)
 			if err != nil {
 				return err
 			}
