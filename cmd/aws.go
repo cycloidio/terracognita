@@ -75,7 +75,7 @@ var (
 				return err
 			}
 
-			err = importProvider(ctx, logger, awsP)
+			err = importProvider(ctx, logger, awsP, tags)
 			if err != nil {
 				return err
 			}

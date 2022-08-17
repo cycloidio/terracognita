@@ -20,6 +20,7 @@ import (
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/provider"
 	"github.com/cycloidio/terracognita/state"
+	"github.com/cycloidio/terracognita/tag"
 	"github.com/cycloidio/terracognita/writer"
 	kitlog "github.com/go-kit/kit/log"
 	"github.com/spf13/cobra"
@@ -29,6 +30,7 @@ import (
 
 var (
 	isHCLDir bool
+	noTags   []tag.Tag = nil
 	hclOut   io.ReadWriter
 	stateOut io.Writer
 
@@ -293,11 +295,12 @@ func getWriterOptions() (*writer.Options, error) {
 	}, nil
 }
 
-func importProvider(ctx context.Context, logger kitlog.Logger, p provider.Provider) error {
+func importProvider(ctx context.Context, logger kitlog.Logger, p provider.Provider, tags []tag.Tag) error {
 	f := &filter.Filter{
 		Include: include,
 		Exclude: exclude,
 		Targets: targets,
+		Tags:    tags,
 	}
 
 	var hclW, stateW writer.Writer

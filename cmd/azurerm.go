@@ -60,7 +60,7 @@ var (
 				return err
 			}
 
-			err = importProvider(ctx, logger, azureRMP)
+			err = importProvider(ctx, logger, azureRMP, noTags)
 			if err != nil {
 				return err
 			}
