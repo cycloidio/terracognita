@@ -1,5 +1,5 @@
 # build stage
-FROM golang:1.17-alpine3.14 as builder
+FROM golang:1.17-alpine3.16 as builder
 
 RUN apk add --update git
 
@@ -16,7 +16,7 @@ RUN GIT_TAG=$(git describe --tags --always) && \
   CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-X github.com/cycloidio/terracognita/cmd.Version=$GIT_TAG"
 
 # final stage
-FROM alpine:3.14
+FROM alpine:3.16
 COPY --from=builder /app/terracognita /app/
 # https://github.com/hashicorp/terraform/issues/10779
 RUN apk --update add ca-certificates
