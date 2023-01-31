@@ -281,6 +281,10 @@ type Reader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetECSServices(ctx context.Context, input *ecs.DescribeServicesInput) ([]*ecs.Service, error)
 
+	// GetECSTaskDefinitionsArns returns the ecs task definitions arns on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetECSTaskDefinitionsArns(ctx context.Context, input *ecs.ListTaskDefinitionsInput) ([]*string, error)
+
 	// GetEFSFileSystems returns the EFS File Systems on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetEFSFileSystems(ctx context.Context, input *efs.DescribeFileSystemsInput) ([]*efs.FileSystemDescription, error)
@@ -2181,6 +2185,37 @@ func (c *connector) GetECSServices(ctx context.Context, input *ecs.DescribeServi
 		hasNextToken = false
 
 		opt = append(opt, o.Services...)
+
+	}
+
+	return opt, nil
+}
+
+func (c *connector) GetECSTaskDefinitionsArns(ctx context.Context, input *ecs.ListTaskDefinitionsInput) ([]*string, error) {
+	if c.svc.ecs == nil {
+		c.svc.ecs = ecs.New(c.svc.session)
+	}
+
+	opt := make([]*string, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.ecs.ListTaskDefinitionsWithContext(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.TaskDefinitionArns == nil {
+			hasNextToken = false
+			continue
+		}
+
+		if input == nil {
+			input = &ecs.ListTaskDefinitionsInput{}
+		}
+		input.NextToken = o.NextToken
+		hasNextToken = o.NextToken != nil
+
+		opt = append(opt, o.TaskDefinitionArns...)
 
 	}
 

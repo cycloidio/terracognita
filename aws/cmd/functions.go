@@ -621,6 +621,18 @@ var (
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
+		Function{
+			FnName:          "GetECSTaskDefinitionsArns",
+			Entity:          "TaskDefinitions",
+			FnAttributeList: "TaskDefinitionArns",
+			FnOutput:        "string",
+			Prefix:          "List",
+			Service:         "ecs",
+			Documentation: `
+			// GetECSTaskDefinitionsArns returns the ecs task definitions arns on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
 
 		// efs
 		Function{
