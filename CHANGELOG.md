@@ -5,6 +5,7 @@
 - Allow the writing of tf/provider into a separated config key
   ([PR#319](https://github.com/cycloidio/terracognita/pull/319))
 - Add new aws resource: aws_ecs_task_definition
+  ([PR#333](https://github.com/cycloidio/terracognita/pull/333))
 
 ### Fixed
 
