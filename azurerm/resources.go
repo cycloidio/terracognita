@@ -2,6 +2,7 @@ package azurerm
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -18,17 +19,18 @@ type ResourceType int
 const (
 	ResourceGroup ResourceType = iota
 	// Compute Resources
+	AvailabilitySet
+	Image
+	ManagedDisk
 	VirtualMachine
-	WindowsVirtualMachine
-	LinuxVirtualMachine
+	VirtualMachineDataDiskAttachment
 	VirtualMachineExtension
-	WindowsVirtualMachineScaleSet
-	LinuxVirtualMachineScaleSet
 	VirtualMachineScaleSetExtension
 	VirtualNetwork
-	AvailabilitySet
-	ManagedDisk
-	Image
+	LinuxVirtualMachine
+	LinuxVirtualMachineScaleSet
+	WindowsVirtualMachine
+	WindowsVirtualMachineScaleSet
 	// Network Resources
 	Subnet
 	NetworkInterface
@@ -175,17 +177,18 @@ var (
 	resources = map[ResourceType]rtFn{
 		ResourceGroup: resourceGroup,
 		// Compute Resources
-		VirtualMachine:                  virtualMachines,
-		WindowsVirtualMachine:           virtualMachines,
-		LinuxVirtualMachine:             virtualMachines,
-		VirtualMachineExtension:         virtualMachineExtensions,
-		VirtualNetwork:                  virtualNetworks,
-		WindowsVirtualMachineScaleSet:   virtualMachineScaleSets,
-		LinuxVirtualMachineScaleSet:     virtualMachineScaleSets,
-		VirtualMachineScaleSetExtension: virtualMachineScaleSetExtensions,
-		AvailabilitySet:                 availabilitySets,
-		ManagedDisk:                     disks,
-		Image:                           images,
+		VirtualMachine:                   virtualMachines,
+		WindowsVirtualMachine:            virtualMachines,
+		LinuxVirtualMachine:              virtualMachines,
+		VirtualMachineExtension:          virtualMachineExtensions,
+		VirtualNetwork:                   virtualNetworks,
+		WindowsVirtualMachineScaleSet:    virtualMachineScaleSets,
+		LinuxVirtualMachineScaleSet:      virtualMachineScaleSets,
+		VirtualMachineScaleSetExtension:  virtualMachineScaleSetExtensions,
+		AvailabilitySet:                  availabilitySets,
+		ManagedDisk:                      disks,
+		VirtualMachineDataDiskAttachment: virtualMachineDataDiskAttachments,
+		Image:                            images,
 		// Network Resources
 		Subnet:                            subnets,
 		NetworkInterface:                  networkInterfaces,
@@ -467,6 +470,41 @@ func disks(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string
 	for _, disk := range disks {
 		r := provider.NewResource(*disk.ID, resourceType, a)
 		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func virtualMachineDataDiskAttachments(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	// Get the list of disks
+	disks, err := ar.ListDisks(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list disks attachments from reader")
+	}
+
+	// Get the vms list to check if disk attached
+	virtualMachines, err := ar.ListVirtualMachines(ctx, "")
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list virtual machines from reader")
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, disk := range disks {
+		if disk.DiskProperties.DiskState == "Attached" {
+			// check on wich VM the disk is attached
+			for _, virtualMachine := range virtualMachines {
+				if profile := virtualMachine.StorageProfile; profile != nil {
+					if dataDisks := profile.DataDisks; dataDisks != nil {
+						for _, dataDisk := range *dataDisks {
+							if *dataDisk.Name == *disk.Name {
+								r := provider.NewResource(fmt.Sprintf("%s/dataDisks/%s", *virtualMachine.ID, *disk.Name), resourceType, a)
+								resources = append(resources, r)
+								break
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 	return resources, nil
 }
