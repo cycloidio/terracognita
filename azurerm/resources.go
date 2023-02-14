@@ -468,6 +468,16 @@ func disks(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string
 	}
 	resources := make([]provider.Resource, 0, len(disks))
 	for _, disk := range disks {
+		// If disk is used as Operating System, the disk is managed by the virtual_machine resource, not a dedicated disk
+		if disk.DiskProperties.OsType != "" {
+			continue
+		}
+
+		// When using azurerm_virtual_machine resource, extra attached disk are managed via storage_data_disk
+		// CreateOption == Empty : fully managed by
+		if disk.DiskProperties.DiskState == "Attached" && filters.IsIncluded("azurerm_virtual_machine") {
+			continue
+		}
 		r := provider.NewResource(*disk.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -475,6 +485,13 @@ func disks(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string
 }
 
 func virtualMachineDataDiskAttachments(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	// only Managed Disks are supported via this separate resource,
+	// Unmanaged Disks can be attached using the storage_data_disk block in the azurerm_virtual_machine resource.
+	// So if using azurerm_virtual_machine, do not define azurerm_virtual_machine_data_disk_attachment.
+	if filters.IsIncluded("azurerm_virtual_machine") {
+		return nil, nil
+	}
+
 	// Get the list of disks
 	disks, err := ar.ListDisks(ctx)
 	if err != nil {
