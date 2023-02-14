@@ -7,6 +7,11 @@
 - Allow the writing of tf/provider into a separated config key
   ([PR#319](https://github.com/cycloidio/terracognita/pull/319))
 
+### Changed
+
+- Azure: azure: do not define external disk with `azurerm_virtual_machine`
+  ([PR #336](https://github.com/cycloidio/terracognita/pull/336))
+
 ### Fixed
 
 - Tags are being used again for filtering when importing
