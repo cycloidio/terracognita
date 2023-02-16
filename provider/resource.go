@@ -251,17 +251,26 @@ func (r *resource) ImportState() ([]Resource, error) {
 }
 
 func (r *resource) Read(f *filter.Filter) error {
+	var err error
 	rrreq := ReadResourceRequest{
 		TypeName:   r.Type(),
 		PriorState: r.stateValue,
 	}
 	rrres := r.client.ReadResource(rrreq)
-	if err := rrres.Diagnostics.Err(); err != nil {
+	if err = rrres.Diagnostics.Err(); err != nil {
 		return errors.Wrapf(err, "could not read resource %s with id %s", r.resourceType, r.id)
 	}
-	newInstanceState := terraform.NewInstanceStateShimmedFromValue(rrres.NewState, r.TFResource().SchemaVersion)
+
+	// After getting the resource data we call the provider to fix any potential
+	// issues it may have like invalid configurations
+	newStateValue, err := r.Provider().FixResource(r.Type(), rrres.NewState)
+	if err != nil {
+		return errors.Wrapf(err, "failed to fix resource %s", r.Type())
+	}
+
+	newInstanceState := terraform.NewInstanceStateShimmedFromValue(newStateValue, r.TFResource().SchemaVersion)
 	r.state = newInstanceState
-	r.stateValue = rrres.NewState
+	r.stateValue = newStateValue
 
 	// The old provider API used an empty id to signal that the remote
 	// object appears to have been deleted, but our new protocol expects
@@ -304,7 +313,7 @@ func (r *resource) Read(f *filter.Filter) error {
 		return err
 	}
 
-	zstate, err := util.HashicorpToZclonfValue(rrres.NewState, r.tfResource.CoreConfigSchema().ImpliedType())
+	zstate, err := util.HashicorpToZclonfValue(newStateValue, r.tfResource.CoreConfigSchema().ImpliedType())
 	if err != nil {
 		return err
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/cycloidio/terracognita/filter"
+	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -52,4 +53,10 @@ type Provider interface {
 	// the provider. The keys have to be the Provider
 	// attributes as defined on the TF Schema
 	Configuration() map[string]interface{}
+
+	// FixResource will try to fix some attributes that we know are wrong
+	// and that we do not want to write or change the value they have
+	// depending on other conditions.
+	// This could also be issues that the Providers have and may not fix
+	FixResource(t string, v cty.Value) (cty.Value, error)
 }

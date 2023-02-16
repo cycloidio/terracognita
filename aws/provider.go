@@ -11,6 +11,7 @@ import (
 	"github.com/cycloidio/terracognita/filter"
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/provider"
+	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-provider-aws/conns"
 	tfaws "github.com/hashicorp/terraform-provider-aws/provider"
@@ -124,5 +125,6 @@ func (a *aws) HasResourceType(t string) bool {
 	_, err := ResourceTypeString(t)
 	return err == nil
 }
-func (a *aws) Source() string                        { return "hashicorp/aws" }
-func (a *aws) Configuration() map[string]interface{} { return a.configuration }
+func (a *aws) Source() string                                       { return "hashicorp/aws" }
+func (a *aws) Configuration() map[string]interface{}                { return a.configuration }
+func (a *aws) FixResource(t string, v cty.Value) (cty.Value, error) { return v, nil }

@@ -475,7 +475,7 @@ func disks(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string
 
 		// When using azurerm_virtual_machine resource, extra attached disk are managed via storage_data_disk
 		// CreateOption == Empty : fully managed by
-		if disk.DiskProperties.DiskState == "Attached" && filters.IsIncluded("azurerm_virtual_machine") {
+		if (disk.DiskProperties.DiskState == "Attached" || disk.DiskProperties.DiskState == "Reserved") && filters.IsIncluded("azurerm_virtual_machine") {
 			continue
 		}
 		r := provider.NewResource(*disk.ID, resourceType, a)
@@ -506,7 +506,7 @@ func virtualMachineDataDiskAttachments(ctx context.Context, a *azurerm, ar *Azur
 
 	resources := make([]provider.Resource, 0)
 	for _, disk := range disks {
-		if disk.DiskProperties.DiskState == "Attached" {
+		if disk.DiskProperties.DiskState == "Attached" || disk.DiskProperties.DiskState == "Reserved" {
 			// check on wich VM the disk is attached
 			for _, virtualMachine := range virtualMachines {
 				if profile := virtualMachine.StorageProfile; profile != nil {
@@ -2098,8 +2098,8 @@ func applicationInsightsAnalyticsItems(ctx context.Context, a *azurerm, ar *Azur
 	return resources, nil
 }
 
-//issue import Error = 'json: cannot unmarshal array into Go value of type insights.WebTestListResult' JSON
-//follow-up at https://github.com/Azure/azure-rest-api-specs/issues/9463
+// issue import Error = 'json: cannot unmarshal array into Go value of type insights.WebTestListResult' JSON
+// follow-up at https://github.com/Azure/azure-rest-api-specs/issues/9463
 func applicationInsightsWebTests(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	insightsWebTests, err := ar.ListINSIGHTSWebTests(ctx)
 	if err != nil {
