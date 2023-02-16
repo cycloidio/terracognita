@@ -10,30 +10,30 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// Writer is a mock of Writer interface
+// Writer is a mock of Writer interface.
 type Writer struct {
 	ctrl     *gomock.Controller
 	recorder *WriterMockRecorder
 }
 
-// WriterMockRecorder is the mock recorder for Writer
+// WriterMockRecorder is the mock recorder for Writer.
 type WriterMockRecorder struct {
 	mock *Writer
 }
 
-// NewWriter creates a new mock instance
+// NewWriter creates a new mock instance.
 func NewWriter(ctrl *gomock.Controller) *Writer {
 	mock := &Writer{ctrl: ctrl}
 	mock.recorder = &WriterMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *Writer) EXPECT() *WriterMockRecorder {
 	return m.recorder
 }
 
-// Has mocks base method
+// Has mocks base method.
 func (m *Writer) Has(arg0 string) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Has", arg0)
@@ -42,25 +42,25 @@ func (m *Writer) Has(arg0 string) (bool, error) {
 	return ret0, ret1
 }
 
-// Has indicates an expected call of Has
+// Has indicates an expected call of Has.
 func (mr *WriterMockRecorder) Has(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Has", reflect.TypeOf((*Writer)(nil).Has), arg0)
 }
 
-// Interpolate mocks base method
+// Interpolate mocks base method.
 func (m *Writer) Interpolate(arg0 map[string]string) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Interpolate", arg0)
 }
 
-// Interpolate indicates an expected call of Interpolate
+// Interpolate indicates an expected call of Interpolate.
 func (mr *WriterMockRecorder) Interpolate(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Interpolate", reflect.TypeOf((*Writer)(nil).Interpolate), arg0)
 }
 
-// Sync mocks base method
+// Sync mocks base method.
 func (m *Writer) Sync() error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Sync")
@@ -68,13 +68,13 @@ func (m *Writer) Sync() error {
 	return ret0
 }
 
-// Sync indicates an expected call of Sync
+// Sync indicates an expected call of Sync.
 func (mr *WriterMockRecorder) Sync() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Sync", reflect.TypeOf((*Writer)(nil).Sync))
 }
 
-// Write mocks base method
+// Write mocks base method.
 func (m *Writer) Write(arg0 string, arg1 interface{}) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Write", arg0, arg1)
@@ -82,7 +82,7 @@ func (m *Writer) Write(arg0 string, arg1 interface{}) error {
 	return ret0
 }
 
-// Write indicates an expected call of Write
+// Write indicates an expected call of Write.
 func (mr *WriterMockRecorder) Write(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Write", reflect.TypeOf((*Writer)(nil).Write), arg0, arg1)

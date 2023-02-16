@@ -17,30 +17,30 @@ import (
 	states "github.com/hashicorp/terraform/states"
 )
 
-// Resource is a mock of Resource interface
+// Resource is a mock of Resource interface.
 type Resource struct {
 	ctrl     *gomock.Controller
 	recorder *ResourceMockRecorder
 }
 
-// ResourceMockRecorder is the mock recorder for Resource
+// ResourceMockRecorder is the mock recorder for Resource.
 type ResourceMockRecorder struct {
 	mock *Resource
 }
 
-// NewResource creates a new mock instance
+// NewResource creates a new mock instance.
 func NewResource(ctrl *gomock.Controller) *Resource {
 	mock := &Resource{ctrl: ctrl}
 	mock.recorder = &ResourceMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *Resource) EXPECT() *ResourceMockRecorder {
 	return m.recorder
 }
 
-// AttributesReference mocks base method
+// AttributesReference mocks base method.
 func (m *Resource) AttributesReference() ([]string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AttributesReference")
@@ -49,13 +49,13 @@ func (m *Resource) AttributesReference() ([]string, error) {
 	return ret0, ret1
 }
 
-// AttributesReference indicates an expected call of AttributesReference
+// AttributesReference indicates an expected call of AttributesReference.
 func (mr *ResourceMockRecorder) AttributesReference() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AttributesReference", reflect.TypeOf((*Resource)(nil).AttributesReference))
 }
 
-// Data mocks base method
+// Data mocks base method.
 func (m *Resource) Data() *schema.ResourceData {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Data")
@@ -63,13 +63,13 @@ func (m *Resource) Data() *schema.ResourceData {
 	return ret0
 }
 
-// Data indicates an expected call of Data
+// Data indicates an expected call of Data.
 func (mr *ResourceMockRecorder) Data() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Data", reflect.TypeOf((*Resource)(nil).Data))
 }
 
-// HCL mocks base method
+// HCL mocks base method.
 func (m *Resource) HCL(arg0 writer.Writer) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "HCL", arg0)
@@ -77,13 +77,13 @@ func (m *Resource) HCL(arg0 writer.Writer) error {
 	return ret0
 }
 
-// HCL indicates an expected call of HCL
+// HCL indicates an expected call of HCL.
 func (mr *ResourceMockRecorder) HCL(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HCL", reflect.TypeOf((*Resource)(nil).HCL), arg0)
 }
 
-// ID mocks base method
+// ID mocks base method.
 func (m *Resource) ID() string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ID")
@@ -91,13 +91,13 @@ func (m *Resource) ID() string {
 	return ret0
 }
 
-// ID indicates an expected call of ID
+// ID indicates an expected call of ID.
 func (mr *ResourceMockRecorder) ID() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ID", reflect.TypeOf((*Resource)(nil).ID))
 }
 
-// ImpliedType mocks base method
+// ImpliedType mocks base method.
 func (m *Resource) ImpliedType() cty.Type {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ImpliedType")
@@ -105,13 +105,13 @@ func (m *Resource) ImpliedType() cty.Type {
 	return ret0
 }
 
-// ImpliedType indicates an expected call of ImpliedType
+// ImpliedType indicates an expected call of ImpliedType.
 func (mr *ResourceMockRecorder) ImpliedType() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ImpliedType", reflect.TypeOf((*Resource)(nil).ImpliedType))
 }
 
-// ImportState mocks base method
+// ImportState mocks base method.
 func (m *Resource) ImportState() ([]provider.Resource, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ImportState")
@@ -120,13 +120,13 @@ func (m *Resource) ImportState() ([]provider.Resource, error) {
 	return ret0, ret1
 }
 
-// ImportState indicates an expected call of ImportState
+// ImportState indicates an expected call of ImportState.
 func (mr *ResourceMockRecorder) ImportState() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ImportState", reflect.TypeOf((*Resource)(nil).ImportState))
 }
 
-// InstanceInfo mocks base method
+// InstanceInfo mocks base method.
 func (m *Resource) InstanceInfo() *terraform.InstanceInfo {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "InstanceInfo")
@@ -134,13 +134,13 @@ func (m *Resource) InstanceInfo() *terraform.InstanceInfo {
 	return ret0
 }
 
-// InstanceInfo indicates an expected call of InstanceInfo
+// InstanceInfo indicates an expected call of InstanceInfo.
 func (mr *ResourceMockRecorder) InstanceInfo() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstanceInfo", reflect.TypeOf((*Resource)(nil).InstanceInfo))
 }
 
-// InstanceState mocks base method
+// InstanceState mocks base method.
 func (m *Resource) InstanceState() *terraform.InstanceState {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "InstanceState")
@@ -148,13 +148,13 @@ func (m *Resource) InstanceState() *terraform.InstanceState {
 	return ret0
 }
 
-// InstanceState indicates an expected call of InstanceState
+// InstanceState indicates an expected call of InstanceState.
 func (mr *ResourceMockRecorder) InstanceState() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstanceState", reflect.TypeOf((*Resource)(nil).InstanceState))
 }
 
-// Name mocks base method
+// Name mocks base method.
 func (m *Resource) Name() string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Name")
@@ -162,13 +162,13 @@ func (m *Resource) Name() string {
 	return ret0
 }
 
-// Name indicates an expected call of Name
+// Name indicates an expected call of Name.
 func (mr *ResourceMockRecorder) Name() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Name", reflect.TypeOf((*Resource)(nil).Name))
 }
 
-// Provider mocks base method
+// Provider mocks base method.
 func (m *Resource) Provider() provider.Provider {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Provider")
@@ -176,13 +176,13 @@ func (m *Resource) Provider() provider.Provider {
 	return ret0
 }
 
-// Provider indicates an expected call of Provider
+// Provider indicates an expected call of Provider.
 func (mr *ResourceMockRecorder) Provider() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Provider", reflect.TypeOf((*Resource)(nil).Provider))
 }
 
-// Read mocks base method
+// Read mocks base method.
 func (m *Resource) Read(arg0 *filter.Filter) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Read", arg0)
@@ -190,13 +190,13 @@ func (m *Resource) Read(arg0 *filter.Filter) error {
 	return ret0
 }
 
-// Read indicates an expected call of Read
+// Read indicates an expected call of Read.
 func (mr *ResourceMockRecorder) Read(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Read", reflect.TypeOf((*Resource)(nil).Read), arg0)
 }
 
-// ResourceInstanceObject mocks base method
+// ResourceInstanceObject mocks base method.
 func (m *Resource) ResourceInstanceObject() *states.ResourceInstanceObject {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ResourceInstanceObject")
@@ -204,25 +204,25 @@ func (m *Resource) ResourceInstanceObject() *states.ResourceInstanceObject {
 	return ret0
 }
 
-// ResourceInstanceObject indicates an expected call of ResourceInstanceObject
+// ResourceInstanceObject indicates an expected call of ResourceInstanceObject.
 func (mr *ResourceMockRecorder) ResourceInstanceObject() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResourceInstanceObject", reflect.TypeOf((*Resource)(nil).ResourceInstanceObject))
 }
 
-// SetImporter mocks base method
+// SetImporter mocks base method.
 func (m *Resource) SetImporter(arg0 *schema.ResourceImporter) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "SetImporter", arg0)
 }
 
-// SetImporter indicates an expected call of SetImporter
+// SetImporter indicates an expected call of SetImporter.
 func (mr *ResourceMockRecorder) SetImporter(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetImporter", reflect.TypeOf((*Resource)(nil).SetImporter), arg0)
 }
 
-// State mocks base method
+// State mocks base method.
 func (m *Resource) State(arg0 writer.Writer) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "State", arg0)
@@ -230,13 +230,13 @@ func (m *Resource) State(arg0 writer.Writer) error {
 	return ret0
 }
 
-// State indicates an expected call of State
+// State indicates an expected call of State.
 func (mr *ResourceMockRecorder) State(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "State", reflect.TypeOf((*Resource)(nil).State), arg0)
 }
 
-// TFResource mocks base method
+// TFResource mocks base method.
 func (m *Resource) TFResource() *schema.Resource {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "TFResource")
@@ -244,13 +244,13 @@ func (m *Resource) TFResource() *schema.Resource {
 	return ret0
 }
 
-// TFResource indicates an expected call of TFResource
+// TFResource indicates an expected call of TFResource.
 func (mr *ResourceMockRecorder) TFResource() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TFResource", reflect.TypeOf((*Resource)(nil).TFResource))
 }
 
-// Type mocks base method
+// Type mocks base method.
 func (m *Resource) Type() string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Type")
@@ -258,7 +258,7 @@ func (m *Resource) Type() string {
 	return ret0
 }
 
-// Type indicates an expected call of Type
+// Type indicates an expected call of Type.
 func (mr *ResourceMockRecorder) Type() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Type", reflect.TypeOf((*Resource)(nil).Type))

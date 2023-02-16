@@ -18,6 +18,8 @@
   ([Issue #322](https://github.com/cycloidio/terracognita/issues/322))
 - Remove duplicate names from the reader cache on AzureRM
   ([Issue #341](https://github.com/cycloidio/terracognita/issues/341))
+- Added a new Provider function to let the Provider fix resources content before writing it and fixed some AzureRM resources with it
+  ([Issue #322](https://github.com/cycloidio/terracognita/issues/322))
 
 ## [0.8.1] _2022-08-10_
 

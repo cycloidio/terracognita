@@ -9,6 +9,7 @@ import (
 	"github.com/cycloidio/terracognita/filter"
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/provider"
+	"github.com/hashicorp/go-cty/cty"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	tfgoogle "github.com/hashicorp/terraform-provider-google/google"
@@ -124,3 +125,4 @@ func (g *google) TFClient() interface{} {
 func (g *google) TFProvider() *schema.Provider {
 	return g.tfProvider
 }
+func (g *google) FixResource(t string, v cty.Value) (cty.Value, error) { return v, nil }
