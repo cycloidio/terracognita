@@ -16,6 +16,8 @@
 
 - Tags are being used again for filtering when importing
   ([Issue #322](https://github.com/cycloidio/terracognita/issues/322))
+- Remove duplicate names from the reader cache on AzureRM
+  ([Issue #341](https://github.com/cycloidio/terracognita/issues/341))
 
 ## [0.8.1] _2022-08-10_
 
