@@ -230,7 +230,7 @@ func getVirtualMachineNames(ctx context.Context, a *azurerm, ar *AzureReader, rt
 		names = append(names, i.Data().Get("name").(string))
 	}
 
-	return names, nil
+	return removeDuplicateStr(names), nil
 }
 
 func cacheVirtualMachineScaleSets(ctx context.Context, a *azurerm, ar *AzureReader, rtList []string, filters *filter.Filter) ([]provider.Resource, error) {
@@ -266,7 +266,7 @@ func getVirtualMachineScaleSetNames(ctx context.Context, a *azurerm, ar *AzureRe
 		names = append(names, i.Data().Get("name").(string))
 	}
 
-	return names, nil
+	return removeDuplicateStr(names), nil
 }
 
 // Logic
@@ -661,7 +661,7 @@ func getPrivateDNSZones(ctx context.Context, a *azurerm, ar *AzureReader, rt str
 	return names, nil
 }
 
-//Application Insights
+// Application Insights
 func cacheApplicationInsights(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]provider.Resource, error) {
 	rs, err := a.cache.Get(rt)
 	if err != nil {
@@ -844,4 +844,16 @@ func getStaticSites(ctx context.Context, a *azurerm, ar *AzureReader, rt string,
 	}
 
 	return names, nil
+}
+
+func removeDuplicateStr(strSlice []string) []string {
+	allKeys := make(map[string]struct{})
+	list := []string{}
+	for _, item := range strSlice {
+		if _, value := allKeys[item]; !value {
+			allKeys[item] = struct{}{}
+			list = append(list, item)
+		}
+	}
+	return list
 }
