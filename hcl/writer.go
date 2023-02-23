@@ -412,6 +412,10 @@ func walkVariables(cfg map[string]interface{}, validVariables map[string]struct{
 	return cfg
 }
 
+var (
+	reIndexKey = regexp.MustCompile(`\.[\d]+\.`)
+)
+
 // hasKey will validate that the key is present on the map.
 // The key will have the format: aws_instance.front.attr1.attr2...
 // and the validVariables will not have the `front` interpolation, also
@@ -422,8 +426,15 @@ func hasKey(validVariables map[string]struct{}, key string) bool {
 	}
 
 	sk := strings.Split(key, ".")
+	// This remove the 'front' from 'aws_instance.front.attr1'
 	k := append(sk[0:1], sk[2:]...)
-	_, ok := validVariables[strings.Join(k, ".")]
+
+	// If the key comes from an array it'll have the position on it
+	// so it'll look something like `aws_instance.ebs_block_device.1.volume_size`
+	// but the variable was defined as `aw_instance.ebs_block_device.volume_size`
+	// so we have to strip all the indices if any
+	nk := reIndexKey.ReplaceAllString(strings.Join(k, "."), ".")
+	_, ok := validVariables[nk]
 
 	return ok
 }
