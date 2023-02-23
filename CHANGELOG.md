@@ -20,6 +20,8 @@
   ([Issue #341](https://github.com/cycloidio/terracognita/issues/341))
 - Added a new Provider function to let the Provider fix resources content before writing it and fixed some AzureRM resources with it
   ([Issue #322](https://github.com/cycloidio/terracognita/issues/322))
+- ModueleVariables now works with nested fields of array blocks
+  ([Issue #344](https://github.com/cycloidio/terracognita/issues/344))
 
 ## [0.8.1] _2022-08-10_
 
