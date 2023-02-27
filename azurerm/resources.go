@@ -169,6 +169,8 @@ const (
 	StaticSite
 	StaticSiteCustomDomain
 	WebAppHybridConnection
+	// dataprotection
+	DataProtectionBackupVault
 )
 
 type rtFn func(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error)
@@ -327,6 +329,8 @@ var (
 		StaticSite:             staticSites,
 		StaticSiteCustomDomain: staticSiteCustomDomains,
 		WebAppHybridConnection: webAppHybridConnections,
+		// dataprotection
+		DataProtectionBackupVault: dataProtectionBackupVaults,
 	}
 )
 
@@ -2422,6 +2426,28 @@ func webAppActiveSlots(ctx context.Context, a *azurerm, ar *AzureReader, resourc
 				resources = append(resources, r)
 			}
 		}
+	}
+	return resources, nil
+}
+
+// dataprotection
+func dataProtectionBackupVaults(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	backupVaults, err := ar.ListBackupVaultResources(ctx)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list backup vaults from reader")
+	}
+	resources := make([]provider.Resource, 0, len(backupVaults))
+	for _, backupVault := range backupVaults {
+
+		// TODO: recheck with upgrade SDK if still need to change the string to avoid error on import
+		r := provider.NewResource(strings.ReplaceAll(*backupVault.ID, "BackupVault", "backupVault"), resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
+		if err := r.Data().Set("name", *backupVault.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the app service static site '%s'", *backupVault.Name)
+		}
+		resources = append(resources, r)
 	}
 	return resources, nil
 }

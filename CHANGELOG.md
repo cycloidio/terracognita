@@ -6,6 +6,8 @@
   ([PR#334](https://github.com/cycloidio/terracognita/pull/334))
 - Allow the writing of tf/provider into a separated config key
   ([PR#319](https://github.com/cycloidio/terracognita/pull/319))
+- Added new Azure resource: `azurerm_data_protection_backup_vault`
+  ([PR#349](https://github.com/cycloidio/terracognita/pull/349))
 
 ### Changed
 
