@@ -8,6 +8,7 @@ import (
 
 	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/filter"
+	"github.com/cycloidio/terracognita/interpolator"
 	"github.com/cycloidio/terracognita/mock"
 	"github.com/cycloidio/terracognita/provider"
 	"github.com/golang/mock/gomock"
@@ -26,7 +27,7 @@ func TestImport(t *testing.T) {
 			p                 = mock.NewProvider(ctrl)
 			hw                = mock.NewWriter(ctrl)
 			sw                = mock.NewWriter(ctrl)
-			i                 = make(map[string]string)
+			i                 = interpolator.New("aws")
 			instanceResource1 = mock.NewResource(ctrl)
 			instanceResource2 = mock.NewResource(ctrl)
 			iamUser1          = mock.NewResource(ctrl)
@@ -37,6 +38,7 @@ func TestImport(t *testing.T) {
 
 		defer ctrl.Finish()
 
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().ResourceTypes().Return([]string{"aws_instance", "aws_iam_user"})
 
 		p.EXPECT().Resources(ctx, "aws_instance", f).Return([]provider.Resource{instanceResource1, instanceResource2}, nil)
@@ -95,7 +97,7 @@ func TestImport(t *testing.T) {
 			sw                = mock.NewWriter(ctrl)
 			instanceResource1 = mock.NewResource(ctrl)
 			instanceResource2 = mock.NewResource(ctrl)
-			i                 = make(map[string]string)
+			i                 = interpolator.New("aws")
 
 			f = &filter.Filter{
 				Include: []string{"aws_instance"},
@@ -104,6 +106,7 @@ func TestImport(t *testing.T) {
 
 		defer ctrl.Finish()
 
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().HasResourceType("aws_instance").Return(true)
 		p.EXPECT().Resources(ctx, "aws_instance", f).Return([]provider.Resource{instanceResource1, instanceResource2}, nil)
 
@@ -146,7 +149,7 @@ func TestImport(t *testing.T) {
 			sw       = mock.NewWriter(ctrl)
 			iamUser1 = mock.NewResource(ctrl)
 			iamUser2 = mock.NewResource(ctrl)
-			i        = make(map[string]string)
+			i        = interpolator.New("aws")
 
 			f = &filter.Filter{
 				Exclude: []string{"aws_instance"},
@@ -155,6 +158,7 @@ func TestImport(t *testing.T) {
 
 		defer ctrl.Finish()
 
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().HasResourceType("aws_instance").Return(true)
 		p.EXPECT().ResourceTypes().Return([]string{"aws_instance", "aws_iam_user"})
 
@@ -199,7 +203,7 @@ func TestImport(t *testing.T) {
 			sw       = mock.NewWriter(ctrl)
 			iamUser1 = mock.NewResource(ctrl)
 			iamUser2 = mock.NewResource(ctrl)
-			i        = make(map[string]string)
+			i        = interpolator.New("aws")
 
 			f = &filter.Filter{
 				Exclude: []string{"aws_instance"},
@@ -208,6 +212,7 @@ func TestImport(t *testing.T) {
 
 		defer ctrl.Finish()
 
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().HasResourceType("aws_instance").Return(true)
 		p.EXPECT().ResourceTypes().Return([]string{"aws_instance", "aws_iam_user"})
 
@@ -248,7 +253,7 @@ func TestImport(t *testing.T) {
 			sw       = mock.NewWriter(ctrl)
 			iamUser1 = mock.NewResource(ctrl)
 			iamUser2 = mock.NewResource(ctrl)
-			i        = make(map[string]string)
+			i        = interpolator.New("aws")
 
 			f = &filter.Filter{
 				Exclude: []string{"aws_instance"},
@@ -257,6 +262,7 @@ func TestImport(t *testing.T) {
 
 		defer ctrl.Finish()
 
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().HasResourceType("aws_instance").Return(true)
 		p.EXPECT().ResourceTypes().Return([]string{"aws_instance", "aws_iam_user"})
 
@@ -292,7 +298,7 @@ func TestImport(t *testing.T) {
 			hw       = mock.NewWriter(ctrl)
 			iamUser1 = mock.NewResource(ctrl)
 			iamUser2 = mock.NewResource(ctrl)
-			i        = make(map[string]string)
+			i        = interpolator.New("aws")
 
 			f = &filter.Filter{
 				Exclude: []string{"aws_instance"},
@@ -301,6 +307,7 @@ func TestImport(t *testing.T) {
 
 		defer ctrl.Finish()
 
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().HasResourceType("aws_instance").Return(true)
 		p.EXPECT().ResourceTypes().Return([]string{"aws_instance", "aws_iam_user"})
 
@@ -337,7 +344,7 @@ func TestImport(t *testing.T) {
 			sw       = mock.NewWriter(ctrl)
 			iamUser1 = mock.NewResource(ctrl)
 			iamUser2 = mock.NewResource(ctrl)
-			i        = make(map[string]string)
+			i        = interpolator.New("aws")
 
 			f = &filter.Filter{
 				Exclude: []string{"aws_instance"},
@@ -346,6 +353,7 @@ func TestImport(t *testing.T) {
 
 		defer ctrl.Finish()
 
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().HasResourceType("aws_instance").Return(true)
 		p.EXPECT().ResourceTypes().Return([]string{"aws_instance", "aws_iam_user"})
 
@@ -386,7 +394,7 @@ func TestImport(t *testing.T) {
 			sw       = mock.NewWriter(ctrl)
 			iamUser1 = mock.NewResource(ctrl)
 			iamUser2 = mock.NewResource(ctrl)
-			i        = make(map[string]string)
+			i        = interpolator.New("aws")
 
 			f = &filter.Filter{
 				Exclude: []string{"aws_instance"},
@@ -395,6 +403,7 @@ func TestImport(t *testing.T) {
 
 		defer ctrl.Finish()
 
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().HasResourceType("aws_instance").Return(true)
 		p.EXPECT().ResourceTypes().Return([]string{"aws_instance", "aws_iam_user"})
 
@@ -490,6 +499,7 @@ func TestImport(t *testing.T) {
 		p.EXPECT().HasResourceType("aws_instance").Return(true)
 		p.EXPECT().ResourceTypes().Return([]string{"aws_instance", "aws_iam_user"})
 
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().Resources(ctx, "aws_iam_user", f).Return(nil, errors.New("should stop the import"))
 
 		err := provider.Import(ctx, p, hw, sw, f, ioutil.Discard)
@@ -503,7 +513,7 @@ func TestImport(t *testing.T) {
 			p                 = mock.NewProvider(ctrl)
 			hw                = mock.NewWriter(ctrl)
 			sw                = mock.NewWriter(ctrl)
-			i                 = make(map[string]string)
+			i                 = interpolator.New("aws")
 			instanceResource1 = mock.NewResource(ctrl)
 			instanceResource2 = mock.NewResource(ctrl)
 
@@ -512,6 +522,7 @@ func TestImport(t *testing.T) {
 
 		defer ctrl.Finish()
 
+		p.EXPECT().String().Return("aws")
 		p.EXPECT().ResourceTypes().Return([]string{"aws_instance", "aws_iam_user"})
 
 		p.EXPECT().Resources(ctx, "aws_instance", f).Return([]provider.Resource{instanceResource1, instanceResource2}, nil)

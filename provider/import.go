@@ -9,6 +9,7 @@ import (
 
 	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/filter"
+	"github.com/cycloidio/terracognita/interpolator"
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/util"
 	"github.com/cycloidio/terracognita/writer"
@@ -65,11 +66,7 @@ func Import(ctx context.Context, p Provider, hcl, tfstate writer.Writer, f *filt
 	fmt.Fprintf(out, "Importing with filters: %s", f)
 	logger.Log("filters", f.String())
 
-	// interpolation will contains the key/value to interpolate.
-	// For each resource, the attributes reference will be
-	// binded to a value: ${resource_type.resource_name.`key`} in order
-	// to replace each occurence of the key by the value in the HCL file.
-	interpolation := make(map[string]string)
+	interpolation := interpolator.New(p.String())
 
 	for _, t := range types {
 		logger := kitlog.With(logger, "resource", t)
@@ -152,20 +149,19 @@ func Import(ctx context.Context, p Provider, hcl, tfstate writer.Writer, f *filt
 				state := r.InstanceState()
 
 				if state != nil {
-					// we construct a map[string]string to perform
-					// interpolation later. Keys are are the value of the
-					// attributes reference for each resource
 					attributes, err := re.AttributesReference()
 					if err != nil {
 						return errors.Wrapf(err, "unable to fetch attributes of resource")
 					}
+					attrs := make(map[string]string)
 					for _, attribute := range attributes {
 						value, ok := state.Attributes[attribute]
 						if !ok || len(value) == 0 {
 							continue
 						}
-						interpolation[value] = fmt.Sprintf("${%s.%s.%s}", r.Type(), r.Name(), attribute)
+						attrs[attribute] = value
 					}
+					interpolation.AddResourceAttributes(fmt.Sprintf("%s.%s", r.Type(), r.Name()), attrs)
 				}
 			}
 		}

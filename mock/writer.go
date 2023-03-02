@@ -7,6 +7,7 @@ package mock
 import (
 	reflect "reflect"
 
+	interpolator "github.com/cycloidio/terracognita/interpolator"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -49,7 +50,7 @@ func (mr *WriterMockRecorder) Has(arg0 interface{}) *gomock.Call {
 }
 
 // Interpolate mocks base method.
-func (m *Writer) Interpolate(arg0 map[string]string) {
+func (m *Writer) Interpolate(arg0 *interpolator.Interpolator) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Interpolate", arg0)
 }

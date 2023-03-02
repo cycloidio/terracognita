@@ -11,6 +11,8 @@
 
 - Azure: azure: do not define external disk with `azurerm_virtual_machine`
   ([PR #336](https://github.com/cycloidio/terracognita/pull/336))
+- Improved the way resource references/interpolations work, now it's more deterministic
+  ([Issue #346](https://github.com/cycloidio/terracognita/issues/346))
 
 ### Fixed
 

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/cycloidio/terracognita/errcode"
+	"github.com/cycloidio/terracognita/interpolator"
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/provider"
 	"github.com/cycloidio/terracognita/util"
@@ -134,8 +135,8 @@ func (w *Writer) Sync() error {
 }
 
 // Interpolate will defined dependencies for each component using
-// the `i` map built in the import.
-func (w *Writer) Interpolate(i map[string]string) {
+// the `i` Interpolator built in the import.
+func (w *Writer) Interpolate(i *interpolator.Interpolator) {
 	if !w.opts.Interpolate {
 		return
 	}
@@ -160,10 +161,10 @@ func (w *Writer) Interpolate(i map[string]string) {
 			if !ok {
 				continue
 			}
-			for _, attribute := range res.InstanceState().Attributes {
+			for ak, av := range res.InstanceState().Attributes {
 				// if we find any relevant link between the instance attribute and the interpolation map,
 				// we flag a dependency
-				if dependency, ok := i[attribute]; ok {
+				if dependency, ok := i.Interpolate(ak, av); ok {
 					rt, rn := extractResourceTypeAndName(dependency)
 					rsc := fmt.Sprintf("%s.%s", rt, rn)
 					// avoid mutual dependencies
