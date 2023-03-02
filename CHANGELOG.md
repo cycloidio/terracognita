@@ -11,6 +11,8 @@
 
 ### Changed
 
+- Azure: Set a valide `admin_password` with `azurerm_windows_virtual_machine`
+  ([Issue #352](https://github.com/cycloidio/terracognita/issues/352))
 - Azure: azure: do not define external disk with `azurerm_virtual_machine`
   ([PR #336](https://github.com/cycloidio/terracognita/pull/336))
 
