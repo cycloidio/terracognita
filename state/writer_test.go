@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/cycloidio/terracognita/errcode"
+	"github.com/cycloidio/terracognita/interpolator"
 	"github.com/cycloidio/terracognita/mock"
 	"github.com/cycloidio/terracognita/provider"
 	"github.com/cycloidio/terracognita/state"
@@ -308,7 +309,7 @@ func TestSync(t *testing.T) {
 func TestDependencies(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		var (
-			i      = make(map[string]string)
+			i      = interpolator.New("aws")
 			ctrl   = gomock.NewController(t)
 			b      = &bytes.Buffer{}
 			sw     = state.NewWriter(b, &writer.Options{Interpolate: true})
@@ -433,7 +434,9 @@ func TestDependencies(t *testing.T) {
 		err = sw.Write("aws_security_group_rule.sgrule", resSGR)
 		require.NoError(t, err)
 
-		i["sg-1234"] = "${aws_security_group.sg.id}"
+		i.AddResourceAttributes("aws_security_group.sg", map[string]string{
+			"id": "sg-1234",
+		})
 		sw.Interpolate(i)
 
 		err = sw.Sync()
@@ -453,7 +456,7 @@ func TestDependencies(t *testing.T) {
 	})
 	t.Run("SuccessWitmModules", func(t *testing.T) {
 		var (
-			i      = make(map[string]string)
+			i      = interpolator.New("aws")
 			ctrl   = gomock.NewController(t)
 			b      = &bytes.Buffer{}
 			sw     = state.NewWriter(b, &writer.Options{Interpolate: true, Module: "cycloid"})
@@ -580,7 +583,9 @@ func TestDependencies(t *testing.T) {
 		err = sw.Write("aws_security_group_rule.sgrule", resSGR)
 		require.NoError(t, err)
 
-		i["sg-1234"] = "${aws_security_group.sg.id}"
+		i.AddResourceAttributes("aws_security_group.sg", map[string]string{
+			"id": "sg-1234",
+		})
 		sw.Interpolate(i)
 
 		err = sw.Sync()
@@ -600,7 +605,7 @@ func TestDependencies(t *testing.T) {
 	})
 	t.Run("SuccessNoInterpolation", func(t *testing.T) {
 		var (
-			i      = make(map[string]string)
+			i      = interpolator.New("aws")
 			ctrl   = gomock.NewController(t)
 			b      = &bytes.Buffer{}
 			sw     = state.NewWriter(b, &writer.Options{Interpolate: false})
@@ -713,7 +718,9 @@ func TestDependencies(t *testing.T) {
 		err = sw.Write("aws_security_group_rule.sgrule", resSGR)
 		require.NoError(t, err)
 
-		i["sg-1234"] = "${aws_security_group.sg.id}"
+		i.AddResourceAttributes("aws_security_group.sg", map[string]string{
+			"id": "sg-1234",
+		})
 		sw.Interpolate(i)
 
 		err = sw.Sync()

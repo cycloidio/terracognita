@@ -1,5 +1,7 @@
 package writer
 
+import "github.com/cycloidio/terracognita/interpolator"
+
 //go:generate mockgen -destination=../mock/writer.go -mock_names=Writer=Writer -package mock github.com/cycloidio/terracognita/writer Writer
 
 const (
@@ -35,5 +37,5 @@ type Writer interface {
 
 	// Interpolate replaces the hardcoded resources link
 	// with TF interpolation
-	Interpolate(map[string]string)
+	Interpolate(*interpolator.Interpolator)
 }
