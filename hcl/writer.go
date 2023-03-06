@@ -13,6 +13,7 @@ import (
 
 	"github.com/cycloidio/mxwriter"
 	"github.com/cycloidio/terracognita/errcode"
+	"github.com/cycloidio/terracognita/interpolator"
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/provider"
 	"github.com/cycloidio/terracognita/util"
@@ -412,6 +413,10 @@ func walkVariables(cfg map[string]interface{}, validVariables map[string]struct{
 	return cfg
 }
 
+var (
+	reIndexKey = regexp.MustCompile(`\.[\d]+\.`)
+)
+
 // hasKey will validate that the key is present on the map.
 // The key will have the format: aws_instance.front.attr1.attr2...
 // and the validVariables will not have the `front` interpolation, also
@@ -422,8 +427,15 @@ func hasKey(validVariables map[string]struct{}, key string) bool {
 	}
 
 	sk := strings.Split(key, ".")
+	// This remove the 'front' from 'aws_instance.front.attr1'
 	k := append(sk[0:1], sk[2:]...)
-	_, ok := validVariables[strings.Join(k, ".")]
+
+	// If the key comes from an array it'll have the position on it
+	// so it'll look something like `aws_instance.ebs_block_device.1.volume_size`
+	// but the variable was defined as `aw_instance.ebs_block_device.volume_size`
+	// so we have to strip all the indices if any
+	nk := reIndexKey.ReplaceAllString(strings.Join(k, "."), ".")
+	_, ok := validVariables[nk]
 
 	return ok
 }
@@ -478,15 +490,11 @@ func writeTuple(pbody, body *hclwrite.Body, attr string, value cty.Value) {
 
 // Interpolate replaces the hardcoded resources link
 // with TF interpolation.
-// It has the following format:
-// * VALUE => ${aws_instance.name.attribute}
-// So then each value matching the VALUE will
-// be replaced with the reference
-func (w *Writer) Interpolate(i map[string]string) {
+func (w *Writer) Interpolate(i *interpolator.Interpolator) {
 	// If Interpolation is disabled or
 	// a module without specific attributes to
 	// create as variables (so all are variables),
-	// we ignore the Interpolation as this may happend and is invalid
+	// we ignore the Interpolation as this may happened and is invalid
 	// variable "aws_ses_identity_notification_topic_XoqJb_identity" {
 	//   default = aws_ses_domain_mail_from.SSWXE.id
 	// }
@@ -525,7 +533,7 @@ func (w *Writer) Interpolate(i map[string]string) {
 
 // walkInterpolation through a resource block. it's easier since we do not know how the block is made
 // `dest` will be the new "block" with the values interpolated from `interpolate`
-func (w *Writer) walkInterpolation(dest, src reflect.Value, interpolate map[string]string, name, key string, resourceType string, relations *map[string]struct{}) {
+func (w *Writer) walkInterpolation(dest, src reflect.Value, interpolate *interpolator.Interpolator, name, key string, resourceType string, relations *map[string]struct{}) {
 	switch src.Kind() {
 	// it's an interface, so we basically need
 	// to extract the elem and walk through it
@@ -565,10 +573,12 @@ func (w *Writer) walkInterpolation(dest, src reflect.Value, interpolate map[stri
 	// a bool / an int without more context.
 	case reflect.String:
 		// we check if there is a value to interpolate
-		if interpolatedValue, ok := interpolate[src.Interface().(string)]; ok {
+		skey := strings.Split(key, ".")
+		ak := skey[len(skey)-1]
+		if interpolatedValue, ok := interpolate.Interpolate(ak, src.Interface().(string)); ok {
 			irt, in := extractResourceTypeAndName(interpolatedValue)
-			target := fmt.Sprintf("%s.%s", irt, in)
 			source := fmt.Sprintf("%s.%s", resourceType, name)
+			target := fmt.Sprintf("%s.%s", irt, in)
 			if w.opts.HasModule() && len(w.opts.ModuleVariables) != 0 {
 				// If the current value is part of the ModulesVariables do not try to interpolate it
 				if _, ok := w.opts.ModuleVariables[fmt.Sprintf("%s.%s", resourceType, key)]; ok {

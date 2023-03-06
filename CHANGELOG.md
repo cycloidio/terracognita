@@ -2,15 +2,35 @@
 
 ### Added
 
+- Added new Azure resource: `azurerm_virtual_machine_data_disk_attachment`
+  ([PR#334](https://github.com/cycloidio/terracognita/pull/334))
 - Allow the writing of tf/provider into a separated config key
   ([PR#319](https://github.com/cycloidio/terracognita/pull/319))
 - Add new aws resource: aws_ecs_task_definition
   ([PR#333](https://github.com/cycloidio/terracognita/pull/333))
+- Added new Azure resource: `azurerm_data_protection_backup_vault`
+  ([PR#349](https://github.com/cycloidio/terracognita/pull/349))
+
+### Changed
+
+- Azure: Set a valide `admin_password` with `azurerm_windows_virtual_machine`
+  ([Issue #352](https://github.com/cycloidio/terracognita/issues/352))
+- Azure: azure: do not define external disk with `azurerm_virtual_machine`
+  ([PR #336](https://github.com/cycloidio/terracognita/pull/336))
+- Improved the way resource references/interpolations work, now it's more deterministic
+  ([Issue #346](https://github.com/cycloidio/terracognita/issues/346))
+
 
 ### Fixed
 
 - Tags are being used again for filtering when importing
   ([Issue #322](https://github.com/cycloidio/terracognita/issues/322))
+- Remove duplicate names from the reader cache on AzureRM
+  ([Issue #341](https://github.com/cycloidio/terracognita/issues/341))
+- Added a new Provider function to let the Provider fix resources content before writing it and fixed some AzureRM resources with it
+  ([Issue #322](https://github.com/cycloidio/terracognita/issues/322))
+- ModueleVariables now works with nested fields of array blocks
+  ([Issue #344](https://github.com/cycloidio/terracognita/issues/344))
 
 ## [0.8.1] _2022-08-10_
 

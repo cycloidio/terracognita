@@ -2,6 +2,7 @@ package azurerm
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -18,17 +19,18 @@ type ResourceType int
 const (
 	ResourceGroup ResourceType = iota
 	// Compute Resources
+	AvailabilitySet
+	Image
+	ManagedDisk
 	VirtualMachine
-	WindowsVirtualMachine
-	LinuxVirtualMachine
+	VirtualMachineDataDiskAttachment
 	VirtualMachineExtension
-	WindowsVirtualMachineScaleSet
-	LinuxVirtualMachineScaleSet
 	VirtualMachineScaleSetExtension
 	VirtualNetwork
-	AvailabilitySet
-	ManagedDisk
-	Image
+	LinuxVirtualMachine
+	LinuxVirtualMachineScaleSet
+	WindowsVirtualMachine
+	WindowsVirtualMachineScaleSet
 	// Network Resources
 	Subnet
 	NetworkInterface
@@ -167,6 +169,8 @@ const (
 	StaticSite
 	StaticSiteCustomDomain
 	WebAppHybridConnection
+	// dataprotection
+	DataProtectionBackupVault
 )
 
 type rtFn func(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error)
@@ -175,17 +179,18 @@ var (
 	resources = map[ResourceType]rtFn{
 		ResourceGroup: resourceGroup,
 		// Compute Resources
-		VirtualMachine:                  virtualMachines,
-		WindowsVirtualMachine:           virtualMachines,
-		LinuxVirtualMachine:             virtualMachines,
-		VirtualMachineExtension:         virtualMachineExtensions,
-		VirtualNetwork:                  virtualNetworks,
-		WindowsVirtualMachineScaleSet:   virtualMachineScaleSets,
-		LinuxVirtualMachineScaleSet:     virtualMachineScaleSets,
-		VirtualMachineScaleSetExtension: virtualMachineScaleSetExtensions,
-		AvailabilitySet:                 availabilitySets,
-		ManagedDisk:                     disks,
-		Image:                           images,
+		VirtualMachine:                   virtualMachines,
+		WindowsVirtualMachine:            virtualMachines,
+		LinuxVirtualMachine:              virtualMachines,
+		VirtualMachineExtension:          virtualMachineExtensions,
+		VirtualNetwork:                   virtualNetworks,
+		WindowsVirtualMachineScaleSet:    virtualMachineScaleSets,
+		LinuxVirtualMachineScaleSet:      virtualMachineScaleSets,
+		VirtualMachineScaleSetExtension:  virtualMachineScaleSetExtensions,
+		AvailabilitySet:                  availabilitySets,
+		ManagedDisk:                      disks,
+		VirtualMachineDataDiskAttachment: virtualMachineDataDiskAttachments,
+		Image:                            images,
 		// Network Resources
 		Subnet:                            subnets,
 		NetworkInterface:                  networkInterfaces,
@@ -324,6 +329,8 @@ var (
 		StaticSite:             staticSites,
 		StaticSiteCustomDomain: staticSiteCustomDomains,
 		WebAppHybridConnection: webAppHybridConnections,
+		// dataprotection
+		DataProtectionBackupVault: dataProtectionBackupVaults,
 	}
 )
 
@@ -465,8 +472,60 @@ func disks(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string
 	}
 	resources := make([]provider.Resource, 0, len(disks))
 	for _, disk := range disks {
+		// If disk is used as Operating System, the disk is managed by the virtual_machine resource, not a dedicated disk
+		if disk.DiskProperties.OsType != "" {
+			continue
+		}
+
+		// When using azurerm_virtual_machine resource, extra attached disk are managed via storage_data_disk
+		// CreateOption == Empty : fully managed by
+		if (disk.DiskProperties.DiskState == "Attached" || disk.DiskProperties.DiskState == "Reserved") && filters.IsIncluded("azurerm_virtual_machine") {
+			continue
+		}
 		r := provider.NewResource(*disk.ID, resourceType, a)
 		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func virtualMachineDataDiskAttachments(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	// only Managed Disks are supported via this separate resource,
+	// Unmanaged Disks can be attached using the storage_data_disk block in the azurerm_virtual_machine resource.
+	// So if using azurerm_virtual_machine, do not define azurerm_virtual_machine_data_disk_attachment.
+	if filters.IsIncluded("azurerm_virtual_machine") {
+		return nil, nil
+	}
+
+	// Get the list of disks
+	disks, err := ar.ListDisks(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list disks attachments from reader")
+	}
+
+	// Get the vms list to check if disk attached
+	virtualMachines, err := ar.ListVirtualMachines(ctx, "")
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list virtual machines from reader")
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, disk := range disks {
+		if disk.DiskProperties.DiskState == "Attached" || disk.DiskProperties.DiskState == "Reserved" {
+			// check on wich VM the disk is attached
+			for _, virtualMachine := range virtualMachines {
+				if profile := virtualMachine.StorageProfile; profile != nil {
+					if dataDisks := profile.DataDisks; dataDisks != nil {
+						for _, dataDisk := range *dataDisks {
+							if *dataDisk.Name == *disk.Name {
+								r := provider.NewResource(fmt.Sprintf("%s/dataDisks/%s", *virtualMachine.ID, *disk.Name), resourceType, a)
+								resources = append(resources, r)
+								break
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 	return resources, nil
 }
@@ -2043,8 +2102,8 @@ func applicationInsightsAnalyticsItems(ctx context.Context, a *azurerm, ar *Azur
 	return resources, nil
 }
 
-//issue import Error = 'json: cannot unmarshal array into Go value of type insights.WebTestListResult' JSON
-//follow-up at https://github.com/Azure/azure-rest-api-specs/issues/9463
+// issue import Error = 'json: cannot unmarshal array into Go value of type insights.WebTestListResult' JSON
+// follow-up at https://github.com/Azure/azure-rest-api-specs/issues/9463
 func applicationInsightsWebTests(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	insightsWebTests, err := ar.ListINSIGHTSWebTests(ctx)
 	if err != nil {
@@ -2367,6 +2426,28 @@ func webAppActiveSlots(ctx context.Context, a *azurerm, ar *AzureReader, resourc
 				resources = append(resources, r)
 			}
 		}
+	}
+	return resources, nil
+}
+
+// dataprotection
+func dataProtectionBackupVaults(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	backupVaults, err := ar.ListBackupVaultResources(ctx)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list backup vaults from reader")
+	}
+	resources := make([]provider.Resource, 0, len(backupVaults))
+	for _, backupVault := range backupVaults {
+
+		// TODO: recheck with upgrade SDK if still need to change the string to avoid error on import
+		r := provider.NewResource(strings.ReplaceAll(*backupVault.ID, "BackupVault", "backupVault"), resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
+		if err := r.Data().Set("name", *backupVault.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the app service static site '%s'", *backupVault.Name)
+		}
+		resources = append(resources, r)
 	}
 	return resources, nil
 }

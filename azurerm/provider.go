@@ -3,8 +3,11 @@ package azurerm
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	autorestAzure "github.com/Azure/go-autorest/autorest/azure"
+	"github.com/hashicorp/go-cty/cty"
+	"github.com/hashicorp/go-cty/cty/gocty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	tfazurerm "github.com/hashicorp/terraform-provider-azurerm/provider"
@@ -74,7 +77,6 @@ func NewProvider(ctx context.Context, clientID, clientSecret, environment string
 		},
 	}, nil
 }
-
 func (a *azurerm) HasResourceType(t string) bool {
 	_, err := ResourceTypeString(t)
 	return err == nil
@@ -132,4 +134,163 @@ func (a *azurerm) TFClient() interface{} {
 
 func (a *azurerm) TFProvider() *schema.Provider {
 	return a.tfProvider
+}
+
+func (a *azurerm) FixResource(t string, v cty.Value) (cty.Value, error) {
+	var err error
+	switch t {
+	case "azurerm_virtual_machine":
+		// We should never set the managed_disk_id if create_option is FromImage
+		// the unsetManageDiskID is the list of all the indexed of the storage_account_type that
+		// have the create_option as FromImage
+		var unsetManageDiskID = make(map[int]struct{})
+		err = cty.Walk(v, func(path cty.Path, val cty.Value) (bool, error) {
+			if len(path) == 3 {
+				if gas, ok := path[0].(cty.GetAttrStep); ok {
+
+					switch gas.Name {
+					case "storage_os_disk":
+						if path[2].(cty.GetAttrStep).Name == "create_option" {
+							var co string
+							err := gocty.FromCtyValue(val, &co)
+							if err != nil {
+								return false, errors.Wrapf(err, "failed to convert CTY value to GO type")
+							}
+							if co == "FromImage" {
+								var idx int
+								err := gocty.FromCtyValue(path[1].(cty.IndexStep).Key, &idx)
+								if err != nil {
+									return false, errors.Wrapf(err, "failed to convert CTY value to GO type")
+								}
+								unsetManageDiskID[idx] = struct{}{}
+							}
+						}
+					}
+				}
+			}
+			return true, nil
+		})
+		if err != nil {
+			return v, errors.Wrapf(err, "failed to convert CTY value to GO type")
+		}
+		v, err = cty.Transform(v, func(path cty.Path, v cty.Value) (cty.Value, error) {
+			if len(path) == 3 {
+				if gas, ok := path[0].(cty.GetAttrStep); ok {
+					switch gas.Name {
+					case "os_profile":
+						switch path[2].(cty.GetAttrStep).Name {
+						case "admin_password":
+							// The value can't be retrieved. Terraform Azure provider set "ignored-as-imported" which is not a valid password.
+							// In this case, set the default password which respects Azure constraints
+							return cty.StringVal("Ignored-as-!mport3d"), nil
+						}
+					case "storage_os_disk":
+						var idx int
+						err := gocty.FromCtyValue(path[1].(cty.IndexStep).Key, &idx)
+						if err != nil {
+							return v, errors.Wrapf(err, "failed to convert CTY value to GO type")
+						}
+						if _, ok := unsetManageDiskID[idx]; ok && path[2].(cty.GetAttrStep).Name == "managed_disk_id" {
+							return cty.NullVal(cty.String), nil
+						}
+					case "storage_data_disk":
+						switch path[2].(cty.GetAttrStep).Name {
+						case "managed_disk_id":
+							// Since we manage extra disk with the resource itself, id should never be set
+							return cty.NullVal(cty.String), nil
+						case "create_option":
+							// Since we manage extra disk with the resource itself, id should always be set to Empty
+							return cty.StringVal("Empty"), nil
+						}
+					}
+				}
+			}
+			return v, nil
+		})
+		if err != nil {
+			return v, errors.Wrapf(err, "failed to convert CTY value to GO type")
+		}
+	case "azurerm_managed_disk":
+		// Are set to default value which is good but only with type not UltraSSD or PremiumV2, else terraform will raise an error
+		var unsetDiskReadWrite bool
+		err = cty.Walk(v, func(path cty.Path, v cty.Value) (bool, error) {
+			if len(path) > 0 {
+				if gas, ok := path[0].(cty.GetAttrStep); ok {
+					switch gas.Name {
+					case "storage_account_type":
+						var sat string
+						err := gocty.FromCtyValue(v, &sat)
+						if err != nil {
+							return false, errors.Wrapf(err, "failed to convert CTY value to GO type")
+						}
+						if sat != "UltraSSD" && sat != "PremiumV2" {
+							unsetDiskReadWrite = true
+						}
+					}
+				}
+			}
+			return true, nil
+		})
+		if err != nil {
+			return cty.NullVal(cty.EmptyObject), errors.Wrapf(err, "failed to convert CTY value to GO type")
+		}
+		// Once we know we have to unset the disk default values we Transform the config
+		if unsetDiskReadWrite {
+			v, err = cty.Transform(v, func(path cty.Path, v cty.Value) (cty.Value, error) {
+				if len(path) > 0 {
+					if gas, ok := path[0].(cty.GetAttrStep); ok {
+						switch gas.Name {
+						case "disk_iops_read_write", "disk_mbps_read_write":
+							return cty.NullVal(cty.Number), nil
+						}
+					}
+				}
+				return v, nil
+			})
+			if err != nil {
+				return v, errors.Wrapf(err, "failed to convert CTY value to GO type")
+			}
+		}
+	case "azurerm_windows_virtual_machine":
+		v, err = cty.Transform(v, func(path cty.Path, v cty.Value) (cty.Value, error) {
+			if len(path) > 0 {
+				if gas, ok := path[0].(cty.GetAttrStep); ok {
+					switch gas.Name {
+					case "admin_password":
+						// The value can't be retrieved. Terraform Azure provider set "ignored-as-imported" which is not a valid password.
+						// In this case, set the default password which respects Azure constraints
+						return cty.StringVal("Ignored-as-!mport3d"), nil
+					case "platform_fault_domain":
+						// By default this attribute is set, but this is not a valid value with terraform apply.
+						// In this case, we shouldn't write platform_fault_domain.
+						var pfd int
+						err := gocty.FromCtyValue(v, &pfd)
+						if err != nil {
+							return v, errors.Wrapf(err, "failed to convert CTY value to GO type")
+						}
+						if pfd == -1 {
+							return cty.NullVal(cty.Number), nil
+						}
+					case "availability_set_id":
+						// For some reason this values has the end part of the ID capitalized which
+						// makes it fail when trying to create a link between resources
+						var asi string
+						err := gocty.FromCtyValue(v, &asi)
+						if err != nil {
+							return v, errors.Wrapf(err, "failed to convert CTY value to GO type")
+						}
+						sasi := strings.Split(asi, "/")
+						sasi[len(sasi)-1] = strings.ToLower(sasi[len(sasi)-1])
+						return cty.StringVal(strings.Join(sasi, "/")), nil
+					}
+				}
+			}
+			return v, nil
+		})
+		if err != nil {
+			return v, errors.Wrapf(err, "failed to convert CTY value to GO type")
+		}
+
+	}
+	return v, nil
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/cycloidio/terracognita/filter"
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/provider"
+	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	tfvsphere "github.com/hashicorp/terraform-provider-vsphere/vsphere"
@@ -114,4 +115,5 @@ func (vs vsphere) Resources(ctx context.Context, resourceType string, f *filter.
 
 func (vs vsphere) Source() string { return "hashicorp/vsphere" }
 
-func (vs vsphere) Configuration() map[string]interface{} { return vs.configuration }
+func (vs vsphere) Configuration() map[string]interface{}                { return vs.configuration }
+func (vs vsphere) FixResource(t string, v cty.Value) (cty.Value, error) { return v, nil }

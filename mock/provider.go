@@ -11,6 +11,7 @@ import (
 	filter "github.com/cycloidio/terracognita/filter"
 	provider "github.com/cycloidio/terracognita/provider"
 	gomock "github.com/golang/mock/gomock"
+	cty "github.com/hashicorp/go-cty/cty"
 	schema "github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -49,6 +50,21 @@ func (m *Provider) Configuration() map[string]interface{} {
 func (mr *ProviderMockRecorder) Configuration() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Configuration", reflect.TypeOf((*Provider)(nil).Configuration))
+}
+
+// FixResource mocks base method.
+func (m *Provider) FixResource(arg0 string, arg1 cty.Value) (cty.Value, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FixResource", arg0, arg1)
+	ret0, _ := ret[0].(cty.Value)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FixResource indicates an expected call of FixResource.
+func (mr *ProviderMockRecorder) FixResource(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FixResource", reflect.TypeOf((*Provider)(nil).FixResource), arg0, arg1)
 }
 
 // HasResourceType mocks base method.

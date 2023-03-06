@@ -9,6 +9,7 @@ import (
 	"github.com/cycloidio/mxwriter"
 	"github.com/cycloidio/terracognita/errcode"
 	"github.com/cycloidio/terracognita/hcl"
+	"github.com/cycloidio/terracognita/interpolator"
 	"github.com/cycloidio/terracognita/mock"
 	"github.com/cycloidio/terracognita/writer"
 	"github.com/golang/mock/gomock"
@@ -518,6 +519,17 @@ variable "type_name_key" {
 			mx    = mxwriter.NewMux()
 			value = map[string]interface{}{
 				"key": "value",
+				"key3": map[string]interface{}{
+					"nested_key3": "nvalue3",
+				},
+				"key4": []interface{}{
+					map[string]interface{}{
+						"nested_key4": "nvalue4.0",
+					},
+					map[string]interface{}{
+						"nested_key4": "nvalue4.1",
+					},
+				},
 			}
 			value2 = map[string]interface{}{
 				"key":  "value",
@@ -526,6 +538,15 @@ variable "type_name_key" {
 			ehcl = `
 resource "type" "name" {
   key = var.type_name_key
+	key3 {
+		nested_key3 = var.type_name_key3_nested_key3
+	}
+	key4 {
+		nested_key4 = var.type_name_key4_0_nested_key4
+	}
+	key4 {
+		nested_key4 = var.type_name_key4_1_nested_key4
+	}
 }
 
 resource "type" "name2" {
@@ -537,6 +558,9 @@ module "test" {
   source = "./module-test"
 	type_name2_key = "value"
 	type_name_key = "value"
+	type_name_key3_nested_key3 = "nvalue3"
+	type_name_key4_0_nested_key4 = "nvalue4.0"
+	type_name_key4_1_nested_key4 = "nvalue4.1"
 }
 
 provider "aws" { }
@@ -557,6 +581,18 @@ variable "type_name2_key" {
 variable "type_name_key" {
 	default = "value"
 }
+
+variable "type_name_key3_nested_key3" {
+	default = "nvalue3"
+}
+
+variable "type_name_key4_0_nested_key4" {
+	default = "nvalue4.0"
+}
+
+variable "type_name_key4_1_nested_key4" {
+	default = "nvalue4.1"
+}
 `
 		)
 		p.EXPECT().String().Return("aws").Times(2)
@@ -566,7 +602,11 @@ variable "type_name_key" {
 			"region": "eu-west-1",
 		})
 
-		hw := hcl.NewWriter(mx, p, &writer.Options{Interpolate: true, HCLProviderBlock: true, Module: "test", ModuleVariables: map[string]struct{}{"type.key": struct{}{}}})
+		hw := hcl.NewWriter(mx, p, &writer.Options{Interpolate: true, HCLProviderBlock: true, Module: "test", ModuleVariables: map[string]struct{}{
+			"type.key":              struct{}{},
+			"type.key3.nested_key3": struct{}{},
+			"type.key4.nested_key4": struct{}{},
+		}})
 
 		err := hw.Write("type.name", value)
 		require.NoError(t, err)
@@ -821,13 +861,15 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 			network = map[string]interface{}{
 				"id": "interpolated",
 			}
-			i = make(map[string]string)
+			i = interpolator.New("aws")
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
-		i["to-be-interpolated"] = "${aType.aName.id}"
+		i.AddResourceAttributes("aType.aName", map[string]string{
+			"id": "to-be-interpolated",
+		})
 		hw.Write("type.name", value)
 		hw.Write("aType.aName", network)
 
@@ -852,13 +894,15 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 			network = map[string]interface{}{
 				"id": "interpolated",
 			}
-			i = make(map[string]string)
+			i = interpolator.New("aws")
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Module: "test", Interpolate: true})
-		i["to-be-interpolated"] = "${aType.aName.id}"
+		i.AddResourceAttributes("aType.aName", map[string]string{
+			"id": "to-be-interpolated",
+		})
 		hw.Write("type.name", value)
 		hw.Write("aType.aName", network)
 
@@ -883,13 +927,15 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 			network = map[string]interface{}{
 				"id": "interpolated",
 			}
-			i = make(map[string]string)
+			i = interpolator.New("aws")
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Module: "test", ModuleVariables: map[string]struct{}{"type.name": struct{}{}}, Interpolate: true})
-		i["to-be-interpolated"] = "${aType.aName.id}"
+		i.AddResourceAttributes("aType.aName", map[string]string{
+			"id": "to-be-interpolated",
+		})
 		hw.Write("type.name", value)
 		hw.Write("aType.aName", network)
 
@@ -914,13 +960,15 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 			network = map[string]interface{}{
 				"id": "interpolated",
 			}
-			i = make(map[string]string)
+			i = interpolator.New("aws")
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Module: "test", ModuleVariables: map[string]struct{}{"type.network": struct{}{}}, Interpolate: true})
-		i["to-be-interpolated"] = "${aType.aName.id}"
+		i.AddResourceAttributes("aType.aName", map[string]string{
+			"id": "to-be-interpolated",
+		})
 		hw.Write("type.name", value)
 		hw.Write("aType.aName", network)
 
@@ -946,13 +994,15 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 				"id":   "interpolated",
 				"name": "to-be-interpolated",
 			}
-			i = make(map[string]string)
+			i = interpolator.New("aws")
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
-		i["to-be-interpolated"] = "${aType.aName.id}"
+		i.AddResourceAttributes("aType.aName", map[string]string{
+			"id": "to-be-interpolated",
+		})
 		hw.Write("type.name", value)
 		hw.Write("aType.aName", network)
 
@@ -978,14 +1028,18 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 				"id":                "subnet-1",
 				"availability_zone": "a-zone",
 			}
-			i = make(map[string]string)
+			i = interpolator.New("aws")
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
-		i["a-zone"] = "${aws_instance.instance.availability_zone}"
-		i["1234"] = "${aws_subnet.subnet.id}"
+		i.AddResourceAttributes("aws_instance.instance", map[string]string{
+			"availability_zone": "a-zone",
+		})
+		i.AddResourceAttributes("aws_subnet.subnet", map[string]string{
+			"id": "1234",
+		})
 		hw.Write("aws_subnet.subnet", subnet)
 		hw.Write("aws_instance.instance", instance)
 
@@ -1013,13 +1067,15 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 				"id":   "interpolated",
 				"name": "to-be-interpolated",
 			}
-			i = make(map[string]string)
+			i = interpolator.New("aws")
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: false})
-		i["should-not-be-interpolated"] = "${aType.aName.id}"
+		i.AddResourceAttributes("aType.aName", map[string]string{
+			"id": "should-not-be-interpolated",
+		})
 		hw.Write("type.name", value)
 		hw.Write("aType.aName", network)
 

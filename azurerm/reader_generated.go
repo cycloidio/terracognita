@@ -10,6 +10,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2021-12-01/compute"
 	"github.com/Azure/azure-sdk-for-go/services/containerregistry/mgmt/2019-05-01/containerregistry"
 	"github.com/Azure/azure-sdk-for-go/services/containerservice/mgmt/2022-01-01/containerservice"
+	"github.com/Azure/azure-sdk-for-go/services/dataprotection/mgmt/2021-07-01/dataprotection"
 	"github.com/Azure/azure-sdk-for-go/services/dns/mgmt/2018-05-01/dns"
 	"github.com/Azure/azure-sdk-for-go/services/logic/mgmt/2019-05-01/logic"
 	"github.com/Azure/azure-sdk-for-go/services/mariadb/mgmt/2020-01-01/mariadb"
@@ -2373,6 +2374,31 @@ func (ar *AzureReader) ListHybridConnections(ctx context.Context, name string) (
 	}
 
 	resources := make([]web.HybridConnection, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListBackupVaultResources returns a list of BackupVaultResources within a subscription and a resource group
+func (ar *AzureReader) ListBackupVaultResources(ctx context.Context) ([]dataprotection.BackupVaultResource, error) {
+	client := dataprotection.NewBackupVaultsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.GetInResourceGroup(ctx, ar.GetResourceGroupName())
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list dataprotection.BackupVaultResource from Azure APIs")
+	}
+
+	resources := make([]dataprotection.BackupVaultResource, 0)
 	for output.NotDone() {
 
 		for _, res := range output.Values() {
