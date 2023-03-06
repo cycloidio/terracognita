@@ -83,6 +83,7 @@ const (
 	EBSVolume
 	ECSCluster
 	ECSService
+	ECSTaskDefinition
 	EC2TransitGateway
 	EC2TransitGatewayVPCAttachment
 	EC2TransitGatewayRouteTable
@@ -223,6 +224,7 @@ var (
 		EBSVolume:                                  ebsVolumes,
 		ECSCluster:                                 cacheECSClusters,
 		ECSService:                                 ecsServices,
+		ECSTaskDefinition:                          ecsTaskDefinitions,
 		EC2TransitGateway:                          ec2TransitGateways,
 		EC2TransitGatewayVPCAttachment:             ec2TransitGatewayVPCAttachment,
 		EC2TransitGatewayRouteTable:                cacheTransitGatewayRouteTables,
@@ -1253,6 +1255,26 @@ func ecsServices(ctx context.Context, a *aws, resourceType string, filters *filt
 				resources = append(resources, r)
 			}
 		}
+	}
+
+	return resources, nil
+}
+
+func ecsTaskDefinitions(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	ecsTaskDefinitionArns, err := a.awsr.GetECSTaskDefinitionsArns(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+
+	for _, taskDefinitionArn := range ecsTaskDefinitionArns {
+		r, err := initializeResource(a, *taskDefinitionArn, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
 	}
 
 	return resources, nil

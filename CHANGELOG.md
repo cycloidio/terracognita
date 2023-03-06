@@ -6,6 +6,8 @@
   ([PR#334](https://github.com/cycloidio/terracognita/pull/334))
 - Allow the writing of tf/provider into a separated config key
   ([PR#319](https://github.com/cycloidio/terracognita/pull/319))
+- Add new aws resource: aws_ecs_task_definition
+  ([PR#333](https://github.com/cycloidio/terracognita/pull/333))
 - Added new Azure resource: `azurerm_data_protection_backup_vault`
   ([PR#349](https://github.com/cycloidio/terracognita/pull/349))
 
@@ -17,6 +19,7 @@
   ([PR #336](https://github.com/cycloidio/terracognita/pull/336))
 - Improved the way resource references/interpolations work, now it's more deterministic
   ([Issue #346](https://github.com/cycloidio/terracognita/issues/346))
+
 
 ### Fixed
 
