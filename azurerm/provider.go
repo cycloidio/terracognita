@@ -177,6 +177,13 @@ func (a *azurerm) FixResource(t string, v cty.Value) (cty.Value, error) {
 			if len(path) == 3 {
 				if gas, ok := path[0].(cty.GetAttrStep); ok {
 					switch gas.Name {
+					case "os_profile":
+						switch path[2].(cty.GetAttrStep).Name {
+						case "admin_password":
+							// The value can't be retrieved. Terraform Azure provider set "ignored-as-imported" which is not a valid password.
+							// In this case, set the default password which respects Azure constraints
+							return cty.StringVal("Ignored-as-!mport3d"), nil
+						}
 					case "storage_os_disk":
 						var idx int
 						err := gocty.FromCtyValue(path[1].(cty.IndexStep).Key, &idx)
@@ -249,6 +256,10 @@ func (a *azurerm) FixResource(t string, v cty.Value) (cty.Value, error) {
 			if len(path) > 0 {
 				if gas, ok := path[0].(cty.GetAttrStep); ok {
 					switch gas.Name {
+					case "admin_password":
+						// The value can't be retrieved. Terraform Azure provider set "ignored-as-imported" which is not a valid password.
+						// In this case, set the default password which respects Azure constraints
+						return cty.StringVal("Ignored-as-!mport3d"), nil
 					case "platform_fault_domain":
 						// By default this attribute is set, but this is not a valid value with terraform apply.
 						// In this case, we shouldn't write platform_fault_domain.
