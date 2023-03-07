@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.8.2] _2023-03-07_
+
 ### Added
 
 - Added new Azure resource: `azurerm_virtual_machine_data_disk_attachment`
