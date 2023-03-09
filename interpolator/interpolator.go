@@ -111,14 +111,14 @@ func (i *Interpolator) Interpolate(k, v string) (string, bool) {
 func (i *Interpolator) checkAttributes(sk []string, v string, ngi int, ng string, rns map[string]map[string]string) string {
 	for rn, attrs := range rns {
 		att := strings.Join(sk[(len(sk)-(ngi)):len(sk)], "_")
-		if av, ok := attrs[att]; ok && av == v {
+		if av, ok := attrs[att]; ok && strings.ToLower(av) == strings.ToLower(v) {
 			return fmt.Sprintf("${%s.%s.%s}", fmt.Sprintf("%s_%s", i.provider, ng), rn, att)
 		}
 	}
 	// Then if no exact we try to find first one with the same value on the resource
 	for rn, attrs := range rns {
 		for ak, av := range attrs {
-			if av == v {
+			if strings.ToLower(av) == strings.ToLower(v) {
 				return fmt.Sprintf("${%s.%s.%s}", fmt.Sprintf("%s_%s", i.provider, ng), rn, ak)
 			}
 		}
