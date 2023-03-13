@@ -2,6 +2,8 @@
 
 ### Fixed
 
+- Azurerm force `create_option="Attach"` with `azurerm_virtual_machine_data_disk_attachment`
+  ([PR #359](https://github.com/cycloidio/terracognita/pull/359))
 - Azurerm `azurerm_network_security_group.security_rule.protocol` now has the right format
   ([PR #357](https://github.com/cycloidio/terracognita/pull/357))
 
