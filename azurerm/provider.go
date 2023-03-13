@@ -12,6 +12,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	tfazurerm "github.com/hashicorp/terraform-provider-azurerm/provider"
 	"github.com/pkg/errors"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 
 	"github.com/cycloidio/terracognita/cache"
 	"github.com/cycloidio/terracognita/errcode"
@@ -282,6 +284,30 @@ func (a *azurerm) FixResource(t string, v cty.Value) (cty.Value, error) {
 						sasi := strings.Split(asi, "/")
 						sasi[len(sasi)-1] = strings.ToLower(sasi[len(sasi)-1])
 						return cty.StringVal(strings.Join(sasi, "/")), nil
+					}
+				}
+			}
+			return v, nil
+		})
+	case "azurerm_network_security_group":
+		v, err = cty.Transform(v, func(path cty.Path, v cty.Value) (cty.Value, error) {
+			if len(path) > 0 {
+				if gas, ok := path[0].(cty.GetAttrStep); ok {
+					switch gas.Name {
+					case "security_rule":
+						if len(path) < 3 {
+							return v, nil
+						}
+						switch path[2].(cty.GetAttrStep).Name {
+						case "protocol":
+							// For some reason the Protocol is set like: TCP, but the valid value is Tcp
+							var sp string
+							err := gocty.FromCtyValue(v, &sp)
+							if err != nil {
+								return v, errors.Wrapf(err, "failed to convert CTY value to GO type")
+							}
+							return cty.StringVal(cases.Title(language.English).String(strings.ToLower(sp))), nil
+						}
 					}
 				}
 			}

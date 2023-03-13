@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+### Fixed
+
+- Azurerm `azurerm_network_security_group.security_rule.protocol` now has the right format
+  ([PR #357](https://github.com/cycloidio/terracognita/pull/357))
+
 ## [0.8.2] _2023-03-07_
 
 ### Added
