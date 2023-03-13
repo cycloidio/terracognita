@@ -271,7 +271,6 @@ func (a *azurerm) FixResource(t string, v cty.Value) (cty.Value, error) {
 		if err != nil {
 			return v, errors.Wrapf(err, "failed to convert CTY value to GO type")
 		}
-
 	case "azurerm_windows_virtual_machine":
 		v, err = cty.Transform(v, func(path cty.Path, v cty.Value) (cty.Value, error) {
 			if len(path) > 0 {
