@@ -253,6 +253,25 @@ func (a *azurerm) FixResource(t string, v cty.Value) (cty.Value, error) {
 				return v, errors.Wrapf(err, "failed to convert CTY value to GO type")
 			}
 		}
+
+	case "azurerm_virtual_machine_data_disk_attachment":
+		v, err = cty.Transform(v, func(path cty.Path, v cty.Value) (cty.Value, error) {
+			if len(path) > 0 {
+				if gas, ok := path[0].(cty.GetAttrStep); ok {
+					switch gas.Name {
+					case "create_option":
+						// For some reason this values is Empty sometime.
+						// When importing we only list attached disk. So it should always be set to Attach
+						return cty.StringVal("Attach"), nil
+					}
+				}
+			}
+			return v, nil
+		})
+		if err != nil {
+			return v, errors.Wrapf(err, "failed to convert CTY value to GO type")
+		}
+
 	case "azurerm_windows_virtual_machine":
 		v, err = cty.Transform(v, func(path cty.Path, v cty.Value) (cty.Value, error) {
 			if len(path) > 0 {
