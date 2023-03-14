@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.8.3] _2023-03-14_
+
 ### Fixed
 
 - Azurerm force `create_option="Attach"` with `azurerm_virtual_machine_data_disk_attachment`
