@@ -28,6 +28,7 @@ var (
 			viper.BindPFlag("resource-group-name", cmd.Flags().Lookup("resource-group-name"))
 			viper.BindPFlag("subscription-id", cmd.Flags().Lookup("subscription-id"))
 			viper.BindPFlag("tenant-id", cmd.Flags().Lookup("tenant-id"))
+			viper.BindPFlag("tags", cmd.Flags().Lookup("tags"))
 
 			return nil
 		},
@@ -60,7 +61,12 @@ var (
 				return err
 			}
 
-			err = importProvider(ctx, logger, azureRMP, noTags)
+			tags, err := initializeTags("tags")
+			if err != nil {
+				return err
+			}
+
+			err = importProvider(ctx, logger, azureRMP, tags)
 			if err != nil {
 				return err
 			}
@@ -79,6 +85,8 @@ func init() {
 	azurermCmd.Flags().StringSlice("resource-group-name", nil, "Resource Group Names (required)")
 	azurermCmd.Flags().String("subscription-id", "", "Subscription ID (required)")
 	azurermCmd.Flags().String("tenant-id", "", "Tenant ID (required)")
+
+	azurermCmd.Flags().StringSliceVarP(&tags, "tags", "t", []string{}, "List of tags to filter with format 'NAME:VALUE'")
 
 	// Optional flags
 	azurermCmd.Flags().String("environment", "public", "Environment")

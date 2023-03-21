@@ -124,7 +124,13 @@ func (a *azurerm) Resources(ctx context.Context, t string, f *filter.Filter) ([]
 
 			return nil, errors.Wrapf(err, "error while reading from resource %q", t)
 		}
-		resources = append(resources, nres...)
+		for _, r := range nres {
+			// As we are already doing the filter in the reader
+			// we can set all the resources to ignore further
+			// Tag fitlers
+			r.SetIgnoreTagFilter(true)
+			resources = append(resources, r)
+		}
 	}
 
 	return resources, nil

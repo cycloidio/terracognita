@@ -210,6 +210,18 @@ func (mr *ResourceMockRecorder) ResourceInstanceObject() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ResourceInstanceObject", reflect.TypeOf((*Resource)(nil).ResourceInstanceObject))
 }
 
+// SetIgnoreTagFilter mocks base method.
+func (m *Resource) SetIgnoreTagFilter(arg0 bool) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetIgnoreTagFilter", arg0)
+}
+
+// SetIgnoreTagFilter indicates an expected call of SetIgnoreTagFilter.
+func (mr *ResourceMockRecorder) SetIgnoreTagFilter(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetIgnoreTagFilter", reflect.TypeOf((*Resource)(nil).SetIgnoreTagFilter), arg0)
+}
+
 // SetImporter mocks base method.
 func (m *Resource) SetImporter(arg0 *schema.ResourceImporter) {
 	m.ctrl.T.Helper()
