@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 
 	kitlog "github.com/go-kit/kit/log"
 	"github.com/spf13/cobra"
@@ -10,7 +9,6 @@ import (
 
 	"github.com/cycloidio/terracognita/google"
 	"github.com/cycloidio/terracognita/log"
-	"github.com/cycloidio/terracognita/tag"
 )
 
 var (
@@ -40,14 +38,9 @@ var (
 				return err
 			}
 
-			// Initialize the tags
-			tags := make([]tag.Tag, 0, len(viper.GetStringSlice("labels")))
-			for _, t := range viper.GetStringSlice("labels") {
-				tg, err := tag.New(t)
-				if err != nil {
-					return fmt.Errorf("invalid format for --labels with value %q: %w", t, err)
-				}
-				tags = append(tags, tg)
+			tags, err := initializeTags("labels")
+			if err != nil {
+				return err
 			}
 
 			ctx := context.Background()
@@ -82,7 +75,7 @@ func init() {
 	googleCmd.Flags().String("region", "", "region (required)")
 
 	// Filter flags
-	googleCmd.Flags().StringSliceVarP(&tags, "labels", "t", []string{}, "List of labels to filter with format 'NAME:VALUE'")
+	googleCmd.Flags().StringSliceVarP(&tags, "labels", "l", []string{}, "List of labels to filter with format 'NAME:VALUE'")
 
 	// Optional flags
 	googleCmd.Flags().Uint64("max-results", 500, "max results to fetch when pagination is used")

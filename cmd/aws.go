@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -10,7 +9,6 @@ import (
 
 	"github.com/cycloidio/terracognita/aws"
 	"github.com/cycloidio/terracognita/log"
-	"github.com/cycloidio/terracognita/tag"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -58,14 +56,9 @@ var (
 				return err
 			}
 
-			// Initialize the tags
-			tags := make([]tag.Tag, 0, len(viper.GetStringSlice("tags")))
-			for _, t := range viper.GetStringSlice("tags") {
-				tg, err := tag.New(t)
-				if err != nil {
-					return fmt.Errorf("invalid format for --tags with value %q: %w", t, err)
-				}
-				tags = append(tags, tg)
+			tags, err := initializeTags("tags")
+			if err != nil {
+				return err
 			}
 
 			ctx := context.Background()

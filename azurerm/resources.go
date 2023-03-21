@@ -341,6 +341,23 @@ func resourceGroup(ctx context.Context, a *azurerm, ar *AzureReader, resourceTyp
 	return resources, nil
 }
 
+func filterByTags(f *filter.Filter, tags map[string]*string) bool {
+	if len(f.Tags) == 0 {
+		return true
+	}
+	for _, t := range f.Tags {
+		if v, ok := tags[t.Name]; ok {
+			if v == nil {
+				continue
+			}
+			if *v == t.Value {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 // Compute Resources
 
 func virtualMachines(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
@@ -350,6 +367,9 @@ func virtualMachines(ctx context.Context, a *azurerm, ar *AzureReader, resourceT
 	}
 	resources := make([]provider.Resource, 0)
 	for _, virtualMachine := range virtualMachines {
+		if !filterByTags(filters, virtualMachine.Tags) {
+			continue
+		}
 
 		// To avoid having the same vm for different resources (azurerm_virtual_machine and azurerm_windows_virtual_machine or azurerm_linux_virtual_machine)
 		// Check VM OS (based on the criteria to create specific os type vm resources)
@@ -406,6 +426,9 @@ func virtualMachineScaleSets(ctx context.Context, a *azurerm, ar *AzureReader, r
 	}
 	resources := make([]provider.Resource, 0)
 	for _, virtualMachineScaleSet := range virtualMachineScaleSets {
+		if !filterByTags(filters, virtualMachineScaleSet.Tags) {
+			continue
+		}
 
 		// if resource_type is one of the elements of vm and not a caching method
 		if resourceType == "azurerm_linux_virtual_machine_scale_set" || resourceType == "azurerm_windows_virtual_machine_scale_set" {
@@ -472,6 +495,9 @@ func disks(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string
 	}
 	resources := make([]provider.Resource, 0, len(disks))
 	for _, disk := range disks {
+		if !filterByTags(filters, disk.Tags) {
+			continue
+		}
 		// If disk is used as Operating System, the disk is managed by the virtual_machine resource, not a dedicated disk
 		if disk.DiskProperties.OsType != "" {
 			continue
@@ -510,6 +536,9 @@ func virtualMachineDataDiskAttachments(ctx context.Context, a *azurerm, ar *Azur
 
 	resources := make([]provider.Resource, 0)
 	for _, disk := range disks {
+		if !filterByTags(filters, disk.Tags) {
+			continue
+		}
 		if disk.DiskProperties.DiskState == "Attached" || disk.DiskProperties.DiskState == "Reserved" {
 			// check on wich VM the disk is attached
 			for _, virtualMachine := range virtualMachines {
@@ -542,6 +571,9 @@ func virtualMachineExtensions(ctx context.Context, a *azurerm, ar *AzureReader, 
 			return nil, errors.Wrap(err, "unable to list virtual machine extensions from reader")
 		}
 		for _, extension := range extensions {
+			if !filterByTags(filters, extension.Tags) {
+				continue
+			}
 			r := provider.NewResource(*extension.ID, resourceType, a)
 			resources = append(resources, r)
 		}
@@ -556,6 +588,9 @@ func availabilitySets(ctx context.Context, a *azurerm, ar *AzureReader, resource
 	}
 	resources := make([]provider.Resource, 0, len(availabilitySets))
 	for _, availabilitySet := range availabilitySets {
+		if !filterByTags(filters, availabilitySet.Tags) {
+			continue
+		}
 		r := provider.NewResource(*availabilitySet.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -569,6 +604,9 @@ func images(ctx context.Context, a *azurerm, ar *AzureReader, resourceType strin
 	}
 	resources := make([]provider.Resource, 0, len(images))
 	for _, image := range images {
+		if !filterByTags(filters, image.Tags) {
+			continue
+		}
 		r := provider.NewResource(*image.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -584,6 +622,9 @@ func virtualNetworks(ctx context.Context, a *azurerm, ar *AzureReader, resourceT
 	}
 	resources := make([]provider.Resource, 0, len(virtualNetworks))
 	for _, virtualNetwork := range virtualNetworks {
+		if !filterByTags(filters, virtualNetwork.Tags) {
+			continue
+		}
 		r := provider.NewResource(*virtualNetwork.ID, resourceType, a)
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
@@ -621,6 +662,9 @@ func networkInterfaces(ctx context.Context, a *azurerm, ar *AzureReader, resourc
 	}
 	resources := make([]provider.Resource, 0, len(networkInterfaces))
 	for _, networkInterface := range networkInterfaces {
+		if !filterByTags(filters, networkInterface.Tags) {
+			continue
+		}
 		r := provider.NewResource(*networkInterface.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -634,6 +678,9 @@ func networkSecurityGroups(ctx context.Context, a *azurerm, ar *AzureReader, res
 	}
 	resources := make([]provider.Resource, 0, len(securityGroups))
 	for _, securityGroup := range securityGroups {
+		if !filterByTags(filters, securityGroup.Tags) {
+			continue
+		}
 		r := provider.NewResource(*securityGroup.ID, resourceType, a)
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
@@ -665,6 +712,9 @@ func applicationSecurityGroups(ctx context.Context, a *azurerm, ar *AzureReader,
 	}
 	resources := make([]provider.Resource, 0, len(applicationSecurityGroups))
 	for _, applicationSecurityGroup := range applicationSecurityGroups {
+		if !filterByTags(filters, applicationSecurityGroup.Tags) {
+			continue
+		}
 		r := provider.NewResource(*applicationSecurityGroup.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -678,6 +728,9 @@ func networkddosProtectionPlans(ctx context.Context, a *azurerm, ar *AzureReader
 	}
 	resources := make([]provider.Resource, 0, len(ddosProtectionPlans))
 	for _, ddosProtectionPlan := range ddosProtectionPlans {
+		if !filterByTags(filters, ddosProtectionPlan.Tags) {
+			continue
+		}
 		r := provider.NewResource(*ddosProtectionPlan.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -691,6 +744,9 @@ func firewalls(ctx context.Context, a *azurerm, ar *AzureReader, resourceType st
 	}
 	resources := make([]provider.Resource, 0, len(azureFirewalls))
 	for _, azureFirewall := range azureFirewalls {
+		if !filterByTags(filters, azureFirewall.Tags) {
+			continue
+		}
 		r := provider.NewResource(*azureFirewall.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -704,6 +760,9 @@ func localNetworkGateways(ctx context.Context, a *azurerm, ar *AzureReader, reso
 	}
 	resources := make([]provider.Resource, 0, len(localNetworkGateways))
 	for _, localNetworkGateway := range localNetworkGateways {
+		if !filterByTags(filters, localNetworkGateway.Tags) {
+			continue
+		}
 		r := provider.NewResource(*localNetworkGateway.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -717,6 +776,9 @@ func natGateways(ctx context.Context, a *azurerm, ar *AzureReader, resourceType 
 	}
 	resources := make([]provider.Resource, 0, len(natGateways))
 	for _, natGateway := range natGateways {
+		if !filterByTags(filters, natGateway.Tags) {
+			continue
+		}
 		r := provider.NewResource(*natGateway.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -730,6 +792,9 @@ func networkProfiles(ctx context.Context, a *azurerm, ar *AzureReader, resourceT
 	}
 	resources := make([]provider.Resource, 0, len(profiles))
 	for _, profile := range profiles {
+		if !filterByTags(filters, profile.Tags) {
+			continue
+		}
 		r := provider.NewResource(*profile.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -762,6 +827,9 @@ func publicIP(ctx context.Context, a *azurerm, ar *AzureReader, resourceType str
 	}
 	resources := make([]provider.Resource, 0, len(publicIPAddresses))
 	for _, publicIPAddress := range publicIPAddresses {
+		if !filterByTags(filters, publicIPAddress.Tags) {
+			continue
+		}
 		r := provider.NewResource(*publicIPAddress.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -775,6 +843,9 @@ func publicIPPrefixes(ctx context.Context, a *azurerm, ar *AzureReader, resource
 	}
 	resources := make([]provider.Resource, 0, len(publicIPPrefixes))
 	for _, publicIPPrefix := range publicIPPrefixes {
+		if !filterByTags(filters, publicIPPrefix.Tags) {
+			continue
+		}
 		r := provider.NewResource(*publicIPPrefix.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -788,6 +859,9 @@ func routeTables(ctx context.Context, a *azurerm, ar *AzureReader, resourceType 
 	}
 	resources := make([]provider.Resource, 0, len(routeTables))
 	for _, routeTable := range routeTables {
+		if !filterByTags(filters, routeTable.Tags) {
+			continue
+		}
 		r := provider.NewResource(*routeTable.ID, resourceType, a)
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
@@ -825,6 +899,9 @@ func virtualNetworkGateways(ctx context.Context, a *azurerm, ar *AzureReader, re
 	}
 	resources := make([]provider.Resource, 0, len(virtualNetworkGateways))
 	for _, virtualNetworkGateway := range virtualNetworkGateways {
+		if !filterByTags(filters, virtualNetworkGateway.Tags) {
+			continue
+		}
 		r := provider.NewResource(*virtualNetworkGateway.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -838,6 +915,9 @@ func virtualNetworkGatewayConnections(ctx context.Context, a *azurerm, ar *Azure
 	}
 	resources := make([]provider.Resource, 0, len(virtualNetworkGatewayConnections))
 	for _, virtualNetworkGatewayConnection := range virtualNetworkGatewayConnections {
+		if !filterByTags(filters, virtualNetworkGatewayConnection.Tags) {
+			continue
+		}
 		r := provider.NewResource(*virtualNetworkGatewayConnection.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -870,6 +950,9 @@ func webApplicationFirewallPolicies(ctx context.Context, a *azurerm, ar *AzureRe
 	}
 	resources := make([]provider.Resource, 0, len(webApplicationFirewallPolicies))
 	for _, webApplicationFirewallPolicy := range webApplicationFirewallPolicies {
+		if !filterByTags(filters, webApplicationFirewallPolicy.Tags) {
+			continue
+		}
 		r := provider.NewResource(*webApplicationFirewallPolicy.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -883,6 +966,9 @@ func virtualHubs(ctx context.Context, a *azurerm, ar *AzureReader, resourceType 
 	}
 	resources := make([]provider.Resource, 0, len(virtualHubs))
 	for _, virtualHub := range virtualHubs {
+		if !filterByTags(filters, virtualHub.Tags) {
+			continue
+		}
 		r := provider.NewResource(*virtualHub.ID, resourceType, a)
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
@@ -981,6 +1067,9 @@ func virtualHubSecurityPartnerProvider(ctx context.Context, a *azurerm, ar *Azur
 	}
 	resources := make([]provider.Resource, 0, len(virtualHubSecurityPartnerProviders))
 	for _, virtualHubSecurityPartnerProvider := range virtualHubSecurityPartnerProviders {
+		if !filterByTags(filters, virtualHubSecurityPartnerProvider.Tags) {
+			continue
+		}
 		r := provider.NewResource(*virtualHubSecurityPartnerProvider.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -995,6 +1084,9 @@ func lbs(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, 
 	}
 	resources := make([]provider.Resource, 0, len(lbs))
 	for _, lb := range lbs {
+		if !filterByTags(filters, lb.Tags) {
+			continue
+		}
 		r := provider.NewResource(*lb.ID, resourceType, a)
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
@@ -1033,6 +1125,9 @@ func lbProperties(ctx context.Context, a *azurerm, ar *AzureReader, resourceType
 	}
 	resources := make([]provider.Resource, 0)
 	for _, lb := range lbs {
+		if !filterByTags(filters, lb.Tags) {
+			continue
+		}
 		if lbProperties := lb.LoadBalancerPropertiesFormat; lbProperties != nil {
 			if resourceType == "azurerm_lb_rule" && lbProperties.LoadBalancingRules != nil {
 				for _, lbRule := range *lbProperties.LoadBalancingRules {
@@ -1074,6 +1169,9 @@ func virtualDesktopHostPools(ctx context.Context, a *azurerm, ar *AzureReader, r
 	}
 	resources := make([]provider.Resource, 0, len(pools))
 	for _, hostPool := range pools {
+		if !filterByTags(filters, hostPool.Tags) {
+			continue
+		}
 		r := provider.NewResource(*hostPool.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -1089,6 +1187,9 @@ func virtualApplicationGroups(ctx context.Context, a *azurerm, ar *AzureReader, 
 	}
 	resources := make([]provider.Resource, 0, len(applicationGroups))
 	for _, applicationGroup := range applicationGroups {
+		if !filterByTags(filters, applicationGroup.Tags) {
+			continue
+		}
 		r := provider.NewResource(*applicationGroup.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -1104,6 +1205,9 @@ func logicAppWorkflows(ctx context.Context, a *azurerm, ar *AzureReader, resourc
 	}
 	resources := make([]provider.Resource, 0, len(appWorkflows))
 	for _, appWorkflow := range appWorkflows {
+		if !filterByTags(filters, appWorkflow.Tags) {
+			continue
+		}
 		r := provider.NewResource(*appWorkflow.ID, resourceType, a)
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
@@ -1171,6 +1275,9 @@ func containerRegistries(ctx context.Context, a *azurerm, ar *AzureReader, resou
 	}
 	resources := make([]provider.Resource, 0, len(containerRegistries))
 	for _, containerRegistry := range containerRegistries {
+		if !filterByTags(filters, containerRegistry.Tags) {
+			continue
+		}
 		r := provider.NewResource(*containerRegistry.ID, resourceType, a)
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
@@ -1194,6 +1301,9 @@ func containerRegistryWebhooks(ctx context.Context, a *azurerm, ar *AzureReader,
 			return nil, errors.Wrap(err, "unable to list container registry webhooks from reader")
 		}
 		for _, containerRegistryWebhook := range containerRegistryWebhooks {
+			if !filterByTags(filters, containerRegistryWebhook.Tags) {
+				continue
+			}
 			r := provider.NewResource(*containerRegistryWebhook.ID, resourceType, a)
 			resources = append(resources, r)
 		}
@@ -1210,6 +1320,9 @@ func kubernetesClusters(ctx context.Context, a *azurerm, ar *AzureReader, resour
 	}
 	resources := make([]provider.Resource, 0, len(kubernetesClusters))
 	for _, kubernetesCluster := range kubernetesClusters {
+		if !filterByTags(filters, kubernetesCluster.Tags) {
+			continue
+		}
 		r := provider.NewResource(*kubernetesCluster.ID, resourceType, a)
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
@@ -1233,6 +1346,9 @@ func kubernetesClustersNodePools(ctx context.Context, a *azurerm, ar *AzureReade
 			return nil, errors.Wrap(err, "unable to list kubernetes clusters node pools from reader")
 		}
 		for _, kubernetesClustersNodePool := range kubernetesClustersNodePools {
+			if !filterByTags(filters, kubernetesClustersNodePool.Tags) {
+				continue
+			}
 			r := provider.NewResource(*kubernetesClustersNodePool.ID, resourceType, a)
 			resources = append(resources, r)
 		}
@@ -1249,6 +1365,9 @@ func storageAccounts(ctx context.Context, a *azurerm, ar *AzureReader, resourceT
 	}
 	resources := make([]provider.Resource, 0, len(storageAccounts))
 	for _, storageAccount := range storageAccounts {
+		if !filterByTags(filters, storageAccount.Tags) {
+			continue
+		}
 		r := provider.NewResource(*storageAccount.ID, resourceType, a)
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
@@ -1359,6 +1478,9 @@ func mariadbServers(ctx context.Context, a *azurerm, ar *AzureReader, resourceTy
 	}
 	resources := make([]provider.Resource, 0, len(mariadbServers))
 	for _, mariadbServer := range mariadbServers {
+		if !filterByTags(filters, mariadbServer.Tags) {
+			continue
+		}
 		r := provider.NewResource(*mariadbServer.ID, resourceType, a)
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
@@ -1455,6 +1577,9 @@ func mysqlServers(ctx context.Context, a *azurerm, ar *AzureReader, resourceType
 	}
 	resources := make([]provider.Resource, 0, len(mysqlServers))
 	for _, mysqlServer := range mysqlServers {
+		if !filterByTags(filters, mysqlServer.Tags) {
+			continue
+		}
 		r := provider.NewResource(*mysqlServer.ID, resourceType, a)
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
@@ -1551,6 +1676,9 @@ func postgresqlServers(ctx context.Context, a *azurerm, ar *AzureReader, resourc
 	}
 	resources := make([]provider.Resource, 0, len(postgresqlServers))
 	for _, postgresqlServer := range postgresqlServers {
+		if !filterByTags(filters, postgresqlServer.Tags) {
+			continue
+		}
 		r := provider.NewResource(*postgresqlServer.ID, resourceType, a)
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
@@ -1647,6 +1775,9 @@ func mssqlServers(ctx context.Context, a *azurerm, ar *AzureReader, resourceType
 	}
 	resources := make([]provider.Resource, 0, len(sqlServers))
 	for _, sqlServer := range sqlServers {
+		if !filterByTags(filters, sqlServer.Tags) {
+			continue
+		}
 		r := provider.NewResource(*sqlServer.ID, resourceType, a)
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
@@ -1670,6 +1801,9 @@ func mssqlElasticPools(ctx context.Context, a *azurerm, ar *AzureReader, resourc
 			return nil, errors.Wrap(err, "unable to list SQL Elastic Pools from reader")
 		}
 		for _, sqlElasticPool := range sqlElasticPools {
+			if !filterByTags(filters, sqlElasticPool.Tags) {
+				continue
+			}
 			r := provider.NewResource(*sqlElasticPool.ID, resourceType, a)
 			resources = append(resources, r)
 		}
@@ -1693,6 +1827,9 @@ func mssqlDatabases(ctx context.Context, a *azurerm, ar *AzureReader, resourceTy
 			return nil, errors.Wrap(err, "unable to list SQL databases from reader")
 		}
 		for _, sqlDatabase := range sqlDatabases {
+			if !filterByTags(filters, sqlDatabase.Tags) {
+				continue
+			}
 			r := provider.NewResource(*sqlDatabase.ID, resourceType, a)
 			resources = append(resources, r)
 		}
@@ -1764,6 +1901,9 @@ func mssqlVirtualMachines(ctx context.Context, a *azurerm, ar *AzureReader, reso
 	}
 	resources := make([]provider.Resource, 0, len(sqlVirtualMachines))
 	for _, sqlVirtualMachine := range sqlVirtualMachines {
+		if !filterByTags(filters, sqlVirtualMachine.Tags) {
+			continue
+		}
 		r := provider.NewResource(*sqlVirtualMachine.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -1798,6 +1938,9 @@ func redisCaches(ctx context.Context, a *azurerm, ar *AzureReader, resourceType 
 	}
 	resources := make([]provider.Resource, 0, len(redisCaches))
 	for _, redisCache := range redisCaches {
+		if !filterByTags(filters, redisCache.Tags) {
+			continue
+		}
 		r := provider.NewResource(*redisCache.ID, resourceType, a)
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
@@ -1837,6 +1980,9 @@ func dnsZones(ctx context.Context, a *azurerm, ar *AzureReader, resourceType str
 	}
 	resources := make([]provider.Resource, 0, len(dnsZones))
 	for _, dnsZone := range dnsZones {
+		if !filterByTags(filters, dnsZone.Tags) {
+			continue
+		}
 		r := provider.NewResource(*dnsZone.ID, resourceType, a)
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
@@ -1899,6 +2045,9 @@ func privateDNSZones(ctx context.Context, a *azurerm, ar *AzureReader, resourceT
 	}
 	resources := make([]provider.Resource, 0, len(privateDNSZones))
 	for _, privateDNSZone := range privateDNSZones {
+		if !filterByTags(filters, privateDNSZone.Tags) {
+			continue
+		}
 		r := provider.NewResource(*privateDNSZone.ID, resourceType, a)
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
@@ -1961,7 +2110,6 @@ func privateDNSVirtualNetworkLinks(ctx context.Context, a *azurerm, ar *AzureRea
 			return nil, errors.Wrap(err, "unable to list Private DNS Record set from reader")
 		}
 		for _, privateDNSVirtualNetworkLink := range privateDNSVirtualNetworkLinks {
-
 			r := provider.NewResource(*privateDNSVirtualNetworkLink.ID, resourceType, a)
 			resources = append(resources, r)
 		}
@@ -2018,6 +2166,9 @@ func keyVaults(ctx context.Context, a *azurerm, ar *AzureReader, resourceType st
 	}
 	resources := make([]provider.Resource, 0, len(keyVaults))
 	for _, keyVault := range keyVaults {
+		if !filterByTags(filters, keyVault.Tags) {
+			continue
+		}
 		r := provider.NewResource(*keyVault.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -2031,6 +2182,9 @@ func keyVaultProperties(ctx context.Context, a *azurerm, ar *AzureReader, resour
 	}
 	resources := make([]provider.Resource, 0)
 	for _, keyVault := range keyVaults {
+		if !filterByTags(filters, keyVault.Tags) {
+			continue
+		}
 		if vaultProps := keyVault.Properties; vaultProps == nil {
 			if resourceType == "azurerm_key_vault_access_policy" && vaultProps.AccessPolicies != nil {
 				for _, vaultAcessPolicy := range *vaultProps.AccessPolicies {
@@ -2051,6 +2205,9 @@ func applicationInsights(ctx context.Context, a *azurerm, ar *AzureReader, resou
 	}
 	resources := make([]provider.Resource, 0, len(applicationInsights))
 	for _, applicationInsight := range applicationInsights {
+		if !filterByTags(filters, applicationInsight.Tags) {
+			continue
+		}
 		r := provider.NewResource(*applicationInsight.ID, resourceType, a)
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
@@ -2074,7 +2231,6 @@ func applicationInsightsAPIKeys(ctx context.Context, a *azurerm, ar *AzureReader
 			return nil, errors.Wrap(err, "unable to list application insigths api keys set from reader")
 		}
 		for _, applicationInsightsAPIKey := range applicationInsightsAPIKeys {
-
 			r := provider.NewResource(*applicationInsightsAPIKey.ID, resourceType, a)
 			resources = append(resources, r)
 		}
@@ -2094,7 +2250,6 @@ func applicationInsightsAnalyticsItems(ctx context.Context, a *azurerm, ar *Azur
 			return nil, errors.Wrap(err, "unable to list application insigths api keys set from reader")
 		}
 		for _, applicationInsightsAnalyticsItem := range applicationInsightsAnalyticsItems {
-
 			r := provider.NewResource(*applicationInsightsAnalyticsItem.ID, resourceType, a)
 			resources = append(resources, r)
 		}
@@ -2111,6 +2266,9 @@ func applicationInsightsWebTests(ctx context.Context, a *azurerm, ar *AzureReade
 	}
 	resources := make([]provider.Resource, 0, len(insightsWebTests))
 	for _, insightsWebTest := range insightsWebTests {
+		if !filterByTags(filters, insightsWebTest.Tags) {
+			continue
+		}
 		r := provider.NewResource(*insightsWebTest.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -2125,6 +2283,9 @@ func logAnalyticsWorkspaces(ctx context.Context, a *azurerm, ar *AzureReader, re
 	}
 	resources := make([]provider.Resource, 0, len(workspaces))
 	for _, workspace := range workspaces {
+		if !filterByTags(filters, workspace.Tags) {
+			continue
+		}
 		r := provider.NewResource(*workspace.ID, resourceType, a)
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
@@ -2148,7 +2309,9 @@ func logAnalyticsLinkedServices(ctx context.Context, a *azurerm, ar *AzureReader
 			return nil, errors.Wrap(err, "unable to list log analytics linked services set from reader")
 		}
 		for _, linkedService := range linkedServices {
-
+			if !filterByTags(filters, linkedService.Tags) {
+				continue
+			}
 			r := provider.NewResource(*linkedService.ID, resourceType, a)
 			resources = append(resources, r)
 		}
@@ -2168,6 +2331,9 @@ func logAnalyticsDatasources(ctx context.Context, a *azurerm, ar *AzureReader, r
 			return nil, errors.Wrap(err, "unable to list log analytics datasources set from reader")
 		}
 		for _, datasource := range datasources {
+			if !filterByTags(filters, datasource.Tags) {
+				continue
+			}
 			if resourceType == "azurerm_log_analytics_datasource_windows_performance_counter" && datasource.Kind != "WindowsPerformanceCounter" {
 				continue
 			} else if resourceType == "azurerm_log_analytics_datasource_windows_event" && datasource.Kind != "WindowsEvent" {
@@ -2188,6 +2354,9 @@ func monitorActionGroups(ctx context.Context, a *azurerm, ar *AzureReader, resou
 	}
 	resources := make([]provider.Resource, 0, len(actionGroups))
 	for _, actionGroup := range actionGroups {
+		if !filterByTags(filters, actionGroup.Tags) {
+			continue
+		}
 		r := provider.NewResource(*actionGroup.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -2201,6 +2370,9 @@ func monitorActivityLogAlerts(ctx context.Context, a *azurerm, ar *AzureReader, 
 	}
 	resources := make([]provider.Resource, 0, len(activityLogAlerts))
 	for _, activityLogAlert := range activityLogAlerts {
+		if !filterByTags(filters, activityLogAlert.Tags) {
+			continue
+		}
 		r := provider.NewResource(*activityLogAlert.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -2214,6 +2386,9 @@ func monitorAutoscaleSettings(ctx context.Context, a *azurerm, ar *AzureReader, 
 	}
 	resources := make([]provider.Resource, 0, len(autoscaleSettings))
 	for _, autoscaleSetting := range autoscaleSettings {
+		if !filterByTags(filters, autoscaleSetting.Tags) {
+			continue
+		}
 		r := provider.NewResource(*autoscaleSetting.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -2227,6 +2402,9 @@ func monitorLogProfiles(ctx context.Context, a *azurerm, ar *AzureReader, resour
 	}
 	resources := make([]provider.Resource, 0, len(logProfiles))
 	for _, logProfile := range logProfiles {
+		if !filterByTags(filters, logProfile.Tags) {
+			continue
+		}
 		r := provider.NewResource(*logProfile.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -2240,6 +2418,9 @@ func monitorMetricAlerts(ctx context.Context, a *azurerm, ar *AzureReader, resou
 	}
 	resources := make([]provider.Resource, 0, len(metricsAlerts))
 	for _, metricsAlert := range metricsAlerts {
+		if !filterByTags(filters, metricsAlert.Tags) {
+			continue
+		}
 		r := provider.NewResource(*metricsAlert.ID, resourceType, a)
 		resources = append(resources, r)
 	}
@@ -2254,6 +2435,9 @@ func webApps(ctx context.Context, a *azurerm, ar *AzureReader, resourceType stri
 	}
 	resources := make([]provider.Resource, 0, len(webApps))
 	for _, webApp := range webApps {
+		if !filterByTags(filters, webApp.Tags) {
+			continue
+		}
 
 		// https://azure.github.io/AppService/2021/08/31/Kind-property-overview.html
 		// is linux if reserved is set
@@ -2281,6 +2465,9 @@ func servicePlans(ctx context.Context, a *azurerm, ar *AzureReader, resourceType
 	}
 	resources := make([]provider.Resource, 0, len(servicePlans))
 	for _, servicePlan := range servicePlans {
+		if !filterByTags(filters, servicePlan.Tags) {
+			continue
+		}
 
 		r := provider.NewResource(*servicePlan.ID, resourceType, a)
 		// we set the name prior of reading it from the state
@@ -2318,7 +2505,9 @@ func staticSites(ctx context.Context, a *azurerm, ar *AzureReader, resourceType 
 	}
 	resources := make([]provider.Resource, 0, len(staticSites))
 	for _, staticSite := range staticSites {
-
+		if !filterByTags(filters, staticSite.Tags) {
+			continue
+		}
 		r := provider.NewResource(*staticSite.ID, resourceType, a)
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
@@ -2342,7 +2531,6 @@ func staticSiteCustomDomains(ctx context.Context, a *azurerm, ar *AzureReader, r
 			return nil, errors.Wrap(err, "unable to list app service static sites custom domains set from reader")
 		}
 		for _, staticSiteCustomDomain := range staticSiteCustomDomains {
-
 			r := provider.NewResource(*staticSiteCustomDomain.ID, resourceType, a)
 			resources = append(resources, r)
 		}
@@ -2362,7 +2550,6 @@ func webAppHybridConnections(ctx context.Context, a *azurerm, ar *AzureReader, r
 			return nil, errors.Wrap(err, "unable to list app service web app hybrid connections set from reader")
 		}
 		for _, hybridConnection := range hybridConnections {
-
 			r := provider.NewResource(*hybridConnection.ID, resourceType, a)
 			resources = append(resources, r)
 		}
@@ -2382,7 +2569,9 @@ func linuxWebAppSlots(ctx context.Context, a *azurerm, ar *AzureReader, resource
 			return nil, errors.Wrap(err, "unable to list app service linux web app deployment slots set from reader")
 		}
 		for _, deploymentSlot := range deploymentSlots {
-
+			if !filterByTags(filters, deploymentSlot.Tags) {
+				continue
+			}
 			r := provider.NewResource(*deploymentSlot.ID, resourceType, a)
 			resources = append(resources, r)
 		}
@@ -2402,7 +2591,9 @@ func windowsWebAppSlots(ctx context.Context, a *azurerm, ar *AzureReader, resour
 			return nil, errors.Wrap(err, "unable to list app service web windows app deployment slots set from reader")
 		}
 		for _, deploymentSlot := range deploymentSlots {
-
+			if !filterByTags(filters, deploymentSlot.Tags) {
+				continue
+			}
 			r := provider.NewResource(*deploymentSlot.ID, resourceType, a)
 			resources = append(resources, r)
 		}
@@ -2417,6 +2608,9 @@ func webAppActiveSlots(ctx context.Context, a *azurerm, ar *AzureReader, resourc
 	}
 	resources := make([]provider.Resource, 0, len(webApps))
 	for _, webApp := range webApps {
+		if !filterByTags(filters, webApp.Tags) {
+			continue
+		}
 
 		if webApp.SiteProperties != nil && webApp.SiteProperties.SlotSwapStatus != nil {
 
@@ -2439,6 +2633,9 @@ func dataProtectionBackupVaults(ctx context.Context, a *azurerm, ar *AzureReader
 	}
 	resources := make([]provider.Resource, 0, len(backupVaults))
 	for _, backupVault := range backupVaults {
+		if !filterByTags(filters, backupVault.Tags) {
+			continue
+		}
 
 		// TODO: recheck with upgrade SDK if still need to change the string to avoid error on import
 		r := provider.NewResource(strings.ReplaceAll(*backupVault.ID, "BackupVault", "backupVault"), resourceType, a)

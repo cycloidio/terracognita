@@ -331,6 +331,22 @@ func importProvider(ctx context.Context, logger kitlog.Logger, p provider.Provid
 	return nil
 }
 
+// initializeTags returns the list of tags for the flagName, as different
+// providers have diferent for them (google names them lables) we need to
+// know the actual name of the flag
+func initializeTags(flagName string) ([]tag.Tag, error) {
+	// Initialize the tags
+	tags := make([]tag.Tag, 0, len(viper.GetStringSlice(flagName)))
+	for _, t := range viper.GetStringSlice(flagName) {
+		tg, err := tag.New(t)
+		if err != nil {
+			return nil, fmt.Errorf("invalid format for --%s with value %q: %w", flagName, t, err)
+		}
+		tags = append(tags, tg)
+	}
+	return tags, nil
+}
+
 func init() {
 	cobra.OnInitialize(initViper)
 	RootCmd.AddCommand(awsCmd)
