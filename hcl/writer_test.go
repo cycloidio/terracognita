@@ -530,6 +530,9 @@ variable "type_name_key" {
 						"nested_key4": "nvalue4.1",
 					},
 				},
+				"=tc=tags": map[string]interface{}{
+					"tagk": "tagv",
+				},
 			}
 			value2 = map[string]interface{}{
 				"key":  "value",
@@ -537,6 +540,7 @@ variable "type_name_key" {
 			}
 			ehcl = `
 resource "type" "name" {
+	tags = var.type_name_tags
   key = var.type_name_key
 	key3 {
 		nested_key3 = var.type_name_key3_nested_key3
@@ -555,6 +559,9 @@ resource "type" "name2" {
 }
 
 module "test" {
+	type_name_tags = {
+		tagk = "tagv"
+	}
   source = "./module-test"
 	type_name2_key = "value"
 	type_name_key = "value"
@@ -593,6 +600,12 @@ variable "type_name_key4_0_nested_key4" {
 variable "type_name_key4_1_nested_key4" {
 	default = "nvalue4.1"
 }
+
+variable "type_name_tags" {
+	default = {
+		tagk = "tagv"
+	}
+}
 `
 		)
 		p.EXPECT().String().Return("aws").Times(2)
@@ -604,6 +617,7 @@ variable "type_name_key4_1_nested_key4" {
 
 		hw := hcl.NewWriter(mx, p, &writer.Options{Interpolate: true, HCLProviderBlock: true, Module: "test", ModuleVariables: map[string]struct{}{
 			"type.key":              struct{}{},
+			"type.tags":             struct{}{},
 			"type.key3.nested_key3": struct{}{},
 			"type.key4.nested_key4": struct{}{},
 		}})

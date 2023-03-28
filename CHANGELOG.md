@@ -4,6 +4,8 @@
 
 - Azurerm now can use the `--tags` filter
   ([Issue #361](https://github.com/cycloidio/terracognita/issues/361))
+- Ability declare module variables on map types
+  ([Issue #365](https://github.com/cycloidio/terracognita/issues/365))
 
 ## [0.8.3] _2023-03-14_
 
