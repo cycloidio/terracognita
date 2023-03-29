@@ -35,6 +35,7 @@ var azureAPIs = []AzureAPI{
 	{PackageIdentifier: "monitor", API: "insights", OtherPath: "monitor/mgmt", APIVersion: "2021-07-01-preview", IsPreview: true},              // used for monitor resources
 	{API: "web", APIVersion: "2021-03-01"},
 	{API: "dataprotection", APIVersion: "2021-07-01"},
+	{API: "apimanagement", APIVersion: "2021-08-01"},
 }
 
 var functions = []Function{
@@ -600,6 +601,8 @@ var functions = []Function{
 	}},
 	// dataprotection
 	{ResourceName: "BackupVaultResource", API: "dataprotection", IrregularClientName: "NewBackupVaultsClient", AzureSDKListFunction: "GetInResourceGroup", ResourceGroup: true},
+	// apimanagement
+	{ResourceName: "ServiceResource", IrregularClientName: "NewServiceClient", FunctionName: "ListAPIManagementServiceResources", API: "apimanagement"},
 }
 
 func main() {

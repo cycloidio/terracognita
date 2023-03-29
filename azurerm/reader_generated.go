@@ -6,6 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/Azure/azure-sdk-for-go/services/apimanagement/mgmt/2021-08-01/apimanagement"
 	"github.com/Azure/azure-sdk-for-go/services/appinsights/mgmt/2020-02-02/insights"
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2021-12-01/compute"
 	"github.com/Azure/azure-sdk-for-go/services/containerregistry/mgmt/2019-05-01/containerregistry"
@@ -2399,6 +2400,31 @@ func (ar *AzureReader) ListBackupVaultResources(ctx context.Context) ([]dataprot
 	}
 
 	resources := make([]dataprotection.BackupVaultResource, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListAPIManagementServiceResources returns a list of ServiceResources within a subscription
+func (ar *AzureReader) ListAPIManagementServiceResources(ctx context.Context) ([]apimanagement.ServiceResource, error) {
+	client := apimanagement.NewServiceClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list apimanagement.ServiceResource from Azure APIs")
+	}
+
+	resources := make([]apimanagement.ServiceResource, 0)
 	for output.NotDone() {
 
 		for _, res := range output.Values() {
