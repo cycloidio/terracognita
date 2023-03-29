@@ -27,6 +27,7 @@ import (
 const (
 	defaultCategory      = "hcl"
 	variablesCategoryKey = "variables"
+	isMap                = true
 )
 
 // Writer is a Writer implementation that writes to
@@ -359,7 +360,12 @@ func (w *Writer) setVariables() {
 	}
 
 	for k, v := range variables {
-		w.Config[writer.ModuleCategoryKey]["module"].(map[string]interface{})[w.opts.Module].(map[string]interface{})[fmt.Sprintf("%s", k)] = v.(map[string]interface{})["default"]
+		msi := v.(map[string]interface{})
+		if d, ok := msi["default"]; ok {
+			w.Config[writer.ModuleCategoryKey]["module"].(map[string]interface{})[w.opts.Module].(map[string]interface{})[k] = d
+		} else if d, ok := msi["=tc=default"]; ok {
+			w.Config[writer.ModuleCategoryKey]["module"].(map[string]interface{})[w.opts.Module].(map[string]interface{})[fmt.Sprintf("=tc=%s", k)] = d
+		}
 	}
 }
 
@@ -371,13 +377,29 @@ func walkVariables(cfg map[string]interface{}, validVariables map[string]struct{
 		currentKey := fmt.Sprintf("%s.%s", k, key)
 		switch v := value.(type) {
 		case map[string]interface{}:
-			cfg[key] = walkVariables(v, validVariables, currentKey, variables)
+			if ok, nk := hasKey(validVariables, currentKey, isMap); ok {
+				varName := util.NormalizeName(strings.ReplaceAll(nk, ".", "_"))
+				prefix := ""
+				if strings.Contains(currentKey, "=tc=") {
+					prefix = "=tc="
+				}
+				variables[varName] = map[string]interface{}{
+					fmt.Sprintf("%sdefault", prefix): cfg[key],
+				}
+				cfg[key] = fmt.Sprintf("${var.%s}", varName)
+			} else {
+				cfg[key] = walkVariables(v, validVariables, currentKey, variables)
+			}
 		case []interface{}:
 			if len(v) == 0 {
-				if hasKey(validVariables, currentKey) {
-					varName := util.NormalizeName(strings.ReplaceAll(currentKey, ".", "_"))
+				if ok, nk := hasKey(validVariables, currentKey, !isMap); ok {
+					varName := util.NormalizeName(strings.ReplaceAll(nk, ".", "_"))
+					prefix := ""
+					if strings.Contains(currentKey, "=tc=") {
+						prefix = "=tc="
+					}
 					variables[varName] = map[string]interface{}{
-						"default": cfg[key],
+						fmt.Sprintf("%sdefault", prefix): cfg[key],
 					}
 					cfg[key] = fmt.Sprintf("${var.%s}", varName)
 				}
@@ -390,10 +412,14 @@ func walkVariables(cfg map[string]interface{}, validVariables map[string]struct{
 					v[i] = walkVariables(vvv.(map[string]interface{}), validVariables, fmt.Sprintf("%s.%d", currentKey, i), variables)
 				}
 			} else {
-				if hasKey(validVariables, currentKey) {
-					varName := util.NormalizeName(strings.ReplaceAll(currentKey, ".", "_"))
+				if ok, nk := hasKey(validVariables, currentKey, !isMap); ok {
+					varName := util.NormalizeName(strings.ReplaceAll(nk, ".", "_"))
+					prefix := ""
+					if strings.Contains(currentKey, "=tc=") {
+						prefix = "=tc="
+					}
 					variables[varName] = map[string]interface{}{
-						"default": cfg[key],
+						fmt.Sprintf("%sdefault", prefix): cfg[key],
 					}
 					cfg[key] = fmt.Sprintf("${var.%s}", varName)
 				}
@@ -401,10 +427,14 @@ func walkVariables(cfg map[string]interface{}, validVariables map[string]struct{
 		default:
 			// This means is a "simple" value so we can
 			// directly replace it with the variable
-			if hasKey(validVariables, currentKey) {
-				varName := util.NormalizeName(strings.ReplaceAll(currentKey, ".", "_"))
+			if ok, nk := hasKey(validVariables, currentKey, !isMap); ok {
+				varName := util.NormalizeName(strings.ReplaceAll(nk, ".", "_"))
+				prefix := ""
+				if strings.Contains(currentKey, "=tc=") {
+					prefix = "=tc="
+				}
 				variables[varName] = map[string]interface{}{
-					"default": cfg[key],
+					fmt.Sprintf("%sdefault", prefix): cfg[key],
 				}
 				cfg[key] = fmt.Sprintf("${var.%s}", varName)
 			}
@@ -421,9 +451,12 @@ var (
 // The key will have the format: aws_instance.front.attr1.attr2...
 // and the validVariables will not have the `front` interpolation, also
 // it'll validate that if validVariables is empty it's always true
-func hasKey(validVariables map[string]struct{}, key string) bool {
+// It also returns the key to use in case is a special =tc= key
+// The isMap is used to not return true if validVariables is empty, because then
+// all the resources would not be written as all would be variables
+func hasKey(validVariables map[string]struct{}, key string, isMap bool) (bool, string) {
 	if len(validVariables) == 0 {
-		return true
+		return !isMap, key
 	}
 
 	sk := strings.Split(key, ".")
@@ -437,7 +470,12 @@ func hasKey(validVariables map[string]struct{}, key string) bool {
 	nk := reIndexKey.ReplaceAllString(strings.Join(k, "."), ".")
 	_, ok := validVariables[nk]
 
-	return ok
+	if !ok && strings.Contains(key, "=tc=") {
+		key = strings.Replace(key, "=tc=", "", -1)
+		ok, key = hasKey(validVariables, key, isMap)
+	}
+
+	return ok, key
 }
 
 // writeTuple will write anything that's already been identified as IsTupleType
