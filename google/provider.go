@@ -126,3 +126,4 @@ func (g *google) TFProvider() *schema.Provider {
 	return g.tfProvider
 }
 func (g *google) FixResource(t string, v cty.Value) (cty.Value, error) { return v, nil }
+func (g *google) FilterByTags(tags interface{}) error                  { return nil }

@@ -344,3 +344,4 @@ func (a *azurerm) FixResource(t string, v cty.Value) (cty.Value, error) {
 	}
 	return v, nil
 }
+func (a *azurerm) FilterByTags(tags interface{}) error { return nil }
