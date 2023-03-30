@@ -65,8 +65,8 @@ func ResourceTypeString(s string) (ResourceType, error) {
 	if val, ok := _ResourceTypeNameToValueMap[s]; ok {
 		return val, nil
 	}
-	s = strings.ToLower(s)
-	if val, ok := _ResourceTypeNameToValueMap[s]; ok {
+
+	if val, ok := _ResourceTypeNameToValueMap[strings.ToLower(s)]; ok {
 		return val, nil
 	}
 	return 0, fmt.Errorf("%s does not belong to ResourceType values", s)

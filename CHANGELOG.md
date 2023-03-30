@@ -1,6 +1,10 @@
 ## [Unreleased]
 
 ## Added
+- Added new AWS resources: `aws_ec2_managed_prefix_list`
+  ([Issue #368](https://github.com/cycloidio/terracognita/issues/368))
+
+## Added
 
 - Azurerm now can use the `--tags` filter
   ([Issue #361](https://github.com/cycloidio/terracognita/issues/361))
