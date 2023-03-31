@@ -1,7 +1,7 @@
 ## [Unreleased]
 
 ## Added
-- Added new AWS resource `ec2_aws_managed_prefix_lists`
+- Added new AWS resource `aws_ec2_managed_prefix_lists`
   ([Issue #368](https://github.com/cycloidio/terracognita/issues/368))
 
 ## Added
