@@ -478,6 +478,16 @@ var (
 			`,
 		},
 		Function{
+			FnName:  "GetManagedPrefixLists",
+			Entity:  "ManagedPrefixLists",
+			Prefix:  "Describe",
+			Service: "ec2",
+			Documentation: `
+			// GetManagedPrefixLists returns the ec2 Managed Prefix Lists on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
 			FnName:  "GetTransitGateways",
 			Entity:  "TransitGateways",
 			Prefix:  "Describe",

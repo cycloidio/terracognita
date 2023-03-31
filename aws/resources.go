@@ -84,6 +84,7 @@ const (
 	ECSCluster
 	ECSService
 	ECSTaskDefinition
+	EC2ManagedPrefixList
 	EC2TransitGateway
 	EC2TransitGatewayVPCAttachment
 	EC2TransitGatewayRouteTable
@@ -225,6 +226,7 @@ var (
 		ECSCluster:                                 cacheECSClusters,
 		ECSService:                                 ecsServices,
 		ECSTaskDefinition:                          ecsTaskDefinitions,
+		EC2ManagedPrefixList:                       ec2ManagedPrefixList,
 		EC2TransitGateway:                          ec2TransitGateways,
 		EC2TransitGatewayVPCAttachment:             ec2TransitGatewayVPCAttachment,
 		EC2TransitGatewayRouteTable:                cacheTransitGatewayRouteTables,
@@ -1270,6 +1272,26 @@ func ecsTaskDefinitions(ctx context.Context, a *aws, resourceType string, filter
 
 	for _, taskDefinitionArn := range ecsTaskDefinitionArns {
 		r, err := initializeResource(a, *taskDefinitionArn, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func ec2ManagedPrefixList(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	managedPrefixList, err := a.awsr.GetManagedPrefixLists(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+
+	for _, i := range managedPrefixList {
+		r, err := initializeResource(a, *i.PrefixListId, resourceType)
 		if err != nil {
 			return nil, err
 		}
