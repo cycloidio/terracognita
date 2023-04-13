@@ -52,6 +52,20 @@ func (mr *ProviderMockRecorder) Configuration() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Configuration", reflect.TypeOf((*Provider)(nil).Configuration))
 }
 
+// FilterByTags mocks base method.
+func (m *Provider) FilterByTags(arg0 interface{}) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FilterByTags", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// FilterByTags indicates an expected call of FilterByTags.
+func (mr *ProviderMockRecorder) FilterByTags(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FilterByTags", reflect.TypeOf((*Provider)(nil).FilterByTags), arg0)
+}
+
 // FixResource mocks base method.
 func (m *Provider) FixResource(arg0 string, arg1 cty.Value) (cty.Value, error) {
 	m.ctrl.T.Helper()

@@ -117,3 +117,4 @@ func (vs vsphere) Source() string { return "hashicorp/vsphere" }
 
 func (vs vsphere) Configuration() map[string]interface{}                { return vs.configuration }
 func (vs vsphere) FixResource(t string, v cty.Value) (cty.Value, error) { return v, nil }
+func (vs vsphere) FilterByTags(tags interface{}) error                  { return nil }

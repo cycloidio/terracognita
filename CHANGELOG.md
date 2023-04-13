@@ -7,6 +7,11 @@
 - Ability declare module variables on map types
   ([Issue #365](https://github.com/cycloidio/terracognita/issues/365))
 
+### Changed
+
+- Validation for specific provider tags to ignore is done now on the Provider implementation
+  ([Issue #358](https://github.com/cycloidio/terracognita/issues/358))
+
 ## [0.8.3] _2023-03-14_
 
 ### Fixed
