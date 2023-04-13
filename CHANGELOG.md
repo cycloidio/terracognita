@@ -11,6 +11,8 @@
 
 - Validation for specific provider tags to ignore is done now on the Provider implementation
   ([Issue #358](https://github.com/cycloidio/terracognita/issues/358))
+- Added new Azure resource: `azurerm_api_management`
+  ([PR#363](https://github.com/cycloidio/terracognita/pull/363))
 
 ## [0.8.3] _2023-03-14_
 
