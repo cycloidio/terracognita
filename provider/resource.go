@@ -436,12 +436,13 @@ func (r *resource) ResourceInstanceObject() *states.ResourceInstanceObject {
 // mergeFullConfig creates the key to the map and if it had a value before set it, if
 func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, key string) map[string]interface{} {
 	res := make(map[string]interface{})
-	// conflicts has all the possible conflicts that we can have at this level
+	// conflicts and exactly have all the possible conflicts that we can have at this level
 	// of the schema, so we do not add a conflicted attribute after the other.
 	// The structure is:
 	// * key: Value that is Conflicted with
 	// * value: Attribute that has Clonflicts
 	conflicts := make(map[string]string)
+	exactly := make(map[string]string)
 	for k, v := range sch {
 		// If it's just a Computed value, do not add it to the output
 		if !isConfig(v) {
@@ -510,13 +511,17 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 			continue
 		}
 
-		// Format the ConflictsWith so they are "standard"
-		conflictsWith := formatConflictsWith(v.ConflictsWith)
+		// Format the ConflictsWith and ExactlyOneOf so they are "standard"
+		conflictsWith := formatAttributePaths(v.ConflictsWith)
+		exactlyOneOf := formatAttributePaths(v.ExactlyOneOf)
 
 		// A value in which this one conflicts has been set before
 		// so we should no set this one as it'll raise an error of
 		// `conflicts with *` on Terraform
-		if hasConflict(res, conflictsWith) {
+		if mapHasKeys(res, conflictsWith) {
+			continue
+		}
+		if mapHasKeys(res, exactlyOneOf) {
 			continue
 		}
 
@@ -526,6 +531,9 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 		if c, ok := conflicts[k]; ok {
 			delete(res, c)
 		}
+		if e, ok := exactly[k]; ok {
+			delete(res, e)
+		}
 
 		// If the ConflictsWith has values we store them on the
 		// conflicts map so none of those attributes is added after
@@ -533,6 +541,11 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 		if len(conflictsWith) != 0 {
 			for _, c := range conflictsWith {
 				conflicts[c] = k
+			}
+		}
+		if len(exactlyOneOf) != 0 {
+			for _, e := range exactlyOneOf {
+				exactly[e] = k
 			}
 		}
 
@@ -551,11 +564,11 @@ func mergeFullConfig(cfgr *schema.ResourceData, sch map[string]*schema.Schema, k
 	return res
 }
 
-// formatConflictsWith get's the last element of the string, the
+// formatAttributePaths get's the last element of the string, the
 // cws look like this sometimes '["name", "a.name", "a.0.name"]'
 // and as we always need the "name" from all of them we just have
 // to abstract the last element
-func formatConflictsWith(cws []string) []string {
+func formatAttributePaths(cws []string) []string {
 	for i, cw := range cws {
 		aux := strings.Split(cw, ".")
 		cws[i] = aux[len(aux)-1]
@@ -563,8 +576,8 @@ func formatConflictsWith(cws []string) []string {
 	return cws
 }
 
-// hasConflict checks if any of the keys is present on the res
-func hasConflict(res map[string]interface{}, keys []string) bool {
+// mapHasKeys checks if any of the keys is present on the res
+func mapHasKeys(res map[string]interface{}, keys []string) bool {
 	for _, key := range keys {
 		if _, ok := res[key]; ok {
 			return true

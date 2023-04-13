@@ -59,14 +59,14 @@ import (
 //
 // The accountID is helpful to return only the AMI or snapshots that belong to the account.
 //
-// While the region has to be a valid AWS region
+// # While the region has to be a valid AWS region
 //
 // An error is returned if any of the needed AWS request for creating the reader returns an AWS error, in such case it
 // will have any of the common error codes (see below) or EmptyStaticCreds code or a go standard error in case that no
 // regions are matched with the ones available, at the time, in AWS.
 // See:
-//  * https://docs.aws.amazon.com/AWSEC2/latest/APIReference/errors-overview.html#CommonErrors
-//  * https://docs.aws.amazon.com/STS/latest/APIReference/CommonErrors.html
+//   - https://docs.aws.amazon.com/AWSEC2/latest/APIReference/errors-overview.html#CommonErrors
+//   - https://docs.aws.amazon.com/STS/latest/APIReference/CommonErrors.html
 func New(ctx context.Context, accessKey, secretKey, region, sessionToken string, config *aws.Config) (Reader, error) {
 	var c = connector{}
 
