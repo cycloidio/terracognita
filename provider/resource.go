@@ -642,6 +642,10 @@ func normalizeSetList(sch map[string]*schema.Schema, list []interface{}) interfa
 					if !isDefault(sch[k], ns) {
 						res[k] = ns
 					}
+				case map[string]interface{}:
+					if !isDefault(sch[k], v) {
+						res[fmt.Sprintf("=tc=%s", k)] = v
+					}
 				case interface{}:
 					if !isDefault(sch[k], v) {
 						res[k] = v
