@@ -540,13 +540,13 @@ func (w *Writer) Interpolate(i *interpolator.Interpolator) {
 		(w.opts.HasModule() && len(w.opts.ModuleVariables) == 0) {
 		return
 	}
+	// who's interpolated with who
+	relations := make(map[string]struct{}, 0)
 	for k, v := range w.Config {
 		if k == writer.ModuleCategoryKey || k == variablesCategoryKey || k == w.opts.TerraformCategoryKey {
 			continue
 		}
 		resources := v["resource"]
-		// who's interpolated with who
-		relations := make(map[string]struct{}, 0)
 		// we need to isolate each resource
 		// getting each resource is easier to avoid cycle
 		// or interpolation.
@@ -560,7 +560,7 @@ func (w *Writer) Interpolate(i *interpolator.Interpolator) {
 				dest := reflect.New(src.Type()).Elem()
 
 				// walk through the resources to interpolate the good values
-				w.walkInterpolation(dest, src, i, name, "", rt, &relations)
+				w.walkInterpolation(dest, src, i, name, "", rt, relations)
 
 				// remove reflect.Value wrapper from dest
 				resources.(map[string]map[string]interface{})[rt][name] = dest.Interface()
@@ -571,7 +571,7 @@ func (w *Writer) Interpolate(i *interpolator.Interpolator) {
 
 // walkInterpolation through a resource block. it's easier since we do not know how the block is made
 // `dest` will be the new "block" with the values interpolated from `interpolate`
-func (w *Writer) walkInterpolation(dest, src reflect.Value, interpolate *interpolator.Interpolator, name, key string, resourceType string, relations *map[string]struct{}) {
+func (w *Writer) walkInterpolation(dest, src reflect.Value, interpolate *interpolator.Interpolator, name, key string, resourceType string, relations map[string]struct{}) {
 	switch src.Kind() {
 	// it's an interface, so we basically need
 	// to extract the elem and walk through it
@@ -630,7 +630,7 @@ func (w *Writer) walkInterpolation(dest, src reflect.Value, interpolate *interpo
 			if !(strings.Contains(interpolatedValue, name) || strings.Contains(interpolatedValue, resourceType) || isMutualInterpolation(target, source, relations)) {
 				dest.SetString(interpolatedValue)
 				// we store this new relationship
-				(*relations)[fmt.Sprintf("%s+%s", source, target)] = struct{}{}
+				relations[fmt.Sprintf("%s+%s", source, target)] = struct{}{}
 			} else {
 				dest.SetString(src.Interface().(string))
 			}
@@ -645,11 +645,11 @@ func (w *Writer) walkInterpolation(dest, src reflect.Value, interpolate *interpo
 // isMutualInterpolation will simply go through the list of relations to find out
 // if a relation is already present between the two resources in one direction
 // or the other
-func isMutualInterpolation(target, source string, relations *map[string]struct{}) bool {
-	if _, ok := (*relations)[fmt.Sprintf("%s+%s", source, target)]; ok {
+func isMutualInterpolation(target, source string, relations map[string]struct{}) bool {
+	if _, ok := relations[fmt.Sprintf("%s+%s", source, target)]; ok {
 		return true
 	}
-	if _, ok := (*relations)[fmt.Sprintf("%s+%s", target, source)]; ok {
+	if _, ok := relations[fmt.Sprintf("%s+%s", target, source)]; ok {
 		return true
 	}
 	return false

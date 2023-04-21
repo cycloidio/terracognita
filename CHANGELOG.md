@@ -20,6 +20,8 @@
 
 - Nested HCL Maps now are written correctly
   ([Issue #337](https://github.com/cycloidio/terracognita/issues/337))
+- Cyclic dependencies between resources now it's fixed
+  ([Issue #379](https://github.com/cycloidio/terracognita/issues/379))
 
 ## [0.8.3] _2023-03-14_
 
