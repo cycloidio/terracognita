@@ -22,6 +22,8 @@
   ([Issue #337](https://github.com/cycloidio/terracognita/issues/337))
 - Cyclic dependencies between resources now it's fixed
   ([Issue #379](https://github.com/cycloidio/terracognita/issues/379))
+- `aws_db_subnet_group` that have `name: "default"` are now ignored as they are managed by AWS
+  ([Issue #376](https://github.com/cycloidio/terracognita/issues/376))
 
 ## [0.8.3] _2023-03-14_
 
