@@ -24,6 +24,8 @@
   ([Issue #379](https://github.com/cycloidio/terracognita/issues/379))
 - `aws_db_subnet_group` that have `name: "default"` are now ignored as they are managed by AWS
   ([Issue #376](https://github.com/cycloidio/terracognita/issues/376))
+- `aws_alb_listener_rule` and `aws_lb_listener_rule` that have `priority: 99999` are now ignored as they are managed by AWS
+  ([Issue #375](https://github.com/cycloidio/terracognita/issues/375))
 
 ## [0.8.3] _2023-03-14_
 
