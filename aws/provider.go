@@ -154,6 +154,28 @@ func (a *aws) FixResource(t string, v cty.Value) (cty.Value, error) {
 		if err != nil {
 			return v, errors.Wrapf(err, "failed to fix resources")
 		}
+	case "aws_alb_listener_rule", "aws_lb_listener_rule":
+		err = cty.Walk(v, func(path cty.Path, val cty.Value) (bool, error) {
+			if len(path) > 0 {
+				if gas, ok := path[0].(cty.GetAttrStep); ok {
+					switch gas.Name {
+					case "priority":
+						var sp string
+						err := gocty.FromCtyValue(val, &sp)
+						if err != nil {
+							return false, errors.Wrapf(err, "failed to convert CTY value to GO type")
+						}
+						if sp == "99999" {
+							return false, fmt.Errorf("ignoring 'aws_alb_listener_rule' or 'aws_lb_listener_rule' with 'priority: 99999' name as it's managed for AWS")
+						}
+					}
+				}
+			}
+			return true, nil
+		})
+		if err != nil {
+			return v, errors.Wrapf(err, "failed to fix resources")
+		}
 	}
 	return v, nil
 }
