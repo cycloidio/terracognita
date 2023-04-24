@@ -121,12 +121,10 @@ func Import(ctx context.Context, p Provider, hcl, tfstate writer.Writer, f *filt
 			for _, r := range append([]Resource{re}, res...) {
 				err = util.RetryDefault(func() error { return r.Read(f) })
 				if err != nil {
-					cause := errors.Cause(err)
-
 					// Errors are ignored. If a resource is invalid we assume it can be skipped, it can be related to inconsistencies in deployed resources.
 					// So instead of failing and stopping execution we ignore them and continue (we log them if -v is specified)
 
-					logger.Log("error", cause)
+					logger.Log("error", err)
 
 					continue
 				}
