@@ -11,7 +11,7 @@
 
 Imports your current Cloud infrastructure to an Infrastructure As Code [Terraform](https://www.terraform.io/) configuration (HCL) or/and to a Terraform State.
 
-At [Cycloid](https://www.cycloid.io/), Infrastructure As Code is in the company DNA since the beginning. To help our new customers adopting this best practice, we decided to build Terracognita to convert an existing infrastructure on Cloud Infrastructure into Terraform code in an automated way, relying on Terraform providers built by the community. We focused on AWS, GCP and Azure but Alibaba, Vmware and Openstack will be the next to be integrated.
+At [Cycloid](https://www.cycloid.io/), Infrastructure As Code is in the company DNA since the beginning. To help our new customers adopting this best practice, we decided to build Terracognita to convert an existing infrastructure on Cloud Infrastructure into Terraform code in an automated way, relying on Terraform providers built by the community. We focused on AWS, GCP, Azure and Vmware.
 
 We decided to Open Source this tool as we believe that it will help people to adopt IaC in an easy way. Cycloid provides this tool to let people import their infrastructure into [Cycloid's pipelines](https://www.cycloid.io/devops-framework), allow them to generate infrastructure diagram and manage all infra/application life cycle from a single interface.
 
@@ -199,7 +199,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Meet Cycloid
 
-[Cycloid](https://www.cycloid.io/) is a hybrid cloud DevOps collaboration platform providing end-to-end frameworks to accelerate and industrialize software delivery.
+[Cycloid](https://www.cycloid.io/) is a sustainable platform engineering to allow anyone to interact with tools, automation and cloud without having to become an expert and in respect of the best practices. Inside the self-service portal, you find some modules around Governance, deployment, operations, Finops and GreenOps. InfraImport inside Cycloid is the visual representation of Terracognita. 
 
 As of now, we have three open-source tools:
 
@@ -207,4 +207,4 @@ As of now, we have three open-source tools:
 * [InfraMap](https://github.com/cycloidio/inframap): Reads .tfstate or HCL to generate a graph specific for each provider
 * [TerraCost](https://github.com/cycloidio/terracost): Cloud cost estimation for Terraform in the CLI
 
-...and the functionality of each is also embedded in our DevOps solution, which you can find out more about [here](https://www.cycloid.io/hybrid-cloud-devops-platform).
+...and the functionality of each is also embedded in our platform, which you can find out more about [here](https://www.cycloid.io).
