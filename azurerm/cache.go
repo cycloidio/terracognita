@@ -23,7 +23,8 @@ import (
 //   Application Insights -> application_insights
 //   Log analytics -> log_analytics_workspace
 //   App service -> web_app, service_plans, static_sites
-
+//   Data protection -> vault
+//   Recovery Services -> vault
 //Network
 
 func cacheVirtualNetworks(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]provider.Resource, error) {
@@ -846,6 +847,79 @@ func getStaticSites(ctx context.Context, a *azurerm, ar *AzureReader, rt string,
 	return names, nil
 }
 
+// Data Protection
+func cacheDataProtectionBackupVaults(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]provider.Resource, error) {
+	rs, err := a.cache.Get(rt)
+	if err != nil {
+		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
+			return nil, errors.WithStack(err)
+		}
+
+		rs, err = dataProtectionBackupVaults(ctx, a, ar, rt, filters)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to get data protection backup vaults")
+		}
+
+		err = a.cache.Set(rt, rs)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return rs, nil
+}
+
+func getDataProtectionBackupVaults(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]string, error) {
+	rs, err := cacheDataProtectionBackupVaults(ctx, a, ar, rt, filters)
+	if err != nil {
+		return nil, err
+	}
+
+	names := make([]string, 0, len(rs))
+	for _, i := range rs {
+		names = append(names, i.Data().Get("name").(string))
+	}
+
+	return names, nil
+}
+
+// Recovery Services
+func cacheRecoveryServicesVaults(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]provider.Resource, error) {
+	rs, err := a.cache.Get(rt)
+	if err != nil {
+		if errors.Cause(err) != errcode.ErrCacheKeyNotFound {
+			return nil, errors.WithStack(err)
+		}
+
+		rs, err = recoveryServicesVaults(ctx, a, ar, rt, filters)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to get recovery services vaults")
+		}
+
+		err = a.cache.Set(rt, rs)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return rs, nil
+}
+
+func getRecoveryServicesVaults(ctx context.Context, a *azurerm, ar *AzureReader, rt string, filters *filter.Filter) ([]string, error) {
+	rs, err := cacheRecoveryServicesVaults(ctx, a, ar, rt, filters)
+	if err != nil {
+		return nil, err
+	}
+
+	names := make([]string, 0, len(rs))
+	for _, i := range rs {
+		names = append(names, i.Data().Get("name").(string))
+	}
+
+	return names, nil
+}
+
+// helper to delete duplicated strings
 func removeDuplicateStr(strSlice []string) []string {
 	allKeys := make(map[string]struct{})
 	list := []string{}

@@ -29,6 +29,8 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/preview/sql/mgmt/v5.0/sql"
 	"github.com/Azure/azure-sdk-for-go/services/preview/sqlvirtualmachine/mgmt/2017-03-01-preview/sqlvirtualmachine"
 	"github.com/Azure/azure-sdk-for-go/services/privatedns/mgmt/2018-09-01/privatedns"
+	"github.com/Azure/azure-sdk-for-go/services/recoveryservices/mgmt/2021-08-01/recoveryservices"
+	"github.com/Azure/azure-sdk-for-go/services/recoveryservices/mgmt/2021-12-01/backup"
 	"github.com/Azure/azure-sdk-for-go/services/redis/mgmt/2020-12-01/redis"
 	"github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2021-08-01/storage"
 	"github.com/Azure/azure-sdk-for-go/services/web/mgmt/2021-03-01/web"
@@ -2414,6 +2416,56 @@ func (ar *AzureReader) ListBackupVaultResources(ctx context.Context) ([]dataprot
 
 }
 
+// ListBackupInstanceResources returns a list of BackupInstanceResources within a subscription and a resource group
+func (ar *AzureReader) ListBackupInstanceResources(ctx context.Context, vaultName string) ([]dataprotection.BackupInstanceResource, error) {
+	client := dataprotection.NewBackupInstancesClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, vaultName, ar.GetResourceGroupName())
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list dataprotection.BackupInstanceResource from Azure APIs")
+	}
+
+	resources := make([]dataprotection.BackupInstanceResource, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListBaseBackupPolicyResources returns a list of BaseBackupPolicyResources within a subscription and a resource group
+func (ar *AzureReader) ListBaseBackupPolicyResources(ctx context.Context, vaultName string) ([]dataprotection.BaseBackupPolicyResource, error) {
+	client := dataprotection.NewBackupPoliciesClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, vaultName, ar.GetResourceGroupName())
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list dataprotection.BaseBackupPolicyResource from Azure APIs")
+	}
+
+	resources := make([]dataprotection.BaseBackupPolicyResource, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
 // ListAPIManagementServiceResources returns a list of ServiceResources within a subscription
 func (ar *AzureReader) ListAPIManagementServiceResources(ctx context.Context) ([]apimanagement.ServiceResource, error) {
 	client := apimanagement.NewServiceClient(ar.config.SubscriptionID)
@@ -2425,6 +2477,81 @@ func (ar *AzureReader) ListAPIManagementServiceResources(ctx context.Context) ([
 	}
 
 	resources := make([]apimanagement.ServiceResource, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListRecoveryServicesVault returns a list of Vaults within a subscription and a resource group
+func (ar *AzureReader) ListRecoveryServicesVault(ctx context.Context) ([]recoveryservices.Vault, error) {
+	client := recoveryservices.NewVaultsClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName())
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list recoveryservices.Vault from Azure APIs")
+	}
+
+	resources := make([]recoveryservices.Vault, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListBackupPolicies returns a list of ProtectionPolicyResources within a subscription and a resource group
+func (ar *AzureReader) ListBackupPolicies(ctx context.Context, filter string, vaultName string) ([]backup.ProtectionPolicyResource, error) {
+	client := backup.NewPoliciesClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, filter, ar.GetResourceGroupName(), vaultName)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list backup.ProtectionPolicyResource from Azure APIs")
+	}
+
+	resources := make([]backup.ProtectionPolicyResource, 0)
+	for output.NotDone() {
+
+		for _, res := range output.Values() {
+			resources = append(resources, res)
+		}
+
+		if err := output.NextWithContext(ctx); err != nil {
+			break
+		}
+	}
+	return resources, nil
+
+}
+
+// ListBackupProtectedItems returns a list of ProtectedItemResources within a subscription and a resource group
+func (ar *AzureReader) ListBackupProtectedItems(ctx context.Context, vaultName string, filter string, skipToken string) ([]backup.ProtectedItemResource, error) {
+	client := backup.NewProtectedItemsGroupClient(ar.config.SubscriptionID)
+	client.Authorizer = ar.authorizer
+
+	output, err := client.List(ctx, vaultName, ar.GetResourceGroupName(), filter, skipToken)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list backup.ProtectedItemResource from Azure APIs")
+	}
+
+	resources := make([]backup.ProtectedItemResource, 0)
 	for output.NotDone() {
 
 		for _, res := range output.Values() {

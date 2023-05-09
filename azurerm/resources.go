@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/cycloidio/terracognita/filter"
+	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/provider"
 )
 
@@ -171,8 +172,15 @@ const (
 	WebAppHybridConnection
 	// Data Protection
 	DataProtectionBackupVault
+	DataProtectionBackupInstanceDisk
+	DataProtectionBackupPolicyDisk
 	// API Management
 	APIManagement
+	// Recovery Services
+	RecoveryServicesVault
+	//Recovery Services - backup
+	BackupPolicyVM
+	BackupProtectedVM
 )
 
 type rtFn func(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error)
@@ -332,9 +340,16 @@ var (
 		StaticSiteCustomDomain: staticSiteCustomDomains,
 		WebAppHybridConnection: webAppHybridConnections,
 		// Data protection
-		DataProtectionBackupVault: dataProtectionBackupVaults,
+		DataProtectionBackupVault:        dataProtectionBackupVaults,
+		DataProtectionBackupInstanceDisk: dataProtectionBackupInstanceDisks,
+		DataProtectionBackupPolicyDisk:   dataProtectionBackupPolicyDisks,
 		// API Management
 		APIManagement: apiManagements,
+		// Recovery Services
+		RecoveryServicesVault: recoveryServicesVaults,
+		//Recovery Services - backup
+		BackupPolicyVM:    backupPolicyVMs,
+		BackupProtectedVM: backupProtectedVMs,
 	}
 )
 
@@ -466,7 +481,7 @@ func virtualMachineScaleSets(ctx context.Context, a *azurerm, ar *AzureReader, r
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
 		if err := r.Data().Set("name", *virtualMachineScaleSet.Name); err != nil {
-			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the virtual machine '%s'", *virtualMachineScaleSet.Name)
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the virtual machine scale set '%s'", *virtualMachineScaleSet.Name)
 		}
 		resources = append(resources, r)
 	}
@@ -689,7 +704,7 @@ func networkSecurityGroups(ctx context.Context, a *azurerm, ar *AzureReader, res
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
 		if err := r.Data().Set("name", *securityGroup.Name); err != nil {
-			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the virtual machine '%s'", *securityGroup.Name)
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the security group '%s'", *securityGroup.Name)
 		}
 		resources = append(resources, r)
 	}
@@ -2646,12 +2661,72 @@ func dataProtectionBackupVaults(ctx context.Context, a *azurerm, ar *AzureReader
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
 		if err := r.Data().Set("name", *backupVault.Name); err != nil {
-			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the app service static site '%s'", *backupVault.Name)
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the data protection backup vault '%s'", *backupVault.Name)
 		}
 		resources = append(resources, r)
 	}
 	return resources, nil
 }
+
+func dataProtectionBackupInstanceDisks(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	vaultNames, err := getDataProtectionBackupVaults(ctx, a, ar, DataProtectionBackupVault.String(), filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list data protection backup vaults from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, vaultName := range vaultNames {
+		backupInstanceResources, err := ar.ListBackupInstanceResources(ctx, vaultName)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list backup instance resources from reader")
+		}
+		logger := log.Get()
+		logger.Log("here", len(backupInstanceResources))
+		for _, backupInstanceResource := range backupInstanceResources {
+			if props := backupInstanceResource.Properties; props != nil {
+				if info := backupInstanceResource.Properties.DataSourceInfo; info != nil {
+					if *info.ResourceType == "Microsoft.Compute/disks" {
+						r := provider.NewResource(fmt.Sprintf("/subscriptions/%s/resourceGroups/%s/providers/Microsoft.DataProtection/backupVaults/%s/backupInstances/%s", ar.config.SubscriptionID, ar.GetResourceGroupName(), vaultName, *backupInstanceResource.Name), resourceType, a)
+						resources = append(resources, r)
+					}
+				}
+			}
+		}
+	}
+	return resources, nil
+}
+
+func dataProtectionBackupPolicyDisks(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	vaultNames, err := getDataProtectionBackupVaults(ctx, a, ar, DataProtectionBackupVault.String(), filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list data protection backup vaults from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, vaultName := range vaultNames {
+		backupPolicyResources, err := ar.ListBaseBackupPolicyResources(ctx, vaultName)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list backup instance resources from reader")
+		}
+		for _, backupPolicyResource := range backupPolicyResources {
+
+			if info, ok := backupPolicyResource.Properties.AsBackupPolicy(); ok {
+				isDisk := false
+				for _, v := range *info.DatasourceTypes {
+					if v == "Microsoft.Compute/disks" {
+						isDisk = true
+						break
+					}
+				}
+				if isDisk {
+					r := provider.NewResource(*backupPolicyResource.ID, resourceType, a)
+					resources = append(resources, r)
+				}
+			}
+		}
+	}
+	return resources, nil
+}
+
+//DataProtectionBackupPolicyDisk: dataProtectionBackupPolicyDisks,
 
 // API Management
 func apiManagements(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
@@ -2670,9 +2745,76 @@ func apiManagements(ctx context.Context, a *azurerm, ar *AzureReader, resourceTy
 		// we set the name prior of reading it from the state
 		// as it is required to able to List resources depending on this one
 		if err := r.Data().Set("name", *apiManagement.Name); err != nil {
-			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the app service static site '%s'", *apiManagement.Name)
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the api managment '%s'", *apiManagement.Name)
 		}
 		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+// Recovery Services
+func recoveryServicesVaults(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	vaults, err := ar.ListRecoveryServicesVault(ctx)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list Recovery Services Vaults from reader")
+	}
+	resources := make([]provider.Resource, 0, len(vaults))
+	for _, vault := range vaults {
+		if !filterByTags(filters, vault.Tags) {
+			continue
+		}
+
+		r := provider.NewResource(*vault.ID, resourceType, a)
+		// we set the name prior of reading it from the state
+		// as it is required to able to List resources depending on this one
+		if err := r.Data().Set("name", *vault.Name); err != nil {
+			return nil, errors.Wrapf(err, "unable to set name data on the provider.Resource for the recovery service vault '%s'", *vault.Name)
+		}
+		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+//Recovery Services - backup
+func backupPolicyVMs(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	vaultNames, err := getRecoveryServicesVaults(ctx, a, ar, RecoveryServicesVault.String(), filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list recovery services vaults from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, vaultName := range vaultNames {
+		backupPolicies, err := ar.ListBackupPolicies(ctx, vaultName, "")
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list backup instance resources from reader")
+		}
+		for _, backupPolicy := range backupPolicies {
+			if _, ok := backupPolicy.Properties.AsAzureIaaSVMProtectionPolicy(); ok {
+				r := provider.NewResource(*backupPolicy.ID, resourceType, a)
+				resources = append(resources, r)
+			}
+		}
+	}
+	return resources, nil
+}
+
+func backupProtectedVMs(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	vaultNames, err := getRecoveryServicesVaults(ctx, a, ar, RecoveryServicesVault.String(), filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list recovery services vaults from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, vaultName := range vaultNames {
+		backupProtectedItems, err := ar.ListBackupProtectedItems(ctx, vaultName, "", "")
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list backup instance resources from reader")
+		}
+		for _, backupProtectedItem := range backupProtectedItems {
+			if _, ok := backupProtectedItem.Properties.AsAzureIaaSComputeVMProtectedItem(); ok {
+				r := provider.NewResource(*backupProtectedItem.ID, resourceType, a)
+				resources = append(resources, r)
+			}
+		}
 	}
 	return resources, nil
 }
