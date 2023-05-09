@@ -28,11 +28,11 @@ const (
 	// functionTmpl it's the implementation of a reader function
 	functionTmpl = `
 	// {{ .FunctionName }} returns a list of {{ .PluralName }} within a subscription {{ if .Location }}and a location {{ end }}{{ if .ResourceGroup }}and a resource group {{ end }}
-	func (ar *AzureReader) {{ .FunctionName }}(ctx context.Context{{ range .ExtraArgs }},{{ .Name }} {{ .Type }} {{ end }}) ([]{{ .API }}.{{ .ResourceName }}, error) {
+	func (ar *AzureReader) {{ .FunctionName }}(ctx context.Context{{ range .ExtraArgsBeforeResourceGroup }},{{ .Name }} {{ .Type }} {{ end }}{{ range .ExtraArgs }},{{ .Name }} {{ .Type }} {{ end }}) ([]{{ .API }}.{{ .ResourceName }}, error) {
 		client := {{ .API }}.{{ if .IrregularClientName }}{{ .IrregularClientName }}{{ else }}New{{ .PluralName }}Client{{ end }}(ar.config.SubscriptionID)
 		client.Authorizer = ar.authorizer
 
-		output, err := client.{{ .AzureSDKListFunction }}(ctx{{ if .Location }}, ar.GetLocation(){{ end }}{{ if .Subscription }}, ar.config.SubscriptionID{{ end }}{{ if .ResourceGroup }}, ar.GetResourceGroupName(){{ end }}{{ range .ExtraArgs }},{{ .Name }}{{ end }})
+		output, err := client.{{ .AzureSDKListFunction }}(ctx{{ if .Location }}, ar.GetLocation(){{ end }}{{ if .Subscription }}, ar.config.SubscriptionID{{ end }}{{ if .ResourceGroup }}{{ range .ExtraArgsBeforeResourceGroup }},{{ .Name }}{{ end }}, ar.GetResourceGroupName(){{ end }}{{ range .ExtraArgs }},{{ .Name }}{{ end }})
 		if err != nil {
 			return nil, errors.Wrap(err, "unable to list {{ .API }}.{{ .ResourceName }} from Azure APIs")
 		}
@@ -164,6 +164,10 @@ type Function struct {
 
 	// ExtraArgs should be specified if extra arguments are required for the list function
 	ExtraArgs []Arg
+
+	// ExtraArgsBeforeResourceGroup should be specified if extra arguments are required for the list function but before the resource group
+	// ex: List(extra_arg_before1, rg, extra_arg1)
+	ExtraArgsBeforeResourceGroup []Arg
 }
 
 // Execute uses the fnTmpl to interpolate f
