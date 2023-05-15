@@ -36,6 +36,8 @@ var azureAPIs = []AzureAPI{
 	{API: "web", APIVersion: "2021-03-01"},
 	{API: "dataprotection", APIVersion: "2021-07-01"},
 	{API: "apimanagement", APIVersion: "2021-08-01"},
+	{API: "recoveryservices", APIVersion: "2021-08-01"},
+	{API: "backup", OtherPath: "recoveryservices/mgmt", APIVersion: "2021-12-01"},
 }
 
 var functions = []Function{
@@ -601,8 +603,49 @@ var functions = []Function{
 	}},
 	// dataprotection
 	{ResourceName: "BackupVaultResource", API: "dataprotection", IrregularClientName: "NewBackupVaultsClient", AzureSDKListFunction: "GetInResourceGroup", ResourceGroup: true},
+	{ResourceName: "BackupInstanceResource", API: "dataprotection", IrregularClientName: "NewBackupInstancesClient", ResourceGroup: true, ExtraArgsBeforeResourceGroup: []Arg{
+		{
+			Name: "vaultName",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "BaseBackupPolicyResource", API: "dataprotection", IrregularClientName: "NewBackupPoliciesClient", ResourceGroup: true, ExtraArgsBeforeResourceGroup: []Arg{
+		{
+			Name: "vaultName",
+			Type: "string",
+		},
+	}},
 	// apimanagement
 	{ResourceName: "ServiceResource", IrregularClientName: "NewServiceClient", FunctionName: "ListAPIManagementServiceResources", API: "apimanagement"},
+	// recoveryservices
+	{ResourceName: "Vault", FunctionName: "ListRecoveryServicesVault", AzureSDKListFunction: "ListByResourceGroup", API: "recoveryservices", ResourceGroup: true},
+	//recoreveryservices/backup
+	{ResourceName: "ProtectionPolicyResource", IrregularClientName: "NewPoliciesClient", FunctionName: "ListBackupPolicies", AzureSDKListFunction: "List", API: "backup", ResourceGroup: true, ExtraArgs: []Arg{
+		{
+			Name: "vaultName",
+			Type: "string",
+		},
+	}, ExtraArgsBeforeResourceGroup: []Arg{
+		{
+			Name: "filter",
+			Type: "string",
+		},
+	}},
+	{ResourceName: "ProtectedItemResource", IrregularClientName: "NewProtectedItemsGroupClient", FunctionName: "ListBackupProtectedItems", AzureSDKListFunction: "List", API: "backup", ResourceGroup: true, ExtraArgsBeforeResourceGroup: []Arg{
+		{
+			Name: "vaultName",
+			Type: "string",
+		},
+	}, ExtraArgs: []Arg{
+		{
+			Name: "filter",
+			Type: "string",
+		},
+		{
+			Name: "skipToken",
+			Type: "string",
+		},
+	}},
 }
 
 func main() {

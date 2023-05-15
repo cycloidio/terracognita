@@ -1,7 +1,8 @@
 ## [Unreleased]
 
 ## Added
-
+- Azurerm added new resources: `azurerm_recovery_services_vault`, `azurerm_backup_policy_vm`, `azurerm_backup_protected_vm`, `azurerm_data_protection_backup_instance_disk`, ` azurerm_data_protection_backup_policy_disk`
+  ([Issue #383](https://github.com/cycloidio/terracognita/issues/383))
 - Azurerm now can use the `--tags` filter
   ([Issue #361](https://github.com/cycloidio/terracognita/issues/361))
 - Ability declare module variables on map types
@@ -10,7 +11,8 @@
   ([Issue #340](https://github.com/cycloidio/terracognita/issues/340))
 
 ### Changed
-
+- Update azurerm template for irregular cases in List method arguments order
+  ([Issue #383](https://github.com/cycloidio/terracognita/issues/383))
 - Validation for specific provider tags to ignore is done now on the Provider implementation
   ([Issue #358](https://github.com/cycloidio/terracognita/issues/358))
 - Added new Azure resource: `azurerm_api_management`
