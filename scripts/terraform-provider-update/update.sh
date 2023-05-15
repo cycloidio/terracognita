@@ -27,7 +27,9 @@ move_out_internal() {
   git remote add upstream https://github.com/hashicorp/${GIT_REPO}.git
   git fetch upstream
   # grep -v -: do not get alpha/beta/rc tags
-  TAG=$(git tag | grep -v '-' | tail -n1)
+  if [[ -z "${TAG}" ]]; then
+    TAG=$(git tag --sort=-creatordate | grep -v '-' | head -n1 )
+  fi
   # create a new branch for the release
   git branch cy-${TAG}
   git checkout cy-${TAG}

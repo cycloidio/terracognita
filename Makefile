@@ -97,4 +97,4 @@ clean: ## Removes binary and/or docker image
 
 .PHONY: update-terraform-provider
 update-terraform-provider: ## Update terraform-provider version used for AWS, Azure, GCP
-	./scripts/terraform-provider-update/update.sh $(PROVIDER)
+	./scripts/terraform-provider-update/update.sh $(PROVIDER) $(VERSION)

@@ -17,6 +17,8 @@
   ([Issue #358](https://github.com/cycloidio/terracognita/issues/358))
 - Added new Azure resource: `azurerm_api_management`
   ([PR#363](https://github.com/cycloidio/terracognita/pull/363))
+- Added new Azure resource: `azurerm_backup_policy_vm_workload`
+  ([PR#386](https://github.com/cycloidio/terracognita/pull/386))
 
 ### Fixed
 
