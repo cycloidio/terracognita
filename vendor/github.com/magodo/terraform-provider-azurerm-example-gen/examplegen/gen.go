@@ -252,8 +252,8 @@ func (info TestFuncInfo) GenPrintTestCaseFdecl() (*ast.FuncDecl, error) {
 	}
 
 	// The first test step can be either:
-	// - A resource.TestStep composite literal: e.g. https://github.com/hashicorp/terraform-provider-azurerm/blob/fcfcdbdf8051050f83c0ec39d09b2bc2ca9152a9/internal/services/network/subnet_resource_test.go#L22
-	// - A call to the data.ApplyStep: e.g. https://github.com/hashicorp/terraform-provider-azurerm/blob/fcfcdbdf8051050f83c0ec39d09b2bc2ca9152a9/internal/services/resource/resource_group_resource_test.go#L24
+	// - A resource.TestStep composite literal: e.g. https://github.com/hashicorp/terraform-provider-azurerm/blob/fcfcdbdf8051050f83c0ec39d09b2bc2ca9152a9/services/network/subnet_resource_test.go#L22
+	// - A call to the data.ApplyStep: e.g. https://github.com/hashicorp/terraform-provider-azurerm/blob/fcfcdbdf8051050f83c0ec39d09b2bc2ca9152a9/services/resource/resource_group_resource_test.go#L24
 	var configcallexpr *ast.CallExpr
 	switch firstteststep := teststeps.Elts[0].(type) {
 	case *ast.CompositeLit:

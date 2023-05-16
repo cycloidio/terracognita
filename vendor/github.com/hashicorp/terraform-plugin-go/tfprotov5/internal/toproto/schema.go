@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-go/tfprotov5"
-	"github.com/hashicorp/terraform-plugin-go/tfprotov5/internal/tfplugin5"
+	"github.com/hashicorp/terraform-plugin-go/tfprotov5/tfplugin5"
 )
 
 func Schema(in *tfprotov5.Schema) (*tfplugin5.Schema, error) {

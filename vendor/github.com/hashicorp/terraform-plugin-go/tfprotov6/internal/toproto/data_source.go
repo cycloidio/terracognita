@@ -2,7 +2,7 @@ package toproto
 
 import (
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
-	"github.com/hashicorp/terraform-plugin-go/tfprotov6/internal/tfplugin6"
+	"github.com/hashicorp/terraform-plugin-go/tfprotov6/tfplugin6"
 )
 
 func ValidateDataResourceConfig_Request(in *tfprotov6.ValidateDataResourceConfigRequest) (*tfplugin6.ValidateDataResourceConfig_Request, error) {

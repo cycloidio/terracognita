@@ -3,7 +3,7 @@ package fromproto
 import (
 	"errors"
 
-	"github.com/hashicorp/terraform-plugin-go/tfprotov6/internal/tfplugin6"
+	"github.com/hashicorp/terraform-plugin-go/tfprotov6/tfplugin6"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 )
 

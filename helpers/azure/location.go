@@ -3,7 +3,7 @@ package azure
 import (
 	"github.com/hashicorp/go-azure-helpers/resourcemanager/commonschema"
 	"github.com/hashicorp/go-azure-helpers/resourcemanager/location"
-	"github.com/hashicorp/terraform-provider-azurerm/internal/tf/pluginsdk"
+	"github.com/hashicorp/terraform-provider-azurerm/tf/pluginsdk"
 )
 
 func SchemaLocation() *pluginsdk.Schema {

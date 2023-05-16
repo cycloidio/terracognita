@@ -4,8 +4,8 @@ import (
 	"github.com/hashicorp/go-azure-helpers/resourcemanager/commonschema"
 	"github.com/hashicorp/go-azure-helpers/resourcemanager/resourcegroups"
 
-	"github.com/hashicorp/terraform-provider-azurerm/internal/tf/pluginsdk"
-	"github.com/hashicorp/terraform-provider-azurerm/internal/tf/suppress"
+	"github.com/hashicorp/terraform-provider-azurerm/tf/pluginsdk"
+	"github.com/hashicorp/terraform-provider-azurerm/tf/suppress"
 )
 
 func SchemaResourceGroupName() *pluginsdk.Schema {

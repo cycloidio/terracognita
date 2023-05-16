@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-go/tfprotov5"
-	"github.com/hashicorp/terraform-plugin-go/tfprotov5/internal/tfplugin5"
+	"github.com/hashicorp/terraform-plugin-go/tfprotov5/tfplugin5"
 )
 
 func ValidateResourceTypeConfigRequest(in *tfplugin5.ValidateResourceTypeConfig_Request) (*tfprotov5.ValidateResourceTypeConfigRequest, error) {

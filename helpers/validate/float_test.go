@@ -3,7 +3,7 @@ package validate
 import (
 	"testing"
 
-	"github.com/hashicorp/terraform-provider-azurerm/internal/tf/pluginsdk"
+	"github.com/hashicorp/terraform-provider-azurerm/tf/pluginsdk"
 )
 
 func TestValidateFloatInSlice(t *testing.T) {

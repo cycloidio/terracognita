@@ -10,7 +10,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-go/tfprotov5"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov5/internal/fromproto"
-	"github.com/hashicorp/terraform-plugin-go/tfprotov5/internal/tfplugin5"
+	"github.com/hashicorp/terraform-plugin-go/tfprotov5/tfplugin5"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov5/internal/toproto"
 
 	"github.com/hashicorp/go-hclog"

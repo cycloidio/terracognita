@@ -1,8 +1,8 @@
 package azure
 
 import (
-	"github.com/hashicorp/terraform-provider-azurerm/internal/tf/pluginsdk"
-	"github.com/hashicorp/terraform-provider-azurerm/internal/tf/validation"
+	"github.com/hashicorp/terraform-provider-azurerm/tf/pluginsdk"
+	"github.com/hashicorp/terraform-provider-azurerm/tf/validation"
 )
 
 func SchemaZones() *pluginsdk.Schema {
