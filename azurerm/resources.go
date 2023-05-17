@@ -181,6 +181,7 @@ const (
 	//Recovery Services - backup
 	BackupPolicyVM
 	BackupProtectedVM
+	BackupPolicyVMWorkload
 )
 
 type rtFn func(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error)
@@ -348,8 +349,9 @@ var (
 		// Recovery Services
 		RecoveryServicesVault: recoveryServicesVaults,
 		//Recovery Services - backup
-		BackupPolicyVM:    backupPolicyVMs,
-		BackupProtectedVM: backupProtectedVMs,
+		BackupPolicyVM:         backupPolicyVMs,
+		BackupProtectedVM:      backupProtectedVMs,
+		BackupPolicyVMWorkload: backupPolicyVMWorkloads,
 	}
 )
 
@@ -2812,6 +2814,27 @@ func backupProtectedVMs(ctx context.Context, a *azurerm, ar *AzureReader, resour
 		for _, backupProtectedItem := range backupProtectedItems {
 			if _, ok := backupProtectedItem.Properties.AsAzureIaaSComputeVMProtectedItem(); ok {
 				r := provider.NewResource(*backupProtectedItem.ID, resourceType, a)
+				resources = append(resources, r)
+			}
+		}
+	}
+	return resources, nil
+}
+
+func backupPolicyVMWorkloads(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	vaultNames, err := getRecoveryServicesVaults(ctx, a, ar, RecoveryServicesVault.String(), filters)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list recovery services vaults from cache")
+	}
+	resources := make([]provider.Resource, 0)
+	for _, vaultName := range vaultNames {
+		backupPolicies, err := ar.ListBackupPolicies(ctx, vaultName, "")
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to list backup instance resources from reader")
+		}
+		for _, backupPolicy := range backupPolicies {
+			if _, ok := backupPolicy.Properties.AsAzureVMWorkloadProtectionPolicy(); ok {
+				r := provider.NewResource(*backupPolicy.ID, resourceType, a)
 				resources = append(resources, r)
 			}
 		}
