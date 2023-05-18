@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.8.4] _2023-05-18_
+
 ## Added
 - Azurerm added new resources: `azurerm_recovery_services_vault`, `azurerm_backup_policy_vm`, `azurerm_backup_protected_vm`, `azurerm_data_protection_backup_instance_disk`, ` azurerm_data_protection_backup_policy_disk`
   ([Issue #383](https://github.com/cycloidio/terracognita/issues/383))
