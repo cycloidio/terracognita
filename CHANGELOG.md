@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## Added
+- Azurerm added new resource: `azurerm_network_interface_security_group_association`
+  ([Issue #389](https://github.com/cycloidio/terracognita/issues/389))
+
+
 ## [0.8.4] _2023-05-18_
 
 ## Added
