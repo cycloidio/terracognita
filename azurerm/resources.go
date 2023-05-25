@@ -35,6 +35,7 @@ const (
 	// Network Resources
 	Subnet
 	NetworkInterface
+	NetworkInterfaceSecurityGroupAssociation
 	NetworkSecurityGroup
 	ApplicationGateway
 	ApplicationSecurityGroup
@@ -203,31 +204,32 @@ var (
 		VirtualMachineDataDiskAttachment: virtualMachineDataDiskAttachments,
 		Image:                            images,
 		// Network Resources
-		Subnet:                            subnets,
-		NetworkInterface:                  networkInterfaces,
-		NetworkSecurityGroup:              networkSecurityGroups,
-		ApplicationGateway:                applicationGateways,
-		ApplicationSecurityGroup:          applicationSecurityGroups,
-		NetworkDdosProtectionPlan:         networkddosProtectionPlans,
-		Firewall:                          firewalls,
-		LocalNetworkGateway:               localNetworkGateways,
-		NatGateway:                        natGateways,
-		NetworkProfile:                    networkProfiles,
-		NetworkSecurityRule:               networkSecurityRules,
-		PublicIP:                          publicIP,
-		PublicIPPrefix:                    publicIPPrefixes,
-		Route:                             routes,
-		RouteTable:                        routeTables,
-		VirtualNetworkGateway:             virtualNetworkGateways,
-		VirtualNetworkGatewayConnection:   virtualNetworkGatewayConnections,
-		VirtualNetworkPeering:             virtualNetworkPeerings,
-		WebApplicationFirewallPolicy:      webApplicationFirewallPolicies,
-		VirtualHub:                        virtualHubs,
-		VirtualHubBgpConnection:           virtualHubBgpConnection,
-		VirtualHubConnection:              virtualHubConnection,
-		VirtualHubIP:                      virtualHubIP,
-		VirtualHubRouteTable:              virtualHubRouteTable,
-		VirtualHubSecurityPartnerProvider: virtualHubSecurityPartnerProvider,
+		Subnet:                                   subnets,
+		NetworkInterface:                         networkInterfaces,
+		NetworkInterfaceSecurityGroupAssociation: networkInterfaceSecurityGroupAssociations,
+		NetworkSecurityGroup:                     networkSecurityGroups,
+		ApplicationGateway:                       applicationGateways,
+		ApplicationSecurityGroup:                 applicationSecurityGroups,
+		NetworkDdosProtectionPlan:                networkddosProtectionPlans,
+		Firewall:                                 firewalls,
+		LocalNetworkGateway:                      localNetworkGateways,
+		NatGateway:                               natGateways,
+		NetworkProfile:                           networkProfiles,
+		NetworkSecurityRule:                      networkSecurityRules,
+		PublicIP:                                 publicIP,
+		PublicIPPrefix:                           publicIPPrefixes,
+		Route:                                    routes,
+		RouteTable:                               routeTables,
+		VirtualNetworkGateway:                    virtualNetworkGateways,
+		VirtualNetworkGatewayConnection:          virtualNetworkGatewayConnections,
+		VirtualNetworkPeering:                    virtualNetworkPeerings,
+		WebApplicationFirewallPolicy:             webApplicationFirewallPolicies,
+		VirtualHub:                               virtualHubs,
+		VirtualHubBgpConnection:                  virtualHubBgpConnection,
+		VirtualHubConnection:                     virtualHubConnection,
+		VirtualHubIP:                             virtualHubIP,
+		VirtualHubRouteTable:                     virtualHubRouteTable,
+		VirtualHubSecurityPartnerProvider:        virtualHubSecurityPartnerProvider,
 		// Load Balancer
 		Lb:                   lbs,
 		LbBackendAddressPool: lbBackendAddressPools,
@@ -1093,6 +1095,30 @@ func virtualHubSecurityPartnerProvider(ctx context.Context, a *azurerm, ar *Azur
 		}
 		r := provider.NewResource(*virtualHubSecurityPartnerProvider.ID, resourceType, a)
 		resources = append(resources, r)
+	}
+	return resources, nil
+}
+
+func networkInterfaceSecurityGroupAssociations(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	networkInterfaces, err := ar.ListInterfaces(ctx)
+	//TODO CACHE
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list network interfaces from reader")
+	}
+	resources := make([]provider.Resource, 0, len(networkInterfaces))
+	for _, networkInterface := range networkInterfaces {
+
+		if !filterByTags(filters, networkInterface.Tags) {
+			continue
+		}
+
+		props := networkInterface.InterfacePropertiesFormat
+		if props != nil {
+			if props.NetworkSecurityGroup != nil || props.NetworkSecurityGroup.ID != nil {
+				r := provider.NewResource(fmt.Sprintf("%s|%s", *networkInterface.ID, *props.NetworkSecurityGroup.ID), resourceType, a)
+				resources = append(resources, r)
+			}
+		}
 	}
 	return resources, nil
 }
