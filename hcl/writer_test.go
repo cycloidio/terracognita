@@ -28,6 +28,7 @@ func TestNewHCLWriter(t *testing.T) {
 		)
 		p.EXPECT().String().Return("aws").Times(2)
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 		p.EXPECT().TFProvider().Return(aws.Provider())
 		p.EXPECT().Configuration().Return(map[string]interface{}{
 			"region": "eu-west-1",
@@ -41,7 +42,8 @@ func TestNewHCLWriter(t *testing.T) {
 				"terraform": map[string]interface{}{
 					"required_providers": map[string]interface{}{
 						"=tc=aws": map[string]interface{}{
-							"source": "hashicorp/aws",
+							"source":  "hashicorp/aws",
+							"version": "=4.9.0",
 						},
 					},
 					"required_version": ">= 1.0",
@@ -56,6 +58,7 @@ func TestNewHCLWriter(t *testing.T) {
 		)
 		p.EXPECT().String().Return("aws").Times(2)
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 		p.EXPECT().TFProvider().Return(aws.Provider())
 		p.EXPECT().Configuration().Return(map[string]interface{}{
 			"region": "eu-west-1",
@@ -75,7 +78,8 @@ func TestNewHCLWriter(t *testing.T) {
 				"terraform": map[string]interface{}{
 					"required_providers": map[string]interface{}{
 						"=tc=aws": map[string]interface{}{
-							"source": "hashicorp/aws",
+							"source":  "hashicorp/aws",
+							"version": "=4.9.0",
 						},
 					},
 					"required_version": ">= 1.0",
@@ -90,6 +94,7 @@ func TestNewHCLWriter(t *testing.T) {
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 
 		hw := hcl.NewWriter(nil, p, &writer.Options{})
 		assert.Equal(t, map[string]map[string]interface{}{
@@ -98,7 +103,8 @@ func TestNewHCLWriter(t *testing.T) {
 				"terraform": map[string]interface{}{
 					"required_providers": map[string]interface{}{
 						"=tc=aws": map[string]interface{}{
-							"source": "hashicorp/aws",
+							"source":  "hashicorp/aws",
+							"version": "=4.9.0",
 						},
 					},
 					"required_version": ">= 1.0",
@@ -113,6 +119,7 @@ func TestNewHCLWriter(t *testing.T) {
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 
 		hw := hcl.NewWriter(nil, p, &writer.Options{Module: "my-module"})
 		assert.Equal(t, map[string]map[string]interface{}{
@@ -125,7 +132,8 @@ func TestNewHCLWriter(t *testing.T) {
 				"terraform": map[string]interface{}{
 					"required_providers": map[string]interface{}{
 						"=tc=aws": map[string]interface{}{
-							"source": "hashicorp/aws",
+							"source":  "hashicorp/aws",
+							"version": "=4.9.0",
 						},
 					},
 					"required_version": ">= 1.0",
@@ -140,6 +148,7 @@ func TestNewHCLWriter(t *testing.T) {
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 
 		hw := hcl.NewWriter(nil, p, &writer.Options{
 			Module:               "my-module",
@@ -157,7 +166,8 @@ func TestNewHCLWriter(t *testing.T) {
 				"terraform": map[string]interface{}{
 					"required_providers": map[string]interface{}{
 						"=tc=aws": map[string]interface{}{
-							"source": "hashicorp/aws",
+							"source":  "hashicorp/aws",
+							"version": "=4.9.0",
 						},
 					},
 					"required_version": ">= 1.0",
@@ -182,6 +192,7 @@ func TestHCLWriter_Write(t *testing.T) {
 
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
@@ -200,7 +211,8 @@ func TestHCLWriter_Write(t *testing.T) {
 				"terraform": map[string]interface{}{
 					"required_providers": map[string]interface{}{
 						"=tc=aws": map[string]interface{}{
-							"source": "hashicorp/aws",
+							"source":  "hashicorp/aws",
+							"version": "=4.9.0",
 						},
 					},
 					"required_version": ">= 1.0",
@@ -224,6 +236,7 @@ func TestHCLWriter_Write(t *testing.T) {
 
 				p.EXPECT().String().Return("aws")
 				p.EXPECT().Source().Return("hashicorp/aws")
+				p.EXPECT().Version().Return("4.9.0")
 
 				mw = mxwriter.NewMux()
 				hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true, Module: "s"})
@@ -242,6 +255,7 @@ func TestHCLWriter_Write(t *testing.T) {
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
@@ -256,6 +270,7 @@ func TestHCLWriter_Write(t *testing.T) {
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
@@ -270,6 +285,7 @@ func TestHCLWriter_Write(t *testing.T) {
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
@@ -290,6 +306,7 @@ func TestHCLWriter_Write(t *testing.T) {
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
@@ -318,6 +335,7 @@ terraform {
 	required_providers {
 		aws = {
 			source = "hashicorp/aws"
+			version = "=4.9.0"
 		}
 	}
 	required_version = ">= 1.0"
@@ -332,6 +350,7 @@ resource "type" "name" {
 
 		p.EXPECT().String().Return("aws").Times(2)
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 		p.EXPECT().TFProvider().Return(aws.Provider())
 		p.EXPECT().Configuration().Return(map[string]interface{}{
 			"region": "eu-west-1",
@@ -364,6 +383,7 @@ terraform {
 	required_providers {
 		aws = {
 			source = "hashicorp/aws"
+			version = "=4.9.0"
 		}
 	}
 	required_version = ">= 1.0"
@@ -378,6 +398,7 @@ resource "type" "name" {
 
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 
 		hw := hcl.NewWriter(mx, p, &writer.Options{Interpolate: true})
 
@@ -455,6 +476,7 @@ terraform {
 	required_providers {
 		aws = {
 			source = "hashicorp/aws"
+			version = "=4.9.0"
 		}
 	}
 	required_version = ">= 1.0"
@@ -491,6 +513,7 @@ variable "type_name_key" {
 		)
 		p.EXPECT().String().Return("aws").Times(2)
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 		p.EXPECT().TFProvider().Return(aws.Provider())
 		p.EXPECT().Configuration().Return(map[string]interface{}{
 			"region": "eu-west-1",
@@ -576,6 +599,7 @@ terraform {
 	required_providers {
 		aws = {
 			source = "hashicorp/aws"
+			version = "=4.9.0"
 		}
 	}
 	required_version = ">= 1.0"
@@ -610,6 +634,7 @@ variable "type_name_tags" {
 		)
 		p.EXPECT().String().Return("aws").Times(2)
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 		p.EXPECT().TFProvider().Return(aws.Provider())
 		p.EXPECT().Configuration().Return(map[string]interface{}{
 			"region": "eu-west-1",
@@ -664,6 +689,7 @@ terraform {
 	required_providers {
 		azurerm = {
 			source = "hashicorp/azurerm"
+			version = "=4.9.0"
 		}
 	}
 	required_version = ">= 1.0"
@@ -687,6 +713,7 @@ variable "type_name_key" {
 		)
 		p.EXPECT().String().Return("azurerm").Times(5)
 		p.EXPECT().Source().Return("hashicorp/azurerm")
+		p.EXPECT().Version().Return("4.9.0")
 		p.EXPECT().TFProvider().Return(azurerm.AzureProvider())
 		p.EXPECT().Configuration().Return(map[string]interface{}{
 			"metadata_host": "host",
@@ -739,6 +766,7 @@ terraform {
 	required_providers {
 		aws = {
 			source = "hashicorp/aws"
+			version = "=4.9.0"
 		}
 	}
 	required_version = ">= 1.0"
@@ -747,6 +775,7 @@ terraform {
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
@@ -786,6 +815,7 @@ terraform {
 	required_providers {
 		aws = {
 			source = "hashicorp/aws"
+			version = "=4.9.0"
 		}
 	}
 	required_version = ">= 1.0"
@@ -794,6 +824,7 @@ terraform {
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
@@ -839,6 +870,7 @@ terraform {
 	required_providers {
 		aws = {
 			source = "hashicorp/aws"
+			version = "=4.9.0"
 		}
 	}
 	required_version = ">= 1.0"
@@ -847,6 +879,7 @@ terraform {
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 
@@ -879,6 +912,7 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 		i.AddResourceAttributes("aType.aName", map[string]string{
@@ -912,6 +946,7 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Module: "test", Interpolate: true})
 		i.AddResourceAttributes("aType.aName", map[string]string{
@@ -945,6 +980,7 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Module: "test", ModuleVariables: map[string]struct{}{"type.name": struct{}{}}, Interpolate: true})
 		i.AddResourceAttributes("aType.aName", map[string]string{
@@ -978,6 +1014,7 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Module: "test", ModuleVariables: map[string]struct{}{"type.network": struct{}{}}, Interpolate: true})
 		i.AddResourceAttributes("aType.aName", map[string]string{
@@ -1012,6 +1049,7 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 		i.AddResourceAttributes("aType.aName", map[string]string{
@@ -1046,6 +1084,7 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: true})
 		i.AddResourceAttributes("aws_instance.instance", map[string]string{
@@ -1085,6 +1124,7 @@ func TestHCLWriter_Interpolate(t *testing.T) {
 		)
 		p.EXPECT().String().Return("aws")
 		p.EXPECT().Source().Return("hashicorp/aws")
+		p.EXPECT().Version().Return("4.9.0")
 
 		hw := hcl.NewWriter(mw, p, &writer.Options{Interpolate: false})
 		i.AddResourceAttributes("aType.aName", map[string]string{

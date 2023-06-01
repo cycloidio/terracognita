@@ -207,3 +207,17 @@ func (mr *ProviderMockRecorder) TagKey() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TagKey", reflect.TypeOf((*Provider)(nil).TagKey))
 }
+
+// Version mocks base method.
+func (m *Provider) Version() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Version")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// Version indicates an expected call of Version.
+func (mr *ProviderMockRecorder) Version() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Version", reflect.TypeOf((*Provider)(nil).Version))
+}

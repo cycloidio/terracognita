@@ -5,6 +5,7 @@
 Script used by `make update-terraform-provider`.
 The goal is to help updating Terraform and Terraform providers used by Terracognita.
 
+The firs parameter is the `provider` to update and it can also expect the `TAG` env variable import a specific version
 
 ### Actions
 
@@ -23,3 +24,4 @@ update_terracognita
  * Update Terracognita Go mod with the latest
  * Update README.md
  * Apply specific `terracognita_fix_*` script (if needed)
+ * Update the specific version on the provider package

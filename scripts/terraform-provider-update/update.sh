@@ -7,7 +7,7 @@ update() {
   PROVIDER_LIST=$1
 
   if [ "$PROVIDER_LIST" = "all" ]; then
-    PROVIDER_LIST="aws azurerm google terraform"
+    PROVIDER_LIST="aws azurerm google vsphere terraform"
   fi
 
   for PROVIDER in $PROVIDER_LIST; do
@@ -69,8 +69,8 @@ update_terraform_provider() {
   GIT_ORG=cycloidio
   GIT_REPO=terraform-provider-${PROVIDER}
 
-  # google: do not have lib under internal and do not need a fork. Use the upstream repo
-  if [ "$PROVIDER" = "google" ]; then
+  # google|vsphere: do not have lib under internal and do not need a fork. Use the upstream repo
+  if [ "$PROVIDER" = "google" ] || [ "$PROVIDER" = "vsphere" ]; then
     GIT_ORG=hashicorp
   fi
 
@@ -87,9 +87,11 @@ update_terraform_provider() {
 
   cd ${PROVIDER_LOCAL_DIR}
   # Use the upstream version
-  if [ "$PROVIDER" = "google" ]; then
+  if [ "$PROVIDER" = "google" ] || [ "$PROVIDER" = "vsphere" ]; then
     git fetch
-    TAG=$(git tag | tail -n1)
+    if [[ -z "${TAG}" ]]; then
+      TAG=$(git tag --sort=-creatordate | grep -v '-' | head -n1 )
+    fi
     git checkout ${TAG}
     LASTCOMMIT=$(git rev-parse --short HEAD)
   else
@@ -110,8 +112,8 @@ update_terracognita() {
   GIT_ORG=cycloidio
   GIT_REPO=terraform-provider-${PROVIDER}
 
-  # google: do not have lib under internal and do not need a fork. Use the upstream repo
-  if [ "$PROVIDER" = "google" ]; then
+  # google|vsphere: do not have lib under internal and do not need a fork. Use the upstream repo
+  if [ "$PROVIDER" = "google" ] || [ "$PROVIDER" = "vsphere" ]; then
     GIT_ORG=hashicorp
   fi
   # terraform: change to match the terraform repository name
@@ -124,13 +126,21 @@ update_terracognita() {
   go mod edit -replace github.com/hashicorp/${GIT_REPO}=github.com/${GIT_ORG}/${GIT_REPO}@$LASTCOMMIT
   go mod tidy
 
+  prefix="v"
+  provider_version=${TAG#"$prefix"}
   echo "Update README.md ..."
   if [ "$PROVIDER" = "aws" ]; then
       sed -i "s/^ \* AWS: .*/ * AWS: $TAG/" README.md
+      sed -i "s/^const version = .*/const version = \"${provider_version}\"/" aws/provider.go
   elif [ "$PROVIDER" = "azurerm" ]; then
       sed -i "s/^ \* AzureRM: .*/ * AzureRM: $TAG/" README.md
+      sed -i "s/^const version = .*/const version = \"${provider_version}\"/" azurerm/provider.go
   elif [ "$PROVIDER" = "google" ]; then
       sed -i "s/^ \* Google: .*/ * Google: $TAG/" README.md
+      sed -i "s/^const version = .*/const version = \"${provider_version}\"/" google/provider.go
+  elif [ "$PROVIDER" = "vsphere" ]; then
+      sed -i "s/^ \* vSphere: .*/ * vSphere: $TAG/" README.md
+      sed -i "s/^const version = .*/const version = \"${provider_version}\"/" vsphere/provider.go
   elif [ "$PROVIDER" = "terraform" ]; then
       sed -E -i "s/Terraform \([0-9\.]+\)/Terraform ($TAG)/" README.md
       terracognita_fix_terraform
@@ -149,6 +159,9 @@ case "$1" in
     gcp|google)
         update google
         ;;
+    vsphere)
+        update vsphere
+        ;;
     terraform)
         update terraform
         ;;
@@ -156,7 +169,7 @@ case "$1" in
         update all
         ;;
     *)
-        echo "Usage: $0 {aws|azurerm|google|terraform|all}"
+        echo "Usage: $0 {aws|azurerm|google|vsphere|terraform|all}"
         exit 1
         ;;
 esac
