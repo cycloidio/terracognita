@@ -4,6 +4,10 @@
 - Azurerm added new resource: `azurerm_network_interface_security_group_association`
   ([Issue #389](https://github.com/cycloidio/terracognita/issues/389))
 
+### Fixed
+- The generated HCL now has the fixed version for the provider used instead of using the latest one by default
+  ([Issue #378](https://github.com/cycloidio/terracognita/issues/378))
+
 
 ## [0.8.4] _2023-05-18_
 

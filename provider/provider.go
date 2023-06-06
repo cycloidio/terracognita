@@ -48,6 +48,9 @@ type Provider interface {
 	// to declare on the HCL
 	Source() string
 
+	// Version returns the current version of the used provider
+	Version() string
+
 	// Configuration returns the Provider configuration
 	// that may be interpolated with HCL when declaring
 	// the provider. The keys have to be the Provider

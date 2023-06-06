@@ -16,6 +16,9 @@ import (
 	"github.com/pkg/errors"
 )
 
+// version of the Terraform provider, this is automatically changed with the 'make update-terraform-provider'
+const version = "2.2.0"
+
 type vsphere struct {
 	tfVSphereClient interface{}
 	tfProvider      *schema.Provider
@@ -113,7 +116,8 @@ func (vs vsphere) Resources(ctx context.Context, resourceType string, f *filter.
 	return resources, nil
 }
 
-func (vs vsphere) Source() string { return "hashicorp/vsphere" }
+func (vs vsphere) Source() string  { return "hashicorp/vsphere" }
+func (vs vsphere) Version() string { return version }
 
 func (vs vsphere) Configuration() map[string]interface{}                { return vs.configuration }
 func (vs vsphere) FixResource(t string, v cty.Value) (cty.Value, error) { return v, nil }

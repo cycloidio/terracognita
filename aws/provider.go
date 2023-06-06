@@ -20,6 +20,9 @@ import (
 	"github.com/pkg/errors"
 )
 
+// version of the Terraform provider, this is automatically changed with the 'make update-terraform-provider'
+const version = "4.9.0"
+
 // skippableCodes is a list of codes
 // which won't make Terracognita failed
 // but they will be printed on the output
@@ -128,6 +131,7 @@ func (a *aws) HasResourceType(t string) bool {
 	return err == nil
 }
 func (a *aws) Source() string                        { return "hashicorp/aws" }
+func (a *aws) Version() string                       { return version }
 func (a *aws) Configuration() map[string]interface{} { return a.configuration }
 func (a *aws) FixResource(t string, v cty.Value) (cty.Value, error) {
 	var err error

@@ -18,6 +18,9 @@ import (
 	"github.com/pkg/errors"
 )
 
+// version of the Terraform provider, this is automatically changed with the 'make update-terraform-provider'
+const version = "4.9.0"
+
 // skippableCodes is a list of codes
 // which won't make Terracognita failed
 // but they will be printed on the output
@@ -76,6 +79,7 @@ func (g *google) Project() string                       { return g.tfGoogleClien
 func (g *google) String() string                        { return "google" }
 func (g *google) TagKey() string                        { return "labels" }
 func (g *google) Source() string                        { return "hashicorp/google" }
+func (g *google) Version() string                       { return version }
 func (g *google) Configuration() map[string]interface{} { return make(map[string]interface{}) }
 
 func (g *google) ResourceTypes() []string {

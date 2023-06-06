@@ -22,6 +22,9 @@ import (
 	"github.com/cycloidio/terracognita/provider"
 )
 
+// version of the Terraform provider, this is automatically changed with the 'make update-terraform-provider'
+const version = "3.20.0"
+
 // skippableCodes is a list of codes
 // which won't make Terracognita failed
 // but they will be printed on the output
@@ -88,6 +91,7 @@ func (a *azurerm) Region() string                        { return a.azurerReader
 func (a *azurerm) String() string                        { return "azurerm" }
 func (a *azurerm) TagKey() string                        { return "tags" }
 func (a *azurerm) Source() string                        { return "hashicorp/azurerm" }
+func (a *azurerm) Version() string                       { return version }
 func (a *azurerm) Configuration() map[string]interface{} { return a.configuraiton }
 
 func (a *azurerm) ResourceTypes() []string {
