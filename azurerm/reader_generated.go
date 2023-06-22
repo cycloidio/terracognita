@@ -1150,12 +1150,12 @@ func (ar *AzureReader) ListKubernetesClusterNodes(ctx context.Context, managedCl
 
 }
 
-// ListSTORAGEAccounts returns a list of Accounts within a subscription
+// ListSTORAGEAccounts returns a list of Accounts within a subscription and a resource group
 func (ar *AzureReader) ListSTORAGEAccounts(ctx context.Context) ([]storage.Account, error) {
 	client := storage.NewAccountsClient(ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
-	output, err := client.List(ctx)
+	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName())
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list storage.Account from Azure APIs")
 	}
