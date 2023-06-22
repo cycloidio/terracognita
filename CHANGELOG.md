@@ -7,7 +7,8 @@
 ### Fixed
 - The generated HCL now has the fixed version for the provider used instead of using the latest one by default
   ([Issue #378](https://github.com/cycloidio/terracognita/issues/378))
-
+- Add resource_group scope to azurerm_storage_account
+  ([Issue #393](https://github.com/cycloidio/terracognita/issues/393))
 
 ## [0.8.4] _2023-05-18_
 

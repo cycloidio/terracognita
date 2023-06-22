@@ -225,7 +225,7 @@ var functions = []Function{
 	}},
 
 	// Storage Resources
-	{ResourceName: "Account", API: "storage", ResourceGroup: false},
+	{ResourceName: "Account", API: "storage", AzureSDKListFunction: "ListByResourceGroup", ResourceGroup: true},
 	{ResourceName: "ListContainerItem", PluralName: "BlobContainers", API: "storage", ResourceGroup: true, ExtraArgs: []Arg{
 		{
 			Name: "accountName",
