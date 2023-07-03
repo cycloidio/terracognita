@@ -192,7 +192,7 @@ func TestSync(t *testing.T) {
 		tpt, err := util.HashicorpToZclonfType(aws.Provider().ResourcesMap[tp].CoreConfigSchema().ImpliedType())
 		require.NoError(t, err)
 
-		s, err := hcl2shim.HCL2ValueFromFlatmap(map[string]string{"name": "Pepito"}, tpt)
+		s, err := hcl2shim.HCL2ValueFromFlatmap(map[string]string{"name": "=tc_unquote=Pepito"}, tpt)
 		require.NoError(t, err)
 
 		res.EXPECT().Type().Return(tp)

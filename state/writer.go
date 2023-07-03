@@ -1,6 +1,7 @@
 package state
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"regexp"
@@ -122,14 +123,23 @@ func (w *Writer) Sync() error {
 	lstate := w.state.Lock()
 	defer w.state.Unlock()
 
-	log.Get().Log("func", "state.Sync(State)", "msg", "writting state to state file")
+	log.Get().Log("func", "state.Sync(State)", "msg", "writing state to state file")
 	file := statemgr.NewStateFile()
 	file.State = lstate
 
-	err := statefile.Write(file, w.writer)
+	b := bytes.Buffer{}
+	err := statefile.Write(file, &b)
 	if err != nil {
 		return err
 	}
+
+	// Normally the formatter is only used on the HCL as is the one that has wrong format
+	// but now we set thing before the HCL/State are generated so those are passed through
+	// both of them, for now it's only the `"=tc_unquote=value"` so we remove it
+	m := regexp.MustCompile(`=tc[^=]*=`)
+	fb := m.ReplaceAll(b.Bytes(), nil)
+	nb := bytes.NewBuffer(fb)
+	io.Copy(w.writer, nb)
 
 	return nil
 }

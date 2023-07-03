@@ -154,6 +154,18 @@ func TestFormat(t *testing.T) {
 				role = [var.isa-role,var.isa-role2,"{value}"]
 			}`),
 		},
+		{
+			name: "RemoveQuotes",
+			in: []byte(`
+				"role" = value
+
+				"env" = "=tc_unquote=value"
+			`),
+			out: []byte(`
+				role = value
+				env = value
+			`),
+		},
 	}
 
 	for _, tt := range tests {

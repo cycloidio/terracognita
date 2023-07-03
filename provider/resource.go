@@ -327,7 +327,7 @@ func (r *resource) Read(f *filter.Filter) error {
 		return err
 	}
 
-	zstate, err := util.HashicorpToZclonfValue(newStateValue, r.tfResource.CoreConfigSchema().ImpliedType())
+	zstate, err := util.HashicorpToZclonfValue(newStateValue, r.ImpliedType())
 	if err != nil {
 		return err
 	}

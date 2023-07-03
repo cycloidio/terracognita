@@ -57,7 +57,13 @@ var (
 			},
 		},
 		{
-			match:   regexp.MustCompile(`=tc=`),
+			// Used for quoted values to unquote
+			// Replace all the `"key" = "=tc_unquote=value"` for `"key" = value`
+			match:   regexp.MustCompile(`"=tc_unquote=([^"]+)"`),
+			replace: []byte(`$1`),
+		},
+		{
+			match:   regexp.MustCompile(`=tc[^=]*=`),
 			replace: []byte{},
 		},
 		{
