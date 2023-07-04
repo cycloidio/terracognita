@@ -7,8 +7,10 @@
 ### Fixed
 - The generated HCL now has the fixed version for the provider used instead of using the latest one by default
   ([Issue #378](https://github.com/cycloidio/terracognita/issues/378))
-- Add resource_group scope to azurerm_storage_account
+- Add `resource_group` scope to `azurerm_storage_account`
   ([Issue #393](https://github.com/cycloidio/terracognita/issues/393))
+- AzureRM `azurerm_virtual_machine_data_disk_attachment` and `azurerm_virtual_machine` was still giving issues on import so we added the `lifecycle.ignore_changes=[create_option]` to it
+  ([Issue #395](https://github.com/cycloidio/terracognita/issues/395))
 
 ## [0.8.4] _2023-05-18_
 

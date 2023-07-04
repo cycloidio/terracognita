@@ -20,6 +20,7 @@ import (
 	"github.com/cycloidio/terracognita/filter"
 	"github.com/cycloidio/terracognita/log"
 	"github.com/cycloidio/terracognita/provider"
+	"github.com/cycloidio/terracognita/util"
 )
 
 // version of the Terraform provider, this is automatically changed with the 'make update-terraform-provider'
@@ -145,7 +146,38 @@ func (a *azurerm) TFClient() interface{} {
 }
 
 func (a *azurerm) TFProvider() *schema.Provider {
-	return a.tfProvider
+	tfp := a.tfProvider
+
+	for _, v := range tfp.ResourcesMap {
+		// We add the `lifecycle` to all the resource on AzureRM, if we
+		// need it for other providers then we'll add the missing
+		// Metadata attributes and abstract this too
+		v.Schema["lifecycle"] = &schema.Schema{
+			Type:     schema.TypeSet,
+			Optional: true,
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"create_before_destroy": &schema.Schema{
+						Optional: true,
+						Type:     schema.TypeBool,
+					},
+					"prevent_destroy": &schema.Schema{
+						Optional: true,
+						Type:     schema.TypeBool,
+					},
+					"ignore_changes": &schema.Schema{
+						Optional: true,
+						Type:     schema.TypeList,
+						Elem: &schema.Schema{
+							Type: schema.TypeString,
+						},
+					},
+				},
+			},
+		}
+	}
+
+	return tfp
 }
 
 func (a *azurerm) FixResource(t string, v cty.Value) (cty.Value, error) {
@@ -156,6 +188,8 @@ func (a *azurerm) FixResource(t string, v cty.Value) (cty.Value, error) {
 		// the unsetManageDiskID is the list of all the indexed of the storage_account_type that
 		// have the create_option as FromImage
 		var unsetManageDiskID = make(map[int]struct{})
+		var storageOSDiskCount int
+		var storageDataDiskCount int
 		err = cty.Walk(v, func(path cty.Path, val cty.Value) (bool, error) {
 			if len(path) == 3 {
 				if gas, ok := path[0].(cty.GetAttrStep); ok {
@@ -163,6 +197,7 @@ func (a *azurerm) FixResource(t string, v cty.Value) (cty.Value, error) {
 					switch gas.Name {
 					case "storage_os_disk":
 						if path[2].(cty.GetAttrStep).Name == "create_option" {
+							storageOSDiskCount++
 							var co string
 							err := gocty.FromCtyValue(val, &co)
 							if err != nil {
@@ -176,6 +211,10 @@ func (a *azurerm) FixResource(t string, v cty.Value) (cty.Value, error) {
 								}
 								unsetManageDiskID[idx] = struct{}{}
 							}
+						}
+					case "storage_data_disk":
+						if path[2].(cty.GetAttrStep).Name == "create_option" {
+							storageDataDiskCount++
 						}
 					}
 				}
@@ -219,6 +258,32 @@ func (a *azurerm) FixResource(t string, v cty.Value) (cty.Value, error) {
 			}
 			return v, nil
 		})
+		m, err := util.CtyObjectToUnstructured(&v)
+		if err != nil {
+			return v, errors.Wrapf(err, "failed to convert cty object to map")
+		}
+
+		ignoreChanges := make([]string, 0, 0)
+		for i := 0; i < storageDataDiskCount; i++ {
+			ignoreChanges = append(ignoreChanges, fmt.Sprintf("=tc_unquote=storage_data_disk[%d].create_option", i))
+		}
+		for i := 0; i < storageOSDiskCount; i++ {
+			ignoreChanges = append(ignoreChanges, fmt.Sprintf("=tc_unquote=storage_os_disk[%d].create_option", i))
+		}
+		// We need to set all the possible attributes and if they do not have
+		// any value then set them to nil
+		m["lifecycle"] = []interface{}{
+			map[string]interface{}{
+				"create_before_destroy": nil,
+				"prevent_destroy":       nil,
+				"ignore_changes":        ignoreChanges,
+			},
+		}
+		nv, err := util.UnstructuredToCty(m)
+		if err != nil {
+			return v, errors.Wrapf(err, "failed to convert map to cty object")
+		}
+		return nv, nil
 		if err != nil {
 			return v, errors.Wrapf(err, "failed to convert CTY value to GO type")
 		}
@@ -281,6 +346,25 @@ func (a *azurerm) FixResource(t string, v cty.Value) (cty.Value, error) {
 		if err != nil {
 			return v, errors.Wrapf(err, "failed to convert CTY value to GO type")
 		}
+		m, err := util.CtyObjectToUnstructured(&v)
+		if err != nil {
+			return v, errors.Wrapf(err, "failed to convert cty object to map")
+		}
+
+		// We need to set all the possible attributes and if they do not have
+		// any value then set them to nil
+		m["lifecycle"] = []interface{}{
+			map[string]interface{}{
+				"create_before_destroy": nil,
+				"prevent_destroy":       nil,
+				"ignore_changes":        []string{"=tc_unquote=create_option"},
+			},
+		}
+		nv, err := util.UnstructuredToCty(m)
+		if err != nil {
+			return v, errors.Wrapf(err, "failed to convert map to cty object")
+		}
+		return nv, nil
 	case "azurerm_windows_virtual_machine":
 		v, err = cty.Transform(v, func(path cty.Path, v cty.Value) (cty.Value, error) {
 			if len(path) > 0 {
