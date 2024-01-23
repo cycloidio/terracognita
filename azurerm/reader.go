@@ -6,6 +6,7 @@ import (
 
 	azureResourcesAPI "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-05-01/resources"
 	"github.com/Azure/go-autorest/autorest"
+	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/hashicorp/go-azure-helpers/authentication"
 	"github.com/hashicorp/go-azure-helpers/sender"
 )
@@ -16,6 +17,7 @@ import (
 type AzureReader struct {
 	config     authentication.Config
 	authorizer autorest.Authorizer
+	env        *azure.Environment
 
 	resourceGroup azureResourcesAPI.Group
 }
@@ -61,7 +63,7 @@ func NewAzureReader(ctx context.Context, clientID, clientSecret, environment, re
 	}
 
 	// Resource Group
-	client := azureResourcesAPI.NewGroupsClient(cfg.SubscriptionID)
+	client := azureResourcesAPI.NewGroupsClientWithBaseURI(env.ResourceManagerEndpoint, cfg.SubscriptionID)
 	client.Authorizer = auth
 	resourceGroup, err := client.Get(ctx, resourceGroupName)
 	if err != nil {
@@ -72,6 +74,7 @@ func NewAzureReader(ctx context.Context, clientID, clientSecret, environment, re
 		config:        *cfg,
 		authorizer:    auth,
 		resourceGroup: resourceGroup,
+		env:           env,
 	}, nil
 }
 

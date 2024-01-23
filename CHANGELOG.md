@@ -9,6 +9,8 @@
   ([Issue #378](https://github.com/cycloidio/terracognita/issues/378))
 - Add resource_group scope to azurerm_storage_account
   ([Issue #393](https://github.com/cycloidio/terracognita/issues/393))
+- Make it work with AzureRM government credentials
+  ([Issue #405](https://github.com/cycloidio/terracognita/issues/405))
 
 ## [0.8.4] _2023-05-18_
 

@@ -38,7 +38,7 @@ import (
 
 // ListVirtualMachines returns a list of VirtualMachines within a subscription and a resource group
 func (ar *AzureReader) ListVirtualMachines(ctx context.Context, filter string) ([]compute.VirtualMachine, error) {
-	client := compute.NewVirtualMachinesClient(ar.config.SubscriptionID)
+	client := compute.NewVirtualMachinesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), filter)
@@ -63,7 +63,7 @@ func (ar *AzureReader) ListVirtualMachines(ctx context.Context, filter string) (
 
 // ListVirtualMachineScaleSets returns a list of VirtualMachineScaleSets within a subscription and a resource group
 func (ar *AzureReader) ListVirtualMachineScaleSets(ctx context.Context) ([]compute.VirtualMachineScaleSet, error) {
-	client := compute.NewVirtualMachineScaleSetsClient(ar.config.SubscriptionID)
+	client := compute.NewVirtualMachineScaleSetsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName())
@@ -88,7 +88,7 @@ func (ar *AzureReader) ListVirtualMachineScaleSets(ctx context.Context) ([]compu
 
 // ListVirtualMachineScaleSetExtensions returns a list of VirtualMachineScaleSetExtensions within a subscription and a resource group
 func (ar *AzureReader) ListVirtualMachineScaleSetExtensions(ctx context.Context, VMScaleSetName string) ([]compute.VirtualMachineScaleSetExtension, error) {
-	client := compute.NewVirtualMachineScaleSetExtensionsClient(ar.config.SubscriptionID)
+	client := compute.NewVirtualMachineScaleSetExtensionsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), VMScaleSetName)
@@ -113,7 +113,7 @@ func (ar *AzureReader) ListVirtualMachineScaleSetExtensions(ctx context.Context,
 
 // ListVirtualMachineExtensions returns a list of VirtualMachineExtensions within a subscription and a resource group
 func (ar *AzureReader) ListVirtualMachineExtensions(ctx context.Context, VMName string, expand string) ([]compute.VirtualMachineExtension, error) {
-	client := compute.NewVirtualMachineExtensionsClient(ar.config.SubscriptionID)
+	client := compute.NewVirtualMachineExtensionsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), VMName, expand)
@@ -127,7 +127,7 @@ func (ar *AzureReader) ListVirtualMachineExtensions(ctx context.Context, VMName 
 
 // ListAvailabilitySets returns a list of AvailabilitySets within a subscription and a resource group
 func (ar *AzureReader) ListAvailabilitySets(ctx context.Context) ([]compute.AvailabilitySet, error) {
-	client := compute.NewAvailabilitySetsClient(ar.config.SubscriptionID)
+	client := compute.NewAvailabilitySetsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName())
@@ -152,7 +152,7 @@ func (ar *AzureReader) ListAvailabilitySets(ctx context.Context) ([]compute.Avai
 
 // ListImages returns a list of Images within a subscription
 func (ar *AzureReader) ListImages(ctx context.Context) ([]compute.Image, error) {
-	client := compute.NewImagesClient(ar.config.SubscriptionID)
+	client := compute.NewImagesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx)
@@ -177,7 +177,7 @@ func (ar *AzureReader) ListImages(ctx context.Context) ([]compute.Image, error) 
 
 // ListDisks returns a list of Disks within a subscription and a resource group
 func (ar *AzureReader) ListDisks(ctx context.Context) ([]compute.Disk, error) {
-	client := compute.NewDisksClient(ar.config.SubscriptionID)
+	client := compute.NewDisksClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName())
@@ -202,7 +202,7 @@ func (ar *AzureReader) ListDisks(ctx context.Context) ([]compute.Disk, error) {
 
 // ListVirtualNetworks returns a list of VirtualNetworks within a subscription and a resource group
 func (ar *AzureReader) ListVirtualNetworks(ctx context.Context) ([]network.VirtualNetwork, error) {
-	client := network.NewVirtualNetworksClient(ar.config.SubscriptionID)
+	client := network.NewVirtualNetworksClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName())
@@ -227,7 +227,7 @@ func (ar *AzureReader) ListVirtualNetworks(ctx context.Context) ([]network.Virtu
 
 // ListSubnets returns a list of Subnets within a subscription and a resource group
 func (ar *AzureReader) ListSubnets(ctx context.Context, virtualNetworkName string) ([]network.Subnet, error) {
-	client := network.NewSubnetsClient(ar.config.SubscriptionID)
+	client := network.NewSubnetsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), virtualNetworkName)
@@ -252,7 +252,7 @@ func (ar *AzureReader) ListSubnets(ctx context.Context, virtualNetworkName strin
 
 // ListInterfaces returns a list of Interfaces within a subscription and a resource group
 func (ar *AzureReader) ListInterfaces(ctx context.Context) ([]network.Interface, error) {
-	client := network.NewInterfacesClient(ar.config.SubscriptionID)
+	client := network.NewInterfacesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName())
@@ -277,7 +277,7 @@ func (ar *AzureReader) ListInterfaces(ctx context.Context) ([]network.Interface,
 
 // ListSecurityGroups returns a list of SecurityGroups within a subscription and a resource group
 func (ar *AzureReader) ListSecurityGroups(ctx context.Context) ([]network.SecurityGroup, error) {
-	client := network.NewSecurityGroupsClient(ar.config.SubscriptionID)
+	client := network.NewSecurityGroupsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName())
@@ -302,7 +302,7 @@ func (ar *AzureReader) ListSecurityGroups(ctx context.Context) ([]network.Securi
 
 // ListApplicationGateways returns a list of ApplicationGateways within a subscription and a resource group
 func (ar *AzureReader) ListApplicationGateways(ctx context.Context) ([]network.ApplicationGateway, error) {
-	client := network.NewApplicationGatewaysClient(ar.config.SubscriptionID)
+	client := network.NewApplicationGatewaysClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName())
@@ -327,7 +327,7 @@ func (ar *AzureReader) ListApplicationGateways(ctx context.Context) ([]network.A
 
 // ListApplicationSecurityGroups returns a list of ApplicationSecurityGroups within a subscription and a resource group
 func (ar *AzureReader) ListApplicationSecurityGroups(ctx context.Context) ([]network.ApplicationSecurityGroup, error) {
-	client := network.NewApplicationSecurityGroupsClient(ar.config.SubscriptionID)
+	client := network.NewApplicationSecurityGroupsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName())
@@ -352,7 +352,7 @@ func (ar *AzureReader) ListApplicationSecurityGroups(ctx context.Context) ([]net
 
 // ListDdosProtectionPlans returns a list of DdosProtectionPlans within a subscription
 func (ar *AzureReader) ListDdosProtectionPlans(ctx context.Context) ([]network.DdosProtectionPlan, error) {
-	client := network.NewDdosProtectionPlansClient(ar.config.SubscriptionID)
+	client := network.NewDdosProtectionPlansClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx)
@@ -377,7 +377,7 @@ func (ar *AzureReader) ListDdosProtectionPlans(ctx context.Context) ([]network.D
 
 // ListAzureFirewalls returns a list of AzureFirewalls within a subscription and a resource group
 func (ar *AzureReader) ListAzureFirewalls(ctx context.Context) ([]network.AzureFirewall, error) {
-	client := network.NewAzureFirewallsClient(ar.config.SubscriptionID)
+	client := network.NewAzureFirewallsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName())
@@ -402,7 +402,7 @@ func (ar *AzureReader) ListAzureFirewalls(ctx context.Context) ([]network.AzureF
 
 // ListLocalNetworkGateways returns a list of LocalNetworkGateways within a subscription and a resource group
 func (ar *AzureReader) ListLocalNetworkGateways(ctx context.Context) ([]network.LocalNetworkGateway, error) {
-	client := network.NewLocalNetworkGatewaysClient(ar.config.SubscriptionID)
+	client := network.NewLocalNetworkGatewaysClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName())
@@ -427,7 +427,7 @@ func (ar *AzureReader) ListLocalNetworkGateways(ctx context.Context) ([]network.
 
 // ListNatGateways returns a list of NatGateways within a subscription and a resource group
 func (ar *AzureReader) ListNatGateways(ctx context.Context) ([]network.NatGateway, error) {
-	client := network.NewNatGatewaysClient(ar.config.SubscriptionID)
+	client := network.NewNatGatewaysClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName())
@@ -452,7 +452,7 @@ func (ar *AzureReader) ListNatGateways(ctx context.Context) ([]network.NatGatewa
 
 // ListProfiles returns a list of Profiles within a subscription and a resource group
 func (ar *AzureReader) ListProfiles(ctx context.Context) ([]network.Profile, error) {
-	client := network.NewProfilesClient(ar.config.SubscriptionID)
+	client := network.NewProfilesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName())
@@ -477,7 +477,7 @@ func (ar *AzureReader) ListProfiles(ctx context.Context) ([]network.Profile, err
 
 // ListSecurityRules returns a list of SecurityRules within a subscription and a resource group
 func (ar *AzureReader) ListSecurityRules(ctx context.Context, networkSecurityGroupName string) ([]network.SecurityRule, error) {
-	client := network.NewSecurityRulesClient(ar.config.SubscriptionID)
+	client := network.NewSecurityRulesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), networkSecurityGroupName)
@@ -502,7 +502,7 @@ func (ar *AzureReader) ListSecurityRules(ctx context.Context, networkSecurityGro
 
 // ListPublicIPAddresses returns a list of PublicIPAddresses within a subscription and a resource group
 func (ar *AzureReader) ListPublicIPAddresses(ctx context.Context) ([]network.PublicIPAddress, error) {
-	client := network.NewPublicIPAddressesClient(ar.config.SubscriptionID)
+	client := network.NewPublicIPAddressesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName())
@@ -527,7 +527,7 @@ func (ar *AzureReader) ListPublicIPAddresses(ctx context.Context) ([]network.Pub
 
 // ListPublicIPPrefixes returns a list of PublicIPPrefixes within a subscription and a resource group
 func (ar *AzureReader) ListPublicIPPrefixes(ctx context.Context) ([]network.PublicIPPrefix, error) {
-	client := network.NewPublicIPPrefixesClient(ar.config.SubscriptionID)
+	client := network.NewPublicIPPrefixesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName())
@@ -552,7 +552,7 @@ func (ar *AzureReader) ListPublicIPPrefixes(ctx context.Context) ([]network.Publ
 
 // ListRoutes returns a list of Routes within a subscription and a resource group
 func (ar *AzureReader) ListRoutes(ctx context.Context, routeTableName string) ([]network.Route, error) {
-	client := network.NewRoutesClient(ar.config.SubscriptionID)
+	client := network.NewRoutesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), routeTableName)
@@ -577,7 +577,7 @@ func (ar *AzureReader) ListRoutes(ctx context.Context, routeTableName string) ([
 
 // ListRouteTables returns a list of RouteTables within a subscription and a resource group
 func (ar *AzureReader) ListRouteTables(ctx context.Context) ([]network.RouteTable, error) {
-	client := network.NewRouteTablesClient(ar.config.SubscriptionID)
+	client := network.NewRouteTablesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName())
@@ -602,7 +602,7 @@ func (ar *AzureReader) ListRouteTables(ctx context.Context) ([]network.RouteTabl
 
 // ListVirtualNetworkGateways returns a list of VirtualNetworkGateways within a subscription and a resource group
 func (ar *AzureReader) ListVirtualNetworkGateways(ctx context.Context) ([]network.VirtualNetworkGateway, error) {
-	client := network.NewVirtualNetworkGatewaysClient(ar.config.SubscriptionID)
+	client := network.NewVirtualNetworkGatewaysClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName())
@@ -627,7 +627,7 @@ func (ar *AzureReader) ListVirtualNetworkGateways(ctx context.Context) ([]networ
 
 // ListVirtualNetworkGatewayConnections returns a list of VirtualNetworkGatewayConnections within a subscription and a resource group
 func (ar *AzureReader) ListVirtualNetworkGatewayConnections(ctx context.Context) ([]network.VirtualNetworkGatewayConnection, error) {
-	client := network.NewVirtualNetworkGatewayConnectionsClient(ar.config.SubscriptionID)
+	client := network.NewVirtualNetworkGatewayConnectionsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName())
@@ -652,7 +652,7 @@ func (ar *AzureReader) ListVirtualNetworkGatewayConnections(ctx context.Context)
 
 // ListVirtualNetworkPeerings returns a list of VirtualNetworkPeerings within a subscription and a resource group
 func (ar *AzureReader) ListVirtualNetworkPeerings(ctx context.Context, virtualNetworkName string) ([]network.VirtualNetworkPeering, error) {
-	client := network.NewVirtualNetworkPeeringsClient(ar.config.SubscriptionID)
+	client := network.NewVirtualNetworkPeeringsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), virtualNetworkName)
@@ -677,7 +677,7 @@ func (ar *AzureReader) ListVirtualNetworkPeerings(ctx context.Context, virtualNe
 
 // ListWebApplicationFirewallPolicies returns a list of WebApplicationFirewallPolicies within a subscription and a resource group
 func (ar *AzureReader) ListWebApplicationFirewallPolicies(ctx context.Context) ([]network.WebApplicationFirewallPolicy, error) {
-	client := network.NewWebApplicationFirewallPoliciesClient(ar.config.SubscriptionID)
+	client := network.NewWebApplicationFirewallPoliciesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName())
@@ -702,7 +702,7 @@ func (ar *AzureReader) ListWebApplicationFirewallPolicies(ctx context.Context) (
 
 // ListVirtualHubs returns a list of VirtualHubs within a subscription
 func (ar *AzureReader) ListVirtualHubs(ctx context.Context) ([]network.VirtualHub, error) {
-	client := network.NewVirtualHubsClient(ar.config.SubscriptionID)
+	client := network.NewVirtualHubsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx)
@@ -727,7 +727,7 @@ func (ar *AzureReader) ListVirtualHubs(ctx context.Context) ([]network.VirtualHu
 
 // ListVirtualHubBgpConnections returns a list of VirtualHubBgpConnections within a subscription and a resource group
 func (ar *AzureReader) ListVirtualHubBgpConnections(ctx context.Context, virtualHubName string) ([]network.BgpConnection, error) {
-	client := network.NewVirtualHubBgpConnectionsClient(ar.config.SubscriptionID)
+	client := network.NewVirtualHubBgpConnectionsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), virtualHubName)
@@ -752,7 +752,7 @@ func (ar *AzureReader) ListVirtualHubBgpConnections(ctx context.Context, virtual
 
 // ListHubVirtualNetworkConnections returns a list of HubVirtualNetworkConnections within a subscription and a resource group
 func (ar *AzureReader) ListHubVirtualNetworkConnections(ctx context.Context, virtualHubName string) ([]network.HubVirtualNetworkConnection, error) {
-	client := network.NewHubVirtualNetworkConnectionsClient(ar.config.SubscriptionID)
+	client := network.NewHubVirtualNetworkConnectionsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), virtualHubName)
@@ -777,7 +777,7 @@ func (ar *AzureReader) ListHubVirtualNetworkConnections(ctx context.Context, vir
 
 // ListVirtualHubIPConfiguration returns a list of VirtualHubIPConfiguration within a subscription and a resource group
 func (ar *AzureReader) ListVirtualHubIPConfiguration(ctx context.Context, virtualHubName string) ([]network.HubIPConfiguration, error) {
-	client := network.NewVirtualHubIPConfigurationClient(ar.config.SubscriptionID)
+	client := network.NewVirtualHubIPConfigurationClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), virtualHubName)
@@ -802,7 +802,7 @@ func (ar *AzureReader) ListVirtualHubIPConfiguration(ctx context.Context, virtua
 
 // ListHubRouteTables returns a list of HubRouteTables within a subscription and a resource group
 func (ar *AzureReader) ListHubRouteTables(ctx context.Context, virtualHubName string) ([]network.HubRouteTable, error) {
-	client := network.NewHubRouteTablesClient(ar.config.SubscriptionID)
+	client := network.NewHubRouteTablesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), virtualHubName)
@@ -827,7 +827,7 @@ func (ar *AzureReader) ListHubRouteTables(ctx context.Context, virtualHubName st
 
 // ListSecurityPartnerProviders returns a list of SecurityPartnerProviders within a subscription
 func (ar *AzureReader) ListSecurityPartnerProviders(ctx context.Context) ([]network.SecurityPartnerProvider, error) {
-	client := network.NewSecurityPartnerProvidersClient(ar.config.SubscriptionID)
+	client := network.NewSecurityPartnerProvidersClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx)
@@ -852,7 +852,7 @@ func (ar *AzureReader) ListSecurityPartnerProviders(ctx context.Context) ([]netw
 
 // ListLoadBalancers returns a list of LoadBalancers within a subscription and a resource group
 func (ar *AzureReader) ListLoadBalancers(ctx context.Context) ([]network.LoadBalancer, error) {
-	client := network.NewLoadBalancersClient(ar.config.SubscriptionID)
+	client := network.NewLoadBalancersClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName())
@@ -877,7 +877,7 @@ func (ar *AzureReader) ListLoadBalancers(ctx context.Context) ([]network.LoadBal
 
 // ListLoadBalancerBackendAddressPools returns a list of LoadBalancerBackendAddressPools within a subscription and a resource group
 func (ar *AzureReader) ListLoadBalancerBackendAddressPools(ctx context.Context, loadBalancerName string) ([]network.BackendAddressPool, error) {
-	client := network.NewLoadBalancerBackendAddressPoolsClient(ar.config.SubscriptionID)
+	client := network.NewLoadBalancerBackendAddressPoolsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), loadBalancerName)
@@ -902,7 +902,7 @@ func (ar *AzureReader) ListLoadBalancerBackendAddressPools(ctx context.Context, 
 
 // ListHostPools returns a list of HostPools within a subscription and a resource group
 func (ar *AzureReader) ListHostPools(ctx context.Context) ([]desktopvirtualization.HostPool, error) {
-	client := desktopvirtualization.NewHostPoolsClient(ar.config.SubscriptionID)
+	client := desktopvirtualization.NewHostPoolsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName())
@@ -927,7 +927,7 @@ func (ar *AzureReader) ListHostPools(ctx context.Context) ([]desktopvirtualizati
 
 // ListApplicationGroups returns a list of ApplicationGroups within a subscription and a resource group
 func (ar *AzureReader) ListApplicationGroups(ctx context.Context, filter string) ([]desktopvirtualization.ApplicationGroup, error) {
-	client := desktopvirtualization.NewApplicationGroupsClient(ar.config.SubscriptionID)
+	client := desktopvirtualization.NewApplicationGroupsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName(), filter)
@@ -952,7 +952,7 @@ func (ar *AzureReader) ListApplicationGroups(ctx context.Context, filter string)
 
 // ListWorkflows returns a list of Workflows within a subscription and a resource group
 func (ar *AzureReader) ListWorkflows(ctx context.Context, top *int32, filter string) ([]logic.Workflow, error) {
-	client := logic.NewWorkflowsClient(ar.config.SubscriptionID)
+	client := logic.NewWorkflowsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName(), top, filter)
@@ -977,7 +977,7 @@ func (ar *AzureReader) ListWorkflows(ctx context.Context, top *int32, filter str
 
 // ListWorkflowTriggers returns a list of WorkflowTriggers within a subscription and a resource group
 func (ar *AzureReader) ListWorkflowTriggers(ctx context.Context, workflowName string, top *int32, filter string) ([]logic.WorkflowTrigger, error) {
-	client := logic.NewWorkflowTriggersClient(ar.config.SubscriptionID)
+	client := logic.NewWorkflowTriggersClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), workflowName, top, filter)
@@ -1002,7 +1002,7 @@ func (ar *AzureReader) ListWorkflowTriggers(ctx context.Context, workflowName st
 
 // ListWorkflowRuns returns a list of WorkflowRuns within a subscription and a resource group
 func (ar *AzureReader) ListWorkflowRuns(ctx context.Context, workflowName string, top *int32, filter string) ([]logic.WorkflowRun, error) {
-	client := logic.NewWorkflowRunsClient(ar.config.SubscriptionID)
+	client := logic.NewWorkflowRunsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), workflowName, top, filter)
@@ -1027,7 +1027,7 @@ func (ar *AzureReader) ListWorkflowRuns(ctx context.Context, workflowName string
 
 // ListWorkflowRunActions returns a list of WorkflowRunActions within a subscription and a resource group
 func (ar *AzureReader) ListWorkflowRunActions(ctx context.Context, workflowName string, runName string, top *int32, filter string) ([]logic.WorkflowRunAction, error) {
-	client := logic.NewWorkflowRunActionsClient(ar.config.SubscriptionID)
+	client := logic.NewWorkflowRunActionsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), workflowName, runName, top, filter)
@@ -1052,7 +1052,7 @@ func (ar *AzureReader) ListWorkflowRunActions(ctx context.Context, workflowName 
 
 // ListContainerRegistries returns a list of Registries within a subscription
 func (ar *AzureReader) ListContainerRegistries(ctx context.Context) ([]containerregistry.Registry, error) {
-	client := containerregistry.NewRegistriesClient(ar.config.SubscriptionID)
+	client := containerregistry.NewRegistriesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx)
@@ -1077,7 +1077,7 @@ func (ar *AzureReader) ListContainerRegistries(ctx context.Context) ([]container
 
 // ListContainerRegistryWebhooks returns a list of Webhooks within a subscription and a resource group
 func (ar *AzureReader) ListContainerRegistryWebhooks(ctx context.Context, registryName string) ([]containerregistry.Webhook, error) {
-	client := containerregistry.NewWebhooksClient(ar.config.SubscriptionID)
+	client := containerregistry.NewWebhooksClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), registryName)
@@ -1102,7 +1102,7 @@ func (ar *AzureReader) ListContainerRegistryWebhooks(ctx context.Context, regist
 
 // ListKubernetesClusters returns a list of ManagedClusters within a subscription
 func (ar *AzureReader) ListKubernetesClusters(ctx context.Context) ([]containerservice.ManagedCluster, error) {
-	client := containerservice.NewManagedClustersClient(ar.config.SubscriptionID)
+	client := containerservice.NewManagedClustersClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx)
@@ -1127,7 +1127,7 @@ func (ar *AzureReader) ListKubernetesClusters(ctx context.Context) ([]containers
 
 // ListKubernetesClusterNodes returns a list of AgentPools within a subscription and a resource group
 func (ar *AzureReader) ListKubernetesClusterNodes(ctx context.Context, managedClusterName string) ([]containerservice.AgentPool, error) {
-	client := containerservice.NewAgentPoolsClient(ar.config.SubscriptionID)
+	client := containerservice.NewAgentPoolsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), managedClusterName)
@@ -1152,7 +1152,7 @@ func (ar *AzureReader) ListKubernetesClusterNodes(ctx context.Context, managedCl
 
 // ListSTORAGEAccounts returns a list of Accounts within a subscription and a resource group
 func (ar *AzureReader) ListSTORAGEAccounts(ctx context.Context) ([]storage.Account, error) {
-	client := storage.NewAccountsClient(ar.config.SubscriptionID)
+	client := storage.NewAccountsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName())
@@ -1177,7 +1177,7 @@ func (ar *AzureReader) ListSTORAGEAccounts(ctx context.Context) ([]storage.Accou
 
 // ListSTORAGEBlobContainers returns a list of BlobContainers within a subscription and a resource group
 func (ar *AzureReader) ListSTORAGEBlobContainers(ctx context.Context, accountName string, maxpagesize string, filter string, include storage.ListContainersInclude) ([]storage.ListContainerItem, error) {
-	client := storage.NewBlobContainersClient(ar.config.SubscriptionID)
+	client := storage.NewBlobContainersClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), accountName, maxpagesize, filter, include)
@@ -1202,7 +1202,7 @@ func (ar *AzureReader) ListSTORAGEBlobContainers(ctx context.Context, accountNam
 
 // ListSTORAGEQueue returns a list of Queue within a subscription and a resource group
 func (ar *AzureReader) ListSTORAGEQueue(ctx context.Context, accountName string, maxpagesize string, filter string) ([]storage.ListQueue, error) {
-	client := storage.NewQueueClient(ar.config.SubscriptionID)
+	client := storage.NewQueueClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), accountName, maxpagesize, filter)
@@ -1227,7 +1227,7 @@ func (ar *AzureReader) ListSTORAGEQueue(ctx context.Context, accountName string,
 
 // ListSTORAGEFileShares returns a list of FileShares within a subscription and a resource group
 func (ar *AzureReader) ListSTORAGEFileShares(ctx context.Context, accountName string, maxpagesize string, filter string, expand string) ([]storage.FileShareItem, error) {
-	client := storage.NewFileSharesClient(ar.config.SubscriptionID)
+	client := storage.NewFileSharesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), accountName, maxpagesize, filter, expand)
@@ -1252,7 +1252,7 @@ func (ar *AzureReader) ListSTORAGEFileShares(ctx context.Context, accountName st
 
 // ListSTORAGETable returns a list of Table within a subscription and a resource group
 func (ar *AzureReader) ListSTORAGETable(ctx context.Context, accountName string) ([]storage.Table, error) {
-	client := storage.NewTableClient(ar.config.SubscriptionID)
+	client := storage.NewTableClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), accountName)
@@ -1277,7 +1277,7 @@ func (ar *AzureReader) ListSTORAGETable(ctx context.Context, accountName string)
 
 // ListMARIADBConfigurations returns a list of Configurations within a subscription and a resource group
 func (ar *AzureReader) ListMARIADBConfigurations(ctx context.Context, serverName string) ([]mariadb.Configuration, error) {
-	client := mariadb.NewConfigurationsClient(ar.config.SubscriptionID)
+	client := mariadb.NewConfigurationsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName)
@@ -1291,7 +1291,7 @@ func (ar *AzureReader) ListMARIADBConfigurations(ctx context.Context, serverName
 
 // ListMARIADBDatabases returns a list of Databases within a subscription and a resource group
 func (ar *AzureReader) ListMARIADBDatabases(ctx context.Context, serverName string) ([]mariadb.Database, error) {
-	client := mariadb.NewDatabasesClient(ar.config.SubscriptionID)
+	client := mariadb.NewDatabasesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName)
@@ -1305,7 +1305,7 @@ func (ar *AzureReader) ListMARIADBDatabases(ctx context.Context, serverName stri
 
 // ListMARIADBFirewallRules returns a list of FirewallRules within a subscription and a resource group
 func (ar *AzureReader) ListMARIADBFirewallRules(ctx context.Context, serverName string) ([]mariadb.FirewallRule, error) {
-	client := mariadb.NewFirewallRulesClient(ar.config.SubscriptionID)
+	client := mariadb.NewFirewallRulesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName)
@@ -1319,7 +1319,7 @@ func (ar *AzureReader) ListMARIADBFirewallRules(ctx context.Context, serverName 
 
 // ListMARIADBServers returns a list of Servers within a subscription
 func (ar *AzureReader) ListMARIADBServers(ctx context.Context) ([]mariadb.Server, error) {
-	client := mariadb.NewServersClient(ar.config.SubscriptionID)
+	client := mariadb.NewServersClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx)
@@ -1333,7 +1333,7 @@ func (ar *AzureReader) ListMARIADBServers(ctx context.Context) ([]mariadb.Server
 
 // ListMARIADBVirtualNetworkRules returns a list of VirtualNetworkRules within a subscription and a resource group
 func (ar *AzureReader) ListMARIADBVirtualNetworkRules(ctx context.Context, serverName string) ([]mariadb.VirtualNetworkRule, error) {
-	client := mariadb.NewVirtualNetworkRulesClient(ar.config.SubscriptionID)
+	client := mariadb.NewVirtualNetworkRulesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName)
@@ -1358,7 +1358,7 @@ func (ar *AzureReader) ListMARIADBVirtualNetworkRules(ctx context.Context, serve
 
 // ListMYSQLConfigurations returns a list of Configurations within a subscription and a resource group
 func (ar *AzureReader) ListMYSQLConfigurations(ctx context.Context, serverName string) ([]mysql.Configuration, error) {
-	client := mysql.NewConfigurationsClient(ar.config.SubscriptionID)
+	client := mysql.NewConfigurationsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName)
@@ -1372,7 +1372,7 @@ func (ar *AzureReader) ListMYSQLConfigurations(ctx context.Context, serverName s
 
 // ListMYSQLDatabases returns a list of Databases within a subscription and a resource group
 func (ar *AzureReader) ListMYSQLDatabases(ctx context.Context, serverName string) ([]mysql.Database, error) {
-	client := mysql.NewDatabasesClient(ar.config.SubscriptionID)
+	client := mysql.NewDatabasesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName)
@@ -1386,7 +1386,7 @@ func (ar *AzureReader) ListMYSQLDatabases(ctx context.Context, serverName string
 
 // ListMYSQLFirewallRules returns a list of FirewallRules within a subscription and a resource group
 func (ar *AzureReader) ListMYSQLFirewallRules(ctx context.Context, serverName string) ([]mysql.FirewallRule, error) {
-	client := mysql.NewFirewallRulesClient(ar.config.SubscriptionID)
+	client := mysql.NewFirewallRulesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName)
@@ -1400,7 +1400,7 @@ func (ar *AzureReader) ListMYSQLFirewallRules(ctx context.Context, serverName st
 
 // ListMYSQLServers returns a list of Servers within a subscription
 func (ar *AzureReader) ListMYSQLServers(ctx context.Context) ([]mysql.Server, error) {
-	client := mysql.NewServersClient(ar.config.SubscriptionID)
+	client := mysql.NewServersClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx)
@@ -1414,7 +1414,7 @@ func (ar *AzureReader) ListMYSQLServers(ctx context.Context) ([]mysql.Server, er
 
 // ListMYSQLVirtualNetworkRules returns a list of VirtualNetworkRules within a subscription and a resource group
 func (ar *AzureReader) ListMYSQLVirtualNetworkRules(ctx context.Context, serverName string) ([]mysql.VirtualNetworkRule, error) {
-	client := mysql.NewVirtualNetworkRulesClient(ar.config.SubscriptionID)
+	client := mysql.NewVirtualNetworkRulesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName)
@@ -1439,7 +1439,7 @@ func (ar *AzureReader) ListMYSQLVirtualNetworkRules(ctx context.Context, serverN
 
 // ListPOSTGRESQLConfigurations returns a list of Configurations within a subscription and a resource group
 func (ar *AzureReader) ListPOSTGRESQLConfigurations(ctx context.Context, serverName string) ([]postgresql.Configuration, error) {
-	client := postgresql.NewConfigurationsClient(ar.config.SubscriptionID)
+	client := postgresql.NewConfigurationsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName)
@@ -1453,7 +1453,7 @@ func (ar *AzureReader) ListPOSTGRESQLConfigurations(ctx context.Context, serverN
 
 // ListPOSTGRESQLDatabases returns a list of Databases within a subscription and a resource group
 func (ar *AzureReader) ListPOSTGRESQLDatabases(ctx context.Context, serverName string) ([]postgresql.Database, error) {
-	client := postgresql.NewDatabasesClient(ar.config.SubscriptionID)
+	client := postgresql.NewDatabasesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName)
@@ -1467,7 +1467,7 @@ func (ar *AzureReader) ListPOSTGRESQLDatabases(ctx context.Context, serverName s
 
 // ListPOSTGRESQLFirewallRules returns a list of FirewallRules within a subscription and a resource group
 func (ar *AzureReader) ListPOSTGRESQLFirewallRules(ctx context.Context, serverName string) ([]postgresql.FirewallRule, error) {
-	client := postgresql.NewFirewallRulesClient(ar.config.SubscriptionID)
+	client := postgresql.NewFirewallRulesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName)
@@ -1481,7 +1481,7 @@ func (ar *AzureReader) ListPOSTGRESQLFirewallRules(ctx context.Context, serverNa
 
 // ListPOSTGRESQLServers returns a list of Servers within a subscription
 func (ar *AzureReader) ListPOSTGRESQLServers(ctx context.Context) ([]postgresql.Server, error) {
-	client := postgresql.NewServersClient(ar.config.SubscriptionID)
+	client := postgresql.NewServersClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx)
@@ -1495,7 +1495,7 @@ func (ar *AzureReader) ListPOSTGRESQLServers(ctx context.Context) ([]postgresql.
 
 // ListPOSTGRESQLVirtualNetworkRules returns a list of VirtualNetworkRules within a subscription and a resource group
 func (ar *AzureReader) ListPOSTGRESQLVirtualNetworkRules(ctx context.Context, serverName string) ([]postgresql.VirtualNetworkRule, error) {
-	client := postgresql.NewVirtualNetworkRulesClient(ar.config.SubscriptionID)
+	client := postgresql.NewVirtualNetworkRulesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName)
@@ -1520,7 +1520,7 @@ func (ar *AzureReader) ListPOSTGRESQLVirtualNetworkRules(ctx context.Context, se
 
 // ListSQLDatabases returns a list of Databases within a subscription and a resource group
 func (ar *AzureReader) ListSQLDatabases(ctx context.Context, serverName string, skipToken string) ([]sql.Database, error) {
-	client := sql.NewDatabasesClient(ar.config.SubscriptionID)
+	client := sql.NewDatabasesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName, skipToken)
@@ -1545,7 +1545,7 @@ func (ar *AzureReader) ListSQLDatabases(ctx context.Context, serverName string, 
 
 // ListSQLElasticPools returns a list of ElasticPools within a subscription and a resource group
 func (ar *AzureReader) ListSQLElasticPools(ctx context.Context, serverName string, skip *int32) ([]sql.ElasticPool, error) {
-	client := sql.NewElasticPoolsClient(ar.config.SubscriptionID)
+	client := sql.NewElasticPoolsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName, skip)
@@ -1570,7 +1570,7 @@ func (ar *AzureReader) ListSQLElasticPools(ctx context.Context, serverName strin
 
 // ListSQLFirewallRules returns a list of FirewallRules within a subscription and a resource group
 func (ar *AzureReader) ListSQLFirewallRules(ctx context.Context, serverName string) ([]sql.FirewallRule, error) {
-	client := sql.NewFirewallRulesClient(ar.config.SubscriptionID)
+	client := sql.NewFirewallRulesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName)
@@ -1595,7 +1595,7 @@ func (ar *AzureReader) ListSQLFirewallRules(ctx context.Context, serverName stri
 
 // ListSQLServers returns a list of Servers within a subscription
 func (ar *AzureReader) ListSQLServers(ctx context.Context, expand string) ([]sql.Server, error) {
-	client := sql.NewServersClient(ar.config.SubscriptionID)
+	client := sql.NewServersClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, expand)
@@ -1620,7 +1620,7 @@ func (ar *AzureReader) ListSQLServers(ctx context.Context, expand string) ([]sql
 
 // ListSQLServerSecurityAlertPolicies returns a list of ServerSecurityAlertPolicies within a subscription and a resource group
 func (ar *AzureReader) ListSQLServerSecurityAlertPolicies(ctx context.Context, serverName string) ([]sql.ServerSecurityAlertPolicy, error) {
-	client := sql.NewServerSecurityAlertPoliciesClient(ar.config.SubscriptionID)
+	client := sql.NewServerSecurityAlertPoliciesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName)
@@ -1645,7 +1645,7 @@ func (ar *AzureReader) ListSQLServerSecurityAlertPolicies(ctx context.Context, s
 
 // ListSQLServerVulnerabilityAssessments returns a list of ServerVulnerabilityAssessments within a subscription and a resource group
 func (ar *AzureReader) ListSQLServerVulnerabilityAssessments(ctx context.Context, serverName string) ([]sql.ServerVulnerabilityAssessment, error) {
-	client := sql.NewServerVulnerabilityAssessmentsClient(ar.config.SubscriptionID)
+	client := sql.NewServerVulnerabilityAssessmentsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName)
@@ -1670,7 +1670,7 @@ func (ar *AzureReader) ListSQLServerVulnerabilityAssessments(ctx context.Context
 
 // ListSQLVirtualNetworkRules returns a list of VirtualNetworkRules within a subscription and a resource group
 func (ar *AzureReader) ListSQLVirtualNetworkRules(ctx context.Context, serverName string) ([]sql.VirtualNetworkRule, error) {
-	client := sql.NewVirtualNetworkRulesClient(ar.config.SubscriptionID)
+	client := sql.NewVirtualNetworkRulesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByServer(ctx, ar.GetResourceGroupName(), serverName)
@@ -1695,7 +1695,7 @@ func (ar *AzureReader) ListSQLVirtualNetworkRules(ctx context.Context, serverNam
 
 // ListSQLVirtualMachines returns a list of SQLVirtualMachines within a subscription
 func (ar *AzureReader) ListSQLVirtualMachines(ctx context.Context) ([]sqlvirtualmachine.SQLVirtualMachine, error) {
-	client := sqlvirtualmachine.NewSQLVirtualMachinesClient(ar.config.SubscriptionID)
+	client := sqlvirtualmachine.NewSQLVirtualMachinesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx)
@@ -1720,7 +1720,7 @@ func (ar *AzureReader) ListSQLVirtualMachines(ctx context.Context) ([]sqlvirtual
 
 // ListRedisCaches returns a list of RedisCaches within a subscription and a resource group
 func (ar *AzureReader) ListRedisCaches(ctx context.Context) ([]redis.ResourceType, error) {
-	client := redis.NewClient(ar.config.SubscriptionID)
+	client := redis.NewClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName())
@@ -1745,7 +1745,7 @@ func (ar *AzureReader) ListRedisCaches(ctx context.Context) ([]redis.ResourceTyp
 
 // ListREDISFirewallRules returns a list of FirewallRules within a subscription and a resource group
 func (ar *AzureReader) ListREDISFirewallRules(ctx context.Context, cacheName string) ([]redis.FirewallRule, error) {
-	client := redis.NewFirewallRulesClient(ar.config.SubscriptionID)
+	client := redis.NewFirewallRulesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), cacheName)
@@ -1770,7 +1770,7 @@ func (ar *AzureReader) ListREDISFirewallRules(ctx context.Context, cacheName str
 
 // ListDNSZones returns a list of Zones within a subscription
 func (ar *AzureReader) ListDNSZones(ctx context.Context, top *int32) ([]dns.Zone, error) {
-	client := dns.NewZonesClient(ar.config.SubscriptionID)
+	client := dns.NewZonesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, top)
@@ -1795,7 +1795,7 @@ func (ar *AzureReader) ListDNSZones(ctx context.Context, top *int32) ([]dns.Zone
 
 // ListDNSRecordSets returns a list of RecordSets within a subscription and a resource group
 func (ar *AzureReader) ListDNSRecordSets(ctx context.Context, zoneName string, top *int32, recordSetNameSuffix string) ([]dns.RecordSet, error) {
-	client := dns.NewRecordSetsClient(ar.config.SubscriptionID)
+	client := dns.NewRecordSetsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListAllByDNSZone(ctx, ar.GetResourceGroupName(), zoneName, top, recordSetNameSuffix)
@@ -1820,7 +1820,7 @@ func (ar *AzureReader) ListDNSRecordSets(ctx context.Context, zoneName string, t
 
 // ListPRIVATEDNSPrivateZones returns a list of PrivateZones within a subscription
 func (ar *AzureReader) ListPRIVATEDNSPrivateZones(ctx context.Context, top *int32) ([]privatedns.PrivateZone, error) {
-	client := privatedns.NewPrivateZonesClient(ar.config.SubscriptionID)
+	client := privatedns.NewPrivateZonesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, top)
@@ -1845,7 +1845,7 @@ func (ar *AzureReader) ListPRIVATEDNSPrivateZones(ctx context.Context, top *int3
 
 // ListPRIVATEDNSRecordSets returns a list of RecordSets within a subscription and a resource group
 func (ar *AzureReader) ListPRIVATEDNSRecordSets(ctx context.Context, zoneName string, top *int32, recordSetNameSuffix string) ([]privatedns.RecordSet, error) {
-	client := privatedns.NewRecordSetsClient(ar.config.SubscriptionID)
+	client := privatedns.NewRecordSetsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), zoneName, top, recordSetNameSuffix)
@@ -1870,7 +1870,7 @@ func (ar *AzureReader) ListPRIVATEDNSRecordSets(ctx context.Context, zoneName st
 
 // ListPRIVATEDNSVirtualNetworkLinks returns a list of VirtualNetworkLinks within a subscription and a resource group
 func (ar *AzureReader) ListPRIVATEDNSVirtualNetworkLinks(ctx context.Context, privateZoneName string, top *int32) ([]privatedns.VirtualNetworkLink, error) {
-	client := privatedns.NewVirtualNetworkLinksClient(ar.config.SubscriptionID)
+	client := privatedns.NewVirtualNetworkLinksClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), privateZoneName, top)
@@ -1895,7 +1895,7 @@ func (ar *AzureReader) ListPRIVATEDNSVirtualNetworkLinks(ctx context.Context, pr
 
 // ListPOLICYDefinitions returns a list of Definitions within a subscription
 func (ar *AzureReader) ListPOLICYDefinitions(ctx context.Context, filter string, top *int32) ([]policy.Definition, error) {
-	client := policy.NewDefinitionsClient(ar.config.SubscriptionID)
+	client := policy.NewDefinitionsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, filter, top)
@@ -1920,7 +1920,7 @@ func (ar *AzureReader) ListPOLICYDefinitions(ctx context.Context, filter string,
 
 // ListPOLICYSetDefinitions returns a list of SetDefinitions within a subscription
 func (ar *AzureReader) ListPOLICYSetDefinitions(ctx context.Context, filter string, top *int32) ([]policy.SetDefinition, error) {
-	client := policy.NewSetDefinitionsClient(ar.config.SubscriptionID)
+	client := policy.NewSetDefinitionsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, filter, top)
@@ -1945,7 +1945,7 @@ func (ar *AzureReader) ListPOLICYSetDefinitions(ctx context.Context, filter stri
 
 // ListPOLICYINSIGHTSRemediations returns a list of Remediations within a subscription and a resource group
 func (ar *AzureReader) ListPOLICYINSIGHTSRemediations(ctx context.Context, top *int32, filter string) ([]policyinsights.Remediation, error) {
-	client := policyinsights.NewRemediationsClient(ar.config.SubscriptionID)
+	client := policyinsights.NewRemediationsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListForResourceGroup(ctx, ar.config.SubscriptionID, ar.GetResourceGroupName(), top, filter)
@@ -1970,7 +1970,7 @@ func (ar *AzureReader) ListPOLICYINSIGHTSRemediations(ctx context.Context, top *
 
 // ListKeyVaults returns a list of Vaults within a subscription and a resource group
 func (ar *AzureReader) ListKeyVaults(ctx context.Context, top *int32) ([]keyvault.Vault, error) {
-	client := keyvault.NewVaultsClient(ar.config.SubscriptionID)
+	client := keyvault.NewVaultsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName(), top)
@@ -1995,7 +1995,7 @@ func (ar *AzureReader) ListKeyVaults(ctx context.Context, top *int32) ([]keyvaul
 
 // ListINSIGHTSComponents returns a list of Components within a subscription
 func (ar *AzureReader) ListINSIGHTSComponents(ctx context.Context) ([]insights.ApplicationInsightsComponent, error) {
-	client := insights.NewComponentsClient(ar.config.SubscriptionID)
+	client := insights.NewComponentsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx)
@@ -2020,7 +2020,7 @@ func (ar *AzureReader) ListINSIGHTSComponents(ctx context.Context) ([]insights.A
 
 // ListINSIGHTSAPIKeys returns a list of APIKeys within a subscription and a resource group
 func (ar *AzureReader) ListINSIGHTSAPIKeys(ctx context.Context, ApplicationInsightsComponent string) ([]insights.ApplicationInsightsComponentAPIKey, error) {
-	client := insights.NewAPIKeysClient(ar.config.SubscriptionID)
+	client := insights.NewAPIKeysClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), ApplicationInsightsComponent)
@@ -2034,7 +2034,7 @@ func (ar *AzureReader) ListINSIGHTSAPIKeys(ctx context.Context, ApplicationInsig
 
 // ListINSIGHTSAnalyticsItems returns a list of AnalyticsItems within a subscription and a resource group
 func (ar *AzureReader) ListINSIGHTSAnalyticsItems(ctx context.Context, ApplicationInsightsComponent string, scopePath insights.ItemScopePath, scope insights.ItemScope, typeParameter insights.ItemTypeParameter, includeContent *bool) ([]insights.ApplicationInsightsComponentAnalyticsItem, error) {
-	client := insights.NewAnalyticsItemsClient(ar.config.SubscriptionID)
+	client := insights.NewAnalyticsItemsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, ar.GetResourceGroupName(), ApplicationInsightsComponent, scopePath, scope, typeParameter, includeContent)
@@ -2048,7 +2048,7 @@ func (ar *AzureReader) ListINSIGHTSAnalyticsItems(ctx context.Context, Applicati
 
 // ListINSIGHTSWebTests returns a list of WebTests within a subscription
 func (ar *AzureReader) ListINSIGHTSWebTests(ctx context.Context) ([]insights.WebTest, error) {
-	client := insights.NewWebTestsClient(ar.config.SubscriptionID)
+	client := insights.NewWebTestsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx)
@@ -2073,7 +2073,7 @@ func (ar *AzureReader) ListINSIGHTSWebTests(ctx context.Context) ([]insights.Web
 
 // ListLogAnalyticsWorkspaces returns a list of Workspaces within a subscription
 func (ar *AzureReader) ListLogAnalyticsWorkspaces(ctx context.Context) ([]operationalinsights.Workspace, error) {
-	client := operationalinsights.NewWorkspacesClient(ar.config.SubscriptionID)
+	client := operationalinsights.NewWorkspacesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx)
@@ -2087,7 +2087,7 @@ func (ar *AzureReader) ListLogAnalyticsWorkspaces(ctx context.Context) ([]operat
 
 // ListLogAnalyticsLinkedService returns a list of LinkedServices within a subscription and a resource group
 func (ar *AzureReader) ListLogAnalyticsLinkedService(ctx context.Context, workspaceName string) ([]operationalinsights.LinkedService, error) {
-	client := operationalinsights.NewLinkedServicesClient(ar.config.SubscriptionID)
+	client := operationalinsights.NewLinkedServicesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByWorkspace(ctx, ar.GetResourceGroupName(), workspaceName)
@@ -2101,7 +2101,7 @@ func (ar *AzureReader) ListLogAnalyticsLinkedService(ctx context.Context, worksp
 
 // ListLogAnalyticsDatasource returns a list of DataSources within a subscription and a resource group
 func (ar *AzureReader) ListLogAnalyticsDatasource(ctx context.Context, workspaceName string, filter string, skiptoken string) ([]operationalinsights.DataSource, error) {
-	client := operationalinsights.NewDataSourcesClient(ar.config.SubscriptionID)
+	client := operationalinsights.NewDataSourcesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByWorkspace(ctx, ar.GetResourceGroupName(), workspaceName, filter, skiptoken)
@@ -2126,7 +2126,7 @@ func (ar *AzureReader) ListLogAnalyticsDatasource(ctx context.Context, workspace
 
 // ListMonitorActionsGroup returns a list of ActionGroupResources within a subscription and a resource group
 func (ar *AzureReader) ListMonitorActionsGroup(ctx context.Context) ([]newActionGroupClient.ActionGroupResource, error) {
-	client := newActionGroupClient.NewActionGroupsClient(ar.config.SubscriptionID)
+	client := newActionGroupClient.NewActionGroupsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName())
@@ -2140,7 +2140,7 @@ func (ar *AzureReader) ListMonitorActionsGroup(ctx context.Context) ([]newAction
 
 // ListMonitorActivityLogAlert returns a list of ActivityLogAlertResources within a subscription and a resource group
 func (ar *AzureReader) ListMonitorActivityLogAlert(ctx context.Context) ([]newActivityLogAlertsClient.ActivityLogAlertResource, error) {
-	client := newActivityLogAlertsClient.NewActivityLogAlertsClient(ar.config.SubscriptionID)
+	client := newActivityLogAlertsClient.NewActivityLogAlertsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName())
@@ -2165,7 +2165,7 @@ func (ar *AzureReader) ListMonitorActivityLogAlert(ctx context.Context) ([]newAc
 
 // ListMonitorAutoScaleSettings returns a list of AutoscaleSettingResources within a subscription and a resource group
 func (ar *AzureReader) ListMonitorAutoScaleSettings(ctx context.Context) ([]monitor.AutoscaleSettingResource, error) {
-	client := monitor.NewAutoscaleSettingsClient(ar.config.SubscriptionID)
+	client := monitor.NewAutoscaleSettingsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName())
@@ -2190,7 +2190,7 @@ func (ar *AzureReader) ListMonitorAutoScaleSettings(ctx context.Context) ([]moni
 
 // ListMonitorLogProfiles returns a list of LogProfileResources within a subscription
 func (ar *AzureReader) ListMonitorLogProfiles(ctx context.Context) ([]monitor.LogProfileResource, error) {
-	client := monitor.NewLogProfilesClient(ar.config.SubscriptionID)
+	client := monitor.NewLogProfilesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx)
@@ -2204,7 +2204,7 @@ func (ar *AzureReader) ListMonitorLogProfiles(ctx context.Context) ([]monitor.Lo
 
 // ListMonitorMetricsAlerts returns a list of MetricAlertResources within a subscription and a resource group
 func (ar *AzureReader) ListMonitorMetricsAlerts(ctx context.Context) ([]monitor.MetricAlertResource, error) {
-	client := monitor.NewMetricAlertsClient(ar.config.SubscriptionID)
+	client := monitor.NewMetricAlertsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName())
@@ -2218,7 +2218,7 @@ func (ar *AzureReader) ListMonitorMetricsAlerts(ctx context.Context) ([]monitor.
 
 // ListWebApps returns a list of Sites within a subscription
 func (ar *AzureReader) ListWebApps(ctx context.Context) ([]web.Site, error) {
-	client := web.NewAppsClient(ar.config.SubscriptionID)
+	client := web.NewAppsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx)
@@ -2243,7 +2243,7 @@ func (ar *AzureReader) ListWebApps(ctx context.Context) ([]web.Site, error) {
 
 // ListDeploymentSlots returns a list of Sites within a subscription and a resource group
 func (ar *AzureReader) ListDeploymentSlots(ctx context.Context, name string) ([]web.Site, error) {
-	client := web.NewAppsClient(ar.config.SubscriptionID)
+	client := web.NewAppsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListSlots(ctx, ar.GetResourceGroupName(), name)
@@ -2268,7 +2268,7 @@ func (ar *AzureReader) ListDeploymentSlots(ctx context.Context, name string) ([]
 
 // ListAppServicePlans returns a list of AppServicePlans within a subscription
 func (ar *AzureReader) ListAppServicePlans(ctx context.Context, detailed *bool) ([]web.AppServicePlan, error) {
-	client := web.NewAppServicePlansClient(ar.config.SubscriptionID)
+	client := web.NewAppServicePlansClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, detailed)
@@ -2293,7 +2293,7 @@ func (ar *AzureReader) ListAppServicePlans(ctx context.Context, detailed *bool) 
 
 // ListSourceControls returns a list of SourceControls within a subscription
 func (ar *AzureReader) ListSourceControls(ctx context.Context) ([]web.SourceControl, error) {
-	client := web.New(ar.config.SubscriptionID)
+	client := web.NewWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListSourceControls(ctx)
@@ -2318,7 +2318,7 @@ func (ar *AzureReader) ListSourceControls(ctx context.Context) ([]web.SourceCont
 
 // ListStaticSites returns a list of StaticSiteARMResources within a subscription
 func (ar *AzureReader) ListStaticSites(ctx context.Context) ([]web.StaticSiteARMResource, error) {
-	client := web.NewStaticSitesClient(ar.config.SubscriptionID)
+	client := web.NewStaticSitesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx)
@@ -2343,7 +2343,7 @@ func (ar *AzureReader) ListStaticSites(ctx context.Context) ([]web.StaticSiteARM
 
 // ListStaticSitesCustomDomain returns a list of StaticSiteCustomDomainOverviewARMResources within a subscription and a resource group
 func (ar *AzureReader) ListStaticSitesCustomDomain(ctx context.Context, name string) ([]web.StaticSiteCustomDomainOverviewARMResource, error) {
-	client := web.NewStaticSitesClient(ar.config.SubscriptionID)
+	client := web.NewStaticSitesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListStaticSiteCustomDomains(ctx, ar.GetResourceGroupName(), name)
@@ -2368,7 +2368,7 @@ func (ar *AzureReader) ListStaticSitesCustomDomain(ctx context.Context, name str
 
 // ListHybridConnections returns a list of HybridConnections within a subscription and a resource group
 func (ar *AzureReader) ListHybridConnections(ctx context.Context, name string) ([]web.HybridConnection, error) {
-	client := web.NewAppServicePlansClient(ar.config.SubscriptionID)
+	client := web.NewAppServicePlansClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListHybridConnections(ctx, ar.GetResourceGroupName(), name)
@@ -2393,7 +2393,7 @@ func (ar *AzureReader) ListHybridConnections(ctx context.Context, name string) (
 
 // ListBackupVaultResources returns a list of BackupVaultResources within a subscription and a resource group
 func (ar *AzureReader) ListBackupVaultResources(ctx context.Context) ([]dataprotection.BackupVaultResource, error) {
-	client := dataprotection.NewBackupVaultsClient(ar.config.SubscriptionID)
+	client := dataprotection.NewBackupVaultsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.GetInResourceGroup(ctx, ar.GetResourceGroupName())
@@ -2418,7 +2418,7 @@ func (ar *AzureReader) ListBackupVaultResources(ctx context.Context) ([]dataprot
 
 // ListBackupInstanceResources returns a list of BackupInstanceResources within a subscription and a resource group
 func (ar *AzureReader) ListBackupInstanceResources(ctx context.Context, vaultName string) ([]dataprotection.BackupInstanceResource, error) {
-	client := dataprotection.NewBackupInstancesClient(ar.config.SubscriptionID)
+	client := dataprotection.NewBackupInstancesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, vaultName, ar.GetResourceGroupName())
@@ -2443,7 +2443,7 @@ func (ar *AzureReader) ListBackupInstanceResources(ctx context.Context, vaultNam
 
 // ListBaseBackupPolicyResources returns a list of BaseBackupPolicyResources within a subscription and a resource group
 func (ar *AzureReader) ListBaseBackupPolicyResources(ctx context.Context, vaultName string) ([]dataprotection.BaseBackupPolicyResource, error) {
-	client := dataprotection.NewBackupPoliciesClient(ar.config.SubscriptionID)
+	client := dataprotection.NewBackupPoliciesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, vaultName, ar.GetResourceGroupName())
@@ -2468,7 +2468,7 @@ func (ar *AzureReader) ListBaseBackupPolicyResources(ctx context.Context, vaultN
 
 // ListAPIManagementServiceResources returns a list of ServiceResources within a subscription
 func (ar *AzureReader) ListAPIManagementServiceResources(ctx context.Context) ([]apimanagement.ServiceResource, error) {
-	client := apimanagement.NewServiceClient(ar.config.SubscriptionID)
+	client := apimanagement.NewServiceClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx)
@@ -2493,7 +2493,7 @@ func (ar *AzureReader) ListAPIManagementServiceResources(ctx context.Context) ([
 
 // ListRecoveryServicesVault returns a list of Vaults within a subscription and a resource group
 func (ar *AzureReader) ListRecoveryServicesVault(ctx context.Context) ([]recoveryservices.Vault, error) {
-	client := recoveryservices.NewVaultsClient(ar.config.SubscriptionID)
+	client := recoveryservices.NewVaultsClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.ListByResourceGroup(ctx, ar.GetResourceGroupName())
@@ -2518,7 +2518,7 @@ func (ar *AzureReader) ListRecoveryServicesVault(ctx context.Context) ([]recover
 
 // ListBackupPolicies returns a list of ProtectionPolicyResources within a subscription and a resource group
 func (ar *AzureReader) ListBackupPolicies(ctx context.Context, filter string, vaultName string) ([]backup.ProtectionPolicyResource, error) {
-	client := backup.NewPoliciesClient(ar.config.SubscriptionID)
+	client := backup.NewPoliciesClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, filter, ar.GetResourceGroupName(), vaultName)
@@ -2543,7 +2543,7 @@ func (ar *AzureReader) ListBackupPolicies(ctx context.Context, filter string, va
 
 // ListBackupProtectedItems returns a list of ProtectedItemResources within a subscription and a resource group
 func (ar *AzureReader) ListBackupProtectedItems(ctx context.Context, vaultName string, filter string, skipToken string) ([]backup.ProtectedItemResource, error) {
-	client := backup.NewProtectedItemsGroupClient(ar.config.SubscriptionID)
+	client := backup.NewProtectedItemsGroupClientWithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 	client.Authorizer = ar.authorizer
 
 	output, err := client.List(ctx, vaultName, ar.GetResourceGroupName(), filter, skipToken)
