@@ -29,7 +29,7 @@ const (
 	functionTmpl = `
 	// {{ .FunctionName }} returns a list of {{ .PluralName }} within a subscription {{ if .Location }}and a location {{ end }}{{ if .ResourceGroup }}and a resource group {{ end }}
 	func (ar *AzureReader) {{ .FunctionName }}(ctx context.Context{{ range .ExtraArgsBeforeResourceGroup }},{{ .Name }} {{ .Type }} {{ end }}{{ range .ExtraArgs }},{{ .Name }} {{ .Type }} {{ end }}) ([]{{ .API }}.{{ .ResourceName }}, error) {
-		client := {{ .API }}.{{ if .IrregularClientName }}{{ .IrregularClientName }}{{ else }}New{{ .PluralName }}Client{{ end }}(ar.config.SubscriptionID)
+		client := {{ .API }}.{{ if .IrregularClientName }}{{ .IrregularClientName }}{{ else }}New{{ .PluralName }}Client{{ end }}WithBaseURI(ar.env.ResourceManagerEndpoint, ar.config.SubscriptionID)
 		client.Authorizer = ar.authorizer
 
 		output, err := client.{{ .AzureSDKListFunction }}(ctx{{ if .Location }}, ar.GetLocation(){{ end }}{{ if .Subscription }}, ar.config.SubscriptionID{{ end }}{{ if .ResourceGroup }}{{ range .ExtraArgsBeforeResourceGroup }},{{ .Name }}{{ end }}, ar.GetResourceGroupName(){{ end }}{{ range .ExtraArgs }},{{ .Name }}{{ end }})

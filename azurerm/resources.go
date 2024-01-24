@@ -1114,7 +1114,7 @@ func networkInterfaceSecurityGroupAssociations(ctx context.Context, a *azurerm, 
 
 		props := networkInterface.InterfacePropertiesFormat
 		if props != nil {
-			if props.NetworkSecurityGroup != nil || props.NetworkSecurityGroup.ID != nil {
+			if props.NetworkSecurityGroup != nil && props.NetworkSecurityGroup.ID != nil {
 				r := provider.NewResource(fmt.Sprintf("%s|%s", *networkInterface.ID, *props.NetworkSecurityGroup.ID), resourceType, a)
 				resources = append(resources, r)
 			}
@@ -2804,7 +2804,7 @@ func recoveryServicesVaults(ctx context.Context, a *azurerm, ar *AzureReader, re
 	return resources, nil
 }
 
-//Recovery Services - backup
+// Recovery Services - backup
 func backupPolicyVMs(ctx context.Context, a *azurerm, ar *AzureReader, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	vaultNames, err := getRecoveryServicesVaults(ctx, a, ar, RecoveryServicesVault.String(), filters)
 	if err != nil {
