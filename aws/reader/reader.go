@@ -3,6 +3,7 @@ package reader
 import (
 	"context"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/apigateway"
 	apigatewaytypes "github.com/aws/aws-sdk-go-v2/service/apigateway/types"
 	"github.com/aws/aws-sdk-go-v2/service/athena"
@@ -49,6 +50,8 @@ import (
 	elasticsearchservicetypes "github.com/aws/aws-sdk-go-v2/service/elasticsearchservice/types"
 	"github.com/aws/aws-sdk-go-v2/service/emr"
 	emrtypes "github.com/aws/aws-sdk-go-v2/service/emr/types"
+	"github.com/aws/aws-sdk-go-v2/service/firehose"
+	firehosetypes "github.com/aws/aws-sdk-go-v2/service/firehose/types"
 	"github.com/aws/aws-sdk-go-v2/service/fsx"
 	fsxtypes "github.com/aws/aws-sdk-go-v2/service/fsx/types"
 	"github.com/aws/aws-sdk-go-v2/service/glue"
@@ -419,6 +422,10 @@ type Reader interface {
 	// GetFSXFileSystems returns the fsx filesystems arns on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetFSXFileSystems(ctx context.Context, input *fsx.DescribeFileSystemsInput) ([]fsxtypes.FileSystem, error)
+
+	// GetFirehoseDeliveryStreams returns the firehose delivery streams on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetFirehoseDeliveryStreams(ctx context.Context, input *firehose.ListDeliveryStreamsInput) ([]firehosetypes.DeliveryStreamDescription, error)
 
 	// GetGlueDatabases returns the Glue databases on the given input
 	// Returned values are commented in the interface doc comment block.
@@ -2946,6 +2953,52 @@ func (c *connector) GetFSXFileSystems(ctx context.Context, input *fsx.DescribeFi
 	return opt, nil
 }
 
+func (c *connector) GetFirehoseDeliveryStreams(ctx context.Context, input *firehose.ListDeliveryStreamsInput) ([]firehosetypes.DeliveryStreamDescription, error) {
+	if c.svc.firehose == nil {
+		c.svc.firehose = firehose.NewFromConfig(c.svc.config)
+	}
+
+	opt := make([]firehosetypes.DeliveryStreamDescription, 0)
+
+	hasNextToken := true
+	for hasNextToken {
+		o, err := c.svc.firehose.ListDeliveryStreams(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		if o.DeliveryStreamNames == nil {
+			hasNextToken = false
+			continue
+		}
+
+		// For each delivery stream name, get the full description
+		for _, streamName := range o.DeliveryStreamNames {
+			describeInput := &firehose.DescribeDeliveryStreamInput{
+				DeliveryStreamName: aws.String(streamName),
+			}
+			describeOutput, err := c.svc.firehose.DescribeDeliveryStream(ctx, describeInput)
+			if err != nil {
+				return nil, err
+			}
+			if describeOutput.DeliveryStreamDescription != nil {
+				opt = append(opt, *describeOutput.DeliveryStreamDescription)
+			}
+		}
+
+		if input == nil {
+			input = &firehose.ListDeliveryStreamsInput{}
+		}
+		// Only set pagination if we have delivery stream names and more streams available
+		if len(o.DeliveryStreamNames) > 0 {
+			input.ExclusiveStartDeliveryStreamName = aws.String(o.DeliveryStreamNames[len(o.DeliveryStreamNames)-1])
+		}
+		hasNextToken = o.HasMoreDeliveryStreams != nil && *o.HasMoreDeliveryStreams
+
+	}
+
+	return opt, nil
+}
+
 func (c *connector) GetGlueDatabases(ctx context.Context, input *glue.GetDatabasesInput) ([]gluetypes.Database, error) {
 	if c.svc.glue == nil {
 		c.svc.glue = glue.NewFromConfig(c.svc.config)
@@ -4659,9 +4712,6 @@ func (c *connector) GetCloudWatchLogGroups(ctx context.Context, input *cloudwatc
 			continue
 		}
 
-		if input == nil {
-			input = &cloudwatchlogs.DescribeLogGroupsInput{}
-		}
 		input.NextToken = o.NextToken
 		hasNextToken = o.NextToken != nil
 

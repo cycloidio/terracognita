@@ -110,6 +110,7 @@ const (
 	ElasticsearchDomainPolicy
 	ELB
 	EMRCluster
+	KinesisFirehoseDeliveryStream
 	FsxLustreFileSystem
 	GlueCatalogDatabase
 	GlueCatalogTable
@@ -247,6 +248,7 @@ var (
 		ElasticsearchDomainPolicy:                  elasticsearchDomains,
 		ELB:                                        elbs,
 		EMRCluster:                                 emrClusters,
+		KinesisFirehoseDeliveryStream:              firehoseDeliveryStreams,
 		FsxLustreFileSystem:                        fsxLustreFileSystems,
 		GlueCatalogDatabase:                        cacheGlueDatabases,
 		GlueCatalogTable:                           glueCatalogTables,
@@ -912,7 +914,7 @@ func cloudfrontPublicKeys(ctx context.Context, a *aws, resourceType string, filt
 
 func cloudwatchLogGroup(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
 	input := &cloudwatchlogs.DescribeLogGroupsInput{
-		Limit: awssdk.Int32(100),
+		Limit: awssdk.Int32(50),
 	}
 	logGroups, err := a.awsr.GetCloudWatchLogGroups(ctx, input)
 	if err != nil {
@@ -1756,6 +1758,24 @@ func emrClusters(ctx context.Context, a *aws, resourceType string, filters *filt
 	resources := make([]provider.Resource, 0)
 	for _, i := range emrClusters {
 		r, err := initializeResource(a, *i.Id, resourceType)
+		if err != nil {
+			return nil, err
+		}
+		resources = append(resources, r)
+	}
+
+	return resources, nil
+}
+
+func firehoseDeliveryStreams(ctx context.Context, a *aws, resourceType string, filters *filter.Filter) ([]provider.Resource, error) {
+	firehoseDeliveryStreams, err := a.awsr.GetFirehoseDeliveryStreams(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resources := make([]provider.Resource, 0)
+	for _, i := range firehoseDeliveryStreams {
+		r, err := initializeResource(a, *i.DeliveryStreamARN, resourceType)
 		if err != nil {
 			return nil, err
 		}

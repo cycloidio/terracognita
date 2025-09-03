@@ -32,6 +32,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.43.13
 	github.com/aws/aws-sdk-go-v2/service/elasticsearchservice v1.32.19
 	github.com/aws/aws-sdk-go-v2/service/emr v1.47.13
+	github.com/aws/aws-sdk-go-v2/service/firehose v1.36.6
 	github.com/aws/aws-sdk-go-v2/service/fsx v1.52.1
 	github.com/aws/aws-sdk-go-v2/service/glue v1.105.10
 	github.com/aws/aws-sdk-go-v2/service/iam v1.39.2
@@ -199,7 +200,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/eventbridge v1.36.12 // indirect
 	github.com/aws/aws-sdk-go-v2/service/evidently v1.23.16 // indirect
 	github.com/aws/aws-sdk-go-v2/service/finspace v1.28.16 // indirect
-	github.com/aws/aws-sdk-go-v2/service/firehose v1.36.6 // indirect
 	github.com/aws/aws-sdk-go-v2/service/fis v1.32.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/fms v1.39.7 // indirect
 	github.com/aws/aws-sdk-go-v2/service/gamelift v1.39.7 // indirect

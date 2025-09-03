@@ -31,6 +31,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticsearchservice"
 	"github.com/aws/aws-sdk-go-v2/service/emr"
+	"github.com/aws/aws-sdk-go-v2/service/firehose"
 	"github.com/aws/aws-sdk-go-v2/service/fsx"
 	"github.com/aws/aws-sdk-go-v2/service/glue"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
@@ -133,6 +134,7 @@ type serviceConnector struct {
 	elbv2                    *elasticloadbalancingv2.Client
 	emr                      *emr.Client
 	fsx                      *fsx.Client
+	firehose                 *firehose.Client
 	glue                     *glue.Client
 	iam                      *iam.Client
 	kinesis                  *kinesis.Client
@@ -223,9 +225,18 @@ func (c *connector) setRegion(ctx context.Context, ec2 *ec2.Client, region strin
 }
 
 func (c *connector) setService(config *aws.Config) {
+	if config != nil {
+		config.Credentials = c.creds
+	} else {
+		config = &aws.Config{
+			Region:      c.region,
+			Credentials: c.creds,
+		}
+	}
 	c.svc = &serviceConnector{
-		config:                   *config,
-		region:                   c.region,
+		config: *config,
+		region: c.region,
+
 		apigateway:               apigateway.NewFromConfig(*config),
 		athena:                   athena.NewFromConfig(*config),
 		autoscaling:              autoscaling.NewFromConfig(*config),
@@ -249,6 +260,7 @@ func (c *connector) setService(config *aws.Config) {
 		elb:                      elasticloadbalancing.NewFromConfig(*config),
 		elbv2:                    elasticloadbalancingv2.NewFromConfig(*config),
 		emr:                      emr.NewFromConfig(*config),
+		firehose:                 firehose.NewFromConfig(*config),
 		fsx:                      fsx.NewFromConfig(*config),
 		glue:                     glue.NewFromConfig(*config),
 		iam:                      iam.NewFromConfig(*config),
