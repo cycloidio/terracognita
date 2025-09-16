@@ -260,7 +260,7 @@ PROVIDER=aws make update-terraform-provider
 
 ##### AzureRM Middleware layer
 
-We have an `azurerm/cmd` that generates the `azurerm/reader_generated.go` methods used to get the resources from the Azure SDK. To add a new call you have to add a new Function to the list in `aws/cmd/generate.go` (and the corresponding AzureAPI if necessary) and run `make generate`, you'll have the code fully generated for that function.
+We have an `azurerm/cmd` that generates the `azurerm/reader_generated.go` methods used to get the resources from the Azure SDK. To add a new call you have to add a new Function to the list in `azurerm/cmd/generate.go` (and the corresponding AzureAPI if necessary) and run `make generate`, you'll have the code fully generated for that function.
 
 ###### Example with azurerm_virtual_machine
 
