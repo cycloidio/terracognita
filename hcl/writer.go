@@ -19,6 +19,7 @@ import (
 	"github.com/cycloidio/terracognita/util"
 	"github.com/cycloidio/terracognita/writer"
 	"github.com/hashicorp/hcl/v2/hclwrite"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/pkg/errors"
 	"github.com/zclconf/go-cty/cty"
 	cjson "github.com/zclconf/go-cty/cty/json"
@@ -269,7 +270,14 @@ func (w *Writer) Sync() error {
 					}
 					attrMap := resources.AsValueMap()
 					for _, attr := range attrKeys {
-						bbody.SetAttributeValue(attr, attrMap[attr])
+						value := attrMap[attr]
+						// Providers/modules/variables can also contain nested blocks,
+						// which are represented as tuples (JSON arrays of objects).
+						if value.Type().IsTupleType() {
+							writeTuple(body, bbody, attr, value)
+						} else {
+							bbody.SetAttributeValue(attr, value)
+						}
 					}
 
 					body.AppendBlock(block)
@@ -671,6 +679,14 @@ func (w *Writer) setProviderConfig(cat string) {
 	pcfg := w.provider.Configuration()
 	for k, s := range w.provider.TFProvider().Schema {
 		if s.Required {
+			// Check if this is a block-type attribute (TypeList/TypeSet with Resource Elem)
+			// Blocks should be written as empty blocks (e.g., features {}) not variable interpolations
+			if isBlockSchema(s) {
+				// For block-type attributes, write an empty block by using a single empty object.
+				// This ensures writeTuple creates an empty block instead of an empty array.
+				w.Config[cat]["provider"].(map[string]interface{})[w.provider.String()].(map[string]interface{})[k] = []interface{}{map[string]interface{}{}}
+				continue
+			}
 			if _, ok := w.Config[cat]["variable"]; !ok {
 				w.Config[cat]["variable"] = make(map[string]interface{})
 			}
@@ -690,4 +706,17 @@ func (w *Writer) setProviderConfig(cat string) {
 			w.Config[cat]["provider"].(map[string]interface{})[w.provider.String()].(map[string]interface{})[k] = fmt.Sprintf("${var.%s}", k)
 		}
 	}
+}
+
+// isBlockSchema checks if a schema field represents a block (nested resource)
+// rather than a simple attribute. Blocks are typically TypeList or TypeSet
+// with a Resource as Elem, which defines nested attributes.
+func isBlockSchema(s *schema.Schema) bool {
+	switch s.Type {
+	case schema.TypeList, schema.TypeSet:
+		if _, ok := s.Elem.(*schema.Resource); ok {
+			return true
+		}
+	}
+	return false
 }

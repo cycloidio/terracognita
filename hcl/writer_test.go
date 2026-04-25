@@ -681,7 +681,7 @@ module "test" {
 
 provider "azurerm" {
 	environment   = var.environment
-	features      = var.features
+	features { }
 	metadata_host = var.metadata_host
 }
 
@@ -697,9 +697,6 @@ terraform {
 
 variable "environment" {
   default = "public"
-}
-
-variable "features" {
 }
 
 variable "metadata_host" {
