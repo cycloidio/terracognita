@@ -96,7 +96,7 @@ We also have `make help` that provide some helpers on using the actual codebase 
 
 ### Modules
 
-Terracognita can generate Terraform Modules directly when importing. To enable this feature you'll need to use the `--module {module/path/name}` and then on that specific path is where the module will be generated. The path has to be directory or a none existent path (it'll be created), the content of the path will be deleted (after user confirmation) so we can have a clean import.
+Terracognita can generate Terraform Modules directly when importing. To enable this feature you'll need to use the `--module {module/path/name}` and then on that specific path is where the module will be generated. The path has to be directory or a none existent path (it'll be created), the content of the path will be deleted (after user confirmation) so we can have a clean import. Use `--overwrite` to delete and recreate an existing `--module` or `--hcl` output directory without confirmation.
 
 The output structure will look like (having `--module test`) this where each file aggregates the resources from the same "category":
 
