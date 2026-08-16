@@ -100,7 +100,7 @@ func preRunEOutput(cmd *cobra.Command, args []string) error {
 		// It means is a existing directory
 		// so we'll ask for confirmation before deleting the
 		// existent content
-		if err == nil {
+		if err == nil && !viper.GetBool("overwrite") {
 			fmt.Printf("We are about to remove all content from %q, are you sure? Yes/No (Y/N):\n", module)
 			var s string
 			fmt.Scanf("%s\n", &s)
@@ -140,7 +140,7 @@ func preRunEOutput(cmd *cobra.Command, args []string) error {
 			// It means is a existing directory
 			// so we'll ask for confirmation before deleting the
 			// existent content
-			if err == nil {
+			if err == nil && !viper.GetBool("overwrite") {
 				fmt.Printf("We are about to remove all content from %q, are you sure? Yes/No (Y/N):\n", hcl)
 				var s string
 				fmt.Scanf("%s\n", &s)
@@ -363,6 +363,9 @@ func init() {
 
 	RootCmd.PersistentFlags().String("module", "", "Generates the output in module format into the directory specified. With this flag (--module) the --hcl is ignored and will be generated inside of the module")
 	_ = viper.BindPFlag("module", RootCmd.PersistentFlags().Lookup("module"))
+
+	RootCmd.PersistentFlags().Bool("overwrite", false, "Delete and recreate an existing --module or --hcl output directory without confirmation")
+	_ = viper.BindPFlag("overwrite", RootCmd.PersistentFlags().Lookup("overwrite"))
 
 	RootCmd.PersistentFlags().String("module-variables", "", "Path to a file containing the list of attributes to use as variables when building the module. The format is a JSON/YAML, more information on https://github.com/cycloidio/terracognita#modules")
 	_ = viper.BindPFlag("module-variables", RootCmd.PersistentFlags().Lookup("module-variables"))
